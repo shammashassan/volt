@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
+import { LenisProvider } from "@/components/lenis-provider";
 
 import { SidebarProvider } from "@/components/ui/sidebar"
 
@@ -35,9 +36,11 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <TooltipProvider>
-            <SidebarProvider className="flex flex-col">
-              {children}
-            </SidebarProvider>
+            <LenisProvider>
+              <SidebarProvider className="flex flex-col">
+                {children}
+              </SidebarProvider>
+            </LenisProvider>
           </TooltipProvider>
         </ThemeProvider>
       </body>

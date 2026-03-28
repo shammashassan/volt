@@ -10,7 +10,7 @@ import { SparklesIcon, RocketIcon } from "lucide-react"
 
 export default function Page() {
   // Get a few featured resources for the dashboard
-  const featuredResources = resources.slice(0, 3)
+  const featuredResources = resources.filter(res => res.featured)
 
   return (
     <div className="@container/main flex flex-1 flex-col gap-8 pb-12">

@@ -1,4 +1,4 @@
-[
+export const dashboardData = [
   {
     "id": 1,
     "header": "Initial UI Setup",
@@ -6,7 +6,8 @@
     "status": "Done",
     "target": "100%",
     "limit": "100%",
-    "reviewer": "Eddie Lake"
+    "reviewer": "Eddie Lake",
+    "featured": false
   },
   {
     "id": 2,
@@ -15,7 +16,8 @@
     "status": "Done",
     "target": "95%",
     "limit": "100%",
-    "reviewer": "Jamik Tashpulatov"
+    "reviewer": "Jamik Tashpulatov",
+    "featured": false
   },
   {
     "id": 3,
@@ -24,7 +26,8 @@
     "status": "Done",
     "target": "90%",
     "limit": "100%",
-    "reviewer": "Emily Whalen"
+    "reviewer": "Emily Whalen",
+    "featured": true
   },
   {
     "id": 4,
@@ -33,7 +36,8 @@
     "status": "In Progress",
     "target": "80%",
     "limit": "100%",
-    "reviewer": "Assign reviewer"
+    "reviewer": "Assign reviewer",
+    "featured": true
   },
   {
     "id": 5,
@@ -42,6 +46,7 @@
     "status": "Done",
     "target": "100%",
     "limit": "100%",
-    "reviewer": "Eddie Lake"
+    "reviewer": "Eddie Lake",
+    "featured": false
   }
 ]

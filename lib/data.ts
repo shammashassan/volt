@@ -4,6 +4,7 @@ export interface Resource {
   description: string;
   category: string;
   logo?: string;
+  featured?: boolean;
 }
 
 export interface Category {
@@ -28,16 +29,16 @@ export const categories: Category[] = [
 export const resources: Resource[] = [
   // START
   { name: "Shadcn Blocks", link: "https://www.shadcnblocks.com", description: "Beautifully designed blocks built with Shadcn UI.", category: "start" },
-  { name: "Tailark", link: "https://tailark.com", description: "Tailwind CSS components and templates.", category: "start" },
+  { name: "Tailark", link: "https://tailark.com", description: "Tailwind CSS components and templates.", category: "start", featured: true },
   { name: "LaunchUI", link: "https://www.launchuicomponents.com", description: "Landing page components for React and Tailwind.", category: "start" },
-  { name: "TripleD", link: "https://ui.tripled.work", description: "Curated collection of 3D UI inspiration.", category: "start" },
+  { name: "TripleD", link: "https://ui.tripled.work", description: "Curated collection of 3D UI inspiration.", category: "start", featured: true },
   { name: "Blocks by MVP Subha", link: "https://blocks.mvp-subha.me", description: "Modern UI blocks for rapid development.", category: "start" },
   { name: "SHSF UI", link: "https://shsfui.com", description: "Open-source UI components for startups.", category: "start" },
-  { name: "Skiper UI", link: "https://skiper-ui.com", description: "A library of high-quality web components.", category: "start" },
-  { name: "Efferd", link: "https://efferd.com", description: "Clean and minimal layout inspiration.", category: "start" },
-  { name: "Uilora", link: "https://uilora.com", description: "Premium design resources for developers.", category: "start" },
+  { name: "Skiper UI", link: "https://skiper-ui.com", description: "A library of high-quality web components.", category: "start", featured: true },
+  { name: "Efferd", link: "https://efferd.com", description: "Clean and minimal layout inspiration.", category: "start", featured: true },
+  { name: "Uilora", link: "https://uilora.com", description: "Premium design resources for developers.", category: "start", featured: true },
   { name: "Shadcn Space", link: "https://shadcnspace.com", description: "Community-driven Shadcn UI examples.", category: "start" },
-  { name: "21st.dev", link: "https://21st.dev/home", description: "The marketplace for React components.", category: "start" },
+  { name: "21st.dev", link: "https://21st.dev/home", description: "The marketplace for React components.", category: "start", featured: true },
   { name: "Awwwards", link: "https://www.awwwards.com/", description: "The best web design inspiration in the world.", category: "start" },
 
   // BUILD
