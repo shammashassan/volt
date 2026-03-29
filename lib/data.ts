@@ -23,7 +23,7 @@ export const categories: Category[] = [
   { id: "maps", title: "Maps", icon: "Map", description: "Map Components & Geospatial Tools" },
   { id: "search", title: "Search", icon: "Search", description: "Developer Search Tools & Engines" },
   { id: "audio", title: "Audio", icon: "Volume2", description: "Audio Utilities & Sound Components" },
-  { id: "agents", title: "Agents", icon: "Bot", description: "AI Agent Tools & Skill Libraries" },
+  { id: "agents", title: "AI & Agents", icon: "Bot", description: "AI SDKs, Components & Agent Skills" },
 ];
 
 export const resources: Resource[] = [
@@ -84,7 +84,9 @@ export const resources: Resource[] = [
   // AUDIO
   { name: "SoundCN", link: "https://soundcn.xyz", description: "Audio effects and soundscapes for UI.", category: "audio" },
 
-  // AGENTS
-  { name: "MotionSites", link: "https://motionsites.ai/", description: "AI-powered motion design for websites.", category: "agents" },
-  { name: "TypeUI", link: "https://typeui.sh", description: "Type-safe UI components for AI agents.", category: "agents" },
+  // AI & AGENTS
+  { name: "MotionSites", link: "https://motionsites.ai/", description: "Prompt-based landing page generation.", category: "agents" },
+  { name: "TypeUI", link: "https://typeui.sh", description: "Multi-style UI skills for AI agents.", category: "agents" },
+  { name: "ElevenLabs UI", link: "https://ui.elevenlabs.io/", description: "Open-source agent and audio components.", category: "agents" },
+  { name: "AI SDK", link: "https://ai-sdk.dev/", description: "Unified SDK for building AI applications.", category: "agents" },
 ];
