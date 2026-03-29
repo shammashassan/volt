@@ -64,7 +64,6 @@ export const resources: Resource[] = [
   { name: "Animista", link: "https://animista.net", description: "CSS animations on demand.", category: "enhance" },
   { name: "React Bits", link: "https://reactbits.dev", description: "Animated components and snippets for React.", category: "enhance" },
   { name: "Kokonut UI", link: "https://kokonutui.com", description: "Smooth interactions and effects for websites.", category: "enhance" },
-  { name: "MotionSites", link: "https://motionsites.ai/", description: "AI-powered motion design for websites.", category: "enhance" },
 
   // CUSTOMIZE
   { name: "UIverse", link: "https://uiverse.io", description: "Community-built UI elements for creators.", category: "customize" },
@@ -86,5 +85,6 @@ export const resources: Resource[] = [
   { name: "SoundCN", link: "https://soundcn.xyz", description: "Audio effects and soundscapes for UI.", category: "audio" },
 
   // AGENTS
+  { name: "MotionSites", link: "https://motionsites.ai/", description: "AI-powered motion design for websites.", category: "agents" },
   { name: "TypeUI", link: "https://typeui.sh", description: "Type-safe UI components for AI agents.", category: "agents" },
 ];
