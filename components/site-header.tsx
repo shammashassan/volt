@@ -4,17 +4,19 @@ import { Separator } from "@/components/ui/separator"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import { SearchCommand } from "@/components/search-command"
 import { ModeToggle } from "@/components/mode-toggle"
-import { 
-  Breadcrumb, 
-  BreadcrumbItem, 
-  BreadcrumbLink, 
-  BreadcrumbList, 
-  BreadcrumbPage, 
-  BreadcrumbSeparator 
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator
 } from "@/components/ui/breadcrumb"
 import { usePathname } from "next/navigation"
 import Link from "next/link"
 import { categories } from "@/lib/data"
+import { Button } from "@/components/ui/button"
+import { Home } from "lucide-react"
 
 export function SiteHeader() {
   const pathname = usePathname()
@@ -35,7 +37,8 @@ export function SiteHeader() {
             <BreadcrumbList>
               <BreadcrumbItem>
                 <BreadcrumbLink asChild>
-                  <Link href="/" className="font-semibold text-muted-foreground/60 transition-colors hover:text-foreground">
+                  <Link href="/" className="flex items-center gap-2 text-muted-foreground/60 transition-colors hover:text-foreground">
+                    <Home className="size-4" />
                     Second Brain
                   </Link>
                 </BreadcrumbLink>
@@ -43,7 +46,7 @@ export function SiteHeader() {
               {!isHome && <BreadcrumbSeparator />}
               {!isHome && (
                 <BreadcrumbItem>
-                  <BreadcrumbPage className="font-bold text-foreground">
+                  <BreadcrumbPage className="text-foreground">
                     {category ? category.title : "Category"}
                   </BreadcrumbPage>
                 </BreadcrumbItem>
@@ -51,10 +54,10 @@ export function SiteHeader() {
             </BreadcrumbList>
           </Breadcrumb>
         </div>
-        
-        <div className="flex items-center gap-4">
-          <ModeToggle />
+
+        <div className="flex items-center gap-2 sm:gap-4">
           <SearchCommand />
+          <ModeToggle />
         </div>
       </div>
     </header>

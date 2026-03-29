@@ -8,7 +8,7 @@ import { resources } from "@/lib/data"
 import { Separator } from "@/components/ui/separator"
 import { SparklesIcon, RocketIcon } from "lucide-react"
 
-export default function Page() {
+export default function ExplorePage() {
   // Get a few featured resources for the dashboard
   const featuredResources = resources.filter(res => res.featured)
 

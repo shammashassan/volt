@@ -36,6 +36,8 @@ import {
 } from "@/components/ui/sidebar"
 import Link from "next/link"
 import { categories } from "@/lib/data"
+import { usePathname } from "next/navigation"
+import { LayoutGrid } from "lucide-react"
 
 const ICON_MAP: Record<string, any> = {
   Rocket: Rocket,
@@ -87,17 +89,28 @@ const data = {
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const pathname = usePathname()
+  
   // Map our Second Brain categories to the NavMain format
-  const navMainItems = categories.map(category => ({
-    title: category.title,
-    url: `/category/${category.id}`,
-    icon: ICON_MAP[category.icon] || BookOpen,
-    isActive: false,
-  }))
+  const navMainItems = [
+    {
+      title: "Explore",
+      url: "/explore",
+      icon: LayoutGrid,
+      isActive: pathname === "/explore",
+    },
+    ...categories.map(category => ({
+      title: category.title,
+      url: `/category/${category.id}`,
+      icon: ICON_MAP[category.icon] || BookOpen,
+      isActive: pathname === `/category/${category.id}`,
+    }))
+  ]
 
   return (
     <Sidebar
       variant="inset"
+      collapsible="icon"
       className="top-(--header-height) h-[calc(100svh-var(--header-height))]!"
       {...props}
     >

@@ -5,8 +5,6 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { LenisProvider } from "@/components/lenis-provider";
 
-import { SidebarProvider } from "@/components/ui/sidebar"
-
 const inter = Inter({
   variable: "--font-sans",
   subsets: ["latin"],
@@ -36,11 +34,9 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <TooltipProvider>
-            <LenisProvider>
-              <SidebarProvider className="flex flex-col">
-                {children}
-              </SidebarProvider>
-            </LenisProvider>
+            {/* <LenisProvider> */}
+            {children}
+            {/* </LenisProvider> */}
           </TooltipProvider>
         </ThemeProvider>
       </body>

@@ -51,7 +51,7 @@ export function DashboardStats() {
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 px-4 lg:px-6">
       {stats.map((stat) => (
-        <Card key={stat.title} className="border-border/40 bg-card/40 backdrop-blur-sm transition-all hover:border-primary/20">
+        <Card key={stat.title} className="border-border/40 bg-card/40 backdrop-blur-sm transition-[border-color,box-shadow,background-color] hover:border-primary/20 hover:shadow-lg hover:shadow-primary/5">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground/80 lowercase italic">
               {stat.title}

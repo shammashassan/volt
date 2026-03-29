@@ -38,7 +38,7 @@ export function CategoryExplorer() {
         
         return (
           <Link key={category.id} href={`/category/${category.id}`} className="group block">
-            <Card className="h-full border-border/40 bg-card/40 backdrop-blur-sm transition-all duration-300 group-hover:border-primary/30 group-hover:bg-card group-hover:shadow-2xl group-hover:shadow-primary/5">
+            <Card className="h-full border-border/40 bg-card/40 backdrop-blur-sm transition-[border-color,background-color,shadow] duration-300 group-hover:border-primary/30 group-hover:bg-card group-hover:shadow-2xl group-hover:shadow-primary/5">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/5 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
                   <Icon className="size-5" />
