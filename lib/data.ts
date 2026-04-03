@@ -56,6 +56,9 @@ export const resources: Resource[] = [
   { name: "Pixel Perfect", link: "https://www.pixel-perfect.space/", description: "Detailed design systems and kits.", category: "build" },
   { name: "Chanh Dai UI", link: "https://chanhdai.com", description: "Elegant and minimal UI components.", category: "build" },
   { name: "Scificn UI", link: "https://scificn.dev", description: "Futuristic and high-tech design patterns.", category: "build" },
+  { name: "VengeanceUI", link: "https://www.vengenceui.com", description: "Premium React components for building stunning interfaces.", category: "build" },
+  { name: "Wigggle UI", link: "https://wigggle-ui.vercel.app/", description: "A collection of 80+ copy-and-paste widgets.", category: "build" },
+  { name: "Cardcn", link: "https://cardcn.dev/", description: "A collection of beautiful Shadcn Card components.", category: "build" },
 
   // ENHANCE
   { name: "Motion Primitives", link: "https://motion-primitives.com/docs", description: "Build beautiful animations with Framer Motion.", category: "enhance" },
@@ -64,6 +67,7 @@ export const resources: Resource[] = [
   { name: "Animista", link: "https://animista.net", description: "CSS animations on demand.", category: "enhance" },
   { name: "React Bits", link: "https://reactbits.dev", description: "Animated components and snippets for React.", category: "enhance" },
   { name: "Kokonut UI", link: "https://kokonutui.com", description: "Smooth interactions and effects for websites.", category: "enhance" },
+  { name: "Kine UI", link: "https://kine-ui.vercel.app/", description: "Spatial computing and hand gesture components for React.", category: "enhance" },
 
   // CUSTOMIZE
   { name: "UIverse", link: "https://uiverse.io", description: "Community-built UI elements for creators.", category: "customize" },
