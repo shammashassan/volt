@@ -39,6 +39,7 @@ export const resources: Resource[] = [
   { name: "Uilora", link: "https://uilora.com", description: "Premium design resources for developers.", category: "start", featured: true },
   { name: "Shadcn Space", link: "https://shadcnspace.com", description: "Community-driven Shadcn UI examples.", category: "start" },
   { name: "21st.dev", link: "https://21st.dev/home", description: "The marketplace for React components.", category: "start", featured: true },
+  { name: "Shadcn UI Blocks", link: "https://www.shadcnui-blocks.com/", description: "Responsive, pre-built UI sections (blocks) for the Shadcn ecosystem.", category: "start" },
   { name: "Awwwards", link: "https://www.awwwards.com/", description: "The best web design inspiration in the world.", category: "start" },
 
   // BUILD
@@ -59,6 +60,10 @@ export const resources: Resource[] = [
   { name: "VengeanceUI", link: "https://www.vengenceui.com", description: "Premium React components for building stunning interfaces.", category: "build" },
   { name: "Wigggle UI", link: "https://wigggle-ui.vercel.app/", description: "A collection of 80+ copy-and-paste widgets.", category: "build" },
   { name: "Cardcn", link: "https://cardcn.dev/", description: "A collection of beautiful Shadcn Card components.", category: "build" },
+  { name: "Commercn", link: "https://commercn.com/", description: "Pre-built UI blocks specifically designed for e-commerce.", category: "build" },
+  { name: "Creative Tim", link: "https://www.creative-tim.com/", description: "Premium UI kits, dashboard templates, and design systems.", category: "build" },
+  { name: "HextaUI", link: "https://www.hextaui.com/", description: "Refined and modern component library extending Shadcn UI.", category: "build" },
+  { name: "PaceKit UI", link: "https://ui.pacekit.dev/", description: "Production-ready dashboard blocks and components.", category: "build" },
 
   // ENHANCE
   { name: "Motion Primitives", link: "https://motion-primitives.com/docs", description: "Build beautiful animations with Framer Motion.", category: "enhance" },
@@ -68,6 +73,9 @@ export const resources: Resource[] = [
   { name: "React Bits", link: "https://reactbits.dev", description: "Animated components and snippets for React.", category: "enhance" },
   { name: "Kokonut UI", link: "https://kokonutui.com", description: "Smooth interactions and effects for websites.", category: "enhance" },
   { name: "Kine UI", link: "https://kine-ui.vercel.app/", description: "Spatial computing and hand gesture components for React.", category: "enhance" },
+  { name: "Chamaac", link: "https://www.chamaac.com/", description: "Interactive shaders and high-performance visual components.", category: "enhance" },
+  { name: "ScrollX UI", link: "https://scrollxui.dev/", description: "Animated scroll-driven interactions for React apps.", category: "enhance" },
+  { name: "Componentry", link: "https://www.componentry.fun/", description: "Animated copy-paste components with Framer Motion.", category: "enhance" },
 
   // CUSTOMIZE
   { name: "UIverse", link: "https://uiverse.io", description: "Community-built UI elements for creators.", category: "customize" },
