@@ -48,7 +48,7 @@ export const resources: Resource[] = [
   // BUILD
   { name: "ShadCN UI", link: "https://ui.shadcn.com", description: "The gold standard for modern component libraries.", category: "build" },
   { name: "ShadCN Extensions", link: "https://shadcn-extension.vercel.app", description: "Extra components for Shadcn UI.", category: "build" },
-  { name: "Origin UI", link: "https://originui.com", description: "A collection of high-end UI components.", category: "build" },
+  { name: "Coss", link: "https://coss.com/origin", description: "A collection of high-end UI components.", category: "build" },
   { name: "Kibo UI", link: "https://kibo-ui.com", description: "Standardized component library for React.", category: "build" },
   { name: "Rigid UI", link: "https://rigidui.com", description: "Strongly typed and accessible components.", category: "build" },
   { name: "Aceternity UI", link: "https://ui.aceternity.com", description: "Copy-paste complex animations and components.", category: "build" },
