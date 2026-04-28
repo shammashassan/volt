@@ -99,6 +99,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       icon: LayoutGrid,
       isActive: pathname === "/explore",
     },
+    {
+      title: "CLI Commands",
+      url: "/commands",
+      icon: SquareTerminal,
+      isActive: pathname === "/commands",
+    },
     ...categories.map(category => ({
       title: category.title,
       url: `/category/${category.id}`,

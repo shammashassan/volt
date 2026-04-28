@@ -6,8 +6,9 @@ import { Resource } from "@/lib/data"
 import { cn } from "@/lib/utils"
 
 export const ResourceCard = React.memo(function ResourceCard({ resource }: { resource: Resource }) {
-  const previewUrl = `https://api.microlink.io/?url=${encodeURIComponent(resource.link)}&screenshot=true&meta=false&embed=screenshot.url`
-
+  // Use WordPress mshots as primary with unoptimized={true} to avoid Next.js proxy timeouts
+  const previewUrl = `https://s0.wp.com/mshots/v1/${encodeURIComponent(resource.link)}?w=600&h=400`
+  
   const [imgSrc, setImgSrc] = React.useState(previewUrl)
   const [isLoading, setIsLoading] = React.useState(true)
   const [hasError, setHasError] = React.useState(false)
@@ -38,16 +39,17 @@ export const ResourceCard = React.memo(function ResourceCard({ resource }: { res
             onLoad={() => setIsLoading(false)}
             onError={() => {
               if (!hasError) {
-                // If Microlink fails, try WordPress mshots as a secondary fallback
+                // If WordPress fails, try Microlink as a secondary fallback
                 setHasError(true)
-                setImgSrc(`https://s0.wp.com/mshots/v1/${encodeURIComponent(resource.link)}?w=600&h=400`)
+                setImgSrc(`https://api.microlink.io/?url=${encodeURIComponent(resource.link)}&screenshot=true&meta=false&embed=screenshot.url`)
               } else {
                 // If both fail, use the branded placeholder
                 setImgSrc(`https://avatar.vercel.sh/${resource.name}?size=400&text=${resource.name.substring(0, 2)}`)
                 setIsLoading(false)
               }
             }}
-            unoptimized={resource.link.includes('github.com')} 
+            unoptimized={true}
+            loading="lazy"
           />
           {/* Hover Overlay */}
           <div className="absolute inset-0 flex items-center justify-center bg-background/20 opacity-0 transition-opacity duration-300 group-hover:opacity-100">

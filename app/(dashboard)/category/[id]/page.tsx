@@ -58,10 +58,10 @@ export default function CategoryPage() {
               <Icon className="size-6" />
             </div>
             <div className="flex items-center gap-2">
-              <h1 className="text-3xl font-black tracking-tight md:text-4xl text-foreground">
+              <h1 className="text-3xl font-black tracking-tight md:text-4xl bg-clip-text text-transparent bg-linear-to-r from-foreground to-foreground/60">
                 {category.title}
               </h1>
-              <Badge variant="outline" className="h-6 px-2 text-[10px] uppercase tracking-tighter font-bold opacity-60">
+              <Badge variant="outline" className="h-6 rounded-full border-primary/20 bg-primary/5 text-primary text-[10px] uppercase font-bold tracking-widest px-2.5">
                 {categoryResources.length} Resources
               </Badge>
             </div>
