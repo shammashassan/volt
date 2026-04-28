@@ -7,12 +7,16 @@ interface BentoGridProps {
   className?: string
 }
 
+import Link from "next/link"
+
 interface BentoCardProps {
-  children: React.ReactNode
+  children?: React.ReactNode
   className?: string
   title?: string
   description?: string
   icon?: React.ReactNode
+  image?: string
+  href?: string
 }
 
 export const BentoGrid = ({ children, className }: BentoGridProps) => {
@@ -23,13 +27,13 @@ export const BentoGrid = ({ children, className }: BentoGridProps) => {
   )
 }
 
-export const BentoCard = ({ children, className, title, description, icon }: BentoCardProps) => {
-  return (
+export const BentoCard = ({ children, className, title, description, icon, image, href }: BentoCardProps) => {
+  const CardContent = (
     <motion.div
       whileHover={{ y: -5 }}
       transition={{ duration: 0.2 }}
       className={cn(
-        "group relative flex flex-col justify-between overflow-hidden rounded-3xl border bg-background p-6 shadow-sm transition-[box-shadow,background-color,border-color,transform] hover:shadow-md",
+        "group relative flex h-full flex-col justify-between overflow-hidden rounded-3xl border bg-background p-6 shadow-sm transition-[box-shadow,background-color,border-color,transform] hover:shadow-md cursor-pointer",
         className
       )}
     >
@@ -46,8 +50,30 @@ export const BentoCard = ({ children, className, title, description, icon }: Ben
       <div className="pointer-events-none absolute inset-0 z-0 transition-opacity duration-300 group-hover:opacity-100" />
       
       <div className="relative z-10 mt-4 h-full w-full overflow-hidden rounded-2xl border bg-muted/50 transition-[background-color,border-color] duration-300 group-hover:bg-muted/80">
-        {children}
+        {image && (
+          <>
+            <img 
+              src={image} 
+              alt={title} 
+              className="absolute inset-0 h-full w-full object-cover opacity-50 transition-all duration-500 group-hover:scale-110 group-hover:opacity-80"
+            />
+            <div className="absolute inset-0 bg-linear-to-t from-background/80 via-transparent to-transparent opacity-60" />
+          </>
+        )}
+        <div className="relative h-full w-full p-4">
+          {children}
+        </div>
       </div>
     </motion.div>
   )
+
+  if (href) {
+    return (
+      <Link href={href} className={cn("block", className)}>
+        {CardContent}
+      </Link>
+    )
+  }
+
+  return CardContent
 }

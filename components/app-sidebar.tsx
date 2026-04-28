@@ -51,46 +51,46 @@ const ICON_MAP: Record<string, any> = {
   Bot: Bot,
 }
 
-const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-  navSecondary: [
-    {
-      title: "Support",
-      url: "#",
-      icon: LifeBuoy,
-    },
-    {
-      title: "Feedback",
-      url: "#",
-      icon: Send,
-    },
-  ],
-  projects: [
-    {
-      name: "Design Engineering",
-      url: "/category/build",
-      icon: Frame,
-    },
-    {
-      name: "Sales & Marketing",
-      url: "/category/start",
-      icon: PieChart,
-    },
-    {
-      name: "Travel",
-      url: "/category/maps",
-      icon: Map,
-    },
-  ],
-}
+// const data = {
+//   user: {
+//     name: "shadcn",
+//     email: "m@example.com",
+//     avatar: "/avatars/shadcn.jpg",
+//   },
+//   navSecondary: [
+//     {
+//       title: "Support",
+//       url: "#",
+//       icon: LifeBuoy,
+//     },
+//     {
+//       title: "Feedback",
+//       url: "#",
+//       icon: Send,
+//     },
+//   ],
+//   projects: [
+//     {
+//       name: "Design Engineering",
+//       url: "/category/build",
+//       icon: Frame,
+//     },
+//     {
+//       name: "Sales & Marketing",
+//       url: "/category/start",
+//       icon: PieChart,
+//     },
+//     {
+//       name: "Travel",
+//       url: "/category/maps",
+//       icon: Map,
+//     },
+//   ],
+// }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname()
-  
+
   // Map our Second Brain categories to the NavMain format
   const navMainItems = [
     {
@@ -133,12 +133,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={navMainItems} />
-        <NavProjects projects={data.projects} />
-        <NavSecondary items={data.navSecondary} className="mt-auto" />
+        {/* <NavProjects projects={data.projects} />
+        <NavSecondary items={data.navSecondary} className="mt-auto" /> */}
       </SidebarContent>
-      <SidebarFooter>
+      {/* <SidebarFooter>
         <NavUser user={data.user} />
-      </SidebarFooter>
+      </SidebarFooter> */}
     </Sidebar>
   )
 }

@@ -6,19 +6,19 @@ import Link from 'next/link'
 import { HeroHeader } from '@/components/header'
 import { BentoGrid, BentoCard } from '@/components/bento-grid'
 import { categories } from '@/lib/data'
-import { 
-  Rocket, 
-  Component, 
-  Zap, 
-  Wrench, 
-  Palette, 
-  Map as MapIcon, 
-  Search, 
-  Volume2, 
+import {
+  Rocket,
+  Component,
+  Zap,
+  Wrench,
+  Palette,
+  Map as MapIcon,
+  Search,
+  Volume2,
   Bot,
   ArrowRight,
   Globe,
-  CheckCircle 
+  CheckCircle
 } from 'lucide-react'
 
 // Custom GitHub Icon SVG as it's missing from the local lucide version
@@ -74,7 +74,7 @@ export default function LandingPage() {
   return (
     <div className="relative min-h-screen bg-background selection:bg-primary/30">
       <HeroHeader />
-      
+
       {/* Hero Section */}
       <section className="relative flex min-h-[90vh] flex-col items-center justify-center px-6 pt-20 text-center lg:px-12">
         <div className="relative z-10 mx-auto max-w-4xl">
@@ -127,7 +127,7 @@ export default function LandingPage() {
             </motion.div>
           </motion.div>
         </div>
-        
+
         {/* Subtle Background Decoration */}
         <div className="absolute inset-0 -z-10 overflow-hidden">
           <div className="absolute left-1/2 top-0 h-[800px] w-[800px] -translate-x-1/2 rounded-full bg-primary/5 blur-[80px]" />
@@ -148,22 +148,20 @@ export default function LandingPage() {
         </div>
 
         <BentoGrid>
-          {categories.slice(0, 6).map((cat, idx) => (
+          {categories.map((cat, idx) => (
             <BentoCard
               key={cat.id}
               title={cat.title}
               description={cat.description}
               icon={ICON_MAP[cat.icon as keyof typeof ICON_MAP]}
-              className={idx === 0 || idx === 3 ? "md:col-span-2" : "md:col-span-1"}
-            >
-              <div className="flex h-full flex-col justify-center p-6 mt-8">
-                <div className="flex flex-1 w-full items-center justify-center rounded-2xl bg-white dark:bg-black border border-border/50 shadow-sm transition-transform duration-500 group-hover:scale-[1.02]">
-                   {React.cloneElement(ICON_MAP[cat.icon as keyof typeof ICON_MAP] as React.ReactElement<{ className?: string }>, { 
-                     className: "size-20 stroke-[1] text-black dark:text-white opacity-80" 
-                   })}
-                </div>
-              </div>
-            </BentoCard>
+              image={cat.image}
+              href={`/category/${cat.id}`}
+              className={
+                [0, 3, 7].includes(idx)
+                  ? "md:col-span-2"
+                  : "md:col-span-1"
+              }
+            />
           ))}
         </BentoGrid>
       </section>

@@ -12,18 +12,19 @@ export interface Category {
   title: string;
   icon: string;
   description: string;
+  image: string;
 }
 
 export const categories: Category[] = [
-  { id: "start", title: "Start", icon: "Rocket", description: "UI Blocks, Layout Inspiration & Design Showcases" },
-  { id: "build", title: "Build", icon: "Component", description: "Reusable UI Components & Design Systems" },
-  { id: "enhance", title: "Enhance", icon: "Zap", description: "Animations, Interactions & Effects" },
-  { id: "customize", title: "Customize", icon: "Wrench", description: "Visual Generators & CSS Tools" },
-  { id: "polish", title: "Polish", icon: "Palette", description: "Icon Libraries & Visual Polish" },
-  { id: "maps", title: "Maps", icon: "Map", description: "Map Components & Geospatial Tools" },
-  { id: "search", title: "Search", icon: "Search", description: "Developer Search Tools & Engines" },
-  { id: "audio", title: "Audio", icon: "Volume2", description: "Audio Utilities & Sound Components" },
-  { id: "agents", title: "AI & Agents", icon: "Bot", description: "AI SDKs, Components & Agent Skills" },
+  { id: "start", title: "Start", icon: "Rocket", description: "UI Blocks, Layout Inspiration & Design Showcases", image: "/images/categories/start.png" },
+  { id: "build", title: "Build", icon: "Component", description: "Reusable UI Components & Design Systems", image: "/images/categories/build.png" },
+  { id: "enhance", title: "Enhance", icon: "Zap", description: "Animations, Interactions & Effects", image: "/images/categories/enhance.png" },
+  { id: "customize", title: "Customize", icon: "Wrench", description: "Visual Generators & CSS Tools", image: "/images/categories/customize.png" },
+  { id: "polish", title: "Polish", icon: "Palette", description: "Icon Libraries & Visual Polish", image: "/images/categories/polish.png" },
+  { id: "maps", title: "Maps", icon: "Map", description: "Map Components & Geospatial Tools", image: "/images/categories/maps.png" },
+  { id: "search", title: "Search", icon: "Search", description: "Developer Search Tools & Engines", image: "/images/categories/search.png" },
+  { id: "audio", title: "Audio", icon: "Volume2", description: "Audio Utilities & Sound Components", image: "/images/categories/audio.png" },
+  { id: "agents", title: "AI & Agents", icon: "Bot", description: "AI SDKs, Components & Agent Skills", image: "/images/categories/agents.png" },
 ];
 
 export const resources: Resource[] = [
@@ -35,12 +36,14 @@ export const resources: Resource[] = [
   { name: "Blocks by MVP Subha", link: "https://blocks.mvp-subha.me", description: "Modern UI blocks for rapid development.", category: "start" },
   { name: "SHSF UI", link: "https://shsfui.com", description: "Open-source UI components for startups.", category: "start" },
   { name: "Skiper UI", link: "https://skiper-ui.com", description: "A library of high-quality web components.", category: "start", featured: true },
+  { name: "unlumen UI", link: "https://ui.unlumen.com/", description: "Beautifully designed React components built with TypeScript, Tailwind CSS and Motion.", category: "start", featured: true },
   { name: "Efferd", link: "https://efferd.com", description: "Clean and minimal layout inspiration.", category: "start", featured: true },
   { name: "Uilora", link: "https://uilora.com", description: "Premium design resources for developers.", category: "start", featured: true },
   { name: "Shadcn Space", link: "https://shadcnspace.com", description: "Community-driven Shadcn UI examples.", category: "start" },
   { name: "21st.dev", link: "https://21st.dev/home", description: "The marketplace for React components.", category: "start", featured: true },
   { name: "Shadcn UI Blocks", link: "https://www.shadcnui-blocks.com/", description: "Responsive, pre-built UI sections (blocks) for the Shadcn ecosystem.", category: "start" },
   { name: "Awwwards", link: "https://www.awwwards.com/", description: "The best web design inspiration in the world.", category: "start" },
+  { name: "Ali Imam", link: "https://aliimam.in/", description: "Modern UI components, templates, and design resources for React and Next.js.", category: "start" },
 
   // BUILD
   { name: "ShadCN UI", link: "https://ui.shadcn.com", description: "The gold standard for modern component libraries.", category: "build" },
@@ -61,6 +64,7 @@ export const resources: Resource[] = [
   { name: "Wigggle UI", link: "https://wigggle-ui.vercel.app/", description: "A collection of 80+ copy-and-paste widgets.", category: "build" },
   { name: "Cardcn", link: "https://cardcn.dev/", description: "A collection of beautiful Shadcn Card components.", category: "build" },
   { name: "Commercn", link: "https://commercn.com/", description: "Pre-built UI blocks specifically designed for e-commerce.", category: "build" },
+  { name: "8StarLabs UI", link: "https://ui.8starlabs.com/", description: "Niche, high-utility UI elements and component library for modern web apps.", category: "build" },
   { name: "Creative Tim", link: "https://www.creative-tim.com/", description: "Premium UI kits, dashboard templates, and design systems.", category: "build" },
   { name: "HextaUI", link: "https://www.hextaui.com/", description: "Refined and modern component library extending Shadcn UI.", category: "build" },
   { name: "PaceKit UI", link: "https://ui.pacekit.dev/", description: "Production-ready dashboard blocks and components.", category: "build" },
@@ -76,6 +80,7 @@ export const resources: Resource[] = [
   { name: "Chamaac", link: "https://www.chamaac.com/", description: "Interactive shaders and high-performance visual components.", category: "enhance" },
   { name: "ScrollX UI", link: "https://scrollxui.dev/", description: "Animated scroll-driven interactions for React apps.", category: "enhance" },
   { name: "Componentry", link: "https://www.componentry.fun/", description: "Animated copy-paste components with Framer Motion.", category: "enhance" },
+  { name: "AI Canvas", link: "https://aicanvas.me/", description: "AI-native animated React components with AI reproduction prompts.", category: "enhance" },
 
   // CUSTOMIZE
   { name: "UIverse", link: "https://uiverse.io", description: "Community-built UI elements for creators.", category: "customize" },
@@ -89,6 +94,7 @@ export const resources: Resource[] = [
 
   // MAPS
   { name: "MapCN", link: "https://www.mapcn.dev", description: "Elegant map components for React.", category: "maps" },
+  { name: "FlightCN", link: "https://flightcn.yencheng.dev/", description: "Flight route and satellite orbit components for MapLibre and mapcn.", category: "maps" },
 
   // SEARCH
   { name: "Shoogle", link: "https://shoogle.dev", description: "Search engine for developers.", category: "search" },
