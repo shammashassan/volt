@@ -42,7 +42,7 @@ export const BentoCard = ({ children, className, title, description, icon, image
         <h3 className="text-xl font-bold text-foreground">
           {title}
         </h3>
-        <p className="max-w-full text-sm text-muted-foreground">
+        <p className="max-w-full line-clamp-2 text-sm text-muted-foreground">
           {description}
         </p>
       </div>

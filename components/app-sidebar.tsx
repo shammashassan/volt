@@ -5,12 +5,6 @@ import {
   BookOpen,
   Bot,
   Command,
-  Frame,
-  LifeBuoy,
-  Map,
-  PieChart,
-  Send,
-  Settings2,
   SquareTerminal,
   Zap,
   Rocket,
@@ -19,11 +13,12 @@ import {
   Palette,
   Search,
   Volume2,
+  UsersIcon,
+  LibraryIcon,
+  LayoutGrid
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
-import { NavProjects } from "@/components/nav-projects"
-import { NavSecondary } from "@/components/nav-secondary"
 import { NavUser } from "@/components/nav-user"
 import {
   Sidebar,
@@ -37,7 +32,7 @@ import {
 import Link from "next/link"
 import { categories } from "@/lib/data"
 import { usePathname } from "next/navigation"
-import { LayoutGrid } from "lucide-react"
+import { authClient } from "@/lib/auth-client"
 
 const ICON_MAP: Record<string, any> = {
   Rocket: Rocket,
@@ -45,53 +40,18 @@ const ICON_MAP: Record<string, any> = {
   Zap: Zap,
   Wrench: Wrench,
   Palette: Palette,
-  Map: Map,
   Search: Search,
   Volume2: Volume2,
   Bot: Bot,
 }
 
-// const data = {
-//   user: {
-//     name: "shadcn",
-//     email: "m@example.com",
-//     avatar: "/avatars/shadcn.jpg",
-//   },
-//   navSecondary: [
-//     {
-//       title: "Support",
-//       url: "#",
-//       icon: LifeBuoy,
-//     },
-//     {
-//       title: "Feedback",
-//       url: "#",
-//       icon: Send,
-//     },
-//   ],
-//   projects: [
-//     {
-//       name: "Design Engineering",
-//       url: "/category/build",
-//       icon: Frame,
-//     },
-//     {
-//       name: "Sales & Marketing",
-//       url: "/category/start",
-//       icon: PieChart,
-//     },
-//     {
-//       name: "Travel",
-//       url: "/category/maps",
-//       icon: Map,
-//     },
-//   ],
-// }
-
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname()
+  const { data: session } = authClient.useSession()
+  
+  const user = session?.user as any
+  const isAdmin = user?.role === "admin"
 
-  // Map our Second Brain categories to the NavMain format
   const navMainItems = [
     {
       title: "Explore",
@@ -105,13 +65,31 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       icon: SquareTerminal,
       isActive: pathname === "/commands",
     },
-    ...categories.map(category => ({
-      title: category.title,
-      url: `/category/${category.id}`,
-      icon: ICON_MAP[category.icon] || BookOpen,
-      isActive: pathname === `/category/${category.id}`,
-    }))
   ]
+
+  if (isAdmin) {
+    navMainItems.push(
+      {
+        title: "Manage Resources",
+        url: "/resources",
+        icon: LibraryIcon,
+        isActive: pathname === "/resources",
+      },
+      {
+        title: "Manage Users",
+        url: "/users",
+        icon: UsersIcon,
+        isActive: pathname === "/users",
+      }
+    )
+  }
+
+  const categoryItems = categories.map(category => ({
+    title: category.title,
+    url: `/category/${category.id}`,
+    icon: ICON_MAP[category.icon] || BookOpen,
+    isActive: pathname === `/category/${category.id}`,
+  }))
 
   return (
     <Sidebar
@@ -138,13 +116,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={navMainItems} />
-        {/* <NavProjects projects={data.projects} />
-        <NavSecondary items={data.navSecondary} className="mt-auto" /> */}
+        <NavMain items={navMainItems} label="Platform" />
+        <NavMain items={categoryItems} label="Categories" />
       </SidebarContent>
-      {/* <SidebarFooter>
-        <NavUser user={data.user} />
-      </SidebarFooter> */}
+      <SidebarFooter>
+        <NavUser />
+      </SidebarFooter>
     </Sidebar>
   )
 }

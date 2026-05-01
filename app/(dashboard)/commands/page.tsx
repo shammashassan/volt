@@ -116,74 +116,74 @@ export default function CommandsPage() {
     <div className="flex flex-1 flex-col @container/main">
       <div className="flex flex-col gap-4 px-4 py-8 md:gap-8 md:px-8">
         <div className="flex flex-col gap-2">
-        <div className="flex items-center gap-4 mb-2">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
-            <SquareTerminal className="size-6" />
-          </div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-4xl font-black tracking-tight bg-clip-text text-transparent bg-linear-to-r from-foreground to-foreground/60">
-              CLI Commands
-            </h1>
-            <Badge variant="outline" className="h-6 rounded-full border-primary/20 bg-primary/5 text-primary text-[10px] uppercase font-bold tracking-widest px-2.5">
-              Tools
-            </Badge>
-          </div>
-        </div>
-        <p className="text-lg text-muted-foreground max-w-2xl font-medium">
-          A curated collection of the most frequently used CLI snippets to speed up your development workflow.
-        </p>
-      </div>
-
-      <Separator className="mb-12 opacity-50" />
-
-      <div className="grid gap-12">
-        {commandGroups.map((group) => (
-          <section key={group.title} className="flex flex-col gap-6">
-            <div className="flex items-center gap-3">
-              <div className="flex size-10 items-center justify-center rounded-xl bg-muted/50 border border-border/40 shadow-sm">
-                {group.icon}
-              </div>
-              <div>
-                <h2 className="text-xl font-bold tracking-tight">{group.title}</h2>
-                <p className="text-sm text-muted-foreground">{group.description}</p>
-              </div>
+          <div className="flex items-center gap-4 mb-2">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
+              <SquareTerminal className="size-6" />
             </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {group.commands.map((cmd) => (
-                <div key={cmd.name} className="flex flex-col gap-3 group">
-                  <div className="flex flex-col gap-1">
-                    <h3 className="text-sm font-semibold text-foreground/80 group-hover:text-primary transition-colors">
-                      {cmd.name}
-                    </h3>
-                    <p className="text-xs text-muted-foreground/70 leading-relaxed">
-                      {cmd.description}
-                    </p>
-                  </div>
-                  <CodeBlock
-                    code={cmd.code}
-                    tabs={cmd.tabs}
-                    language={cmd.language}
-                    className="shadow-sm border-border/30 group-hover:border-primary/20 transition-all"
-                  />
-                </div>
-              ))}
+            <div className="flex items-center gap-2">
+              <h1 className="text-3xl font-black tracking-tight md:text-4xl bg-clip-text text-transparent bg-linear-to-r from-foreground to-foreground/60">
+                CLI Commands
+              </h1>
+              <Badge variant="outline" className="h-6 rounded-full border-primary/20 bg-primary/5 text-primary text-[10px] uppercase font-bold tracking-widest px-2.5">
+                {commandGroups.length} Groups
+              </Badge>
             </div>
-          </section>
-        ))}
-      </div>
-
-      <div className="mt-20 p-8 rounded-3xl bg-primary/5 border border-primary/10 flex flex-col items-center text-center gap-4">
-        <div className="size-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
-          <Zap className="size-6 fill-current" />
-        </div>
-        <div className="space-y-1">
-          <h3 className="text-xl font-bold">Need more?</h3>
-          <p className="text-muted-foreground max-w-md">
-            Check back later for more categorized commands. We're constantly updating this list.
+          </div>
+          <p className="text-lg text-muted-foreground/80 max-w-2xl font-medium">
+            Essential CLI snippets to speed up your development workflow.
           </p>
         </div>
-      </div>
+
+        <Separator className="opacity-40" />
+
+        <div className="grid gap-12">
+          {commandGroups.map((group) => (
+            <section key={group.title} className="flex flex-col gap-6">
+              <div className="flex items-center gap-3">
+                <div className="flex size-10 items-center justify-center rounded-xl bg-muted/50 border border-border/40 shadow-sm">
+                  {group.icon}
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold tracking-tight">{group.title}</h2>
+                  <p className="text-sm text-muted-foreground">{group.description}</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {group.commands.map((cmd) => (
+                  <div key={cmd.name} className="flex flex-col gap-3 group">
+                    <div className="flex flex-col gap-1">
+                      <h3 className="text-sm font-semibold text-foreground/80 group-hover:text-primary transition-colors">
+                        {cmd.name}
+                      </h3>
+                      <p className="text-xs text-muted-foreground/70 leading-relaxed">
+                        {cmd.description}
+                      </p>
+                    </div>
+                    <CodeBlock
+                      code={cmd.code}
+                      tabs={cmd.tabs}
+                      language={cmd.language}
+                      className="shadow-sm border-border/30 group-hover:border-primary/20 transition-all"
+                    />
+                  </div>
+                ))}
+              </div>
+            </section>
+          ))}
+        </div>
+
+        <div className="mt-20 p-8 rounded-3xl bg-primary/5 border border-primary/10 flex flex-col items-center text-center gap-4">
+          <div className="size-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+            <Zap className="size-6 fill-current" />
+          </div>
+          <div className="space-y-1">
+            <h3 className="text-xl font-bold">Need more?</h3>
+            <p className="text-muted-foreground max-w-md">
+              Check back later for more categorized commands. We're constantly updating this list.
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   )

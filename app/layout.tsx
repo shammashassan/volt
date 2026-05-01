@@ -15,6 +15,8 @@ export const metadata: Metadata = {
   description: "A professional developer resource hub for UI and Frontend tools.",
 };
 
+import { Toaster } from "@/components/ui/sonner"
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -37,6 +39,7 @@ export default function RootLayout({
             {/* <LenisProvider> */}
             {children}
             {/* </LenisProvider> */}
+            <Toaster position="top-right" />
           </TooltipProvider>
         </ThemeProvider>
       </body>

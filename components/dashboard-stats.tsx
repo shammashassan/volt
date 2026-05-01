@@ -1,7 +1,6 @@
-"use client"
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { categories, resources } from "@/lib/data"
+import { categories } from "@/lib/data"
+import { getResources } from "@/lib/db"
 import {
   ZapIcon,
   LayersIcon,
@@ -9,7 +8,8 @@ import {
   ActivityIcon
 } from "lucide-react"
 
-export function DashboardStats() {
+export async function DashboardStats() {
+  const resources = await getResources()
   const totalResources = resources.length
   const totalCategories = categories.length
 

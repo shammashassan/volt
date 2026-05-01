@@ -93,7 +93,7 @@ export default function LandingPage() {
             </motion.div>
 
             <motion.div variants={VARIANTS_ITEM}>
-              <h1 className="text-5xl font-bold tracking-tight sm:text-7xl lg:text-9xl">
+              <h1 className="text-4xl font-bold tracking-tight sm:text-6xl lg:text-8xl">
                 The UI Dev
                 <br />
                 <span className="bg-linear-to-r from-primary to-primary/40 bg-clip-text text-transparent">
@@ -193,17 +193,17 @@ export default function LandingPage() {
                 ))}
               </div>
             </div>
-            <div className="relative aspect-square rounded-[2rem] border bg-background p-4 shadow-2xl lg:p-8 overflow-hidden group">
+            <div className="relative aspect-auto lg:aspect-square rounded-[2.5rem] border bg-background p-6 shadow-2xl lg:p-10 overflow-hidden group">
               <div className="absolute inset-0 bg-linear-to-tr from-primary/5 to-transparent" />
-              <div className="relative flex h-full flex-col justify-center gap-6 z-10">
+              <div className="relative flex flex-col justify-center gap-4 sm:gap-6 z-10 lg:h-full">
                 {categories.slice(0, 4).map((cat) => (
-                  <div key={cat.id} className="flex items-center gap-4 rounded-2xl border bg-muted/40 p-5 transition-[background-color,transform] hover:bg-muted/80 hover:translate-x-2">
-                    <div className="flex size-14 items-center justify-center rounded-xl bg-background text-primary shadow-sm ring-1 ring-border">
+                  <div key={cat.id} className="flex items-center gap-4 rounded-2xl border bg-muted/40 p-4 sm:p-5 transition-[background-color,transform] hover:bg-muted/80 hover:translate-x-2">
+                    <div className="flex size-12 sm:size-14 shrink-0 items-center justify-center rounded-xl bg-background text-primary shadow-sm ring-1 ring-border">
                       {ICON_MAP[cat.icon as keyof typeof ICON_MAP]}
                     </div>
-                    <div>
-                      <h4 className="text-lg font-bold">{cat.title}</h4>
-                      <p className="text-sm text-muted-foreground">{cat.description.split('.')[0]}</p>
+                    <div className="min-w-0">
+                      <h4 className="truncate text-lg font-bold">{cat.title}</h4>
+                      <p className="line-clamp-1 text-sm text-muted-foreground">{cat.description.split('.')[0]}</p>
                     </div>
                   </div>
                 ))}

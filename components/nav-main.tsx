@@ -12,6 +12,7 @@ import {
 
 export function NavMain({
   items,
+  label
 }: {
   items: {
     title: string
@@ -19,10 +20,11 @@ export function NavMain({
     icon?: LucideIcon
     isActive?: boolean
   }[]
+  label?: string
 }) {
   return (
-    <SidebarGroup>
-      <SidebarGroupLabel>Resources</SidebarGroupLabel>
+    <SidebarGroup className="group-data-[collapsible=icon]:mt-2">
+      {label && <SidebarGroupLabel>{label}</SidebarGroupLabel>}
       <SidebarMenu>
         {items.map((item) => (
           <SidebarMenuItem key={item.title}>

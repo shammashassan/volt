@@ -1,15 +1,13 @@
-"use client"
-
 import * as React from "react"
 import { DashboardStats } from "@/components/dashboard-stats"
 import { CategoryExplorer } from "@/components/category-explorer"
 import { ResourceCard } from "@/components/resource-card"
-import { resources } from "@/lib/data"
+import { getResources } from "@/lib/db"
 import { Separator } from "@/components/ui/separator"
 import { SparklesIcon, RocketIcon } from "lucide-react"
 
-export default function ExplorePage() {
-  // Get a few featured resources for the dashboard
+export default async function ExplorePage() {
+  const resources = await getResources()
   const featuredResources = resources.filter(res => res.featured)
 
   return (

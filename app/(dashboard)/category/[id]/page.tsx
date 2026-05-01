@@ -1,21 +1,19 @@
-"use client"
-
 import * as React from "react"
-import { useParams } from "next/navigation"
-import { categories, resources } from "@/lib/data"
+import { categories } from "@/lib/data"
+import { getResources } from "@/lib/db"
 import { ResourceCard } from "@/components/resource-card"
 import { Separator } from "@/components/ui/separator"
 import { Badge } from "@/components/ui/badge"
 
-import { 
-  Rocket, 
-  Component, 
-  Zap, 
-  Wrench, 
-  Palette, 
-  Map, 
-  Search, 
-  Volume2, 
+import {
+  Rocket,
+  Component,
+  Zap,
+  Wrench,
+  Palette,
+  Map,
+  Search,
+  Volume2,
   Bot,
   FileText
 } from "lucide-react"
@@ -32,10 +30,10 @@ const ICON_MAP: Record<string, any> = {
   Bot,
 }
 
-export default function CategoryPage() {
-  const params = useParams()
-  const categoryId = params.id as string
-  
+export default async function CategoryPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id: categoryId } = await params
+  const resources = await getResources()
+
   const category = categories.find((c) => c.id === categoryId)
   const categoryResources = resources.filter((r) => r.category === categoryId)
 
@@ -70,9 +68,9 @@ export default function CategoryPage() {
             {category.description}
           </p>
         </div>
-        
+
         <Separator className="opacity-40" />
-        
+
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {categoryResources.map((resource) => (
             <ResourceCard key={resource.name} resource={resource} />
