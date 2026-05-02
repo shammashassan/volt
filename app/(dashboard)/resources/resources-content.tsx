@@ -21,6 +21,16 @@ import { ResourceForm } from "@/components/resource-form"
 import { addResourceAction, deleteResourceAction, updateResourceAction } from "@/lib/actions"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 
 interface ResourcesContentProps {
   initialResources: Resource[]
@@ -29,6 +39,7 @@ interface ResourcesContentProps {
 export function ResourcesContent({ initialResources: resources }: ResourcesContentProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [editingResource, setEditingResource] = useState<Resource | null>(null)
+  const [resourceToDelete, setResourceToDelete] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
 
@@ -37,16 +48,22 @@ export function ResourcesContent({ initialResources: resources }: ResourcesConte
     setIsOpen(true)
   }
 
-  const onDelete = async (link: string) => {
-    if (!confirm("Are you sure you want to delete this resource?")) return
+  const onDelete = (link: string) => {
+    setResourceToDelete(link)
+  }
 
-    const result = await deleteResourceAction(link)
+  const confirmDelete = async () => {
+    if (!resourceToDelete) return
+    setIsLoading(true)
+    const result = await deleteResourceAction(resourceToDelete)
     if (result.success) {
       toast.success("Resource deleted successfully")
       router.refresh()
     } else {
       toast.error(result.error || "Failed to delete resource")
     }
+    setIsLoading(false)
+    setResourceToDelete(null)
   }
 
   const onSubmit = async (formData: FormData) => {
@@ -136,6 +153,31 @@ export function ResourcesContent({ initialResources: resources }: ResourcesConte
             />
           </DialogContent>
         </Dialog>
+
+        <AlertDialog open={!!resourceToDelete} onOpenChange={(open) => !open && setResourceToDelete(null)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This action cannot be undone. This will permanently delete the resource
+                from your database.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={isLoading}>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={(e) => {
+                  e.preventDefault()
+                  confirmDelete()
+                }}
+                disabled={isLoading}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
+                {isLoading ? "Deleting..." : "Delete"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </div>
   )

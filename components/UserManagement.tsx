@@ -53,11 +53,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 
 export function UserManagement({ initialUsers }: { initialUsers: any[] }) {
   const [users, setUsers] = useState(initialUsers)
   const [isLoading, setIsLoading] = useState(false)
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+  const [userToDelete, setUserToDelete] = useState<string | null>(null)
   const router = useRouter()
   const { data: session } = authClient.useSession()
   const currentUserId = session?.user?.id
@@ -110,9 +121,24 @@ export function UserManagement({ initialUsers }: { initialUsers: any[] }) {
     }
   }
 
-  const handleDelete = async (userId: string) => {
-    if (!confirm("Are you sure you want to delete this user? This action is irreversible.")) return
-    toast.info("Delete functionality coming soon or use DB management.")
+  const handleDelete = (userId: string) => {
+    setUserToDelete(userId)
+  }
+
+  const confirmDeleteUser = async () => {
+    if (!userToDelete) return
+    setIsLoading(true)
+    const { error } = await authClient.admin.removeUser({ userId: userToDelete })
+    
+    if (error) {
+      toast.error(error.message || "Failed to delete user")
+    } else {
+      toast.success("User deleted successfully")
+      setUsers(users.filter(u => u.id !== userToDelete))
+      router.refresh()
+    }
+    setIsLoading(false)
+    setUserToDelete(null)
   }
 
   return (
@@ -238,6 +264,31 @@ export function UserManagement({ initialUsers }: { initialUsers: any[] }) {
           </form>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={!!userToDelete} onOpenChange={(open) => !open && setUserToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the user account
+              and all associated data from the database.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isLoading}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.preventDefault()
+                confirmDeleteUser()
+              }}
+              disabled={isLoading}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isLoading ? "Deleting..." : "Delete User"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }
