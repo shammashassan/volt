@@ -2,6 +2,7 @@
 
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import clientPromise from "./mongodb";
 import { auth } from "./auth";
 
@@ -44,6 +45,8 @@ export async function addResourceAction(formData: FormData) {
     }
 
     await collection.insertOne(newResource);
+    revalidatePath("/explore");
+    revalidatePath("/resources");
     return { success: true };
   } catch (error) {
     console.error("Failed to add resource:", error);
@@ -63,6 +66,8 @@ export async function deleteResourceAction(link: string) {
   try {
     const collection = await getCollection();
     await collection.deleteOne({ link });
+    revalidatePath("/explore");
+    revalidatePath("/resources");
     return { success: true };
   } catch (error) {
     console.error("Failed to delete resource:", error);
@@ -109,6 +114,8 @@ export async function updateResourceAction(oldLink: string, data: any) {
     }
 
     await collection.updateOne({ _id: existing._id }, { $set: { ...data, updatedAt: new Date() } });
+    revalidatePath("/explore");
+    revalidatePath("/resources");
     return { success: true };
   } catch (error) {
     console.error("Failed to update resource:", error);

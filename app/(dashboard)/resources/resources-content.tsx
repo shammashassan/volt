@@ -26,8 +26,7 @@ interface ResourcesContentProps {
   initialResources: Resource[]
 }
 
-export function ResourcesContent({ initialResources }: ResourcesContentProps) {
-  const [resources, setResources] = useState<Resource[]>(initialResources)
+export function ResourcesContent({ initialResources: resources }: ResourcesContentProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [editingResource, setEditingResource] = useState<Resource | null>(null)
   const [isLoading, setIsLoading] = useState(false)
@@ -45,7 +44,6 @@ export function ResourcesContent({ initialResources }: ResourcesContentProps) {
     if (result.success) {
       toast.success("Resource deleted successfully")
       router.refresh()
-      setResources(resources.filter(r => r.link !== link))
     } else {
       toast.error(result.error || "Failed to delete resource")
     }
@@ -68,8 +66,6 @@ export function ResourcesContent({ initialResources }: ResourcesContentProps) {
         setIsOpen(false)
         setEditingResource(null)
         router.refresh()
-        // Wait a bit for server to update then reload or re-fetch
-        setTimeout(() => window.location.reload(), 500)
       } else {
         toast.error(result.error || "Failed to update resource")
       }
@@ -79,7 +75,6 @@ export function ResourcesContent({ initialResources }: ResourcesContentProps) {
         toast.success("Resource added successfully")
         setIsOpen(false)
         router.refresh()
-        setTimeout(() => window.location.reload(), 500)
       } else {
         toast.error(result.error || "Failed to add resource")
       }

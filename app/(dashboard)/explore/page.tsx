@@ -6,6 +6,8 @@ import { getResources } from "@/lib/db"
 import { Separator } from "@/components/ui/separator"
 import { SparklesIcon, RocketIcon } from "lucide-react"
 
+export const dynamic = "force-dynamic";
+
 export default async function ExplorePage() {
   const resources = await getResources()
   const featuredResources = resources.filter(res => res.featured)
