@@ -111,7 +111,7 @@ export function CategoriesContent({ initialCategories: categories }: CategoriesC
                   Manage Categories
                 </h1>
                 <Badge variant="outline" className="h-6 rounded-full border-primary/20 bg-primary/5 text-primary text-[10px] uppercase font-bold tracking-widest px-2.5">
-                  {categories.length} Categories
+                  {categories.length} <span className="hidden sm:inline ml-1">Categories</span>
                 </Badge>
               </div>
             </div>
@@ -119,8 +119,8 @@ export function CategoriesContent({ initialCategories: categories }: CategoriesC
               setEditingCategory(null)
               setIsOpen(true)
             }}>
-              <Plus className="mr-2 h-4 w-4" />
-              Add Category
+              <Plus className="sm:mr-2 h-4 w-4" />
+              <span className="hidden sm:inline">Add Category</span>
             </Button>
           </div>
           <p className="text-lg text-muted-foreground/80 max-w-2xl font-medium">

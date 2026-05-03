@@ -37,7 +37,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ id: s
                 {category.title}
               </h1>
               <Badge variant="outline" className="h-6 rounded-full border-primary/20 bg-primary/5 text-primary text-[10px] uppercase font-bold tracking-widest px-2.5">
-                {categoryResources.length} Resources
+                {categoryResources.length} <span className="hidden sm:inline ml-1">Resources</span>
               </Badge>
             </div>
           </div>

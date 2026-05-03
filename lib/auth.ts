@@ -1,15 +1,27 @@
-import { betterAuth } from "better-auth";
+import { betterAuth } from "better-auth/minimal";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
 import { admin } from "better-auth/plugins";
+import { nextCookies } from "better-auth/next-js";
 import clientPromise from "./mongodb";
 
 const client = await clientPromise;
 const db = client.db();
 
 export const auth = betterAuth({
-  database: mongodbAdapter(db),
+  database: mongodbAdapter(db, {
+    client: client
+  }),
   baseURL: process.env.NEXT_PUBLIC_APP_URL || process.env.BETTER_AUTH_URL || "http://localhost:3000",
   emailAndPassword: { enabled: true },
+  session: {
+    cookieCache: {
+      enabled: true,
+      maxAge: 5 * 60 // 5 minutes
+    }
+  },
+  experimental: {
+    joins: true
+  },
   user: {
     deleteUser: {
         enabled: true,
@@ -31,5 +43,6 @@ export const auth = betterAuth({
       defaultRole: "user",
       adminUserIds: ["admin@gmail.com"],
     }),
+    nextCookies()
   ],
 });

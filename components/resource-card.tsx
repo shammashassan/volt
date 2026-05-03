@@ -60,7 +60,7 @@ export const ResourceCard = React.memo(function ResourceCard({ resource }: { res
             </div>
           </div>
         </div>
-        <CardHeader className="px-4 py-3 space-y-0.5">
+        <CardHeader className="flex flex-col gap-0.5 px-4 py-3">
           <CardTitle className="line-clamp-1 text-base font-bold tracking-tight text-foreground/90 transition-colors group-hover:text-primary">
             {resource.name}
           </CardTitle>

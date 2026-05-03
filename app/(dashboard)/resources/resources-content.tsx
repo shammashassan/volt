@@ -114,7 +114,7 @@ export function ResourcesContent({ initialResources: resources, categories }: Re
                   Manage Resources
                 </h1>
                 <Badge variant="outline" className="h-6 rounded-full border-primary/20 bg-primary/5 text-primary text-[10px] uppercase font-bold tracking-widest px-2.5">
-                  {resources.length} Resources
+                  {resources.length} <span className="hidden sm:inline ml-1">Resources</span>
                 </Badge>
               </div>
             </div>
@@ -122,8 +122,8 @@ export function ResourcesContent({ initialResources: resources, categories }: Re
               setEditingResource(null)
               setIsOpen(true)
             }}>
-              <Plus className="mr-2 h-4 w-4" />
-              Add Resource
+              <Plus className="sm:mr-2 h-4 w-4" />
+              <span className="hidden sm:inline">Add Resource</span>
             </Button>
           </div>
           <p className="text-lg text-muted-foreground/80 max-w-2xl font-medium">

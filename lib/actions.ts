@@ -2,7 +2,7 @@
 
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import clientPromise from "./mongodb";
 import { auth } from "./auth";
 
@@ -45,6 +45,7 @@ export async function addResourceAction(formData: FormData) {
     }
 
     await collection.insertOne(newResource);
+    revalidateTag("resources", "max");
     revalidatePath("/explore");
     revalidatePath("/resources");
     return { success: true };
@@ -66,6 +67,7 @@ export async function deleteResourceAction(link: string) {
   try {
     const collection = await getCollection();
     await collection.deleteOne({ link });
+    revalidateTag("resources", "max");
     revalidatePath("/explore");
     revalidatePath("/resources");
     return { success: true };
@@ -114,6 +116,7 @@ export async function updateResourceAction(oldLink: string, data: any) {
     }
 
     await collection.updateOne({ _id: existing._id }, { $set: { ...data, updatedAt: new Date() } });
+    revalidateTag("resources", "max");
     revalidatePath("/explore");
     revalidatePath("/resources");
     revalidatePath("/categories");
@@ -157,6 +160,7 @@ export async function addCategoryAction(formData: FormData) {
       createdAt: new Date()
     });
 
+    revalidateTag("categories", "max");
     revalidatePath("/explore");
     revalidatePath("/categories");
     return { success: true };
@@ -196,6 +200,7 @@ export async function updateCategoryAction(oldId: string, data: any) {
       } }
     );
 
+    revalidateTag("categories", "max");
     revalidatePath("/explore");
     revalidatePath("/categories");
     revalidatePath(`/category/${oldId}`);
@@ -226,6 +231,7 @@ export async function deleteCategoryAction(id: string) {
     }
 
     await db.collection("categories").deleteOne({ id });
+    revalidateTag("categories", "max");
     revalidatePath("/explore");
     revalidatePath("/categories");
     return { success: true };
