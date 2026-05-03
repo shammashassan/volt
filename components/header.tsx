@@ -7,16 +7,38 @@ import React from 'react'
 import { cn } from '@/lib/utils'
 import { ModeToggle } from './mode-toggle'
 
-const menuItems = [
-    { name: 'Explore', href: '/explore' },
-    { name: 'Start', href: '/category/start' },
-    { name: 'Build', href: '/category/build' },
-    { name: 'Enhance', href: '/category/enhance' },
-]
-
 export const HeroHeader = () => {
+    const [menuItems, setMenuItems] = React.useState([
+        { name: 'Explore', href: '/explore' }
+    ])
     const [menuState, setMenuState] = React.useState(false)
     const [isScrolled, setIsScrolled] = React.useState(false)
+
+    React.useEffect(() => {
+        async function fetchTopCategories() {
+            try {
+                const response = await fetch('/api/categories')
+                const categories = await response.json()
+                
+                // Sort by resourceCount descending and take top 4
+                const topCategories = categories
+                    .sort((a: any, b: any) => (b.resourceCount || 0) - (a.resourceCount || 0))
+                    .slice(0, 4)
+                    .map((cat: any) => ({
+                        name: cat.title,
+                        href: `/category/${cat.id}`
+                    }))
+
+                setMenuItems([
+                    { name: 'Explore', href: '/explore' },
+                    ...topCategories
+                ])
+            } catch (error) {
+                console.error("Failed to fetch top categories:", error)
+            }
+        }
+        fetchTopCategories()
+    }, [])
 
     React.useEffect(() => {
         const handleScroll = () => {

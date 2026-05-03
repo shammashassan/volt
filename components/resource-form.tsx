@@ -14,16 +14,32 @@ import {
 } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
-import { categories } from "@/lib/data"
-import { Loader2 } from "lucide-react"
+import { Loader2, Sparkles, Check } from "lucide-react"
+import { toast } from "sonner"
 
 interface ResourceFormProps {
   initialData?: any
   onSubmit: (formData: FormData) => Promise<void>
   isLoading: boolean
+  categories: any[]
 }
 
-export function ResourceForm({ initialData, onSubmit, isLoading }: ResourceFormProps) {
+export function ResourceForm({ initialData, onSubmit, isLoading, categories }: ResourceFormProps) {
+  const [copied, setCopied] = useState(false)
+  const [name, setName] = useState(initialData?.name || "")
+  const [link, setLink] = useState(initialData?.link || "")
+
+  const copyPrompt = () => {
+    const prompt = `Research and write a concise, compelling 1-sentence description for the UI resource "${name}" (${link}). 
+Focus on what makes it unique for design engineers or developers.
+Format the response as a single sentence without quotes.`
+    
+    navigator.clipboard.writeText(prompt)
+    setCopied(true)
+    toast.success("AI Prompt copied to clipboard!")
+    setTimeout(() => setCopied(false), 2000)
+  }
+
   return (
     <form action={onSubmit} className="grid gap-6">
       <div className="grid gap-2">
@@ -31,7 +47,8 @@ export function ResourceForm({ initialData, onSubmit, isLoading }: ResourceFormP
         <Input 
           id="name" 
           name="name" 
-          defaultValue={initialData?.name} 
+          value={name}
+          onChange={(e) => setName(e.target.value)}
           placeholder="e.g. Aceternity UI" 
           required 
         />
@@ -43,7 +60,8 @@ export function ResourceForm({ initialData, onSubmit, isLoading }: ResourceFormP
           id="link" 
           name="link" 
           type="url" 
-          defaultValue={initialData?.link} 
+          value={link}
+          onChange={(e) => setLink(e.target.value)}
           placeholder="https://..." 
           required 
         />
@@ -66,7 +84,20 @@ export function ResourceForm({ initialData, onSubmit, isLoading }: ResourceFormP
       </div>
 
       <div className="grid gap-2">
-        <Label htmlFor="description">Description</Label>
+        <div className="flex items-center justify-between">
+          <Label htmlFor="description">Description</Label>
+          <Button 
+            type="button" 
+            variant="ghost" 
+            size="sm" 
+            className="h-8 gap-1.5 text-xs text-muted-foreground hover:text-primary"
+            onClick={copyPrompt}
+            disabled={!name || !link}
+          >
+            {copied ? <Check className="size-3" /> : <Sparkles className="size-3" />}
+            Copy AI Prompt
+          </Button>
+        </div>
         <Textarea
           id="description"
           name="description"

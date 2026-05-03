@@ -4,9 +4,9 @@ import * as React from "react"
 import { useState } from "react"
 import { columns } from "./columns"
 import { DataTable } from "./data-table"
-import { Resource } from "@/lib/data"
+import { Category } from "@/lib/data"
 import { Button } from "@/components/ui/button"
-import { Settings2, Plus } from "lucide-react"
+import { Layers, Plus } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
 import { Badge } from "@/components/ui/badge"
 
@@ -17,8 +17,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { ResourceForm } from "@/components/resource-form"
-import { addResourceAction, deleteResourceAction, updateResourceAction } from "@/lib/actions"
+import { CategoryForm } from "@/components/category-form"
+import { addCategoryAction, deleteCategoryAction, updateCategoryAction } from "@/lib/actions"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import {
@@ -32,69 +32,66 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 
-interface ResourcesContentProps {
-  initialResources: Resource[]
-  categories: any[]
+interface CategoriesContentProps {
+  initialCategories: Category[]
 }
 
-export function ResourcesContent({ initialResources: resources, categories }: ResourcesContentProps) {
+export function CategoriesContent({ initialCategories: categories }: CategoriesContentProps) {
   const [isOpen, setIsOpen] = useState(false)
-  const [editingResource, setEditingResource] = useState<Resource | null>(null)
-  const [resourceToDelete, setResourceToDelete] = useState<string | null>(null)
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null)
+  const [categoryToDelete, setCategoryToDelete] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
 
-  const onEdit = (resource: Resource) => {
-    setEditingResource(resource)
+  const onEdit = (category: Category) => {
+    setEditingCategory(category)
     setIsOpen(true)
   }
 
-  const onDelete = (link: string) => {
-    setResourceToDelete(link)
+  const onDelete = (id: string) => {
+    setCategoryToDelete(id)
   }
 
   const confirmDelete = async () => {
-    if (!resourceToDelete) return
+    if (!categoryToDelete) return
     setIsLoading(true)
-    const result = await deleteResourceAction(resourceToDelete)
+    const result = await deleteCategoryAction(categoryToDelete)
     if (result.success) {
-      toast.success("Resource deleted successfully")
+      toast.success("Category deleted successfully")
       router.refresh()
     } else {
-      toast.error(result.error || "Failed to delete resource")
+      toast.error(result.error || "Failed to delete category")
     }
     setIsLoading(false)
-    setResourceToDelete(null)
+    setCategoryToDelete(null)
   }
 
   const onSubmit = async (formData: FormData) => {
     setIsLoading(true)
 
-    if (editingResource) {
+    if (editingCategory) {
       const data = {
-        name: formData.get("name"),
-        link: formData.get("link"),
+        title: formData.get("title"),
         description: formData.get("description"),
-        category: formData.get("category"),
-        featured: formData.get("featured") === "on"
+        icon: formData.get("icon"),
       }
-      const result = await updateResourceAction(editingResource.link, data)
+      const result = await updateCategoryAction(editingCategory.id, data)
       if (result.success) {
-        toast.success("Resource updated successfully")
+        toast.success("Category updated successfully")
         setIsOpen(false)
-        setEditingResource(null)
+        setEditingCategory(null)
         router.refresh()
       } else {
-        toast.error(result.error || "Failed to update resource")
+        toast.error(result.error || "Failed to update category")
       }
     } else {
-      const result = await addResourceAction(formData)
+      const result = await addCategoryAction(formData)
       if (result.success) {
-        toast.success("Resource added successfully")
+        toast.success("Category added successfully")
         setIsOpen(false)
         router.refresh()
       } else {
-        toast.error(result.error || "Failed to add resource")
+        toast.error(result.error || "Failed to add category")
       }
     }
     setIsLoading(false)
@@ -107,27 +104,27 @@ export function ResourcesContent({ initialResources: resources, categories }: Re
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-4">
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                <Settings2 className="size-6" />
+                <Layers className="size-6" />
               </div>
               <div className="flex items-center gap-2">
                 <h1 className="text-3xl font-black tracking-tight md:text-4xl bg-clip-text text-transparent bg-linear-to-r from-foreground to-foreground/60">
-                  Manage Resources
+                  Manage Categories
                 </h1>
                 <Badge variant="outline" className="h-6 rounded-full border-primary/20 bg-primary/5 text-primary text-[10px] uppercase font-bold tracking-widest px-2.5">
-                  {resources.length} Resources
+                  {categories.length} Categories
                 </Badge>
               </div>
             </div>
             <Button onClick={() => {
-              setEditingResource(null)
+              setEditingCategory(null)
               setIsOpen(true)
             }}>
               <Plus className="mr-2 h-4 w-4" />
-              Add Resource
+              Add Category
             </Button>
           </div>
           <p className="text-lg text-muted-foreground/80 max-w-2xl font-medium">
-            Manage your curated collection of UI tools and libraries.
+            Define the taxonomy for your UI repository.
           </p>
         </div>
 
@@ -135,35 +132,32 @@ export function ResourcesContent({ initialResources: resources, categories }: Re
 
         <DataTable
           columns={columns(onEdit, onDelete)}
-          data={resources}
-          searchKey="name"
-          categoryOptions={categories.map(c => ({ label: c.title, value: c.id }))}
+          data={categories}
+          searchKey="title"
         />
 
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
-              <DialogTitle>{editingResource ? "Edit Resource" : "Add Resource"}</DialogTitle>
+              <DialogTitle>{editingCategory ? "Edit Category" : "Add Category"}</DialogTitle>
               <DialogDescription>
-                {editingResource ? "Update the details of this resource." : "Add a new resource to your second brain."}
+                {editingCategory ? "Update the details of this category." : "Create a new category for your resources."}
               </DialogDescription>
             </DialogHeader>
-            <ResourceForm
-              initialData={editingResource}
+            <CategoryForm
+              initialData={editingCategory}
               onSubmit={onSubmit}
               isLoading={isLoading}
-              categories={categories}
             />
           </DialogContent>
         </Dialog>
 
-        <AlertDialog open={!!resourceToDelete} onOpenChange={(open) => !open && setResourceToDelete(null)}>
+        <AlertDialog open={!!categoryToDelete} onOpenChange={(open) => !open && setCategoryToDelete(null)}>
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
               <AlertDialogDescription>
-                This action cannot be undone. This will permanently delete the resource
-                from your database.
+                This action cannot be undone. You won't be able to delete a category if it still contains resources.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>

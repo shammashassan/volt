@@ -1,40 +1,17 @@
-import * as React from "react"
-import { categories } from "@/lib/data"
-import { getResources } from "@/lib/db"
+import { getResources, getCategoryById } from "@/lib/db"
 import { ResourceCard } from "@/components/resource-card"
 import { Separator } from "@/components/ui/separator"
 import { Badge } from "@/components/ui/badge"
-
-import {
-  Rocket,
-  Component,
-  Zap,
-  Wrench,
-  Palette,
-  Map,
-  Search,
-  Volume2,
-  Bot,
-  FileText
-} from "lucide-react"
-
-const ICON_MAP: Record<string, any> = {
-  Rocket,
-  Component,
-  Zap,
-  Wrench,
-  Palette,
-  Map,
-  Search,
-  Volume2,
-  Bot,
-}
+import { FileText } from "lucide-react"
+import { ICON_MAP } from "@/lib/icons"
 
 export default async function CategoryPage({ params }: { params: Promise<{ id: string }> }) {
   const { id: categoryId } = await params
-  const resources = await getResources()
+  const [category, resources] = await Promise.all([
+    getCategoryById(categoryId),
+    getResources()
+  ])
 
-  const category = categories.find((c) => c.id === categoryId)
   const categoryResources = resources.filter((r) => r.category === categoryId)
 
   if (!category) {

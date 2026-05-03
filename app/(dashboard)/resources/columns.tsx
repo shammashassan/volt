@@ -15,16 +15,33 @@ import {
 import { Button } from "@/components/ui/button"
 import { MoreHorizontal, Pencil, Trash } from "lucide-react"
 
-const categoryVariants: Record<string, any> = {
-  start: "primary",
-  build: "warning",
-  enhance: "info",
-  customize: "success",
-  polish: "pink",
-  maps: "cyan",
-  search: "secondary",
-  audio: "red",
-  agents: "emerald",
+const BADGE_VARIANTS = [
+  "primary",
+  "success",
+  "warning",
+  "info",
+  "blue",
+  "purple",
+  "pink",
+  "orange",
+  "indigo",
+  "green",
+  "yellow",
+  "cyan",
+  "red",
+  "teal",
+  "violet",
+  "emerald",
+  "amber",
+] as const
+
+const getCategoryVariant = (category: string) => {
+  if (!category) return "primary"
+  const hash = category.split("").reduce((acc, char) => {
+    return char.charCodeAt(0) + ((acc << 5) - acc)
+  }, 0)
+  const index = Math.abs(hash) % BADGE_VARIANTS.length
+  return BADGE_VARIANTS[index]
 }
 
 export const columns = (
@@ -35,9 +52,9 @@ export const columns = (
       accessorKey: "name",
       header: "Name",
       cell: ({ row }) => (
-        <a 
-          href={row.original.link} 
-          target="_blank" 
+        <a
+          href={row.original.link}
+          target="_blank"
           rel="noopener noreferrer"
           className="font-medium hover:text-primary transition-colors"
         >
@@ -50,7 +67,7 @@ export const columns = (
       header: "Category",
       cell: ({ row }) => {
         const category = row.getValue("category") as string
-        const variant = categoryVariants[category] || "primary"
+        const variant = getCategoryVariant(category)
         return (
           <Badge variant={variant} appearance="outline" className="capitalize">
             {category}
@@ -81,9 +98,9 @@ export const columns = (
       cell: ({ row }) => {
         const link = row.getValue("link") as string
         return (
-          <a 
-            href={link} 
-            target="_blank" 
+          <a
+            href={link}
+            target="_blank"
             rel="noopener noreferrer"
             className="block max-w-[200px] truncate text-xs text-muted-foreground hover:text-primary hover:underline transition-colors"
           >

@@ -11,35 +11,17 @@ import {
   CommandSeparator,
 } from "@/components/ui/command"
 import { useRouter } from "next/navigation"
-import { categories, resources } from "@/lib/data"
 import { 
   SearchIcon, 
-  RocketIcon, 
-  ComponentIcon, 
-  ZapIcon, 
-  WrenchIcon, 
-  PaletteIcon, 
-  MapIcon, 
-  Volume2Icon, 
-  BotIcon,
   ExternalLinkIcon,
   FileTextIcon
 } from "lucide-react"
-
-const ICON_MAP: Record<string, any> = {
-  Rocket: RocketIcon,
-  Component: ComponentIcon,
-  Zap: ZapIcon,
-  Wrench: WrenchIcon,
-  Palette: PaletteIcon,
-  Map: MapIcon,
-  Search: SearchIcon,
-  Volume2: Volume2Icon,
-  Bot: BotIcon,
-}
+import { ICON_MAP } from "@/lib/icons"
 
 export function SearchCommand() {
   const [open, setOpen] = React.useState(false)
+  const [categories, setCategories] = React.useState<any[]>([])
+  const [resources, setResources] = React.useState<any[]>([])
   const router = useRouter()
 
   React.useEffect(() => {
@@ -52,6 +34,26 @@ export function SearchCommand() {
     document.addEventListener("keydown", down)
     return () => document.removeEventListener("keydown", down)
   }, [])
+
+  React.useEffect(() => {
+    if (open) {
+      async function fetchData() {
+        try {
+          const [catRes, resRes] = await Promise.all([
+            fetch('/api/categories'),
+            fetch('/api/resources')
+          ])
+          const cats = await catRes.json()
+          const ress = await resRes.json()
+          setCategories(cats)
+          setResources(ress)
+        } catch (error) {
+          console.error("Failed to fetch search data:", error)
+        }
+      }
+      fetchData()
+    }
+  }, [open])
 
   const onSelect = (url: string) => {
     setOpen(false)
@@ -87,7 +89,7 @@ export function SearchCommand() {
                   onSelect={() => onSelect(`/category/${category.id}`)}
                   className="flex items-center gap-2"
                 >
-                  <Icon className="size-4 text-muted-foreground" />
+                  {Icon && <Icon className="size-4 text-muted-foreground" />}
                   <span className="font-medium text-foreground">{category.title}</span>
                 </CommandItem>
               )
@@ -105,7 +107,7 @@ export function SearchCommand() {
                   className="flex items-center justify-between"
                 >
                   <div className="flex items-center gap-2">
-                    <Icon className="size-4 text-muted-foreground/60" />
+                    {Icon && <Icon className="size-4 text-muted-foreground/60" />}
                     <span className="font-medium text-foreground">{resource.name}</span>
                   </div>
                   <div className="flex items-center gap-2">

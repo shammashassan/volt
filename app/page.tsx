@@ -1,25 +1,17 @@
-'use client'
+"use client"
 
 import React from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { HeroHeader } from '@/components/header'
 import { BentoGrid, BentoCard } from '@/components/bento-grid'
-import { categories } from '@/lib/data'
 import {
-  Rocket,
-  Component,
-  Zap,
-  Wrench,
-  Palette,
-  Map as MapIcon,
-  Search,
-  Volume2,
-  Bot,
   ArrowRight,
-  Globe,
-  CheckCircle
+  CheckCircle,
+  Rocket
 } from 'lucide-react'
+import { categories } from '@/lib/data'
+import { ICON_MAP } from '@/lib/icons'
 
 // Custom GitHub Icon SVG as it's missing from the local lucide version
 const GitHubIcon = ({ className }: { className?: string }) => (
@@ -33,18 +25,6 @@ const GitHubIcon = ({ className }: { className?: string }) => (
     <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
   </svg>
 )
-
-const ICON_MAP = {
-  Rocket: <Rocket className="size-6" />,
-  Component: <Component className="size-6" />,
-  Zap: <Zap className="size-6" />,
-  Wrench: <Wrench className="size-6" />,
-  Palette: <Palette className="size-6" />,
-  Map: <MapIcon className="size-6" />,
-  Search: <Search className="size-6" />,
-  Volume2: <Volume2 className="size-6" />,
-  Bot: <Bot className="size-6" />,
-}
 
 const VARIANTS_CONTAINER = {
   hidden: { opacity: 0 },
@@ -71,6 +51,7 @@ const VARIANTS_ITEM = {
 } as const
 
 export default function LandingPage() {
+
   return (
     <div className="relative min-h-screen bg-background selection:bg-primary/30">
       <HeroHeader />
@@ -148,21 +129,23 @@ export default function LandingPage() {
         </div>
 
         <BentoGrid>
-          {categories.map((cat, idx) => (
-            <BentoCard
-              key={cat.id}
-              title={cat.title}
-              description={cat.description}
-              icon={ICON_MAP[cat.icon as keyof typeof ICON_MAP]}
-              image={cat.image}
-              href={`/category/${cat.id}`}
-              className={
-                [0, 3, 7].includes(idx)
-                  ? "md:col-span-2"
-                  : "md:col-span-1"
-              }
-            />
-          ))}
+          {categories.map((cat, idx) => {
+            const Icon = ICON_MAP[cat.icon]
+            return (
+              <BentoCard
+                key={cat.id}
+                title={cat.title}
+                description={cat.description}
+                icon={Icon ? <Icon className="size-6" /> : null}
+                image={cat.image}
+                className={
+                  [0, 3, 7].includes(idx)
+                    ? "md:col-span-2"
+                    : "md:col-span-1"
+                }
+              />
+            )
+          })}
         </BentoGrid>
       </section>
 
@@ -196,17 +179,20 @@ export default function LandingPage() {
             <div className="relative aspect-auto lg:aspect-square rounded-[2.5rem] border bg-background p-6 shadow-2xl lg:p-10 overflow-hidden group">
               <div className="absolute inset-0 bg-linear-to-tr from-primary/5 to-transparent" />
               <div className="relative flex flex-col justify-center gap-4 sm:gap-6 z-10 lg:h-full">
-                {categories.slice(0, 4).map((cat) => (
-                  <div key={cat.id} className="flex items-center gap-4 rounded-2xl border bg-muted/40 p-4 sm:p-5 transition-[background-color,transform] hover:bg-muted/80 hover:translate-x-2">
-                    <div className="flex size-12 sm:size-14 shrink-0 items-center justify-center rounded-xl bg-background text-primary shadow-sm ring-1 ring-border">
-                      {ICON_MAP[cat.icon as keyof typeof ICON_MAP]}
+                {categories.slice(0, 4).map((cat) => {
+                  const Icon = ICON_MAP[cat.icon]
+                  return (
+                    <div key={cat.id} className="flex items-center gap-4 rounded-2xl border bg-muted/40 p-4 sm:p-5 transition-[background-color,transform] hover:bg-muted/80 hover:translate-x-2">
+                      <div className="flex size-12 sm:size-14 shrink-0 items-center justify-center rounded-xl bg-background text-primary shadow-sm ring-1 ring-border">
+                        {Icon && <Icon className="size-6" />}
+                      </div>
+                      <div className="min-w-0">
+                        <h4 className="truncate text-lg font-bold">{cat.title}</h4>
+                        <p className="line-clamp-1 text-sm text-muted-foreground">{cat.description.split('.')[0]}</p>
+                      </div>
                     </div>
-                    <div className="min-w-0">
-                      <h4 className="truncate text-lg font-bold">{cat.title}</h4>
-                      <p className="line-clamp-1 text-sm text-muted-foreground">{cat.description.split('.')[0]}</p>
-                    </div>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             </div>
           </div>

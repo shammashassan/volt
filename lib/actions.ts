@@ -116,9 +116,121 @@ export async function updateResourceAction(oldLink: string, data: any) {
     await collection.updateOne({ _id: existing._id }, { $set: { ...data, updatedAt: new Date() } });
     revalidatePath("/explore");
     revalidatePath("/resources");
+    revalidatePath("/categories");
     return { success: true };
   } catch (error) {
     console.error("Failed to update resource:", error);
     return { success: false, error: "Failed to update resource" };
+  }
+}
+
+// Category Actions
+export async function addCategoryAction(formData: FormData) {
+  const session = await auth.api.getSession({
+    headers: await headers()
+  });
+
+  if (!session) {
+    return { success: false, error: "Unauthorized" };
+  }
+
+  const id = formData.get("id") as string;
+  const title = formData.get("title") as string;
+  const description = formData.get("description") as string;
+  const icon = formData.get("icon") as string;
+
+  try {
+    const client = await clientPromise;
+    const db = client.db();
+    
+    // Duplicate check
+    const existing = await db.collection("categories").findOne({ id });
+    if (existing) {
+      return { success: false, error: "Category ID already exists" };
+    }
+
+    await db.collection("categories").insertOne({
+      id,
+      title,
+      description,
+      icon,
+      createdAt: new Date()
+    });
+
+    revalidatePath("/explore");
+    revalidatePath("/categories");
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to add category:", error);
+    return { success: false, error: "Failed to save category" };
+  }
+}
+
+export async function updateCategoryAction(oldId: string, data: any) {
+  const session = await auth.api.getSession({
+    headers: await headers()
+  });
+
+  if (!session) {
+    return { success: false, error: "Unauthorized" };
+  }
+
+  try {
+    const client = await clientPromise;
+    const db = client.db();
+    
+    const existing = await db.collection("categories").findOne({ id: oldId });
+    if (!existing) {
+      return { success: false, error: "Category not found" };
+    }
+
+    const { title, description, icon } = data;
+
+    await db.collection("categories").updateOne(
+      { id: oldId },
+      { $set: { 
+        ...(title && { title }),
+        ...(description && { description }),
+        ...(icon && { icon }),
+        updatedAt: new Date() 
+      } }
+    );
+
+    revalidatePath("/explore");
+    revalidatePath("/categories");
+    revalidatePath(`/category/${oldId}`);
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to update category:", error);
+    return { success: false, error: "Failed to update category" };
+  }
+}
+
+export async function deleteCategoryAction(id: string) {
+  const session = await auth.api.getSession({
+    headers: await headers()
+  });
+
+  if (!session) {
+    return { success: false, error: "Unauthorized" };
+  }
+
+  try {
+    const client = await clientPromise;
+    const db = client.db();
+    
+    // Check if category has resources
+    const resourcesCount = await db.collection("resources").countDocuments({ category: id });
+    if (resourcesCount > 0) {
+      return { success: false, error: "Cannot delete category that contains resources" };
+    }
+
+    await db.collection("categories").deleteOne({ id });
+    revalidatePath("/explore");
+    revalidatePath("/categories");
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to delete category:", error);
+    return { success: false, error: "Failed to delete category" };
   }
 }

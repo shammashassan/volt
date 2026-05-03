@@ -1,21 +1,15 @@
 "use client"
 
 import * as React from "react"
+import { useState, useEffect } from "react"
 import {
   BookOpen,
-  Bot,
   Command,
   SquareTerminal,
-  Zap,
-  Rocket,
-  Component,
-  Wrench,
-  Palette,
-  Search,
-  Volume2,
   UsersIcon,
   LibraryIcon,
-  LayoutGrid
+  LayoutGrid,
+  Layers
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -30,27 +24,30 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import Link from "next/link"
-import { categories } from "@/lib/data"
 import { usePathname } from "next/navigation"
 import { authClient } from "@/lib/auth-client"
-
-const ICON_MAP: Record<string, any> = {
-  Rocket: Rocket,
-  Component: Component,
-  Zap: Zap,
-  Wrench: Wrench,
-  Palette: Palette,
-  Search: Search,
-  Volume2: Volume2,
-  Bot: Bot,
-}
+import { ICON_MAP } from "@/lib/icons"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname()
   const { data: session } = authClient.useSession()
-  
+  const [categories, setCategories] = useState<any[]>([])
+
   const user = session?.user as any
   const isAdmin = user?.role === "admin"
+
+  useEffect(() => {
+    async function fetchCategories() {
+      try {
+        const response = await fetch('/api/categories')
+        const data = await response.json()
+        setCategories(data)
+      } catch (error) {
+        console.error("Failed to fetch categories:", error)
+      }
+    }
+    fetchCategories()
+  }, [])
 
   const navMainItems = [
     {
@@ -69,6 +66,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   if (isAdmin) {
     navMainItems.push(
+      {
+        title: "Manage Categories",
+        url: "/categories",
+        icon: Layers,
+        isActive: pathname === "/categories",
+      },
       {
         title: "Manage Resources",
         url: "/resources",

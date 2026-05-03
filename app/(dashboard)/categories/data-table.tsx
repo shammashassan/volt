@@ -12,8 +12,6 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
-  getFacetedRowModel,
-  getFacetedUniqueValues,
 } from "@tanstack/react-table"
 
 import {
@@ -26,31 +24,27 @@ import {
 } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { DataTableFacetedFilter } from "@/components/data-table-faceted-filter"
 import { X } from "lucide-react"
-
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[]
-  data: TData[]
-  searchKey: string
-  categoryOptions?: { label: string; value: string }[]
-}
 
 import {
   Pagination,
   PaginationContent,
-  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination"
 
+interface DataTableProps<TData, TValue> {
+  columns: ColumnDef<TData, TValue>[]
+  data: TData[]
+  searchKey: string
+}
+
 export function DataTable<TData, TValue>({
   columns,
   data,
   searchKey,
-  categoryOptions,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -66,8 +60,6 @@ export function DataTable<TData, TValue>({
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    getFacetedRowModel: getFacetedRowModel(),
-    getFacetedUniqueValues: getFacetedUniqueValues(),
     state: {
       sorting,
       columnFilters,
@@ -83,20 +75,13 @@ export function DataTable<TData, TValue>({
       <div className="flex items-center justify-between py-4">
         <div className="flex flex-1 items-center space-x-2">
           <Input
-            placeholder="Filter resources..."
+            placeholder={`Filter by ${searchKey}...`}
             value={(table.getColumn(searchKey)?.getFilterValue() as string) ?? ""}
             onChange={(event) =>
               table.getColumn(searchKey)?.setFilterValue(event.target.value)
             }
             className="h-8 w-[150px] lg:w-[250px]"
           />
-          {table.getColumn("category") && categoryOptions && (
-            <DataTableFacetedFilter
-              column={table.getColumn("category")}
-              title="Category"
-              options={categoryOptions}
-            />
-          )}
           {isFiltered && (
             <Button
               variant="ghost"

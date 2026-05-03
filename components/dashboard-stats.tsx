@@ -1,6 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { categories } from "@/lib/data"
-import { getResources } from "@/lib/db"
+import { getResources, getCategories } from "@/lib/db"
 import {
   ZapIcon,
   LayersIcon,
@@ -9,7 +8,10 @@ import {
 } from "lucide-react"
 
 export async function DashboardStats() {
-  const resources = await getResources()
+  const [resources, categories] = await Promise.all([
+    getResources(),
+    getCategories()
+  ])
   const totalResources = resources.length
   const totalCategories = categories.length
 

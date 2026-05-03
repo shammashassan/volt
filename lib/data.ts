@@ -12,7 +12,7 @@ export interface Category {
   title: string;
   icon: string;
   description: string;
-  image: string;
+  image?: string; // For static landing page use
 }
 
 export const categories: Category[] = [

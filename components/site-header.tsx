@@ -1,5 +1,6 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import { Separator } from "@/components/ui/separator"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import { SearchCommand } from "@/components/search-command"
@@ -14,13 +15,26 @@ import {
 } from "@/components/ui/breadcrumb"
 import { usePathname } from "next/navigation"
 import Link from "next/link"
-import { categories } from "@/lib/data"
-import { Button } from "@/components/ui/button"
 import { Home } from "lucide-react"
 
 export function SiteHeader() {
   const pathname = usePathname()
+  const [categories, setCategories] = useState<any[]>([])
   const isHome = pathname === "/"
+  
+  useEffect(() => {
+    async function fetchCategories() {
+      try {
+        const response = await fetch('/api/categories')
+        const data = await response.json()
+        setCategories(data)
+      } catch (error) {
+        console.error("Failed to fetch categories:", error)
+      }
+    }
+    fetchCategories()
+  }, [])
+
   const categoryId = pathname.split("/").pop()
   const category = categories.find(c => c.id === categoryId)
 
@@ -47,7 +61,7 @@ export function SiteHeader() {
               {!isHome && (
                 <BreadcrumbItem>
                   <BreadcrumbPage className="text-foreground">
-                    {category ? category.title : "Category"}
+                    {category ? category.title : (pathname.includes('/category/') ? "Category" : pathname.split('/').filter(Boolean).pop())}
                   </BreadcrumbPage>
                 </BreadcrumbItem>
               )}
