@@ -28,7 +28,8 @@ import {
   CreditCard,
   Bell,
   HelpCircle,
-  FolderOpen
+  FolderOpen,
+  Shapes
 } from "lucide-react"
 
 export const ICON_MAP: Record<string, any> = {
@@ -61,7 +62,8 @@ export const ICON_MAP: Record<string, any> = {
   CreditCard,
   Bell,
   HelpCircle,
-  FolderOpen
+  FolderOpen,
+  Shapes
 }
 
 export const ICON_LABELS = Object.keys(ICON_MAP).sort().map(key => ({
