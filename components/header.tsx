@@ -20,9 +20,14 @@ export const HeroHeader = () => {
                 const response = await fetch('/api/categories')
                 const categories = await response.json()
                 
-                // Sort by resourceCount descending and take top 4
+                // Sort by order (ascending) primarily, then by resourceCount (descending)
                 const topCategories = categories
-                    .sort((a: any, b: any) => (b.resourceCount || 0) - (a.resourceCount || 0))
+                    .sort((a: any, b: any) => {
+                        if ((a.order || 0) !== (b.order || 0)) {
+                            return (a.order || 0) - (b.order || 0)
+                        }
+                        return (b.resourceCount || 0) - (a.resourceCount || 0)
+                    })
                     .slice(0, 4)
                     .map((cat: any) => ({
                         name: cat.title,

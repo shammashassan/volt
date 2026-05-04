@@ -45,6 +45,15 @@ export const columns = (
       )
     },
     {
+      accessorKey: "order",
+      header: "Order",
+      cell: ({ row }) => (
+        <span className="font-mono text-xs font-medium text-muted-foreground">
+          {row.getValue("order")}
+        </span>
+      )
+    },
+    {
       accessorKey: "description",
       header: "Description",
       cell: ({ row }) => (

@@ -24,12 +24,13 @@ export const getCategories = unstable_cache(
   async (): Promise<Category[]> => {
     const client = await clientPromise;
     const db = client.db();
-    const categories = await db.collection("categories").find().toArray();
+    const categories = await db.collection("categories").find().sort({ order: 1, title: 1 }).toArray();
     return categories.map(c => ({
       id: c.id || c._id.toString(),
       title: c.title,
       icon: c.icon,
-      description: c.description
+      description: c.description,
+      order: c.order || 0
     })) as Category[];
   },
   ["categories"],

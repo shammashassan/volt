@@ -34,7 +34,7 @@ Examples:
 - UI Blocks, Layout Inspiration & Design Showcases
 - Reusable UI Components & Design Systems
 - Animations, Interactions & Effects`
-    
+
     navigator.clipboard.writeText(prompt)
     setCopied(true)
     toast.success("AI Prompt copied to clipboard!")
@@ -45,35 +45,70 @@ Examples:
     <form action={onSubmit} className="grid gap-6">
       <div className="grid gap-2">
         <Label htmlFor="id">Category ID (URL Slug)</Label>
-        <Input 
-          id="id" 
-          name="id" 
-          defaultValue={initialData?.id} 
-          placeholder="e.g. build-blocks" 
-          required 
+        <Input
+          id="id"
+          name="id"
+          defaultValue={initialData?.id}
+          placeholder="e.g. build-blocks"
+          required
           disabled={!!initialData}
         />
       </div>
 
       <div className="grid gap-2">
         <Label htmlFor="title">Title</Label>
-        <Input 
-          id="title" 
-          name="title" 
+        <Input
+          id="title"
+          name="title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          placeholder="e.g. Build Blocks" 
-          required 
+          placeholder="e.g. Build Blocks"
+          required
         />
       </div>
-      
+
+      <div className="grid grid-cols-2 gap-4">
+        <div className="grid gap-2">
+          <Label htmlFor="order">Display Order</Label>
+          <Input
+            id="order"
+            name="order"
+            type="number"
+            defaultValue={initialData?.order || 0}
+            placeholder="0"
+          />
+        </div>
+        <div className="grid gap-2">
+          <Label htmlFor="icon">Icon</Label>
+          <Select name="icon" defaultValue={initialData?.icon || "Rocket"}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select an icon" />
+            </SelectTrigger>
+            <SelectContent className="max-h-[300px]">
+              {ICON_LABELS.map((item) => {
+                const Icon = ICON_MAP[item.value]
+                return (
+                  <SelectItem key={item.value} value={item.value}>
+                    <div className="flex items-center gap-2">
+                      {Icon && <Icon className="size-4" />}
+                      <span>{item.label}</span>
+                    </div>
+                  </SelectItem>
+                )
+              })}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+      <p className="text-[10px] text-muted-foreground italic -mt-4">Lower numbers show first (e.g., 1 appears before 2).</p>
+
       <div className="grid gap-2">
         <div className="flex items-center justify-between">
           <Label htmlFor="description">Description</Label>
-          <Button 
-            type="button" 
-            variant="ghost" 
-            size="sm" 
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
             className="h-8 gap-1.5 text-xs text-muted-foreground hover:text-primary"
             onClick={copyPrompt}
             disabled={!title}
@@ -90,28 +125,6 @@ Examples:
           required
           className="min-h-[80px]"
         />
-      </div>
-
-      <div className="grid gap-2">
-        <Label htmlFor="icon">Icon</Label>
-        <Select name="icon" defaultValue={initialData?.icon || "Rocket"}>
-          <SelectTrigger className="w-full">
-            <SelectValue placeholder="Select an icon" />
-          </SelectTrigger>
-          <SelectContent className="max-h-[300px]">
-            {ICON_LABELS.map((item) => {
-              const Icon = ICON_MAP[item.value]
-              return (
-                <SelectItem key={item.value} value={item.value}>
-                  <div className="flex items-center gap-2">
-                    {Icon && <Icon className="size-4" />}
-                    <span>{item.label}</span>
-                  </div>
-                </SelectItem>
-              )
-            })}
-          </SelectContent>
-        </Select>
       </div>
 
       <Button type="submit" className="w-full" disabled={isLoading}>

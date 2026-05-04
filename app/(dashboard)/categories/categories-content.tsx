@@ -74,6 +74,7 @@ export function CategoriesContent({ initialCategories: categories }: CategoriesC
         title: formData.get("title"),
         description: formData.get("description"),
         icon: formData.get("icon"),
+        order: parseInt(formData.get("order") as string) || 0,
       }
       const result = await updateCategoryAction(editingCategory.id, data)
       if (result.success) {

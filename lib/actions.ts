@@ -141,6 +141,7 @@ export async function addCategoryAction(formData: FormData) {
   const title = formData.get("title") as string;
   const description = formData.get("description") as string;
   const icon = formData.get("icon") as string;
+  const order = parseInt(formData.get("order") as string) || 0;
 
   try {
     const client = await clientPromise;
@@ -157,6 +158,7 @@ export async function addCategoryAction(formData: FormData) {
       title,
       description,
       icon,
+      order,
       createdAt: new Date()
     });
 
@@ -188,7 +190,7 @@ export async function updateCategoryAction(oldId: string, data: any) {
       return { success: false, error: "Category not found" };
     }
 
-    const { title, description, icon } = data;
+    const { title, description, icon, order } = data;
 
     await db.collection("categories").updateOne(
       { id: oldId },
@@ -196,6 +198,7 @@ export async function updateCategoryAction(oldId: string, data: any) {
         ...(title && { title }),
         ...(description && { description }),
         ...(icon && { icon }),
+        ...(typeof order === 'number' && { order }),
         updatedAt: new Date() 
       } }
     );

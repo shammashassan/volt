@@ -13,6 +13,7 @@ export interface Category {
   icon: string;
   description: string;
   image?: string; // For static landing page use
+  order?: number; // Display priority
 }
 
 export const categories: Category[] = [
