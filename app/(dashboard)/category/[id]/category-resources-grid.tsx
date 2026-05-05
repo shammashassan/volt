@@ -6,6 +6,7 @@ import {
   DndContext,
   closestCenter,
   PointerSensor,
+  TouchSensor,
   useSensor,
   useSensors,
   DragEndEvent,
@@ -121,7 +122,11 @@ export function CategoryResourcesGrid({ initialResources, editMode }: CategoryRe
   const router = useRouter()
 
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
+    // Mouse / trackpad — activate after 8px movement
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    // Touch (mobile) — activate after holding 200ms; tolerance prevents accidental
+    // cancellation if the finger drifts slightly during the press
+    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 8 } })
   )
 
   const handleDragStart = useCallback((event: DragStartEvent) => {
