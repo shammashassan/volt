@@ -73,7 +73,7 @@ function SortableResourceCard({
       <Button
         variant="ghost"
         size="icon"
-        className="absolute top-2 left-2 z-10 h-7 w-7 cursor-grab bg-background/90 shadow-md border border-border/60 opacity-0 group-hover/sortable:opacity-100 transition-opacity active:cursor-grabbing"
+        className="absolute top-2 left-2 z-10 h-7 w-7 cursor-grab bg-background/90 shadow-md border border-border/60 sm:opacity-0 sm:group-hover/sortable:opacity-100 transition-opacity active:cursor-grabbing"
         {...attributes}
         {...listeners}
       >
@@ -86,7 +86,7 @@ function SortableResourceCard({
         size="icon"
         onClick={() => onDelete(resource.link)}
         disabled={isDeletingLink === resource.link}
-        className="absolute top-2 right-2 z-10 h-7 w-7 shadow-md opacity-0 group-hover/sortable:opacity-100 [transition:opacity_150ms] disabled:opacity-50"
+        className="absolute top-2 right-2 z-10 h-7 w-7 shadow-md sm:opacity-0 sm:group-hover/sortable:opacity-100 [transition:opacity_150ms] disabled:opacity-50"
         aria-label={`Delete ${resource.name}`}
       >
         {isDeletingLink === resource.link ? (
