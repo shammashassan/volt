@@ -27,8 +27,9 @@ export async function addResourceAction(formData: FormData) {
   const description = formData.get("description") as string;
   const category = formData.get("category") as string;
   const featured = formData.get("featured") === "on";
+  const order = parseInt(formData.get("order") as string) || 0;
 
-  const newResource = { name, link, description, category, featured, createdAt: new Date() };
+  const newResource = { name, link, description, category, featured, order, createdAt: new Date() };
 
   try {
     const collection = await getCollection();
@@ -77,6 +78,30 @@ export async function deleteResourceAction(link: string) {
   }
 }
 
+export async function updateResourceOrdersAction(updates: { link: string; order: number }[]) {
+  const session = await auth.api.getSession({
+    headers: await headers()
+  });
+
+  if (!session) {
+    return { success: false, error: "Unauthorized" };
+  }
+
+  try {
+    const collection = await getCollection();
+    await Promise.all(
+      updates.map(({ link, order }) =>
+        collection.updateOne({ link }, { $set: { order, updatedAt: new Date() } })
+      )
+    );
+    revalidateTag("resources", "max");
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to update resource orders:", error);
+    return { success: false, error: "Failed to update order" };
+  }
+}
+
 export async function updateResourceAction(oldLink: string, data: any) {
   const session = await auth.api.getSession({
     headers: await headers()
@@ -115,7 +140,13 @@ export async function updateResourceAction(oldLink: string, data: any) {
       }
     }
 
-    await collection.updateOne({ _id: existing._id }, { $set: { ...data, updatedAt: new Date() } });
+    await collection.updateOne({ _id: existing._id }, { 
+      $set: { 
+        ...data, 
+        ...(typeof data.order === 'string' && { order: parseInt(data.order) || 0 }),
+        updatedAt: new Date() 
+      } 
+    });
     revalidateTag("resources", "max");
     revalidatePath("/explore");
     revalidatePath("/resources");

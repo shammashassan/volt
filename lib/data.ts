@@ -5,6 +5,7 @@ export interface Resource {
   category: string;
   logo?: string;
   featured?: boolean;
+  order?: number;
 }
 
 export interface Category {

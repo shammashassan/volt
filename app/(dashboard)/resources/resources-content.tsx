@@ -76,7 +76,8 @@ export function ResourcesContent({ initialResources: resources, categories }: Re
         link: formData.get("link"),
         description: formData.get("description"),
         category: formData.get("category"),
-        featured: formData.get("featured") === "on"
+        featured: formData.get("featured") === "on",
+        order: formData.get("order")
       }
       const result = await updateResourceAction(editingResource.link, data)
       if (result.success) {

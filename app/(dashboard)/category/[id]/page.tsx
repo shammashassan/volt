@@ -1,6 +1,4 @@
 import { getResources, getCategoryById, getCategories } from "@/lib/db"
-import { ResourceCard } from "@/components/resource-card"
-import { Separator } from "@/components/ui/separator"
 import { Badge } from "@/components/ui/badge"
 import { FileText } from "lucide-react"
 import { ICON_MAP } from "@/lib/icons"
@@ -29,17 +27,19 @@ export default async function CategoryPage({ params }: { params: Promise<{ id: s
   return (
     <div className="flex flex-1 flex-col @container/main">
       <div className="flex flex-col gap-4 px-4 py-8 md:gap-8 md:px-8">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <div className="flex flex-col gap-2">
+        {/* Header row — title info + action buttons + grid all in one client tree */}
+        <div className="flex flex-wrap gap-4 items-start justify-between">
+          {/* Category info */}
+          <div className="flex flex-col gap-2 min-w-0">
             <div className="flex items-center gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
                 <Icon className="size-6" />
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 min-w-0">
                 <h1 className="text-3xl font-black tracking-tight md:text-4xl bg-clip-text text-transparent bg-linear-to-r from-foreground to-foreground/60">
                   {category.title}
                 </h1>
-                <Badge variant="outline" className="h-6 rounded-full border-primary/20 bg-primary/5 text-primary text-[10px] uppercase font-bold tracking-widest px-2.5">
+                <Badge variant="outline" className="h-6 shrink-0 rounded-full border-primary/20 bg-primary/5 text-primary text-[10px] uppercase font-bold tracking-widest px-2.5">
                   {categoryResources.length} <span className="hidden sm:inline ml-1">Resources</span>
                 </Badge>
               </div>
@@ -48,21 +48,13 @@ export default async function CategoryPage({ params }: { params: Promise<{ id: s
               {category.description}
             </p>
           </div>
-          <CategoryActions categoryId={categoryId} categories={categories} />
-        </div>
 
-        <Separator className="opacity-40" />
-
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {categoryResources.map((resource) => (
-            <ResourceCard key={resource.name} resource={resource} />
-          ))}
-          {categoryResources.length === 0 && (
-            <div className="col-span-full flex flex-col items-center justify-center py-20 text-center">
-              <p className="text-xl font-semibold text-muted-foreground">No resources yet.</p>
-              <p className="text-sm text-muted-foreground/60">We're still curating the best tools for this section.</p>
-            </div>
-          )}
+          {/* Client component — owns buttons + separator + grid */}
+          <CategoryActions
+            categoryId={categoryId}
+            categories={categories}
+            resources={categoryResources}
+          />
         </div>
       </div>
     </div>

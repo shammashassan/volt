@@ -67,20 +67,33 @@ Format the response as a single sentence without quotes.`
         />
       </div>
 
-      <div className="grid gap-2">
-        <Label htmlFor="category">Category</Label>
-        <Select name="category" defaultValue={initialData?.category || ""}>
-          <SelectTrigger>
-            <SelectValue placeholder="Select a category" />
-          </SelectTrigger>
-          <SelectContent>
-            {categories.map((cat) => (
-              <SelectItem key={cat.id} value={cat.id}>
-                {cat.title}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+      <div className="grid grid-cols-2 gap-4">
+        <div className="grid gap-2">
+          <Label htmlFor="category">Category</Label>
+          <Select name="category" defaultValue={initialData?.category || ""}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select" />
+            </SelectTrigger>
+            <SelectContent>
+              {categories.map((cat) => (
+                <SelectItem key={cat.id} value={cat.id}>
+                  {cat.title}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        
+        <div className="grid gap-2">
+          <Label htmlFor="order">Display Order</Label>
+          <Input 
+            id="order" 
+            name="order" 
+            type="number"
+            defaultValue={initialData?.order || 0}
+            placeholder="0" 
+          />
+        </div>
       </div>
 
       <div className="grid gap-2">
