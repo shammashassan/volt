@@ -101,8 +101,8 @@ export function CategoriesContent({ initialCategories: categories }: CategoriesC
   return (
     <div className="flex flex-1 flex-col @container/main">
       <div className="flex flex-col gap-4 px-4 py-8 md:gap-8 md:px-8">
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center justify-between mb-2">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div className="flex flex-col gap-2">
             <div className="flex items-center gap-4">
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
                 <Layers className="size-6" />
@@ -116,17 +116,17 @@ export function CategoriesContent({ initialCategories: categories }: CategoriesC
                 </Badge>
               </div>
             </div>
-            <Button onClick={() => {
-              setEditingCategory(null)
-              setIsOpen(true)
-            }}>
-              <Plus className="sm:mr-2 h-4 w-4" />
-              <span className="hidden sm:inline">Add Category</span>
-            </Button>
+            <p className="text-lg text-muted-foreground/80 max-w-2xl font-medium">
+              Define the taxonomy for your UI repository.
+            </p>
           </div>
-          <p className="text-lg text-muted-foreground/80 max-w-2xl font-medium">
-            Define the taxonomy for your UI repository.
-          </p>
+          <Button onClick={() => {
+            setEditingCategory(null)
+            setIsOpen(true)
+          }} className="w-full sm:w-auto shrink-0">
+            <Plus className="mr-2 h-4 w-4" />
+            Add Category
+          </Button>
         </div>
 
         <Separator className="opacity-40" />

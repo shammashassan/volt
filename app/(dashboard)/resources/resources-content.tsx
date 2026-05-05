@@ -103,8 +103,8 @@ export function ResourcesContent({ initialResources: resources, categories }: Re
   return (
     <div className="flex flex-1 flex-col @container/main">
       <div className="flex flex-col gap-4 px-4 py-8 md:gap-8 md:px-8">
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center justify-between mb-2">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div className="flex flex-col gap-2">
             <div className="flex items-center gap-4">
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
                 <Settings2 className="size-6" />
@@ -118,17 +118,17 @@ export function ResourcesContent({ initialResources: resources, categories }: Re
                 </Badge>
               </div>
             </div>
-            <Button onClick={() => {
-              setEditingResource(null)
-              setIsOpen(true)
-            }}>
-              <Plus className="sm:mr-2 h-4 w-4" />
-              <span className="hidden sm:inline">Add Resource</span>
-            </Button>
+            <p className="text-lg text-muted-foreground/80 max-w-2xl font-medium">
+              Manage your curated collection of UI tools and libraries.
+            </p>
           </div>
-          <p className="text-lg text-muted-foreground/80 max-w-2xl font-medium">
-            Manage your curated collection of UI tools and libraries.
-          </p>
+          <Button onClick={() => {
+            setEditingResource(null)
+            setIsOpen(true)
+          }} className="w-full sm:w-auto shrink-0">
+            <Plus className="mr-2 h-4 w-4" />
+            Add Resource
+          </Button>
         </div>
 
         <Separator className="opacity-40" />
