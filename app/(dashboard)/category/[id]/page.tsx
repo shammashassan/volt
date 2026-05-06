@@ -3,14 +3,22 @@ import { Badge } from "@/components/ui/badge"
 import { FileText } from "lucide-react"
 import { ICON_MAP } from "@/lib/icons"
 import { CategoryActions } from "./category-actions"
+import { auth } from "@/lib/auth"
+import { headers } from "next/headers"
 
 export default async function CategoryPage({ params }: { params: Promise<{ id: string }> }) {
   const { id: categoryId } = await params
-  const [category, resources, categories] = await Promise.all([
+  const [category, resources, categories, session] = await Promise.all([
     getCategoryById(categoryId),
     getResources(),
-    getCategories()
+    getCategories(),
+    auth.api.getSession({
+      headers: await headers()
+    })
   ])
+
+  const user = session?.user as any
+  const isAdmin = user?.role === "admin"
 
   const categoryResources = resources.filter((r) => r.category === categoryId)
 
@@ -54,6 +62,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ id: s
             categoryId={categoryId}
             categories={categories}
             resources={categoryResources}
+            isAdmin={isAdmin}
           />
         </div>
       </div>

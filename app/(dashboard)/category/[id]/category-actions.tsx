@@ -24,9 +24,10 @@ interface CategoryActionsProps {
   categoryId: string
   categories: any[]
   resources: Resource[]
+  isAdmin: boolean
 }
 
-export function CategoryActions({ categoryId, categories, resources }: CategoryActionsProps) {
+export function CategoryActions({ categoryId, categories, resources, isAdmin }: CategoryActionsProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [editMode, setEditMode] = useState(false)
@@ -48,24 +49,26 @@ export function CategoryActions({ categoryId, categories, resources }: CategoryA
   return (
     <>
       {/* Button row — sits inside the header flex */}
-      <div className="flex items-center gap-2 w-full sm:w-auto shrink-0">
-        <Button
-          variant={editMode ? "default" : "outline"}
-          onClick={() => setEditMode((v) => !v)}
-          className={cn(
-            "gap-2 transition-all",
-            editMode && "ring-2 ring-primary/40 ring-offset-2"
-          )}
-        >
-          <GripVertical className="size-4" />
-          {editMode ? "Done Editing" : "Edit Layout"}
-        </Button>
+      {isAdmin && (
+        <div className="flex items-center gap-2 w-full sm:w-auto shrink-0">
+          <Button
+            variant={editMode ? "default" : "outline"}
+            onClick={() => setEditMode((v) => !v)}
+            className={cn(
+              "gap-2 transition-all",
+              editMode && "ring-2 ring-primary/40 ring-offset-2"
+            )}
+          >
+            <GripVertical className="size-4" />
+            {editMode ? "Done Editing" : "Edit Layout"}
+          </Button>
 
-        <Button onClick={() => setIsOpen(true)} className="gap-2">
-          <Plus className="size-4" />
-          Add Resource
-        </Button>
-      </div>
+          <Button onClick={() => setIsOpen(true)} className="gap-2">
+            <Plus className="size-4" />
+            Add Resource
+          </Button>
+        </div>
+      )}
 
       {/* 
         Full-width block: separator + edit hint + grid.
@@ -74,13 +77,13 @@ export function CategoryActions({ categoryId, categories, resources }: CategoryA
       <div className="basis-full w-full flex flex-col gap-4">
         <Separator className="opacity-40" />
 
-        {editMode && (
+        {editMode && isAdmin && (
           <p className="text-[11px] text-muted-foreground/50 italic px-0">
             Drag cards to reorder · Click <span className="text-destructive/70">🗑</span> to delete
           </p>
         )}
 
-        <CategoryResourcesGrid initialResources={resources} editMode={editMode} />
+        <CategoryResourcesGrid initialResources={resources} editMode={editMode && isAdmin} />
       </div>
 
       {/* Add Resource Dialog */}
