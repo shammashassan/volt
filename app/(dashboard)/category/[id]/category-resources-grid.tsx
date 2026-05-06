@@ -74,7 +74,7 @@ function SortableResourceCard({
       <Button
         variant="ghost"
         size="icon"
-        className="absolute top-2 left-2 z-10 h-7 w-7 cursor-grab bg-background/90 shadow-md border border-border/60 sm:opacity-0 sm:group-hover/sortable:opacity-100 transition-opacity active:cursor-grabbing"
+        className="absolute top-2 left-2 z-10 h-7 w-7 cursor-grab touch-none bg-background/90 shadow-md border border-border/60 sm:opacity-0 sm:group-hover/sortable:opacity-100 transition-opacity active:cursor-grabbing"
         {...attributes}
         {...listeners}
       >
