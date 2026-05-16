@@ -120,6 +120,11 @@ export function CategoryResourcesGrid({ initialResources, editMode }: CategoryRe
   const [isDeletingLink, setIsDeletingLink] = useState<string | null>(null)
   const router = useRouter()
 
+  // Synchronize state with props when Server Component re-renders
+  React.useEffect(() => {
+    setResources(initialResources)
+  }, [initialResources])
+
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
   )

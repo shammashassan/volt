@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { getResources, getCategories } from "@/lib/db"
+import { getStats } from "@/lib/db"
 import {
   ZapIcon,
   LayersIcon,
@@ -8,17 +8,12 @@ import {
 } from "lucide-react"
 
 export async function DashboardStats() {
-  const [resources, categories] = await Promise.all([
-    getResources(),
-    getCategories()
-  ])
-  const totalResources = resources.length
-  const totalCategories = categories.length
+  const statsData = await getStats()
 
   const stats = [
     {
       title: "Total Resources",
-      value: totalResources.toString(),
+      value: statsData.totalResources.toString(),
       description: "Curated UI library items",
       icon: LayersIcon,
       color: "text-blue-500",
@@ -26,7 +21,7 @@ export async function DashboardStats() {
     },
     {
       title: "Categories",
-      value: totalCategories.toString(),
+      value: statsData.totalCategories.toString(),
       description: "Organized tool sections",
       icon: ZapIcon,
       color: "text-amber-500",
@@ -42,7 +37,7 @@ export async function DashboardStats() {
     },
     {
       title: "Latest Add",
-      value: resources[0]?.name || "None",
+      value: statsData.latestResourceName,
       description: "Most recently synced",
       icon: CpuIcon,
       color: "text-purple-500",

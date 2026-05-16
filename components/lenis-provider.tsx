@@ -3,12 +3,17 @@
 import Lenis from "lenis";
 import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 export function LenisProvider({ children }: { children: React.ReactNode }) {
   const lenisRef = useRef<Lenis | null>(null);
   const pathname = usePathname();
 
   useEffect(() => {
+    // Only initialize ScrollTrigger and Lenis integration on the client
+    gsap.registerPlugin(ScrollTrigger);
+
     const lenis = new Lenis({
       duration: 1.2,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
@@ -22,25 +27,23 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
 
     lenisRef.current = lenis;
 
-    let raf: number;
+    // Connect Lenis to ScrollTrigger
+    lenis.on('scroll', ScrollTrigger.update);
 
-    function raf_loop(time: number) {
-      lenis.raf(time);
-      raf = requestAnimationFrame(raf_loop);
-    }
+    gsap.ticker.add((time) => {
+      lenis.raf(time * 1000);
+    });
 
-    raf = requestAnimationFrame(raf_loop);
+    gsap.ticker.lagSmoothing(0);
 
     return () => {
-      cancelAnimationFrame(raf);
       lenis.destroy();
+      gsap.ticker.remove(lenis.raf);
       lenisRef.current = null;
     };
   }, []);
 
   // On every route change, scroll to top and resize so Lenis recalculates
-  // document dimensions (the dashboard layout and root layout have very
-  // different scroll heights, which confuses Lenis on client-side navigation)
   useEffect(() => {
     const lenis = lenisRef.current;
     if (!lenis) return;
@@ -49,6 +52,7 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
     const id = setTimeout(() => {
       lenis.scrollTo(0, { immediate: true });
       lenis.resize();
+      ScrollTrigger.refresh();
     }, 50);
 
     return () => clearTimeout(id);

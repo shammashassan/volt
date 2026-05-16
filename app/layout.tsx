@@ -8,6 +8,7 @@ import { LenisProvider } from "@/components/lenis-provider";
 const inter = Inter({
   variable: "--font-sans",
   subsets: ["latin"],
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
@@ -27,9 +28,9 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${inter.variable} h-full antialiased`}
+      className={`${inter.variable} h-full antialiased font-sans`}
     >
-      <body className="min-h-full flex flex-col font-sans [--header-height:calc(--spacing(14))]">
+      <body className="min-h-full flex flex-col [--header-height:calc(--spacing(14))]">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

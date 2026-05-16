@@ -2,15 +2,15 @@ import * as React from "react"
 import { DashboardStats } from "@/components/dashboard-stats"
 import { CategoryExplorer } from "@/components/category-explorer"
 import { ResourceCard } from "@/components/resource-card"
-import { getResources } from "@/lib/db"
+import { getFeaturedResources } from "@/lib/db"
 import { Separator } from "@/components/ui/separator"
 import { SparklesIcon, RocketIcon } from "lucide-react"
 
-export const dynamic = "force-dynamic";
+// Remove force-dynamic to allow ISR/Static caching with revalidateTag
+// export const dynamic = "force-dynamic";
 
 export default async function ExplorePage() {
-  const resources = await getResources()
-  const featuredResources = resources.filter(res => res.featured)
+  const featuredResources = await getFeaturedResources()
 
   return (
     <div className="@container/main flex flex-1 flex-col gap-8 pb-12">
