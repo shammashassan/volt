@@ -112,7 +112,7 @@ export default function LandingPage() {
               </nav>
               <div className="h-px w-full max-w-xs bg-border" />
               <p className="text-base text-muted-foreground">
-                © 2026 UI Dev Second Brain. Built for the design engineering community.
+                © 2026 Second Brain. Built for the design engineering community.
               </p>
             </div>
           </div>

@@ -4,11 +4,12 @@ import { NextRequest, NextResponse } from "next/server";
 export async function proxy(request: NextRequest) {
     const { pathname } = request.nextUrl;
 
-    // These are already handled by the matcher, but we keep a safety check
-    const isStaticAsset = 
-        pathname.startsWith("/_next") || 
+    const isStaticAsset =
+        pathname.startsWith("/_next") ||
         pathname.startsWith("/api") ||
-        pathname === "/favicon.ico";
+        pathname === "/favicon.ico" ||
+        pathname === "/site.webmanifest" ||
+        pathname.endsWith(".png");
 
     if (isStaticAsset) {
         return NextResponse.next();
@@ -20,9 +21,9 @@ export async function proxy(request: NextRequest) {
         headers: request.headers
     });
 
-    const isPublicPath = 
-        pathname === "/" || 
-        pathname === "/login" || 
+    const isPublicPath =
+        pathname === "/" ||
+        pathname === "/login" ||
         pathname === "/pending-approval";
 
     if (!session) {
@@ -57,7 +58,7 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    "/((?!api|_next/static|_next/image|favicon.ico).*)",
-  ],
+    matcher: [
+        "/((?!api|_next/static|_next/image|favicon.ico|site\\.webmanifest|.*\\.png).*)",
+    ],
 };
