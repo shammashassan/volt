@@ -1,0 +1,22 @@
+User-agent: *
+Allow: /
+
+# Auth & approval flow
+Disallow: /login
+Disallow: /pending-approval
+
+# Protected dashboard routes
+Disallow: /account
+Disallow: /categories
+Disallow: /category
+Disallow: /category/
+Disallow: /commands
+Disallow: /explore
+Disallow: /resources
+Disallow: /users
+
+# API routes
+Disallow: /api/
+
+# Sitemap
+Sitemap: https://ui-dev-second-brain.vercel.app/sitemap.xml
