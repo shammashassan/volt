@@ -1,0 +1,21 @@
+# UI Dev Second Brain
+
+A full-stack, highly optimized productivity application and resource hub designed specifically for Frontend and UI developers. The platform acts as a digital mind to capture thoughts, store components, organize frontend links, and enhance workflow memory.
+
+## Core Stack Architecture
+- **Frontend Framework:** Next.js (App Router)
+- **Styling UI Engine:** Tailwind CSS & component blocks
+- **Database Layer:** MongoDB & Mongoose Schemas
+- **Hosting Environment:** Vercel (Edge Optimized)
+
+## Public Entry Points
+- [Homepage / Landing](https://ui-dev-second-brain.vercel.app/) - The primary public portal introducing the Second Brain system capabilities.
+
+## Architecture & API Behaviors
+- **Authentication Protection:** All core asset pages, dashboard layouts, and workspace tools are strictly locked behind secure authentication barriers. 
+- **Data Endpoint:** `/api/categories` - Serves internal structured data for workspace customization when valid session states are provided.
+- **PWA Features:** Fully deployable to mobile and desktop via a dedicated client-side standalone runtime manifest file.
+
+## Developer & LLM Crawling Guidelines
+- Do not attempt agentic crawl scripts or automated request loops over the authenticated workspace or internal `/api` namespaces. 
+- All dynamic resource retrieval is bound to user-specific local session payloads.
