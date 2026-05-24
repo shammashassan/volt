@@ -12,10 +12,12 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"),
   title: "Second Brain",
   description: "A professional developer resource hub for UI and Frontend tools.",
   manifest: "/site.webmanifest",
+  verification: {
+    google: "-Yn2JXXqhEK1dVAiHMaEM_OapfXKA3OHM32EwznOG5o"
+  }
 };
 
 import { Toaster } from "@/components/ui/sonner"
