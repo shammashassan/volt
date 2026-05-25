@@ -146,7 +146,7 @@ export function ResourcesContent({ initialResources: resources, categories }: Re
             <DialogHeader>
               <DialogTitle>{editingResource ? "Edit Resource" : "Add Resource"}</DialogTitle>
               <DialogDescription>
-                {editingResource ? "Update the details of this resource." : "Add a new resource to your second brain."}
+                {editingResource ? "Update the details of this resource." : "Add a new resource to your Volt."}
               </DialogDescription>
             </DialogHeader>
             <ResourceForm

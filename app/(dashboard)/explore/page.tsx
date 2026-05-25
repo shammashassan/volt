@@ -23,7 +23,7 @@ export default async function ExplorePage() {
           </div>
           <h1 className="text-4xl font-black tracking-tight lg:text-5xl text-foreground leading-[1.1]!">
             Your <span className="italic lowercase text-primary/80">UI Development</span> <br />
-            Second Brain.
+            Volt.
           </h1>
           <p className="text-lg text-muted-foreground/80 mt-4 leading-relaxed font-medium">
             A specialized hub for frontend developers to store, organize, and quickly retrieve

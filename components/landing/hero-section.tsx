@@ -56,22 +56,22 @@ export function HeroSection() {
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75"></span>
               <span className="relative inline-flex h-2 w-2 rounded-full bg-primary"></span>
             </span>
-            v2.0 is now live
+            Volt v1.0 • The UI Dev's Second Brain
           </motion.div>
 
           <motion.div variants={VARIANTS_ITEM}>
-            <h1 className="text-4xl font-bold tracking-tight sm:text-6xl lg:text-8xl">
-              The UI Dev
+            <h1 className="text-4xl font-bold tracking-tight sm:text-6xl lg:text-7xl max-w-4xl mx-auto leading-tight">
+              The ultimate workspace
               <br />
               <span className="bg-linear-to-r from-primary to-primary/40 bg-clip-text text-transparent">
-                Second Brain
+                for design engineers.
               </span>
             </h1>
           </motion.div>
 
-          <motion.div variants={VARIANTS_ITEM} className="max-w-2xl">
-            <p className="text-lg text-muted-foreground sm:text-xl lg:text-2xl">
-              The ultimate workspace for design engineers. A curated repository of high-fidelity components, visual tools, and interaction patterns.
+          <motion.div variants={VARIANTS_ITEM} className="max-w-2xl mx-auto">
+            <p className="text-lg text-muted-foreground sm:text-xl">
+              A curated vault to archive, organize, and source production-ready components, interactive animations, and visual tools.
             </p>
           </motion.div>
 

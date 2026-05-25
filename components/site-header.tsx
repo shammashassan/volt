@@ -53,7 +53,7 @@ export function SiteHeader() {
                 <BreadcrumbLink asChild>
                   <Link href="/" className="flex items-center gap-2 text-muted-foreground/60 transition-colors hover:text-foreground">
                     <Home className="size-4" />
-                    Second Brain
+                    Volt
                   </Link>
                 </BreadcrumbLink>
               </BreadcrumbItem>

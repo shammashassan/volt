@@ -1,6 +1,6 @@
-# UI Dev Second Brain
+# Volt
 
-UI Dev Second Brain is a full-stack productivity platform and resource hub for frontend and UI developers. The application helps users store reusable UI components, organize frontend resources, save developer notes, and manage workflow knowledge.
+Volt is a full-stack productivity platform and resource hub for frontend and UI developers. The application helps users store reusable UI components, organize frontend resources, save developer notes, and manage workflow knowledge.
 
 ## Stack
 - Next.js App Router
@@ -10,7 +10,7 @@ UI Dev Second Brain is a full-stack productivity platform and resource hub for f
 - Vercel
 
 ## Public URL
-https://ui-dev-second-brain.vercel.app/
+https://ui-volt.vercel.app/
 
 ## Features
 - Authentication-protected dashboard

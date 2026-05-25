@@ -19,4 +19,4 @@ Disallow: /users
 Disallow: /api/
 
 # Sitemap
-Sitemap: https://ui-dev-second-brain.vercel.app/sitemap.xml
+Sitemap: https://ui-volt.vercel.app/sitemap.xml

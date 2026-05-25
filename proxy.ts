@@ -1,5 +1,5 @@
-import { auth } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
+import { getCookieCache } from "better-auth/cookies";
 
 export async function proxy(request: NextRequest) {
     const { pathname } = request.nextUrl;
@@ -15,11 +15,9 @@ export async function proxy(request: NextRequest) {
         return NextResponse.next();
     }
 
-    // getSession will now use the cookie cache enabled in auth.ts
-    // avoiding a database hit on every navigation.
-    const session = await auth.api.getSession({
-        headers: request.headers
-    });
+    // getCookieCache fetches the session from the client's cookie cache,
+    // avoiding database connection establishment and query on every page navigation.
+    const session = await getCookieCache(request);
 
     const isPublicPath =
         pathname === "/" ||

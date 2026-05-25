@@ -79,9 +79,9 @@ export default function LandingPage() {
               <h2 className="mb-6 text-4xl font-bold sm:text-7xl">
                 Level up your workflow.
               </h2>
-              <h3 className="sr-only tracking-tight">The ultimate UI Dev Second Brain</h3>
+              <h3 className="sr-only tracking-tight">Volt - The ultimate workspace for design engineers</h3>
               <p className="mx-auto mb-12 max-w-2xl text-xl text-muted-foreground">
-                Join thousands of design engineers using the Second Brain to stay ahead of the UI curve. Curated weekly.
+                Join thousands of design engineers using Volt to stay ahead of the UI curve. Curated weekly.
               </p>
               <Link
                 href="/explore"
@@ -101,7 +101,7 @@ export default function LandingPage() {
                 <div className="flex size-10 items-center justify-center rounded-xl bg-primary text-primary-foreground">
                   <Rocket className="size-6" />
                 </div>
-                <span className="text-2xl font-bold tracking-tighter">UI Dev Second Brain</span>
+                <span className="text-2xl font-bold tracking-tighter">Volt</span>
               </div>
               <nav className="flex flex-wrap justify-center gap-x-10 gap-y-4">
                 {['Explore', 'Components', 'Patterns', 'Docs', 'GitHub', 'Twitter'].map((item) => (
@@ -112,7 +112,7 @@ export default function LandingPage() {
               </nav>
               <div className="h-px w-full max-w-xs bg-border" />
               <p className="text-base text-muted-foreground">
-                © 2026 Second Brain. Built for the design engineering community.
+                © 2026 Volt. Built for the design engineering community.
               </p>
             </div>
           </div>

@@ -12,8 +12,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Second Brain",
-  description: "A professional developer resource hub for UI and Frontend tools.",
+  title: "Volt",
+  description: "Volt v1.0 - The UI Dev's Second Brain. The ultimate workspace for design engineers.",
   manifest: "/site.webmanifest",
   verification: {
     google: "-Yn2JXXqhEK1dVAiHMaEM_OapfXKA3OHM32EwznOG5o"

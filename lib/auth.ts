@@ -1,4 +1,4 @@
-import { betterAuth } from "better-auth/minimal";
+import { betterAuth } from "better-auth";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
 import { admin } from "better-auth/plugins";
 import { nextCookies } from "better-auth/next-js";
@@ -11,6 +11,13 @@ export const auth = betterAuth({
   database: mongodbAdapter(db, {
     client: client
   }),
+  rateLimit: {
+    enabled: true,
+    storage: "database",
+    customRules: {
+      "/get-session": false,
+    },
+  },
   baseURL: process.env.NEXT_PUBLIC_APP_URL || process.env.BETTER_AUTH_URL || "http://localhost:3000",
   emailAndPassword: { enabled: true },
   session: {
@@ -24,10 +31,10 @@ export const auth = betterAuth({
   },
   user: {
     deleteUser: {
-        enabled: true,
+      enabled: true,
     },
     changeEmail: {
-        enabled: true,
+      enabled: true,
     },
     additionalFields: {
       isApproved: {

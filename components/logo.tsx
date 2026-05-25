@@ -7,7 +7,7 @@ export const Logo = () => {
             <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                 <Command className="size-4" />
             </div>
-            <span className="text-xl font-bold tracking-tight">UI Dev</span>
+            <span className="text-xl font-bold tracking-tight">Volt</span>
         </div>
     )
 }
