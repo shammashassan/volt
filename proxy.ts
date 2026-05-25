@@ -9,7 +9,9 @@ export async function proxy(request: NextRequest) {
         pathname.startsWith("/api") ||
         pathname === "/favicon.ico" ||
         pathname === "/site.webmanifest" ||
-        pathname.endsWith(".png");
+        pathname.endsWith(".png") ||
+        pathname.endsWith(".xml") ||
+        pathname.endsWith(".txt");
 
     if (isStaticAsset) {
         return NextResponse.next();
