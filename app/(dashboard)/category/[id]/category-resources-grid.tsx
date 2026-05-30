@@ -46,10 +46,12 @@ function SortableResourceCard({
   resource,
   onDelete,
   isDeletingLink,
+  priority = false,
 }: {
   resource: Resource
   onDelete: (link: string) => void
   isDeletingLink: string | null
+  priority?: boolean
 }) {
   const {
     attributes,
@@ -98,7 +100,7 @@ function SortableResourceCard({
 
       {/* Non-interactive card in edit mode */}
       <div className={cn("pointer-events-none select-none", isDragging && "ring-2 ring-primary ring-offset-2 rounded-xl")}>
-        <ResourceCard resource={resource} />
+        <ResourceCard resource={resource} priority={priority} />
       </div>
     </div>
   )
@@ -195,8 +197,8 @@ export function CategoryResourcesGrid({ initialResources, editMode }: CategoryRe
   if (!editMode) {
     return (
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {resources.map((resource) => (
-          <ResourceCard key={resource.link} resource={resource} />
+        {resources.map((resource, index) => (
+          <ResourceCard key={resource.link} resource={resource} priority={index < 6} />
         ))}
       </div>
     )
@@ -223,12 +225,13 @@ export function CategoryResourcesGrid({ initialResources, editMode }: CategoryRe
           strategy={rectSortingStrategy}
         >
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {resources.map((resource) => (
+            {resources.map((resource, index) => (
               <SortableResourceCard
                 key={resource.link}
                 resource={resource}
                 onDelete={handleDelete}
                 isDeletingLink={isDeletingLink}
+                priority={index < 6}
               />
             ))}
           </div>
@@ -237,7 +240,7 @@ export function CategoryResourcesGrid({ initialResources, editMode }: CategoryRe
         <DragOverlay>
           {activeResource && (
             <div className="rotate-2 scale-105 opacity-90 shadow-2xl">
-              <ResourceCard resource={activeResource} />
+              <ResourceCard resource={activeResource} priority={true} />
             </div>
           )}
         </DragOverlay>
