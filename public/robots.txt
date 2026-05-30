@@ -9,7 +9,6 @@ Disallow: /pending-approval
 Disallow: /account
 Disallow: /categories
 Disallow: /category
-Disallow: /category/
 Disallow: /commands
 Disallow: /explore
 Disallow: /resources
