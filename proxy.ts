@@ -4,14 +4,11 @@ import { getCookieCache } from "better-auth/cookies";
 export async function proxy(request: NextRequest) {
     const { pathname } = request.nextUrl;
 
+    // Safety fallback check matching the clean static bypass rules
     const isStaticAsset =
         pathname.startsWith("/_next") ||
         pathname.startsWith("/api") ||
-        pathname === "/favicon.ico" ||
-        pathname === "/site.webmanifest" ||
-        pathname.endsWith(".png") ||
-        pathname.endsWith(".xml") ||
-        pathname.endsWith(".txt");
+        pathname.includes("."); // Catches all files with extensions (.ico, .xml, .png, etc.)
 
     if (isStaticAsset) {
         return NextResponse.next();
@@ -58,7 +55,8 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
+    // Ultra-clean lookahead regex pattern optimization
     matcher: [
-        "/((?!api|_next/static|_next/image|favicon.ico|site\\.webmanifest|.*\\.png).*)",
+        "/((?!api(?:/|$)|_next/static|_next/image|.*\\..*).*)",
     ],
 };
