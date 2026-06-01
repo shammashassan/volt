@@ -21,7 +21,7 @@ export function SiteHeader() {
   const pathname = usePathname()
   const [categories, setCategories] = useState<any[]>([])
   const isHome = pathname === "/"
-  
+
   useEffect(() => {
     async function fetchCategories() {
       try {
@@ -45,7 +45,7 @@ export function SiteHeader() {
           <SidebarTrigger className="-ml-1" />
           <Separator
             orientation="vertical"
-            className="mx-2 data-[orientation=vertical]:h-4 hidden sm:block"
+            className="mx-2 hidden lg:block"
           />
           <Breadcrumb className="hidden md:block">
             <BreadcrumbList>

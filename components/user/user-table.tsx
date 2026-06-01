@@ -83,32 +83,32 @@ export function UserTable({ users, onApprove, onSetRole, onBan, onDelete, curren
               {user.id !== currentUserId ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="h-8 w-8 p-0">
-                      <MoreHorizontal className="h-4 w-4" />
+                    <Button variant="ghost" className="size-8 p-0">
+                      <MoreHorizontal className="size-4" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-48">
                     <DropdownMenuLabel>Actions</DropdownMenuLabel>
                     {!user.isApproved && (
                       <DropdownMenuItem onClick={() => onApprove(user.id)} className="text-emerald-500 focus:text-emerald-500">
-                        <CheckCircle2 className="mr-2 h-4 w-4" />
+                        <CheckCircle2 className="mr-2 size-4" />
                         Approve User
                       </DropdownMenuItem>
                     )}
                     <DropdownMenuSeparator />
                     <DropdownMenuGroup>
                       <DropdownMenuItem onClick={() => onSetRole(user.id, user.role === "admin" ? "user" : "admin")}>
-                        {user.role === "admin" ? <ShieldAlert className="mr-2 h-4 w-4" /> : <ShieldCheck className="mr-2 h-4 w-4" />}
+                        {user.role === "admin" ? <ShieldAlert className="mr-2 size-4" /> : <ShieldCheck className="mr-2 size-4" />}
                         Make {user.role === "admin" ? "User" : "Admin"}
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => onBan(user.id, !!user.banned)} className={user.banned ? "text-emerald-500" : "text-amber-500"}>
-                        {user.banned ? <Unlock className="mr-2 h-4 w-4" /> : <Ban className="mr-2 h-4 w-4" />}
+                        {user.banned ? <Unlock className="mr-2 size-4" /> : <Ban className="mr-2 size-4" />}
                         {user.banned ? "Unban User" : "Ban User"}
                       </DropdownMenuItem>
                     </DropdownMenuGroup>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={() => onDelete(user.id)} className="text-red-500 focus:text-red-500">
-                      <Trash2 className="mr-2 h-4 w-4" />
+                      <Trash2 className="mr-2 size-4" />
                       Delete User
                     </DropdownMenuItem>
                   </DropdownMenuContent>

@@ -1,4 +1,5 @@
 import { AppSidebar } from "@/components/app-sidebar"
+import { SiteFooter } from "@/components/site-footer"
 import { SiteHeader } from "@/components/site-header"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 
@@ -19,6 +20,7 @@ export default function DashboardLayout({
             </div>
           </SidebarInset>
         </div>
+        <SiteFooter />
       </SidebarProvider>
     </div>
   )

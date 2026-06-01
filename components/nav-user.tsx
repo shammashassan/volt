@@ -61,7 +61,7 @@ export function NavUser() {
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <Avatar className="h-8 w-8 rounded-lg grayscale">
+              <Avatar className="size-8 rounded-lg grayscale">
                 <AvatarImage src={user.image || ""} alt={user.name} />
                 <AvatarFallback className="rounded-lg">{user.name.slice(0, 2).toUpperCase()}</AvatarFallback>
               </Avatar>
@@ -82,7 +82,7 @@ export function NavUser() {
           >
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                <Avatar className="h-8 w-8 rounded-lg">
+                <Avatar className="size-8 rounded-lg">
                   <AvatarImage src={user.image || ""} alt={user.name} />
                   <AvatarFallback className="rounded-lg">{user.name.slice(0, 2).toUpperCase()}</AvatarFallback>
                 </Avatar>
@@ -98,7 +98,7 @@ export function NavUser() {
             <DropdownMenuGroup>
               <DropdownMenuItem asChild>
                 <Link href="/account" className="flex w-full items-center">
-                  <CircleUserRoundIcon className="mr-2 h-4 w-4" />
+                  <CircleUserRoundIcon className="mr-2 size-4" />
                   Account
                 </Link>
               </DropdownMenuItem>
