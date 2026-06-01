@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getCookieCache } from "better-auth/cookies";
+import { getCookieCache, getSessionCookie } from "better-auth/cookies";
 
 export async function proxy(request: NextRequest) {
     const { pathname } = request.nextUrl;
@@ -24,6 +24,15 @@ export async function proxy(request: NextRequest) {
         pathname === "/pending-approval";
 
     if (!session) {
+        // Fallback check: if the cookie cache is empty/expired, check if the session cookie itself exists
+        const sessionCookie = getSessionCookie(request);
+
+        if (sessionCookie) {
+            // Allow the request to proceed. The Server Components / Page will validate it 
+            // and automatically rebuild/refresh the client's cookie cache.
+            return NextResponse.next();
+        }
+
         if (isPublicPath) {
             return NextResponse.next();
         }
