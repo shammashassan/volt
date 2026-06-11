@@ -22,7 +22,6 @@ import { CSS } from "@dnd-kit/utilities"
 import { restrictToParentElement } from "@dnd-kit/modifiers"
 import { Resource } from "@/lib/data"
 import { ResourceCard } from "@/components/resource-card"
-import { Button } from "@/components/ui/button"
 import { GripVertical, Trash2, Loader2 } from "lucide-react"
 import {
   AlertDialog,
@@ -32,6 +31,7 @@ import {
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
+  AlertDialogMedia,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { updateResourceOrdersAction, deleteResourceAction } from "@/lib/actions"
@@ -71,24 +71,23 @@ function SortableResourceCard({
 
   return (
     <div ref={setNodeRef} style={style} className="relative group/sortable">
-      {/* Drag handle overlay */}
-      <Button
-        variant="ghost"
-        size="icon"
-        className="absolute top-2 left-2 z-10 h-7 w-7 cursor-grab touch-none bg-background/90 shadow-md border border-border/60 sm:opacity-0 sm:group-hover/sortable:opacity-100 transition-opacity active:cursor-grabbing"
+      {/* Drag handle — matches resource-card overlay button style */}
+      <button
+        type="button"
+        className="absolute top-2 left-2 z-10 flex h-7 w-7 cursor-grab touch-none items-center justify-center rounded-lg bg-background/80 hover:bg-background border border-border/40 backdrop-blur-xs text-muted-foreground hover:text-foreground shadow-xs transition-all sm:opacity-0 sm:group-hover/sortable:opacity-100 active:cursor-grabbing"
         {...attributes}
         {...listeners}
+        aria-label="Drag to reorder"
       >
-        <GripVertical className="size-4 text-muted-foreground" />
-      </Button>
+        <GripVertical className="size-3.5" />
+      </button>
 
-      {/* Delete button */}
-      <Button
-        variant="destructive"
-        size="icon"
+      {/* Delete button — matches resource-card overlay delete style */}
+      <button
+        type="button"
         onClick={() => onDelete(resource.link)}
         disabled={isDeletingLink === resource.link}
-        className="absolute top-2 right-2 z-10 h-7 w-7 shadow-md sm:opacity-0 sm:group-hover/sortable:opacity-100 [transition:opacity_150ms] disabled:opacity-50"
+        className="absolute top-2 right-2 z-10 flex h-7 w-7 items-center justify-center rounded-lg bg-destructive/80 hover:bg-destructive border border-destructive/20 backdrop-blur-xs text-destructive-foreground shadow-xs transition-all sm:opacity-0 sm:group-hover/sortable:opacity-100 disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
         aria-label={`Delete ${resource.name}`}
       >
         {isDeletingLink === resource.link ? (
@@ -96,7 +95,7 @@ function SortableResourceCard({
         ) : (
           <Trash2 className="size-3.5" />
         )}
-      </Button>
+      </button>
 
       {/* Non-interactive card in edit mode */}
       <div className={cn("pointer-events-none select-none", isDragging && "ring-2 ring-primary ring-offset-2 rounded-xl")}>
@@ -250,6 +249,9 @@ export function CategoryResourcesGrid({ initialResources, editMode }: CategoryRe
       <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
+            <AlertDialogMedia className="bg-destructive/10 text-destructive">
+              <Trash2 />
+            </AlertDialogMedia>
             <AlertDialogTitle>Delete this resource?</AlertDialogTitle>
             <AlertDialogDescription>
               This action cannot be undone. The resource will be permanently removed from the database.

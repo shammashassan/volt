@@ -12,10 +12,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Switch } from "@/components/ui/switch"
+import { Toggle } from "@/components/ui/toggle"
 import { Label } from "@/components/ui/label"
-import { Loader2, Sparkles, Check } from "lucide-react"
+import { Field, FieldGroup, FieldLabel } from "@/components/ui/field"
+import { Sparkles, Check, Star, Loader2 } from "lucide-react"
 import { toast } from "sonner"
+
+import { Resource, Category } from "@/lib/types"
 
 interface ResourceFormProps {
   initialData?: any
@@ -25,9 +28,27 @@ interface ResourceFormProps {
 }
 
 export function ResourceForm({ initialData, onSubmit, isLoading, categories }: ResourceFormProps) {
+  return (
+    <form action={onSubmit} className="grid gap-6">
+      <ResourceFormFields initialData={initialData} categories={categories} />
+      <Button type="submit" className="w-full" disabled={isLoading}>
+        {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+        {initialData?.id || initialData?._id ? "Update Resource" : "Add Resource"}
+      </Button>
+    </form>
+  )
+}
+
+interface ResourceFormFieldsProps {
+  initialData?: Partial<Resource>
+  categories: Category[]
+}
+
+export function ResourceFormFields({ initialData, categories }: ResourceFormFieldsProps) {
   const [copied, setCopied] = useState(false)
   const [name, setName] = useState(initialData?.name || "")
   const [link, setLink] = useState(initialData?.link || "")
+  const [featured, setFeatured] = useState(!!initialData?.featured)
 
   const copyPrompt = () => {
     const prompt = `Research and write a concise, compelling 1-sentence description for the UI resource "${name}" (${link}). 
@@ -41,9 +62,9 @@ Format the response as a single sentence without quotes.`
   }
 
   return (
-    <form action={onSubmit} className="grid gap-6">
-      <div className="grid gap-2">
-        <Label htmlFor="name">Resource Name</Label>
+    <FieldGroup className="py-2">
+      <Field>
+        <FieldLabel htmlFor="name">Resource Name</FieldLabel>
         <Input 
           id="name" 
           name="name" 
@@ -52,10 +73,10 @@ Format the response as a single sentence without quotes.`
           placeholder="e.g. Aceternity UI" 
           required 
         />
-      </div>
+      </Field>
       
-      <div className="grid gap-2">
-        <Label htmlFor="link">Link URL</Label>
+      <Field>
+        <FieldLabel htmlFor="link">Link URL</FieldLabel>
         <Input 
           id="link" 
           name="link" 
@@ -65,27 +86,27 @@ Format the response as a single sentence without quotes.`
           placeholder="https://..." 
           required 
         />
-      </div>
+      </Field>
 
       <div className="grid grid-cols-2 gap-4">
-        <div className="grid gap-2">
-          <Label htmlFor="category">Category</Label>
+        <Field>
+          <FieldLabel htmlFor="category">Category</FieldLabel>
           <Select name="category" defaultValue={initialData?.category || ""}>
-            <SelectTrigger>
+            <SelectTrigger id="category">
               <SelectValue placeholder="Select" />
             </SelectTrigger>
             <SelectContent>
               {categories.map((cat) => (
-                <SelectItem key={cat.id} value={cat.id}>
-                  {cat.title}
+                <SelectItem key={cat.id || cat._id?.toString()} value={cat.id || cat._id?.toString() || ""}>
+                  {cat.title || cat.name}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
-        </div>
+        </Field>
         
-        <div className="grid gap-2">
-          <Label htmlFor="order">Display Order</Label>
+        <Field>
+          <FieldLabel htmlFor="order">Display Order</FieldLabel>
           <Input 
             id="order" 
             name="order" 
@@ -93,12 +114,12 @@ Format the response as a single sentence without quotes.`
             defaultValue={initialData?.order || 0}
             placeholder="0" 
           />
-        </div>
+        </Field>
       </div>
 
-      <div className="grid gap-2">
+      <Field>
         <div className="flex items-center justify-between">
-          <Label htmlFor="description">Description</Label>
+          <FieldLabel htmlFor="description">Description</FieldLabel>
           <Button 
             type="button" 
             variant="ghost" 
@@ -119,17 +140,22 @@ Format the response as a single sentence without quotes.`
           required
           className="min-h-[100px]"
         />
-      </div>
+      </Field>
 
-      <div className="flex items-center space-x-2">
-        <Switch id="featured" name="featured" defaultChecked={initialData?.featured} />
-        <Label htmlFor="featured">Featured Resource</Label>
-      </div>
-
-      <Button type="submit" className="w-full" disabled={isLoading}>
-        {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-        {initialData ? "Update Resource" : "Add Resource"}
-      </Button>
-    </form>
+      <Field className="flex flex-col gap-1.5">
+        <FieldLabel>Featured</FieldLabel>
+        <Toggle
+          id="featured-toggle"
+          pressed={featured}
+          onPressedChange={setFeatured}
+          variant="outline"
+          className="h-10 w-full justify-start px-3 gap-2 text-xs font-medium text-muted-foreground hover:bg-muted hover:text-foreground data-[state=on]:bg-muted data-[state=on]:text-foreground"
+        >
+          <Star className={`size-3.5 ${featured ? "fill-current" : ""}`} />
+          <span>Featured Resource</span>
+        </Toggle>
+        <input type="hidden" name="featured" value={featured ? "on" : "off"} />
+      </Field>
+    </FieldGroup>
   )
 }

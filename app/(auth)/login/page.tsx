@@ -1,5 +1,6 @@
 import { LoginForm } from "@/components/login-form"
 import { FlickeringGrid } from "@/components/ui/flickering-grid"
+import { Suspense } from "react"
 
 export default function LoginPage() {
   return (
@@ -13,7 +14,13 @@ export default function LoginPage() {
         flickerChance={0.1}
       />
       <div className="relative z-10 w-full max-w-sm md:max-w-4xl">
-        <LoginForm />
+        <Suspense fallback={
+          <div className="flex h-40 items-center justify-center rounded-xl bg-background/60 backdrop-blur-xl">
+            <div className="size-8 rounded-full border-2 border-primary/20 border-t-primary animate-spin" />
+          </div>
+        }>
+          <LoginForm />
+        </Suspense>
       </div>
     </div>
   )

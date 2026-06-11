@@ -29,10 +29,11 @@ import {
   Bell,
   HelpCircle,
   FolderOpen,
-  Shapes
+  Shapes,
+  type LucideIcon
 } from "lucide-react"
 
-export const ICON_MAP: Record<string, any> = {
+export const ICON_MAP: Record<string, LucideIcon> = {
   Rocket,
   Component,
   Zap,

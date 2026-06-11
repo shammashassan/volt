@@ -3,7 +3,6 @@
 import { ColumnDef } from "@tanstack/react-table"
 import { Resource } from "@/lib/data"
 import { Badge } from "@/components/ui/badge"
-import { Checkbox } from "@/components/ui/checkbox"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -81,11 +80,11 @@ export const columns = (
       cell: ({ row }) => (
         <div className="flex items-center">
           {row.getValue("featured") ? (
-            <Badge variant="amber" appearance="outline">
+            <Badge variant="secondary" >
               Featured
             </Badge>
           ) : (
-            <Badge variant="gray" appearance="outline">
+            <Badge variant="outline">
               Regular
             </Badge>
           )}

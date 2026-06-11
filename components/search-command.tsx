@@ -11,18 +11,43 @@ import {
   CommandSeparator,
 } from "@/components/ui/command"
 import { useRouter } from "next/navigation"
-import { 
-  SearchIcon, 
+import {
+  SearchIcon,
   ExternalLinkIcon,
-  FileTextIcon
+  FileTextIcon,
+  PlusIcon,
+  LayoutDashboardIcon,
+  StarIcon,
+  FolderIcon,
+  UserIcon,
+  BriefcaseIcon
 } from "lucide-react"
 import { ICON_MAP } from "@/lib/icons"
+import { useQuickCapture } from "./quick-capture-drawers"
+import { trackResourceViewAction } from "@/lib/actions"
+import { searchAction } from "@/lib/actions/search"
+import { Category, Resource, Note, Project, Person } from "@/lib/types"
+import { Kbd } from "@/components/ui/kbd"
 
 export function SearchCommand() {
   const [open, setOpen] = React.useState(false)
-  const [categories, setCategories] = React.useState<any[]>([])
-  const [resources, setResources] = React.useState<any[]>([])
+  const [searchQuery, setSearchQuery] = React.useState("")
+  const [results, setResults] = React.useState<{
+    resources: Resource[];
+    notes: Note[];
+    projects: Project[];
+    people: Person[];
+    categories: Category[];
+  }>({
+    resources: [],
+    notes: [],
+    projects: [],
+    people: [],
+    categories: []
+  })
+  const [isLoading, setIsLoading] = React.useState(false)
   const router = useRouter()
+  const { openCapture } = useQuickCapture()
 
   React.useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -36,33 +61,116 @@ export function SearchCommand() {
   }, [])
 
   React.useEffect(() => {
-    if (open) {
-      async function fetchData() {
+    const handleOpenSearch = () => setOpen(true)
+    window.addEventListener("open-global-search", handleOpenSearch)
+    return () => window.removeEventListener("open-global-search", handleOpenSearch)
+  }, [])
+
+  React.useEffect(() => {
+    if (!open) return
+
+    if (searchQuery.trim() === "") {
+      setResults({
+        resources: [],
+        notes: [],
+        projects: [],
+        people: [],
+        categories: []
+      })
+      setIsLoading(false)
+      return
+    }
+
+    const delayDebounceFn = setTimeout(() => {
+      async function performSearch() {
+        setIsLoading(true)
+        console.log("[SearchCommand] Searching database for query:", searchQuery)
         try {
-          const [catRes, resRes] = await Promise.all([
-            fetch('/api/categories'),
-            fetch('/api/resources')
-          ])
-          const cats = await catRes.json()
-          const ress = await resRes.json()
-          setCategories(cats)
-          setResources(ress)
+          const result = await searchAction(searchQuery)
+          console.log("[SearchCommand] Search action result:", result)
+          if (result.success && result.data) {
+            const data = result.data
+            setResults({
+              resources: data.resources || [],
+              notes: data.notes || [],
+              projects: data.projects || [],
+              people: data.people || [],
+              categories: data.categories || []
+            })
+          }
         } catch (error) {
-          console.error("Failed to fetch search data:", error)
+          console.error("[SearchCommand] Search failed:", error)
+        } finally {
+          setIsLoading(false)
         }
       }
-      fetchData()
-    }
-  }, [open])
 
-  const onSelect = (url: string) => {
+      performSearch()
+    }, 250) // 250ms debounce
+
+    return () => clearTimeout(delayDebounceFn)
+  }, [searchQuery, open])
+
+  const onSelectResource = async (resource: Resource) => {
     setOpen(false)
-    if (url.startsWith("http")) {
-      window.open(url, "_blank")
-    } else {
-      router.push(url)
+    const rawUrl = resource.url || resource.link || ""
+    const targetUrl = /^(https?:)?\/\//i.test(rawUrl) ? rawUrl : `https://${rawUrl}`
+    window.open(targetUrl, "_blank")
+    try {
+      const resourceId = resource._id?.toString() || resource.id
+      if (resourceId) {
+        await trackResourceViewAction(resourceId)
+      }
+    } catch (err) {
+      console.error("Failed to track resource view:", err)
     }
   }
+
+  const onSelectEntity = (path: string) => {
+    setOpen(false)
+    router.push(path)
+  }
+
+  const handleQuickCreate = (type: "resource" | "note" | "category" | "project" | "person") => {
+    setOpen(false)
+    setTimeout(() => {
+      openCapture(type)
+    }, 150)
+  }
+
+  const hasResults =
+    results.resources.length > 0 ||
+    results.notes.length > 0 ||
+    results.projects.length > 0 ||
+    results.people.length > 0 ||
+    results.categories.length > 0;
+
+  const quickCreateItems = [
+    { type: "resource" as const, label: "Create Resource" },
+    { type: "note" as const, label: "Create Note" },
+    { type: "category" as const, label: "Create Category" },
+    { type: "project" as const, label: "Create Project" },
+    { type: "person" as const, label: "Create Person" }
+  ];
+
+  const quickActionItems = [
+    { path: "/explore", label: "Go to Dashboard", icon: LayoutDashboardIcon },
+    { path: "/resources", label: "Open Resources", icon: StarIcon },
+    { path: "/categories", label: "Open Categories", icon: FolderIcon }
+  ];
+
+  const filteredQuickCreate = searchQuery.trim() === ""
+    ? quickCreateItems
+    : quickCreateItems.filter(item => item.label.toLowerCase().includes(searchQuery.toLowerCase()));
+
+  const filteredQuickActions = searchQuery.trim() === ""
+    ? quickActionItems
+    : quickActionItems.filter(item => item.label.toLowerCase().includes(searchQuery.toLowerCase()));
+
+  const hasAnyMatches =
+    filteredQuickCreate.length > 0 ||
+    filteredQuickActions.length > 0 ||
+    hasResults;
 
   return (
     <>
@@ -71,55 +179,162 @@ export function SearchCommand() {
         className="flex h-9 w-64 items-center gap-2 rounded-md border border-input bg-muted/40 px-3 text-sm text-muted-foreground transition-all hover:bg-muted"
       >
         <SearchIcon className="size-4" />
-        <span className="flex-1 text-left font-medium">Search labels, tools...</span>
-        <kbd className="pointer-events-none hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
-          <span className="text-xs">⌘</span>K
-        </kbd>
+        <span className="flex-1 text-left font-medium">Search anything</span>
+        <Kbd>⌘</Kbd>
       </button>
-      <CommandDialog open={open} onOpenChange={setOpen}>
-        <CommandInput placeholder="Type a category or resource to search..." />
+
+      <CommandDialog open={open} onOpenChange={setOpen} shouldFilter={false}>
+        <CommandInput
+          placeholder="Type to search resources, notes, projects, people..."
+          value={searchQuery}
+          onValueChange={setSearchQuery}
+        />
         <CommandList>
-          <CommandEmpty>No results found.</CommandEmpty>
-          <CommandGroup heading="Categories">
-            {categories.map((category) => {
-              const Icon = ICON_MAP[category.icon] || FileTextIcon
-              return (
-                <CommandItem
-                  key={category.id}
-                  onSelect={() => onSelect(`/category/${category.id}`)}
-                  className="flex items-center gap-2"
-                >
-                  {Icon && <Icon className="size-4 text-muted-foreground" />}
-                  <span className="font-medium text-foreground">{category.title}</span>
+          {/* Quick Create Actions */}
+          {filteredQuickCreate.length > 0 && (
+            <CommandGroup heading="Quick Create">
+              {filteredQuickCreate.map(item => (
+                <CommandItem key={item.type} onSelect={() => handleQuickCreate(item.type)}>
+                  <PlusIcon className="mr-2 size-4 text-primary" />
+                  <span>{item.label}</span>
                 </CommandItem>
-              )
-            })}
-          </CommandGroup>
-          <CommandSeparator />
-          <CommandGroup heading="Resources">
-            {resources.map((resource) => {
-              const category = categories.find(c => c.id === resource.category)
-              const Icon = category ? (ICON_MAP[category.icon] || ExternalLinkIcon) : ExternalLinkIcon
-              return (
-                <CommandItem
-                  key={resource.name}
-                  onSelect={() => onSelect(resource.link)}
-                  className="flex items-center justify-between"
-                >
-                  <div className="flex items-center gap-2">
-                    {Icon && <Icon className="size-4 text-muted-foreground/60" />}
-                    <span className="font-medium text-foreground">{resource.name}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] uppercase tracking-widest text-muted-foreground/40 font-bold">
-                      {category?.title || resource.category}
-                    </span>
-                    <ExternalLinkIcon className="size-3 text-muted-foreground/20" />
-                  </div>
-                </CommandItem>
-              )
-            })}
-          </CommandGroup>
+              ))}
+            </CommandGroup>
+          )}
+
+          {filteredQuickCreate.length > 0 && filteredQuickActions.length > 0 && <CommandSeparator />}
+
+          {/* Quick Actions / Navigation */}
+          {filteredQuickActions.length > 0 && (
+            <CommandGroup heading="Quick Actions">
+              {filteredQuickActions.map(item => {
+                const Icon = item.icon;
+                return (
+                  <CommandItem key={item.path} onSelect={() => onSelectEntity(item.path)}>
+                    <Icon className="mr-2 size-4" />
+                    <span>{item.label}</span>
+                  </CommandItem>
+                )
+              })}
+            </CommandGroup>
+          )}
+
+          {searchQuery.trim() !== "" && hasResults && <CommandSeparator />}
+
+          {isLoading && (
+            <div className="py-6 text-center text-sm text-muted-foreground">
+              Searching...
+            </div>
+          )}
+
+          {!isLoading && !hasAnyMatches && searchQuery.trim() !== "" && (
+            <div className="py-6 text-center text-sm text-muted-foreground">
+              No results found.
+            </div>
+          )}
+
+          {/* Categories */}
+          {searchQuery.trim() !== "" && results.categories.length > 0 && (
+            <CommandGroup heading="Categories">
+              {results.categories.map((category) => {
+                const Icon = (category.icon && ICON_MAP[category.icon as keyof typeof ICON_MAP]) || FolderIcon
+                const catId = category._id?.toString() || category.id
+                return (
+                  <CommandItem
+                    key={catId}
+                    onSelect={() => onSelectEntity(`/categories/${catId}`)}
+                    className="flex items-center gap-2"
+                  >
+                    <Icon className="size-4 text-muted-foreground/85" />
+                    <span className="font-medium text-foreground">{category.name || category.title}</span>
+                  </CommandItem>
+                )
+              })}
+            </CommandGroup>
+          )}
+
+          {/* Resources */}
+          {searchQuery.trim() !== "" && results.resources.length > 0 && (
+            <CommandGroup heading="Resources">
+              {results.resources.map((resource) => {
+                const resId = resource._id?.toString() || resource.id
+                return (
+                  <CommandItem
+                    key={resId}
+                    onSelect={() => onSelectResource(resource)}
+                    className="flex items-center justify-between"
+                  >
+                    <div className="flex items-center gap-2">
+                      <ExternalLinkIcon className="size-4 text-muted-foreground/60" />
+                      <span className="font-medium text-foreground">{resource.title || resource.name}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[9px] uppercase tracking-wider text-muted-foreground/50 bg-muted px-1.5 py-0.5 rounded">
+                        {resource.type || "website"}
+                      </span>
+                    </div>
+                  </CommandItem>
+                )
+              })}
+            </CommandGroup>
+          )}
+
+          {/* Notes */}
+          {searchQuery.trim() !== "" && results.notes.length > 0 && (
+            <CommandGroup heading="Notes">
+              {results.notes.map((note) => {
+                const noteId = note._id?.toString() || note.id
+                return (
+                  <CommandItem
+                    key={noteId}
+                    onSelect={() => onSelectEntity(`/notes`)} // Notes layout splits in Phase 5
+                    className="flex items-center gap-2"
+                  >
+                    <FileTextIcon className="size-4 text-muted-foreground/70" />
+                    <span className="font-medium text-foreground">{note.title}</span>
+                  </CommandItem>
+                )
+              })}
+            </CommandGroup>
+          )}
+
+          {/* Projects */}
+          {searchQuery.trim() !== "" && results.projects.length > 0 && (
+            <CommandGroup heading="Projects">
+              {results.projects.map((project) => {
+                const projId = project._id?.toString() || project.id
+                return (
+                  <CommandItem
+                    key={projId}
+                    onSelect={() => onSelectEntity(`/projects/${projId}`)}
+                    className="flex items-center gap-2"
+                  >
+                    <BriefcaseIcon className="size-4 text-muted-foreground/70" />
+                    <span className="font-medium text-foreground">{project.name}</span>
+                  </CommandItem>
+                )
+              })}
+            </CommandGroup>
+          )}
+
+          {/* People */}
+          {searchQuery.trim() !== "" && results.people.length > 0 && (
+            <CommandGroup heading="People">
+              {results.people.map((person) => {
+                const personId = person._id?.toString() || person.id
+                return (
+                  <CommandItem
+                    key={personId}
+                    onSelect={() => onSelectEntity(`/people/${personId}`)}
+                    className="flex items-center gap-2"
+                  >
+                    <UserIcon className="size-4 text-muted-foreground/75" />
+                    <span className="font-medium text-foreground">{person.name}</span>
+                  </CommandItem>
+                )
+              })}
+            </CommandGroup>
+          )}
         </CommandList>
       </CommandDialog>
     </>

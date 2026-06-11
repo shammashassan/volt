@@ -1,9 +1,13 @@
 "use client"
 
-import React from 'react'
-import { motion } from 'framer-motion'
+import React, { useRef } from 'react'
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
+import { gsap } from 'gsap'
+import { useGSAP } from '@gsap/react'
+
+// Register the useGSAP plugin
+gsap.registerPlugin(useGSAP)
 
 const GitHubIcon = ({ className }: { className?: string }) => (
   <svg
@@ -17,82 +21,96 @@ const GitHubIcon = ({ className }: { className?: string }) => (
   </svg>
 )
 
-const VARIANTS_CONTAINER = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.15,
-    },
-  },
-} as const
-
-const VARIANTS_ITEM = {
-  hidden: { opacity: 0, y: 20, filter: 'blur(10px)' },
-  visible: {
-    opacity: 1,
-    y: 0,
-    filter: 'blur(0px)',
-    transition: {
-      type: 'spring' as const,
-      bounce: 0.3,
-      duration: 0.6,
-    },
-  },
-} as const
-
 export function HeroSection() {
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  useGSAP(() => {
+    const tl = gsap.timeline({ defaults: { ease: 'power4.out' } })
+
+    tl.fromTo('.hero-badge', {
+      opacity: 0,
+      y: 20,
+    }, {
+      opacity: 1,
+      y: 0,
+      duration: 0.8,
+    })
+      .fromTo('.hero-title', {
+        opacity: 0,
+        y: 35,
+      }, {
+        opacity: 1,
+        y: 0,
+        duration: 1.0,
+      }, '-=0.6')
+      .fromTo('.hero-para', {
+        opacity: 0,
+        y: 15,
+      }, {
+        opacity: 1,
+        y: 0,
+        duration: 0.8,
+      }, '-=0.7')
+      .fromTo('.hero-btn', {
+        opacity: 0,
+        y: 15,
+      }, {
+        opacity: 1,
+        y: 0,
+        stagger: 0.12,
+        duration: 0.8,
+      }, '-=0.6')
+  }, { scope: containerRef })
+
   return (
-    <section className="relative flex min-h-[90vh] flex-col items-center justify-center px-6 pt-20 text-center lg:px-12">
+    <section
+      ref={containerRef}
+      className="relative flex min-h-[90vh] flex-col items-center justify-center px-6 pt-25 text-center lg:px-12"
+    >
       <div className="relative z-10 mx-auto max-w-4xl">
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          variants={VARIANTS_CONTAINER}
-          className="flex flex-col items-center gap-6"
-        >
-          <motion.div variants={VARIANTS_ITEM} className="inline-flex items-center gap-2 rounded-full border bg-muted/50 px-3 py-1 text-sm font-medium">
+        <div className="flex flex-col items-center gap-6">
+          <div className="hero-badge opacity-0 inline-flex items-center gap-2 rounded-full border bg-muted/50 px-3 py-1 text-sm font-medium">
             <span className="relative flex h-2 w-2">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75"></span>
               <span className="relative inline-flex h-2 w-2 rounded-full bg-primary"></span>
             </span>
-            Volt v1.0 • The UI Dev's Second Brain
-          </motion.div>
+            Volt v2.0 • Personal Knowledge OS
+          </div>
 
-          <motion.div variants={VARIANTS_ITEM}>
+          <div className="hero-title opacity-0">
             <h1 className="text-4xl font-bold tracking-tight sm:text-6xl lg:text-7xl max-w-4xl mx-auto leading-tight">
-              The ultimate workspace
+              A searchable network
               <br />
               <span className="bg-linear-to-r from-primary to-primary/40 bg-clip-text text-transparent">
-                for design engineers.
+                of your knowledge.
               </span>
             </h1>
-          </motion.div>
+          </div>
 
-          <motion.div variants={VARIANTS_ITEM} className="max-w-2xl mx-auto">
+          <div className="hero-para opacity-0 max-w-2xl mx-auto">
             <p className="text-lg text-muted-foreground sm:text-xl">
-              A curated vault to archive, organize, and source production-ready components, interactive animations, and visual tools.
+              Not another bookmark manager. Volt is a personal knowledge operating system to capture resources, write notes, link projects, and retrieve everything instantly.
             </p>
-          </motion.div>
+          </div>
 
-          <motion.div variants={VARIANTS_ITEM} className="mt-4 flex flex-wrap justify-center gap-4">
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-4">
             <Link
               href="/explore"
-              className="inline-flex h-14 items-center justify-center gap-2 rounded-full bg-primary px-10 text-base font-semibold text-primary-foreground shadow-lg shadow-primary/20 transition-[transform,shadow,background-color] hover:scale-105 active:scale-95"
+              className="hero-btn opacity-0 inline-flex h-14 items-center justify-center gap-2 rounded-full border border-transparent bg-primary px-10 text-base font-semibold text-primary-foreground shadow-lg shadow-primary/20 transition-[transform,shadow,background-color] hover:scale-105 active:scale-95"
             >
-              Start Exploring
+              Open Workspace
               <ArrowRight className="size-5" />
             </Link>
             <Link
               href="https://github.com"
               target="_blank"
-              className="inline-flex h-14 items-center justify-center gap-2 rounded-full border bg-background px-10 text-base font-semibold transition-[background-color,border-color] hover:bg-muted"
+              className="hero-btn opacity-0 inline-flex h-14 items-center justify-center gap-2 rounded-full border bg-background px-10 text-base font-semibold transition-[background-color,border-color] hover:bg-muted"
             >
               <GitHubIcon className="size-5" />
               Browse Project
             </Link>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
       </div>
 
       <div className="absolute inset-0 -z-10 overflow-hidden">

@@ -9,17 +9,28 @@ import {
 } from "lucide-react"
 import { ICON_MAP } from "@/lib/icons"
 
+import { Category } from "@/lib/types"
+import { getCategoriesAction } from "@/lib/actions/categories"
+
+interface CategoryWithCount extends Category {
+  resourceCount?: number
+}
+
 export function CategoryExplorer() {
-  const [categories, setCategories] = useState<any[]>([])
+  const [categories, setCategories] = useState<CategoryWithCount[]>([])
 
   useEffect(() => {
     async function fetchCategories() {
       try {
-        const response = await fetch('/api/categories')
-        const data = await response.json()
-        setCategories(data)
+        const result = await getCategoriesAction()
+        if (result.success && Array.isArray(result.data)) {
+          setCategories(result.data)
+        } else {
+          setCategories([])
+        }
       } catch (error) {
         console.error("Failed to fetch categories:", error)
+        setCategories([])
       }
     }
     fetchCategories()
@@ -27,12 +38,12 @@ export function CategoryExplorer() {
 
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 px-4 lg:px-6">
-      {categories.map((category) => {
-        const Icon = ICON_MAP[category.icon] || FileTextIcon
+      {(Array.isArray(categories) ? categories : []).map((category) => {
+        const Icon = (category.icon && ICON_MAP[category.icon as keyof typeof ICON_MAP]) || FileTextIcon
         const resourceCount = category.resourceCount || 0
         
         return (
-          <Link key={category.id} href={`/category/${category.id}`} className="group block">
+          <Link key={category.id} href={`/categories/${category.id}`} className="group block">
             <Card className="h-full border-border/40 bg-card/40 backdrop-blur-sm transition-[border-color,background-color,shadow] duration-300 group-hover:border-primary/30 group-hover:bg-card group-hover:shadow-2xl group-hover:shadow-primary/5">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/5 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">

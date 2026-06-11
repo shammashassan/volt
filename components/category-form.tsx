@@ -12,18 +12,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Label } from "@/components/ui/label"
-import { Loader2, Sparkles, Copy, Check } from "lucide-react"
+import { Field, FieldGroup, FieldLabel } from "@/components/ui/field"
+import { Sparkles, Check } from "lucide-react"
 import { ICON_LABELS, ICON_MAP } from "@/lib/icons"
 import { toast } from "sonner"
+import { Category } from "@/lib/types"
 
-interface CategoryFormProps {
-  initialData?: any
-  onSubmit: (formData: FormData) => Promise<void>
-  isLoading: boolean
+interface CategoryFormFieldsProps {
+  initialData?: Partial<Category>
 }
 
-export function CategoryForm({ initialData, onSubmit, isLoading }: CategoryFormProps) {
+export function CategoryFormFields({ initialData }: CategoryFormFieldsProps) {
   const [copied, setCopied] = useState(false)
   const [title, setTitle] = useState(initialData?.title || "")
 
@@ -42,9 +41,9 @@ Examples:
   }
 
   return (
-    <form action={onSubmit} className="grid gap-6">
-      <div className="grid gap-2">
-        <Label htmlFor="id">Category ID (URL Slug)</Label>
+    <FieldGroup className="py-2">
+      <Field>
+        <FieldLabel htmlFor="id">Category ID (URL Slug)</FieldLabel>
         <Input
           id="id"
           name="id"
@@ -53,10 +52,10 @@ Examples:
           required
           disabled={!!initialData}
         />
-      </div>
+      </Field>
 
-      <div className="grid gap-2">
-        <Label htmlFor="title">Title</Label>
+      <Field>
+        <FieldLabel htmlFor="title">Title</FieldLabel>
         <Input
           id="title"
           name="title"
@@ -65,11 +64,11 @@ Examples:
           placeholder="e.g. Build Blocks"
           required
         />
-      </div>
+      </Field>
 
       <div className="grid grid-cols-2 gap-4">
-        <div className="grid gap-2">
-          <Label htmlFor="order">Display Order</Label>
+        <Field>
+          <FieldLabel htmlFor="order">Display Order</FieldLabel>
           <Input
             id="order"
             name="order"
@@ -77,11 +76,11 @@ Examples:
             defaultValue={initialData?.order || 0}
             placeholder="0"
           />
-        </div>
-        <div className="grid gap-2">
-          <Label htmlFor="icon">Icon</Label>
+        </Field>
+        <Field>
+          <FieldLabel htmlFor="icon">Icon</FieldLabel>
           <Select name="icon" defaultValue={initialData?.icon || "Rocket"}>
-            <SelectTrigger className="w-full">
+            <SelectTrigger id="icon" className="w-full">
               <SelectValue placeholder="Select an icon" />
             </SelectTrigger>
             <SelectContent className="max-h-[300px]">
@@ -98,13 +97,13 @@ Examples:
               })}
             </SelectContent>
           </Select>
-        </div>
+        </Field>
       </div>
-      <p className="text-[10px] text-muted-foreground italic -mt-4">Lower numbers show first (e.g., 1 appears before 2).</p>
+      <p className="text-[10px] text-muted-foreground italic -mt-2">Lower numbers show first (e.g., 1 appears before 2).</p>
 
-      <div className="grid gap-2">
+      <Field>
         <div className="flex items-center justify-between">
-          <Label htmlFor="description">Description</Label>
+          <FieldLabel htmlFor="description">Description</FieldLabel>
           <Button
             type="button"
             variant="ghost"
@@ -125,12 +124,7 @@ Examples:
           required
           className="min-h-[80px]"
         />
-      </div>
-
-      <Button type="submit" className="w-full" disabled={isLoading}>
-        {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-        {initialData ? "Update Category" : "Add Category"}
-      </Button>
-    </form>
+      </Field>
+    </FieldGroup>
   )
 }

@@ -1,0 +1,217 @@
+"use server";
+
+import { revalidatePath, updateTag } from "next/cache";
+import clientPromise from "../mongodb";
+import { ObjectId } from "mongodb";
+import { ResourceStatus, ResourceType } from "../types";
+import { getSessionUser, getErrorMessage } from "../auth-utils";
+import { getResources } from "../db";
+
+export async function addResourceAction(
+  dataOrForm: FormData | {
+    title: string;
+    url: string;
+    description?: string;
+    categoryId?: string;
+    tags: string[];
+    notes?: string;
+    whySaved?: string;
+    status: ResourceStatus;
+    type: ResourceType;
+    favorite: boolean;
+    projectIds: string[];
+    personIds: string[];
+  }
+) {
+  try {
+    const user = await getSessionUser();
+    const client = await clientPromise;
+    const db = client.db();
+
+    let resource: Record<string, unknown>;
+
+    if (dataOrForm instanceof FormData) {
+      // Support old FormData format
+      const name = dataOrForm.get("name") as string;
+      const link = dataOrForm.get("link") as string;
+      const description = dataOrForm.get("description") as string;
+      const category = dataOrForm.get("category") as string;
+      const featured = dataOrForm.get("featured") === "on";
+      const order = parseInt(dataOrForm.get("order") as string) || 0;
+
+      resource = {
+        title: name,
+        url: link,
+        description,
+        categoryId: category,
+        tags: [],
+        notes: "",
+        whySaved: "",
+        status: "saved" as ResourceStatus,
+        type: "website" as ResourceType,
+        favorite: featured,
+        projectIds: [],
+        personIds: [],
+        useCount: 0,
+        userId: user.id,
+        order,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+    } else {
+      // Support new structured data format
+      resource = {
+        ...dataOrForm,
+        userId: user.id,
+        useCount: 0,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+    }
+
+    const result = await db.collection("resources").insertOne(resource);
+    revalidatePath("/explore");
+    revalidatePath("/resources");
+    updateTag(`explore-body-${user.id}`);
+    updateTag(`dashboard-stats-${user.id}`);
+    return { success: true, id: result.insertedId.toString() };
+  } catch (error) {
+    return { success: false, error: getErrorMessage(error) };
+  }
+}
+
+export async function updateResourceAction(idOrLink: string, data: Record<string, unknown>) {
+  try {
+    const user = await getSessionUser();
+    const client = await clientPromise;
+    const db = client.db();
+
+    const updateData: Record<string, unknown> = { ...data, updatedAt: new Date() };
+    delete updateData._id;
+
+    // Map old fields if they are present in the update object
+    if (updateData.name) {
+      updateData.title = updateData.name;
+    }
+    if (updateData.link) {
+      updateData.url = updateData.link;
+    }
+    if (updateData.category) {
+      updateData.categoryId = updateData.category;
+    }
+    if (updateData.featured !== undefined) {
+      updateData.favorite = updateData.featured;
+    }
+    if (typeof updateData.order === "string") {
+      updateData.order = parseInt(updateData.order) || 0;
+    }
+
+    const query: Record<string, unknown> = { userId: user.id };
+    if (ObjectId.isValid(idOrLink)) {
+      query._id = new ObjectId(idOrLink);
+    } else {
+      query.url = idOrLink; // For old code using link
+    }
+
+    await db.collection("resources").updateOne(query, { $set: updateData });
+    revalidatePath("/explore");
+    revalidatePath("/resources");
+    updateTag(`explore-body-${user.id}`);
+    updateTag(`dashboard-stats-${user.id}`);
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: getErrorMessage(error) };
+  }
+}
+
+export async function deleteResourceAction(idOrLink: string) {
+  try {
+    const user = await getSessionUser();
+    const client = await clientPromise;
+    const db = client.db();
+
+    const query: Record<string, unknown> = { userId: user.id };
+    if (ObjectId.isValid(idOrLink)) {
+      query._id = new ObjectId(idOrLink);
+    } else {
+      query.url = idOrLink; // For old code using link
+    }
+
+    await db.collection("resources").deleteOne(query);
+    revalidatePath("/explore");
+    revalidatePath("/resources");
+    updateTag(`explore-body-${user.id}`);
+    updateTag(`dashboard-stats-${user.id}`);
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: getErrorMessage(error) };
+  }
+}
+
+export async function trackResourceViewAction(id: string) {
+  try {
+    const user = await getSessionUser();
+    const client = await clientPromise;
+    const db = client.db();
+
+    await db.collection("resources").updateOne(
+      { _id: new ObjectId(id), userId: user.id },
+      { $set: { recentlyViewedAt: new Date() } }
+    );
+    updateTag(`explore-body-${user.id}`);
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: getErrorMessage(error) };
+  }
+}
+
+export async function useResourceAction(id: string) {
+  try {
+    const user = await getSessionUser();
+    const client = await clientPromise;
+    const db = client.db();
+
+    await db.collection("resources").updateOne(
+      { _id: new ObjectId(id), userId: user.id },
+      { 
+        $set: { recentlyUsedAt: new Date() },
+        $inc: { useCount: 1 } 
+      }
+    );
+    updateTag(`explore-body-${user.id}`);
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: getErrorMessage(error) };
+  }
+}
+
+export async function updateResourceOrdersAction(updates: { link: string; order: number }[]) {
+  try {
+    const user = await getSessionUser();
+    const client = await clientPromise;
+    const db = client.db();
+
+    await Promise.all(
+      updates.map(({ link, order }) =>
+        db.collection("resources").updateOne(
+          { url: link, userId: user.id }, 
+          { $set: { order, updatedAt: new Date() } }
+        )
+      )
+    );
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: getErrorMessage(error) };
+  }
+}
+
+// Server Action replacement for GET /api/resources
+export async function getResourcesAction() {
+  try {
+    const user = await getSessionUser();
+    const resources = await getResources(user.id);
+    return { success: true, data: resources };
+  } catch (error) {
+    return { success: false, error: getErrorMessage(error) };
+  }
+}

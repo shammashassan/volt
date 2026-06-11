@@ -5,19 +5,26 @@ import { ICON_MAP } from "@/lib/icons"
 import { CategoryActions } from "./category-actions"
 import { auth } from "@/lib/auth"
 import { headers } from "next/headers"
+import { redirect } from "next/navigation"
 
 export default async function CategoryPage({ params }: { params: Promise<{ id: string }> }) {
   const { id: categoryId } = await params
-  const [category, resources, categories, session] = await Promise.all([
-    getCategoryById(categoryId),
-    getResources(),
-    getCategories(),
-    auth.api.getSession({
-      headers: await headers()
-    })
+  
+  const session = await auth.api.getSession({
+    headers: await headers()
+  })
+  if (!session) {
+    redirect("/login")
+  }
+  const userId = session.user.id
+
+  const [category, resources, categories] = await Promise.all([
+    getCategoryById(categoryId, userId),
+    getResources(userId),
+    getCategories(userId)
   ])
 
-  const user = session?.user as any
+  const user = session.user as any
   const isAdmin = user?.role === "admin"
 
   const categoryResources = resources.filter((r) => r.category === categoryId)
@@ -30,13 +37,13 @@ export default async function CategoryPage({ params }: { params: Promise<{ id: s
     )
   }
 
-  const Icon = ICON_MAP[category.icon] || FileText
+  const Icon = (category.icon && ICON_MAP[category.icon as keyof typeof ICON_MAP]) || FileText
 
   return (
-    <div className="flex flex-1 flex-col @container/main">
-      <div className="flex flex-col gap-4 px-4 py-8 md:gap-8 md:px-8">
-        {/* Header row — title info + action buttons + grid all in one client tree */}
-        <div className="flex flex-wrap gap-4 items-start justify-between">
+    <div className="flex flex-1 flex-col pb-12">
+      {/* Header & Content section */}
+      <section className="px-4 pt-8 lg:px-6">
+        <div className="flex flex-wrap gap-6 items-start justify-between max-w-7xl">
           {/* Category info */}
           <div className="flex flex-col gap-2 min-w-0">
             <div className="flex items-center gap-4">
@@ -52,12 +59,14 @@ export default async function CategoryPage({ params }: { params: Promise<{ id: s
                 </Badge>
               </div>
             </div>
-            <p className="text-lg text-muted-foreground/80 max-w-2xl font-medium">
-              {category.description}
-            </p>
+            {category.description && (
+              <p className="text-lg text-muted-foreground/80 max-w-2xl font-medium mt-2">
+                {category.description}
+              </p>
+            )}
           </div>
 
-          {/* Client component — owns buttons + separator + grid */}
+          {/* Client component — owns buttons + grid */}
           <CategoryActions
             categoryId={categoryId}
             categories={categories}
@@ -65,7 +74,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ id: s
             isAdmin={isAdmin}
           />
         </div>
-      </div>
+      </section>
     </div>
   )
 }

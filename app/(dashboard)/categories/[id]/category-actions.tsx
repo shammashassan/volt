@@ -11,7 +11,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { Separator } from "@/components/ui/separator"
 import { ResourceForm } from "@/components/resource-form"
 import { addResourceAction } from "@/lib/actions"
 import { toast } from "sonner"
@@ -71,12 +70,10 @@ export function CategoryActions({ categoryId, categories, resources, isAdmin }: 
       )}
 
       {/* 
-        Full-width block: separator + edit hint + grid.
+        Full-width block: edit hint + grid.
         basis-full forces a new row inside the flex-wrap parent on the page.
       */}
-      <div className="basis-full w-full flex flex-col gap-4">
-        <Separator className="opacity-40" />
-
+      <div className="basis-full w-full flex flex-col gap-4 mt-6">
         {editMode && isAdmin && (
           <p className="text-[11px] text-muted-foreground/50 italic px-0">
             Drag cards to reorder · Click <span className="text-destructive/70">🗑</span> to delete

@@ -12,7 +12,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import {
   Select,
   SelectContent,
@@ -20,6 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { Field, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { toast } from "sonner"
 import { authClient } from "@/lib/auth-client"
 
@@ -41,7 +41,7 @@ export function CreateUserDialog({ open, onOpenChange, onSuccess }: CreateUserDi
     const password = formData.get("password") as string
     const role = formData.get("role") as "user" | "admin"
 
-    const { data, error } = await authClient.admin.createUser({
+    const { error } = await authClient.admin.createUser({
         email,
         name,
         password,
@@ -61,31 +61,31 @@ export function CreateUserDialog({ open, onOpenChange, onSuccess }: CreateUserDi
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Create New User</DialogTitle>
-          <DialogDescription>
-            Create a new user account directly. They will be automatically approved.
-          </DialogDescription>
-        </DialogHeader>
-        <form onSubmit={handleSubmit}>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="name">Full Name</Label>
+      <form onSubmit={handleSubmit}>
+        <DialogContent className="sm:max-w-[425px] overflow-y-auto max-h-[90vh] no-scrollbar">
+          <DialogHeader>
+            <DialogTitle>Create New User</DialogTitle>
+            <DialogDescription>
+              Create a new user account directly. They will be automatically approved.
+            </DialogDescription>
+          </DialogHeader>
+          <FieldGroup className="py-4">
+            <Field>
+              <FieldLabel htmlFor="name">Full Name</FieldLabel>
               <Input id="name" name="name" placeholder="John Doe" required />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="email">Email Address</Label>
+            </Field>
+            <Field>
+              <FieldLabel htmlFor="email">Email Address</FieldLabel>
               <Input id="email" name="email" type="email" placeholder="john@example.com" required />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="password">Password</Label>
+            </Field>
+            <Field>
+              <FieldLabel htmlFor="password">Password</FieldLabel>
               <Input id="password" name="password" type="password" required />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="role">Role</Label>
+            </Field>
+            <Field>
+              <FieldLabel htmlFor="role">Role</FieldLabel>
               <Select name="role" defaultValue="user">
-                <SelectTrigger>
+                <SelectTrigger id="role">
                   <SelectValue placeholder="Select a role" />
                 </SelectTrigger>
                 <SelectContent>
@@ -93,13 +93,16 @@ export function CreateUserDialog({ open, onOpenChange, onSuccess }: CreateUserDi
                   <SelectItem value="admin">Admin</SelectItem>
                 </SelectContent>
               </Select>
-            </div>
-          </div>
+            </Field>
+          </FieldGroup>
           <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isLoading}>
+              Cancel
+            </Button>
             <Button type="submit" disabled={isLoading}>Create User</Button>
           </DialogFooter>
-        </form>
-      </DialogContent>
+        </DialogContent>
+      </form>
     </Dialog>
   )
 }

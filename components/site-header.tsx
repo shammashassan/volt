@@ -17,26 +17,33 @@ import { usePathname } from "next/navigation"
 import Link from "next/link"
 import { Home } from "lucide-react"
 
+import { Category } from "@/lib/types"
+import { getCategoriesAction } from "@/lib/actions/categories"
+
 export function SiteHeader() {
   const pathname = usePathname()
-  const [categories, setCategories] = useState<any[]>([])
+  const [categories, setCategories] = useState<Category[]>([])
   const isHome = pathname === "/"
 
   useEffect(() => {
     async function fetchCategories() {
       try {
-        const response = await fetch('/api/categories')
-        const data = await response.json()
-        setCategories(data)
+        const result = await getCategoriesAction()
+        if (result.success && Array.isArray(result.data)) {
+          setCategories(result.data)
+        } else {
+          setCategories([])
+        }
       } catch (error) {
         console.error("Failed to fetch categories:", error)
+        setCategories([])
       }
     }
     fetchCategories()
   }, [])
 
   const categoryId = pathname.split("/").pop()
-  const category = categories.find(c => c.id === categoryId)
+  const category = Array.isArray(categories) ? categories.find(c => c.id === categoryId) : undefined
 
   return (
     <header className="sticky top-0 z-50 flex h-(--header-height) shrink-0 items-center gap-2 border-b bg-background/80 backdrop-blur-md transition-all ease-linear">
@@ -61,7 +68,7 @@ export function SiteHeader() {
               {!isHome && (
                 <BreadcrumbItem>
                   <BreadcrumbPage className="text-foreground">
-                    {category ? category.title : (pathname.includes('/category/') ? "Category" : pathname.split('/').filter(Boolean).pop())}
+                    {category ? category.title : (pathname.includes('/categories/') ? "Category" : pathname.split('/').filter(Boolean).pop())}
                   </BreadcrumbPage>
                 </BreadcrumbItem>
               )}
