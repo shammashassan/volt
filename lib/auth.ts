@@ -2,18 +2,15 @@ import { betterAuth } from "better-auth";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
 import { admin } from "better-auth/plugins";
 import { nextCookies } from "better-auth/next-js";
-import clientPromise from "./mongodb";
+import { client } from "./mongodb";
 
-const client = await clientPromise;
 const db = client.db();
 
 export const auth = betterAuth({
-  database: mongodbAdapter(db, {
-    client: client
-  }),
+  database: mongodbAdapter(db),
   rateLimit: {
     enabled: true,
-    storage: "database",
+    storage: "memory",
     customRules: {
       "/get-session": false,
     },

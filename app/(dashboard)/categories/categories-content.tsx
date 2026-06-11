@@ -4,7 +4,7 @@ import * as React from "react"
 import { useState } from "react"
 import { columns } from "./columns"
 import { DataTable } from "./data-table"
-import { Category } from "@/lib/data"
+import { Category } from "@/lib/types"
 import { Button } from "@/components/ui/button"
 import { Layers, Plus } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
@@ -16,8 +16,9 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
+  DialogFooter,
 } from "@/components/ui/dialog"
-import { CategoryForm } from "@/components/category-form"
+import { CategoryFormFields } from "@/components/category-form"
 import { addCategoryAction, deleteCategoryAction, updateCategoryAction } from "@/lib/actions"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
@@ -29,8 +30,10 @@ import {
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
+  AlertDialogMedia,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
+import { Trash2 } from "lucide-react"
 
 interface CategoriesContentProps {
   initialCategories: Category[]
@@ -66,8 +69,11 @@ export function CategoriesContent({ initialCategories: categories }: CategoriesC
     setCategoryToDelete(null)
   }
 
-  const onSubmit = async (formData: FormData) => {
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
     setIsLoading(true)
+
+    const formData = new FormData(e.currentTarget)
 
     if (editingCategory) {
       const data = {
@@ -76,7 +82,8 @@ export function CategoriesContent({ initialCategories: categories }: CategoriesC
         icon: formData.get("icon"),
         order: parseInt(formData.get("order") as string) || 0,
       }
-      const result = await updateCategoryAction(editingCategory.id, data)
+      const categoryId = editingCategory._id?.toString() || editingCategory.id || ""
+      const result = await updateCategoryAction(categoryId, data)
       if (result.success) {
         toast.success("Category updated successfully")
         setIsOpen(false)
@@ -99,9 +106,10 @@ export function CategoriesContent({ initialCategories: categories }: CategoriesC
   }
 
   return (
-    <div className="flex flex-1 flex-col @container/main">
-      <div className="flex flex-col gap-4 px-4 py-8 md:gap-8 md:px-8">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+    <div className="flex flex-1 flex-col gap-6 pb-12">
+      {/* Header section */}
+      <section className="px-4 pt-8 lg:px-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between max-w-7xl">
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-4">
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
@@ -123,60 +131,74 @@ export function CategoriesContent({ initialCategories: categories }: CategoriesC
           <Button onClick={() => {
             setEditingCategory(null)
             setIsOpen(true)
-          }} className="w-full sm:w-auto shrink-0">
-            <Plus className="mr-2 h-4 w-4" />
+          }} className="w-full sm:w-auto shrink-0 font-bold">
+            <Plus data-icon="inline-start" />
             Add Category
           </Button>
         </div>
+      </section>
 
-        <Separator className="opacity-40" />
+      {/* Main Content section */}
+      <section className="px-4 lg:px-6">
+        <div className="max-w-7xl flex flex-col gap-6">
+          <DataTable
+            columns={columns(onEdit, onDelete)}
+            data={categories}
+            searchKey="title"
+          />
 
-        <DataTable
-          columns={columns(onEdit, onDelete)}
-          data={categories}
-          searchKey="title"
-        />
+          <Dialog open={isOpen} onOpenChange={setIsOpen}>
+            <DialogContent className="sm:max-w-[425px] overflow-y-auto max-h-[90vh] no-scrollbar">
+              <form onSubmit={onSubmit}>
+                <DialogHeader>
+                  <DialogTitle>{editingCategory ? "Edit Category" : "Add Category"}</DialogTitle>
+                  <DialogDescription>
+                    {editingCategory ? "Update the details of this category." : "Create a new category for your resources."}
+                  </DialogDescription>
+                </DialogHeader>
+                <CategoryFormFields
+                  initialData={editingCategory || undefined}
+                />
+                <DialogFooter>
+                  <Button type="button" variant="outline" onClick={() => setIsOpen(false)} disabled={isLoading}>
+                    Cancel
+                  </Button>
+                  <Button type="submit" disabled={isLoading}>
+                    {editingCategory ? "Update Category" : "Add Category"}
+                  </Button>
+                </DialogFooter>
+              </form>
+            </DialogContent>
+          </Dialog>
 
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>{editingCategory ? "Edit Category" : "Add Category"}</DialogTitle>
-              <DialogDescription>
-                {editingCategory ? "Update the details of this category." : "Create a new category for your resources."}
-              </DialogDescription>
-            </DialogHeader>
-            <CategoryForm
-              initialData={editingCategory}
-              onSubmit={onSubmit}
-              isLoading={isLoading}
-            />
-          </DialogContent>
-        </Dialog>
-
-        <AlertDialog open={!!categoryToDelete} onOpenChange={(open) => !open && setCategoryToDelete(null)}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-              <AlertDialogDescription>
-                This action cannot be undone. You won't be able to delete a category if it still contains resources.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel disabled={isLoading}>Cancel</AlertDialogCancel>
-              <AlertDialogAction
-                onClick={(e) => {
-                  e.preventDefault()
-                  confirmDelete()
-                }}
-                disabled={isLoading}
-                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              >
-                {isLoading ? "Deleting..." : "Delete"}
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      </div>
+          <AlertDialog open={!!categoryToDelete} onOpenChange={(open) => !open && setCategoryToDelete(null)}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogMedia className="bg-destructive/10 text-destructive">
+                  <Trash2 />
+                </AlertDialogMedia>
+                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. You won&apos;t be able to delete a category if it still contains resources.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel disabled={isLoading}>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  variant="destructive"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    confirmDelete()
+                  }}
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Deleting..." : "Delete"}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
+      </section>
     </div>
   )
 }

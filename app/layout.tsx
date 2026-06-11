@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
-import { LenisProvider } from "@/components/lenis-provider";
+import { Suspense } from "react";
 
 const inter = Inter({
   variable: "--font-sans",
@@ -42,7 +42,9 @@ export default function RootLayout({
         >
           <TooltipProvider>
             {/* <LenisProvider> */}
-            {children}
+            <Suspense fallback={<div className="flex-1 min-h-screen bg-background" />}>
+              {children}
+            </Suspense>
             {/* </LenisProvider> */}
             <Toaster position="top-right" />
           </TooltipProvider>

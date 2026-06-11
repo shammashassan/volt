@@ -1,7 +1,7 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import { Category } from "@/lib/data"
+import { Category } from "@/lib/types"
 import { Button } from "@/components/ui/button"
 import { MoreHorizontal, Edit, Trash, ExternalLink } from "lucide-react"
 import {
@@ -24,7 +24,7 @@ export const columns = (
       header: "Title",
       cell: ({ row }) => {
         const iconName = row.original.icon
-        const Icon = ICON_MAP[iconName]
+        const Icon = ICON_MAP[iconName || "Rocket"]
         return (
           <div className="flex items-center gap-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted text-muted-foreground ring-1 ring-border">
@@ -82,7 +82,7 @@ export const columns = (
                 Edit
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href={`/category/${category.id}`}>
+                <Link href={`/categories/${category.id || ""}`}>
                   <ExternalLink className="mr-2 h-4 w-4" />
                   View page
                 </Link>
@@ -90,7 +90,7 @@ export const columns = (
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 className="text-destructive focus:text-destructive"
-                onClick={() => onDelete(category.id)}
+                onClick={() => onDelete(category.id || "")}
               >
                 <Trash className="mr-2 h-4 w-4" />
                 Delete

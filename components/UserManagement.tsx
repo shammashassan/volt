@@ -4,9 +4,9 @@ import * as React from "react"
 import { useState, useTransition } from "react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { 
-  UserPlus, 
-  CheckCircle2, 
+import {
+  UserPlus,
+  CheckCircle2,
   UsersIcon
 } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
@@ -27,7 +27,16 @@ import {
 import { UserTable } from "./user/user-table"
 import { CreateUserDialog } from "./user/create-user-dialog"
 
-export function UserManagement({ initialUsers }: { initialUsers: any[] }) {
+export interface UserData {
+  id: string
+  name: string
+  email: string
+  role: string
+  isApproved: boolean
+  banned?: boolean
+}
+
+export function UserManagement({ initialUsers }: { initialUsers: UserData[] }) {
   const [users, setUsers] = useState(initialUsers)
   const [isPending, startTransition] = useTransition()
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
@@ -35,6 +44,11 @@ export function UserManagement({ initialUsers }: { initialUsers: any[] }) {
   const router = useRouter()
   const { data: session } = authClient.useSession()
   const currentUserId = session?.user?.id
+
+  const [mounted, setMounted] = useState(false)
+  React.useEffect(() => {
+    setMounted(true)
+  }, [])
 
   // Synchronize state with props when Server Component re-renders
   React.useEffect(() => {
@@ -61,9 +75,10 @@ export function UserManagement({ initialUsers }: { initialUsers: any[] }) {
     })
   }
 
-  const handleSetRole = async (userId: string, role: "user" | "admin") => {
+  const handleSetRole = async (userId: string, role: string) => {
+    if (role !== "user" && role !== "admin") return
     startTransition(async () => {
-      const { error } = await authClient.admin.setRole({ userId, role })
+      const { error } = await authClient.admin.setRole({ userId, role: role as "user" | "admin" })
       if (error) {
         toast.error(error.message || "Failed to set role")
       } else {
@@ -76,20 +91,20 @@ export function UserManagement({ initialUsers }: { initialUsers: any[] }) {
 
   const handleBan = async (userId: string, isBanned: boolean) => {
     startTransition(async () => {
-        let result;
-        if (isBanned) {
-            result = await authClient.admin.unbanUser({ userId })
-        } else {
-            result = await authClient.admin.banUser({ userId })
-        }
-        
-        if (result.error) {
-            toast.error(result.error.message)
-        } else {
-            toast.success(isBanned ? "User unbanned" : "User banned")
-            setUsers(users.map(u => u.id === userId ? { ...u, banned: !isBanned } : u))
-            router.refresh()
-        }
+      let result;
+      if (isBanned) {
+        result = await authClient.admin.unbanUser({ userId })
+      } else {
+        result = await authClient.admin.banUser({ userId })
+      }
+
+      if (result.error) {
+        toast.error(result.error.message)
+      } else {
+        toast.success(isBanned ? "User unbanned" : "User banned")
+        setUsers(users.map(u => u.id === userId ? { ...u, banned: !isBanned } : u))
+        router.refresh()
+      }
     })
   }
 
@@ -101,7 +116,7 @@ export function UserManagement({ initialUsers }: { initialUsers: any[] }) {
     if (!userToDelete) return
     startTransition(async () => {
       const { error } = await authClient.admin.removeUser({ userId: userToDelete })
-      
+
       if (error) {
         toast.error(error.message || "Failed to delete user")
       } else {
@@ -114,9 +129,10 @@ export function UserManagement({ initialUsers }: { initialUsers: any[] }) {
   }
 
   return (
-    <div className="flex flex-1 flex-col @container/main">
-      <div className="flex flex-col gap-4 px-4 py-8 md:gap-8 md:px-8">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+    <div className="flex flex-1 flex-col gap-6 pb-12">
+      {/* Header section */}
+      <section className="px-4 pt-8 lg:px-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between max-w-7xl">
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-4">
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
@@ -135,94 +151,97 @@ export function UserManagement({ initialUsers }: { initialUsers: any[] }) {
               Manage user roles, approvals, and account statuses.
             </p>
           </div>
-          <Button onClick={() => setIsCreateModalOpen(true)} className="w-full sm:w-auto shrink-0">
+          <Button onClick={() => setIsCreateModalOpen(true)} className="w-full sm:w-auto shrink-0 font-bold">
             <UserPlus className="mr-2 h-4 w-4" />
             Create User
           </Button>
         </div>
+      </section>
 
-        <Separator className="opacity-40" />
+      {/* Main Content section */}
+      <section className="px-4 lg:px-6">
+        <div className="max-w-7xl flex flex-col gap-6">
+          <Tabs defaultValue="active" className="w-full">
+            <TabsList className="grid w-full grid-cols-2 max-w-[400px] mb-4">
+              <TabsTrigger value="active" className="gap-2">
+                Active Users
+                <Badge variant="secondary">
+                  {activeUsers.length}
+                </Badge>
+              </TabsTrigger>
+              <TabsTrigger value="pending" className="gap-2">
+                Signup Requests
+                <Badge variant={pendingUsers.length > 0 ? "secondary" : "outline"} className="h-5 px-1.5 min-w-[20px] justify-center">
+                  {pendingUsers.length}
+                </Badge>
+              </TabsTrigger>
+            </TabsList>
 
-      <Tabs defaultValue="active" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 max-w-[400px] mb-4">
-          <TabsTrigger value="active" className="gap-2">
-            Active Users
-            <Badge variant="secondary" className="h-5 px-1.5 min-w-[20px] justify-center">
-              {activeUsers.length}
-            </Badge>
-          </TabsTrigger>
-          <TabsTrigger value="pending" className="gap-2">
-            Signup Requests
-            <Badge variant={pendingUsers.length > 0 ? "secondary" : "outline"} className="h-5 px-1.5 min-w-[20px] justify-center">
-              {pendingUsers.length}
-            </Badge>
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="active" className="border rounded-xl bg-card/40 backdrop-blur-sm overflow-hidden">
-          <UserTable 
-            users={activeUsers} 
-            onApprove={handleApprove} 
-            onSetRole={handleSetRole} 
-            onBan={handleBan}
-            onDelete={handleDelete}
-            currentUserId={currentUserId}
-          />
-        </TabsContent>
-
-        <TabsContent value="pending" className="border rounded-xl bg-card/40 backdrop-blur-sm overflow-hidden">
-          {pendingUsers.length > 0 ? (
-            <UserTable 
-                users={pendingUsers} 
-                onApprove={handleApprove} 
-                onSetRole={handleSetRole} 
+            <TabsContent value="active" className="border rounded-xl bg-card/40 backdrop-blur-sm overflow-hidden">
+              <UserTable
+                users={activeUsers}
+                onApprove={handleApprove}
+                onSetRole={handleSetRole}
                 onBan={handleBan}
                 onDelete={handleDelete}
-                currentUserId={currentUserId}
-            />
-          ) : (
-            <div className="flex flex-col items-center justify-center py-20 text-center">
-              <CheckCircle2 className="size-12 text-muted-foreground/20 mb-4" />
-              <p className="text-xl font-semibold text-muted-foreground">No pending requests</p>
-              <p className="text-sm text-muted-foreground/60 mt-1">All signup requests have been processed.</p>
-            </div>
-          )}
-        </TabsContent>
-      </Tabs>
+                currentUserId={mounted ? currentUserId : undefined}
+              />
+            </TabsContent>
 
-      <CreateUserDialog 
-        open={isCreateModalOpen} 
-        onOpenChange={setIsCreateModalOpen} 
-        onSuccess={() => {
-          router.refresh()
-        }}
-      />
+            <TabsContent value="pending" className="border rounded-xl bg-card/40 backdrop-blur-sm overflow-hidden">
+              {pendingUsers.length > 0 ? (
+                <UserTable
+                  users={pendingUsers}
+                  onApprove={handleApprove}
+                  onSetRole={handleSetRole}
+                  onBan={handleBan}
+                  onDelete={handleDelete}
+                  currentUserId={mounted ? currentUserId : undefined}
+                />
+              ) : (
+                <div className="flex flex-col items-center justify-center py-20 text-center">
+                  <CheckCircle2 className="size-12 text-muted-foreground/20 mb-4" />
+                  <p className="text-xl font-semibold text-muted-foreground">No pending requests</p>
+                  <p className="text-sm text-muted-foreground/60 mt-1">All signup requests have been processed.</p>
+                </div>
+              )}
+            </TabsContent>
+          </Tabs>
 
-      <AlertDialog open={!!userToDelete} onOpenChange={(open) => !open && setUserToDelete(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the user account
-              and all associated data from the database.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={(e) => {
-                e.preventDefault()
-                confirmDeleteUser()
-              }}
-              disabled={isPending}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              {isPending ? "Deleting..." : "Delete User"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-      </div>
+          <CreateUserDialog
+            open={isCreateModalOpen}
+            onOpenChange={setIsCreateModalOpen}
+            onSuccess={() => {
+              router.refresh()
+            }}
+          />
+
+          <AlertDialog open={!!userToDelete} onOpenChange={(open) => !open && setUserToDelete(null)}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. This will permanently delete the user account
+                  and all associated data from the database.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={(e) => {
+                    e.preventDefault()
+                    confirmDeleteUser()
+                  }}
+                  disabled={isPending}
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                >
+                  {isPending ? "Deleting..." : "Delete User"}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
+      </section>
     </div>
   )
 }

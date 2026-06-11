@@ -1,0 +1,1492 @@
+[
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16b4"
+    },
+    "name": "Awwwards",
+    "link": "https://www.awwwards.com/",
+    "description": "The best web design inspiration in the world.",
+    "category": "inspiration",
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-14T13:18:20.051Z"
+    },
+    "featured": false,
+    "order": 0
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16b6"
+    },
+    "name": "ShadCN UI",
+    "link": "https://ui.shadcn.com",
+    "description": "The gold standard for modern component libraries.",
+    "category": "ui-library",
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-16T13:30:09.306Z"
+    },
+    "featured": false,
+    "order": 0
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16e7"
+    },
+    "name": "Systaliko UI",
+    "link": "https://systaliko-ui.vercel.app/",
+    "description": "Free React blocks, e-commerce components, and full-page templates.",
+    "category": "pages",
+    "featured": true,
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-06T18:05:02.633Z"
+    },
+    "order": 2
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16e9"
+    },
+    "name": "Shadcn Studio",
+    "link": "https://shadcnstudio.com/",
+    "description": "UI blocks, kits, and AI tools for faster development.",
+    "category": "blocks",
+    "featured": false,
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-30T15:39:05.735Z"
+    },
+    "order": 3
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16b2"
+    },
+    "name": "21st.dev",
+    "link": "https://21st.dev/home",
+    "description": "The marketplace for React components.",
+    "category": "search",
+    "featured": true,
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-05T17:57:39.653Z"
+    },
+    "order": 0
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16e4"
+    },
+    "name": "AI SDK",
+    "link": "https://ai-sdk.dev/",
+    "description": "Unified SDK for building AI applications.",
+    "category": "ai-agents",
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-05T17:55:30.721Z"
+    },
+    "order": 3
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16e6"
+    },
+    "name": "Spell UI",
+    "link": "https://spell.sh/",
+    "description": "Premium React components 3D perspective books, interactive charts and text effects.",
+    "category": "components",
+    "featured": false,
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-30T15:31:49.691Z"
+    },
+    "order": 21
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16ce"
+    },
+    "name": "Anime.js",
+    "link": "https://animejs.com",
+    "description": "Lightweight Javascript animation library.",
+    "category": "motion-3d",
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-09T17:02:42.634Z"
+    },
+    "featured": false,
+    "order": 8
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16a9"
+    },
+    "name": "LaunchUI",
+    "link": "https://www.launchuicomponents.com",
+    "description": "Landing page components for React and Tailwind.",
+    "category": "blocks",
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-30T15:39:05.735Z"
+    },
+    "featured": false,
+    "order": 5
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16dd"
+    },
+    "name": "MapCN",
+    "link": "https://www.mapcn.dev",
+    "description": "Elegant map components for React.",
+    "category": "maps",
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-05T17:56:08.107Z"
+    },
+    "order": 0
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16de"
+    },
+    "name": "FlightCN",
+    "link": "https://flightcn.yencheng.dev/",
+    "description": "Flight route and satellite orbit components for MapLibre and mapcn.",
+    "category": "maps",
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-05T17:56:08.108Z"
+    },
+    "order": 1
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16a7"
+    },
+    "name": "Shadcn Blocks",
+    "link": "https://www.shadcnblocks.com",
+    "description": "Beautifully designed blocks built with Shadcn UI.",
+    "category": "blocks",
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-30T15:39:05.735Z"
+    },
+    "featured": false,
+    "order": 0
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16e2"
+    },
+    "name": "TypeUI",
+    "link": "https://typeui.sh",
+    "description": "Multi-style UI skills for AI agents.",
+    "category": "ai-agents",
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-05T17:55:30.719Z"
+    },
+    "order": 1
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16b0"
+    },
+    "name": "Uilora",
+    "link": "https://uilora.com",
+    "description": "Premium design resources for developers.",
+    "category": "components",
+    "featured": true,
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-30T15:31:49.690Z"
+    },
+    "order": 2
+  },
+  {
+    "_id": {
+      "$oid": "69f8bdab6277e685797d959d"
+    },
+    "name": "Huge Icons",
+    "link": "https://hugeicons.com/",
+    "description": "Flexible, code-ready icons for high-velocity developers.",
+    "category": "icons",
+    "featured": false,
+    "createdAt": {
+      "$date": "2026-05-04T15:39:23.881Z"
+    },
+    "order": 1,
+    "updatedAt": {
+      "$date": "2026-05-05T17:57:16.424Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69fa1ff4275dc4dcc4f26a5f"
+    },
+    "name": "Godly",
+    "link": "https://godly.website/",
+    "description": "Curated gallery of high-end web design and animations.",
+    "category": "inspiration",
+    "featured": false,
+    "createdAt": {
+      "$date": "2026-05-05T16:51:00.700Z"
+    },
+    "order": 1,
+    "updatedAt": {
+      "$date": "2026-05-14T13:18:20.051Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69ff67da1ad8d94ccbca3840"
+    },
+    "name": "Spline",
+    "link": "https://app.spline.design/",
+    "description": "Browser-based 3D design tool for immersive interactive web experiences.",
+    "category": "motion-3d",
+    "featured": false,
+    "order": 1,
+    "createdAt": {
+      "$date": "2026-05-09T16:59:06.083Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-09T17:02:42.634Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a004511f88d682045f5de86"
+    },
+    "name": "Blocks",
+    "link": "https://blocks.so/",
+    "description": "Copy-paste React components built with shadcn/ui and Tailwind CSS.",
+    "category": "components",
+    "featured": false,
+    "order": 6,
+    "createdAt": {
+      "$date": "2026-05-10T08:42:57.706Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-30T15:31:49.690Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a058457788114e697b91407"
+    },
+    "name": "Watermelon UI",
+    "link": "https://ui.watermelon.sh/",
+    "description": "An elegant, open-source component library built for design engineers.",
+    "category": "components",
+    "featured": false,
+    "order": 4,
+    "createdAt": {
+      "$date": "2026-05-14T08:14:15.507Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-30T15:31:49.690Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a05850c788114e697b91408"
+    },
+    "name": "Style UI",
+    "link": "https://www.styleui.dev/",
+    "description": "Expertly crafted layouts for your next big idea. Choose a template, customize the details, and ship a world-class site today.",
+    "category": "pages",
+    "featured": false,
+    "order": 3,
+    "createdAt": {
+      "$date": "2026-05-14T08:17:16.905Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a05c711f4ae809ed140ec0b"
+    },
+    "name": "Refero Styles",
+    "link": "https://styles.refero.design/",
+    "description": "Search real-world styles by brand or mood with AI-ready design documentation.",
+    "category": "ai-agents",
+    "featured": false,
+    "order": 0,
+    "createdAt": {
+      "$date": "2026-05-14T12:58:57.838Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a05c90ef4ae809ed140ec0c"
+    },
+    "name": "Vibe UI",
+    "link": "https://vibeui.online/",
+    "description": "Curated layout prompts for vibe coders to match aesthetic screenshots.",
+    "category": "ai-agents",
+    "featured": false,
+    "order": 0,
+    "createdAt": {
+      "$date": "2026-05-14T13:07:26.980Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a145e1e9671d6b1c7ae0fad"
+    },
+    "name": "Bklit UI",
+    "link": "https://ui.bklit.com/",
+    "description": "A collection of Open Source charts and utility components that you can customize and extend.",
+    "category": "charts",
+    "featured": false,
+    "order": 0,
+    "createdAt": {
+      "$date": "2026-05-25T14:35:10.640Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-25T14:35:26.801Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16a8"
+    },
+    "name": "Tailark",
+    "link": "https://tailark.com",
+    "description": "Tailwind CSS components and templates.",
+    "category": "blocks",
+    "featured": true,
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-30T15:39:05.735Z"
+    },
+    "order": 6
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16aa"
+    },
+    "name": "TripleD",
+    "link": "https://ui.tripled.work",
+    "description": "Curated collection of 3D UI inspiration.",
+    "category": "blocks",
+    "featured": true,
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-30T15:39:05.735Z"
+    },
+    "order": 7
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16bb"
+    },
+    "name": "Aceternity UI",
+    "link": "https://ui.aceternity.com",
+    "description": "Copy-paste complex animations and components.",
+    "category": "components",
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-30T15:31:49.690Z"
+    },
+    "featured": false,
+    "order": 9
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16c6"
+    },
+    "name": "Cardcn",
+    "link": "https://cardcn.dev/",
+    "description": "A collection of beautiful Shadcn Card components.",
+    "category": "components",
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-30T15:31:49.691Z"
+    },
+    "featured": false,
+    "order": 25
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16b9"
+    },
+    "name": "Kibo UI",
+    "link": "https://kibo-ui.com",
+    "description": "Standardized component library for React.",
+    "category": "components",
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-30T15:31:49.691Z"
+    },
+    "featured": false,
+    "order": 15
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16ae"
+    },
+    "name": "unlumen UI",
+    "link": "https://ui.unlumen.com/",
+    "description": "Beautifully designed React components built with TypeScript, Tailwind CSS and Motion.",
+    "category": "components",
+    "featured": true,
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-30T15:31:49.689Z"
+    },
+    "order": 1
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16d6"
+    },
+    "name": "AI Canvas ",
+    "link": "https://aicanvas.me/",
+    "description": "AI-native animated React components with AI reproduction prompts.",
+    "category": "components",
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-30T15:31:49.691Z"
+    },
+    "featured": false,
+    "order": 23
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16c2"
+    },
+    "name": "Chanh Dai UI",
+    "link": "https://chanhdai.com",
+    "description": "Elegant and minimal UI components.",
+    "category": "components",
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-30T15:31:49.690Z"
+    },
+    "featured": false,
+    "order": 5
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16cb"
+    },
+    "name": "PaceKit UI",
+    "link": "https://ui.pacekit.dev/",
+    "description": "Production-ready dashboard blocks and components.",
+    "category": "pages",
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-06T18:05:02.632Z"
+    },
+    "featured": false,
+    "order": 0
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16d3"
+    },
+    "name": "Chamaac",
+    "link": "https://www.chamaac.com/",
+    "description": "Interactive shaders and high-performance visual components.",
+    "category": "motion-3d",
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-09T17:02:42.634Z"
+    },
+    "featured": false,
+    "order": 4
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16b5"
+    },
+    "name": "Ali Imam",
+    "link": "https://aliimam.in/",
+    "description": "Modern UI components, templates, and design resources for React and Next.js.",
+    "category": "blocks",
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-30T15:39:05.735Z"
+    },
+    "featured": false,
+    "order": 11
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16d7"
+    },
+    "name": "UIverse",
+    "link": "https://uiverse.io",
+    "description": "Community-built UI elements for creators.",
+    "category": "customize",
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-14T13:03:38.128Z"
+    },
+    "order": 0
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16ba"
+    },
+    "name": "Rigid UI",
+    "link": "https://rigidui.com",
+    "description": "Strongly typed and accessible components.",
+    "category": "components",
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-30T15:31:49.691Z"
+    },
+    "featured": false,
+    "order": 24
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16be"
+    },
+    "name": "ReUI",
+    "link": "https://reui.io",
+    "description": "React components for rapid prototyping.",
+    "category": "ui-library",
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-16T13:30:09.307Z"
+    },
+    "featured": false,
+    "order": 2
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16d0"
+    },
+    "name": "React Bits",
+    "link": "https://reactbits.dev",
+    "description": "Animated components and snippets for React.",
+    "category": "motion-3d",
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-09T17:02:42.633Z"
+    },
+    "featured": false,
+    "order": 0
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16bf"
+    },
+    "name": "Smooth UI",
+    "link": "https://smoothui.dev",
+    "description": "Focused on clean typography and spacing.",
+    "category": "components",
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-30T15:31:49.691Z"
+    },
+    "featured": false,
+    "order": 16
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16c9"
+    },
+    "name": "Creative Tim",
+    "link": "https://www.creative-tim.com/",
+    "description": "Premium UI kits, dashboard templates, and design systems.",
+    "category": "blocks",
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-30T15:39:05.735Z"
+    },
+    "featured": false,
+    "order": 12
+  },
+  {
+    "_id": {
+      "$oid": "69f8be0e6277e685797d959e"
+    },
+    "name": "Lucide Animated",
+    "link": "https://lucide-animated.com/",
+    "description": "Lucide icons brought to life with CSS.",
+    "category": "icons",
+    "featured": false,
+    "createdAt": {
+      "$date": "2026-05-04T15:41:02.827Z"
+    },
+    "order": 2,
+    "updatedAt": {
+      "$date": "2026-05-05T17:57:16.424Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69fa1ad335720762a867eaa8"
+    },
+    "name": "Dark Mode Design",
+    "link": "https://www.darkmodedesign.com/",
+    "description": "A curated gallery showcasing the world's best dark-themed websites.",
+    "category": "inspiration",
+    "featured": false,
+    "createdAt": {
+      "$date": "2026-05-05T16:29:07.641Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-14T13:18:20.051Z"
+    },
+    "order": 2
+  },
+  {
+    "_id": {
+      "$oid": "69fa1d73275dc4dcc4f26a5d"
+    },
+    "name": "One Page Love",
+    "link": "https://onepagelove.com/",
+    "description": "The ultimate showcase of premier single-page website inspiration.",
+    "category": "inspiration",
+    "featured": false,
+    "createdAt": {
+      "$date": "2026-05-05T16:40:19.109Z"
+    },
+    "order": 5,
+    "updatedAt": {
+      "$date": "2026-05-14T13:18:20.052Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a01fa466c2e65e088140194"
+    },
+    "name": "UI Layouts",
+    "link": "https://www.ui-layouts.com/",
+    "description": "Build high-end interfaces quickly with professionally curated UI components.",
+    "category": "blocks",
+    "featured": false,
+    "order": 10,
+    "createdAt": {
+      "$date": "2026-05-11T15:48:22.097Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-30T15:39:05.735Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16e5"
+    },
+    "name": "Magic UI",
+    "link": "https://magicui.design/",
+    "description": "Open-source animated components and effects.",
+    "category": "components",
+    "featured": false,
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-30T15:31:49.690Z"
+    },
+    "order": 3
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16cc"
+    },
+    "name": "Motion Primitives",
+    "link": "https://motion-primitives.com/docs",
+    "description": "Build beautiful animations with Framer Motion.",
+    "category": "motion-3d",
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-09T17:02:42.634Z"
+    },
+    "featured": false,
+    "order": 5
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16ca"
+    },
+    "name": "HextaUI",
+    "link": "https://www.hextaui.com/",
+    "description": "Refined and modern component library extending Shadcn UI.",
+    "category": "blocks",
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-30T15:39:05.735Z"
+    },
+    "featured": false,
+    "order": 9
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16cf"
+    },
+    "name": "Animista",
+    "link": "https://animista.net",
+    "description": "CSS animations on demand.",
+    "category": "customize",
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-14T13:03:38.129Z"
+    },
+    "featured": false,
+    "order": 5
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16d1"
+    },
+    "name": "Kokonut UI",
+    "link": "https://kokonutui.com",
+    "description": "Smooth interactions and effects for websites.",
+    "category": "motion-3d",
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-09T17:02:42.634Z"
+    },
+    "featured": false,
+    "order": 6
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16e3"
+    },
+    "name": "ElevenLabs UI",
+    "link": "https://ui.elevenlabs.io/",
+    "description": "Open-source agent and audio components.",
+    "category": "ai-agents",
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-05T17:55:30.720Z"
+    },
+    "order": 2
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16b1"
+    },
+    "name": "Shadcn Space",
+    "link": "https://shadcnspace.com",
+    "description": "Community-driven Shadcn UI examples.",
+    "category": "blocks",
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-30T15:39:05.735Z"
+    },
+    "featured": false,
+    "order": 2
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16c8"
+    },
+    "name": "8StarLabs UI",
+    "link": "https://ui.8starlabs.com/",
+    "description": "Niche, high-utility UI elements and component library for modern web apps.",
+    "category": "components",
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-30T15:31:49.691Z"
+    },
+    "featured": false,
+    "order": 20
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16d4"
+    },
+    "name": "ScrollX UI",
+    "link": "https://scrollxui.dev/",
+    "description": "Animated scroll-driven interactions for React apps.",
+    "category": "motion-3d",
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-09T17:02:42.634Z"
+    },
+    "featured": false,
+    "order": 7
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16cd"
+    },
+    "name": "GSAP",
+    "link": "https://gsap.com",
+    "description": "The industry standard for professional web animation.",
+    "category": "motion-3d",
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-09T17:02:42.634Z"
+    },
+    "featured": false,
+    "order": 9
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16d8"
+    },
+    "name": "PatternCraft",
+    "link": "https://patterncraft.fun",
+    "description": "Visual CSS pattern generator.",
+    "category": "customize",
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-14T13:03:38.129Z"
+    },
+    "order": 2
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16eb"
+    },
+    "name": "Dice UI",
+    "link": "https://www.diceui.com/",
+    "description": "Accessible shadcn components featuring powerful server-side data tables.",
+    "category": "ui-library",
+    "featured": false,
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-16T13:30:09.308Z"
+    },
+    "order": 3
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16db"
+    },
+    "name": "Lucide",
+    "link": "https://lucide.dev",
+    "description": "Beautiful and consistent icon library.",
+    "category": "icons",
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-05T17:57:16.423Z"
+    },
+    "featured": false,
+    "order": 0
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16af"
+    },
+    "name": "Efferd",
+    "link": "https://efferd.com",
+    "description": "Clean and minimal layout inspiration.",
+    "category": "blocks",
+    "featured": true,
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-30T15:39:05.735Z"
+    },
+    "order": 8
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16e8"
+    },
+    "name": "Square UI",
+    "link": "https://square.lndevui.com/",
+    "description": "Beautiful open-source layouts and dashboard templates using shadcn/ui.",
+    "category": "pages",
+    "featured": false,
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-06T18:05:02.633Z"
+    },
+    "order": 1
+  },
+  {
+    "_id": {
+      "$oid": "6a05c820be43958fa403e03f"
+    },
+    "name": "Dot Matrix",
+    "link": "https://dotmatrix.zzzzshawn.cloud/",
+    "description": "Fifty-five open-source, React-based loaders crafted with Tailwind and shadcn.",
+    "category": "customize",
+    "featured": false,
+    "order": 3,
+    "createdAt": {
+      "$date": "2026-05-14T13:03:28.371Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-14T13:03:38.129Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a05caf4788277750b17d5bb"
+    },
+    "name": "Landing Love",
+    "link": "https://www.landing.love/",
+    "description": "Showcase 2,049 top-tier animation websites with full-page video recordings.",
+    "category": "inspiration",
+    "featured": false,
+    "order": 3,
+    "createdAt": {
+      "$date": "2026-05-14T13:15:32.051Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-14T13:18:20.052Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16b3"
+    },
+    "name": "Shadcn UI Blocks",
+    "link": "https://www.shadcnui-blocks.com/",
+    "description": "Responsive, pre-built UI sections (blocks) for the Shadcn ecosystem.",
+    "category": "blocks",
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-30T15:39:05.735Z"
+    },
+    "featured": false,
+    "order": 1
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16df"
+    },
+    "name": "Shoogle",
+    "link": "https://shoogle.dev",
+    "description": "Search engine for developers.",
+    "category": "search",
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-05T17:57:39.655Z"
+    },
+    "order": 1
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16c3"
+    },
+    "name": "Scificn UI",
+    "link": "https://scificn.dev",
+    "description": "Futuristic and high-tech design patterns.",
+    "category": "ui-library",
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-16T13:30:09.308Z"
+    },
+    "featured": false,
+    "order": 4
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16e1"
+    },
+    "name": "MotionSites",
+    "link": "https://motionsites.ai/",
+    "description": "Prompt-based landing page generation.",
+    "category": "ai-agents",
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-05T17:55:30.718Z"
+    },
+    "order": 0
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16dc"
+    },
+    "name": "Tabler Icons",
+    "link": "https://tabler.io/icons",
+    "description": "Over 5000+ open source SVG icons.",
+    "category": "icons",
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-05T17:57:16.425Z"
+    },
+    "featured": false,
+    "order": 3
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16c1"
+    },
+    "name": "Pixel Perfect",
+    "link": "https://www.pixel-perfect.space/",
+    "description": "Detailed design systems and kits.",
+    "category": "components",
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-30T15:31:49.691Z"
+    },
+    "featured": false,
+    "order": 22
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16c4"
+    },
+    "name": "VengeanceUI",
+    "link": "https://www.vengenceui.com",
+    "description": "Premium React components for building stunning interfaces.",
+    "category": "components",
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-30T15:31:49.690Z"
+    },
+    "featured": false,
+    "order": 10
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16ad"
+    },
+    "name": "Skiper UI",
+    "link": "https://skiper-ui.com",
+    "description": "A library of high-quality web components.",
+    "category": "components",
+    "featured": true,
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-30T15:31:49.689Z"
+    },
+    "order": 0
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16b8"
+    },
+    "name": "Coss",
+    "link": "https://coss.com/origin",
+    "description": "A collection of high-end UI components.",
+    "category": "components",
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-30T15:31:49.691Z"
+    },
+    "featured": false,
+    "order": 18
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16ab"
+    },
+    "name": "Blocks by MVP Subha",
+    "link": "https://blocks.mvp-subha.me",
+    "description": "Modern UI blocks for rapid development.",
+    "category": "components",
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-30T15:31:49.691Z"
+    },
+    "featured": false,
+    "order": 19
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16d2"
+    },
+    "name": "Kine UI",
+    "link": "https://kine-ui.vercel.app/",
+    "description": "Spatial computing and hand gesture components for React.",
+    "category": "interactions",
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-04T15:21:00.206Z"
+    },
+    "featured": false
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16d5"
+    },
+    "name": "Componentry",
+    "link": "https://www.componentry.fun/",
+    "description": "Animated copy-paste components with Framer Motion.",
+    "category": "motion-3d",
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-09T17:02:42.634Z"
+    },
+    "featured": false,
+    "order": 3
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16d9"
+    },
+    "name": "Neumorphism Generator",
+    "link": "https://neumorphism.io",
+    "description": "Generate soft UI and neumorphic shadows.",
+    "category": "customize",
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-14T13:03:38.129Z"
+    },
+    "order": 4
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16e0"
+    },
+    "name": "SoundCN",
+    "link": "https://soundcn.xyz",
+    "description": "Audio effects and soundscapes for UI.",
+    "category": "audio",
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16ea"
+    },
+    "name": "ShadcnStore",
+    "link": "https://shadcnstore.com/",
+    "description": "Production-ready blocks, responsive templates, and customizable UI components.",
+    "category": "blocks",
+    "featured": false,
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-30T15:39:05.735Z"
+    },
+    "order": 4
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16c5"
+    },
+    "name": "Wigggle UI",
+    "link": "https://wigggle-ui.vercel.app/",
+    "description": "A collection of 80+ copy-and-paste widgets.",
+    "category": "components",
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-30T15:31:49.691Z"
+    },
+    "featured": false,
+    "order": 14
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16c7"
+    },
+    "name": "Commercn",
+    "link": "https://commercn.com/",
+    "description": "Pre-built UI blocks specifically designed for e-commerce.",
+    "category": "components",
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-30T15:31:49.690Z"
+    },
+    "featured": false,
+    "order": 11
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16da"
+    },
+    "name": "CSS Buttons",
+    "link": "https://cssbuttons.io",
+    "description": "A giant collection of CSS buttons.",
+    "category": "customize",
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-14T13:03:38.129Z"
+    },
+    "order": 1
+  },
+  {
+    "_id": {
+      "$oid": "69f4e6c175930bcc657e16c0"
+    },
+    "name": "Cult UI",
+    "link": "https://cult-ui.com",
+    "description": "Modern components for stylish applications.",
+    "category": "components",
+    "createdAt": {
+      "$date": "2026-05-01T17:45:37.368Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-30T15:31:49.691Z"
+    },
+    "featured": false,
+    "order": 17
+  },
+  {
+    "_id": {
+      "$oid": "69fa1e18275dc4dcc4f26a5e"
+    },
+    "name": "Landbook",
+    "link": "https://land-book.com/",
+    "description": "Curated landing page inspiration for high-converting developer projects.",
+    "category": "inspiration",
+    "featured": false,
+    "createdAt": {
+      "$date": "2026-05-05T16:43:04.560Z"
+    },
+    "order": 4,
+    "updatedAt": {
+      "$date": "2026-05-14T13:18:20.052Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69fc2d42dc816d0fe9f5d9ae"
+    },
+    "name": "Evil Charts",
+    "link": "https://evilcharts.com/",
+    "description": "Unapologetically bold chart visualizations for modern interfaces.",
+    "category": "components",
+    "featured": false,
+    "order": 26,
+    "createdAt": {
+      "$date": "2026-05-07T06:12:18.142Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-30T15:31:49.691Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69fe19cbca98dbe9b61b7bb1"
+    },
+    "name": "Forge UI",
+    "link": "https://forgeui.in/",
+    "description": "Open-source UI blocks tailored for design engineers.",
+    "category": "components",
+    "featured": false,
+    "order": 7,
+    "createdAt": {
+      "$date": "2026-05-08T17:13:47.871Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-30T15:31:49.690Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69fe21aefb1f0abdddfa8523"
+    },
+    "name": "Animate UI",
+    "link": "https://animate-ui.com/",
+    "description": "Animate UI provides production-ready, interactive motion components.",
+    "category": "components",
+    "featured": false,
+    "order": 8,
+    "createdAt": {
+      "$date": "2026-05-08T17:47:26.976Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-30T15:31:49.690Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69ff689e55cc657a6879b492"
+    },
+    "name": "Unicorn Studio",
+    "link": "https://www.unicorn.studio/dashboard",
+    "description": "No-code WebGL platform for immersive interactive website animations.",
+    "category": "motion-3d",
+    "featured": false,
+    "order": 2,
+    "createdAt": {
+      "$date": "2026-05-09T17:02:22.536Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-09T17:02:42.634Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a169cfc3dcfa9b066e11c98"
+    },
+    "name": "Blockus",
+    "link": "https://blockus.lndevui.com/",
+    "description": "blockus is a curated catalog of production-ready React sections built with shadcn/ui and Tailwind CSS.",
+    "category": "blocks",
+    "featured": false,
+    "order": 13,
+    "createdAt": {
+      "$date": "2026-05-27T07:27:56.150Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-30T15:39:05.735Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a1b020d35c0725fe688ecf7"
+    },
+    "name": "ABUI",
+    "link": "https://www.abui.io/",
+    "description": "A shadcn-compatible registry conforming to Vercel's build specification.",
+    "category": "components",
+    "featured": false,
+    "order": 12,
+    "createdAt": {
+      "$date": "2026-05-30T15:28:12.836Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-30T15:31:49.690Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a1b02d2f91d4918cf37e3d6"
+    },
+    "name": "UI Trophy",
+    "link": "https://ui.trophy.so/",
+    "description": "[UI Trophy](https://ui.trophy.so/) is an open-source registry of shadcn-compatible components designed for gamification.",
+    "category": "components",
+    "featured": false,
+    "order": 13,
+    "createdAt": {
+      "$date": "2026-05-30T15:31:29.885Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-30T15:31:49.690Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6a1b0485f91d4918cf37e3d7"
+    },
+    "name": "UI Corr",
+    "link": "https://ui.corr.sh/",
+    "description": "UI Corris a streamlined registry providing high-quality, reusable interface components for modern web developers.",
+    "category": "blocks",
+    "featured": false,
+    "order": 14,
+    "createdAt": {
+      "$date": "2026-05-30T15:38:45.213Z"
+    },
+    "updatedAt": {
+      "$date": "2026-05-30T15:39:05.735Z"
+    }
+  }
+]

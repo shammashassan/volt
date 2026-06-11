@@ -1,47 +1,52 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { getStats } from "@/lib/db"
+import { cacheLife, cacheTag } from "next/cache"
 import {
   ZapIcon,
   LayersIcon,
-  CpuIcon,
-  ActivityIcon
+  FileTextIcon,
+  UsersIcon
 } from "lucide-react"
 
-export async function DashboardStats() {
-  const statsData = await getStats()
+export async function DashboardStats({ userId }: { userId: string }) {
+  'use cache'
+  cacheLife('minutes')
+  cacheTag(`dashboard-stats-${userId}`)
+
+  const statsData = await getStats(userId)
 
   const stats = [
     {
       title: "Total Resources",
-      value: statsData.totalResources.toString(),
-      description: "Curated UI library items",
+      value: statsData.resources.toString(),
+      description: "Curated library items",
       icon: LayersIcon,
       color: "text-blue-500",
       bg: "bg-blue-500/10",
     },
     {
       title: "Categories",
-      value: statsData.totalCategories.toString(),
+      value: statsData.categories.toString(),
       description: "Organized tool sections",
       icon: ZapIcon,
       color: "text-amber-500",
       bg: "bg-amber-500/10",
     },
     {
-      title: "System Status",
-      value: "Online",
-      description: "Ready for discovery",
-      icon: ActivityIcon,
-      color: "text-emerald-500",
-      bg: "bg-emerald-500/10",
-    },
-    {
-      title: "Latest Add",
-      value: statsData.latestResourceName,
-      description: "Most recently synced",
-      icon: CpuIcon,
+      title: "Notes",
+      value: statsData.notes.toString(),
+      description: "Connected thoughts",
+      icon: FileTextIcon,
       color: "text-purple-500",
       bg: "bg-purple-500/10",
+    },
+    {
+      title: "Projects & Contacts",
+      value: `${statsData.projects} / ${statsData.people}`,
+      description: "Active scopes / people",
+      icon: UsersIcon,
+      color: "text-emerald-500",
+      bg: "bg-emerald-500/10",
     },
   ]
 

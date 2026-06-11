@@ -1,20 +1,100 @@
-import React from 'react'
+"use client"
+
+import React, { useRef } from 'react'
 import { HeroHeader } from '@/components/header'
 import { HeroSection } from '@/components/landing/hero-section'
 import { FeatureGrid } from '@/components/landing/feature-grid'
 import {
   CheckCircle,
-  Rocket
+  Rocket,
+  Library,
+  Layers,
+  FolderOpen,
+  Users
 } from 'lucide-react'
-import { categories } from '@/lib/data'
-import { ICON_MAP } from '@/lib/icons'
 import Link from 'next/link'
 import { LenisProvider } from '@/components/lenis-provider'
+import { gsap } from 'gsap'
+import { useGSAP } from '@gsap/react'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+
+// Register plugins
+gsap.registerPlugin(useGSAP, ScrollTrigger)
 
 export default function LandingPage() {
+  const pageRef = useRef<HTMLDivElement>(null)
+
+  useGSAP(() => {
+    const mm = gsap.matchMedia()
+
+    mm.add("(prefers-reduced-motion: reduce)", () => {
+      // Fallback for accessibility
+      gsap.set(".why-reveal-item, .entity-card-reveal, .cta-reveal-item", {
+        opacity: 1,
+        y: 0
+      })
+    })
+
+    mm.add("(prefers-reduced-motion: no-preference)", () => {
+      // Set initial state
+      gsap.set(".why-reveal-item", { opacity: 0, y: 30 })
+      gsap.set(".entity-card-reveal", { opacity: 0, y: 35 })
+      gsap.set(".cta-reveal-item", { opacity: 0, y: 35 })
+
+      // Small delay to let Next.js rendering and page heights completely settle
+      const timer = setTimeout(() => {
+        // Reveal Why Section text items
+        gsap.to(".why-reveal-item", {
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          stagger: 0.15,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: ".why-trigger",
+            start: "top 80%",
+            once: true
+          }
+        })
+
+        // Reveal Entity cards
+        gsap.to(".entity-card-reveal", {
+          opacity: 1,
+          y: 0,
+          duration: 0.7,
+          stagger: 0.12,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: ".why-cards-trigger",
+            start: "top 85%",
+            once: true
+          }
+        })
+
+        // Reveal CTA Section items
+        gsap.to(".cta-reveal-item", {
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          stagger: 0.15,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: ".cta-trigger",
+            start: "top 80%",
+            once: true
+          }
+        })
+
+        ScrollTrigger.refresh()
+      }, 100)
+
+      return () => clearTimeout(timer)
+    })
+  }, { scope: pageRef })
+
   return (
     <LenisProvider>
-      <div className="relative min-h-screen bg-background selection:bg-primary/30">
+      <div ref={pageRef} className="relative min-h-screen bg-background selection:bg-primary/30">
         <HeroHeader />
 
         <HeroSection />
@@ -22,24 +102,24 @@ export default function LandingPage() {
         <FeatureGrid />
 
         {/* Why Section */}
-        <section className="bg-muted/30 py-24 sm:py-40">
+        <section className="why-trigger bg-muted/30 py-24 sm:py-40">
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
             <div className="mx-auto grid max-w-2xl grid-cols-1 gap-x-12 gap-y-16 lg:max-w-none lg:grid-cols-2 lg:items-center">
               <div className="flex flex-col gap-8">
-                <h2 className="text-4xl font-bold tracking-tight sm:text-6xl">
-                  Curation over quantity
+                <h2 className="why-reveal-item opacity-0 text-4xl font-bold tracking-tight sm:text-6xl">
+                  Knowledge over raw data
                 </h2>
-                <p className="text-xl leading-relaxed text-muted-foreground">
-                  There are thousands of component libraries out there. We focus on the high-fidelity primitives that actually make it into production. From 21st.dev to Aceternity, we find the gems so you don't have to.
+                <p className="why-reveal-item opacity-0 text-xl leading-relaxed text-muted-foreground">
+                  Traditional bookmarking managers collect thousands of unorganized, forgotten URLs. Volt shifts the focus to curation: capturing context, detailing why items matter, and structuring custom entities matching your mental model.
                 </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="why-reveal-item opacity-0 grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {[
-                    "Verified production-ready",
-                    "Visual toolsets for CSS",
-                    "Advanced motion patterns",
-                    "AI agent skill libraries",
-                    "Geospatial UI primitives",
-                    "Sound engineering tools"
+                    "Bidirectional relationships",
+                    "Context-first details",
+                    "Command-driven navigation",
+                    "Fully customizable structure",
+                    "Smart related references",
+                    "Activity timelines"
                   ].map((item, i) => (
                     <div key={i} className="flex items-center gap-3">
                       <CheckCircle className="size-6 text-primary" />
@@ -48,19 +128,24 @@ export default function LandingPage() {
                   ))}
                 </div>
               </div>
-              <div className="relative aspect-auto lg:aspect-square rounded-[2.5rem] border bg-background p-6 shadow-2xl lg:p-10 overflow-hidden group">
+              <div className="why-cards-trigger relative aspect-auto lg:aspect-square rounded-[2.5rem] border bg-background p-6 shadow-2xl lg:p-10 overflow-hidden group">
                 <div className="absolute inset-0 bg-linear-to-tr from-primary/5 to-transparent" />
                 <div className="relative flex flex-col justify-center gap-4 sm:gap-6 z-10 lg:h-full">
-                  {categories.slice(0, 4).map((cat) => {
-                    const Icon = ICON_MAP[cat.icon]
+                  {[
+                    { id: "res", title: "Resources", desc: "Save websites, repositories, podcasts, and articles.", icon: Library },
+                    { id: "cat", title: "Categories & Collections", desc: "Build tailored structures and custom groupings.", icon: Layers },
+                    { id: "proj", title: "Projects & Notes", desc: "Document insights and associate with workspaces.", icon: FolderOpen },
+                    { id: "peop", title: "People", desc: "Link resources to creators, mentors, and authors.", icon: Users },
+                  ].map((entity) => {
+                    const Icon = entity.icon
                     return (
-                      <div key={cat.id} className="flex items-center gap-4 rounded-2xl border bg-muted/40 p-4 sm:p-5 transition-[background-color,transform] hover:bg-muted/80 hover:translate-x-2">
+                      <div key={entity.id} className="entity-card-reveal opacity-0 flex items-center gap-4 rounded-2xl border bg-muted/40 p-4 sm:p-5 transition-[background-color,transform] duration-300 hover:bg-muted/80 hover:translate-x-2">
                         <div className="flex size-12 sm:size-14 shrink-0 items-center justify-center rounded-xl bg-background text-primary shadow-sm ring-1 ring-border">
-                          {Icon && <Icon className="size-6" />}
+                          <Icon className="size-6" />
                         </div>
                         <div className="min-w-0">
-                          <h4 className="truncate text-lg font-bold">{cat.title}</h4>
-                          <p className="line-clamp-1 text-sm text-muted-foreground">{cat.description.split('.')[0]}</p>
+                          <h4 className="truncate text-lg font-bold">{entity.title}</h4>
+                          <p className="line-clamp-1 text-sm text-muted-foreground">{entity.desc}</p>
                         </div>
                       </div>
                     )
@@ -72,23 +157,25 @@ export default function LandingPage() {
         </section>
 
         {/* Final CTA */}
-        <section className="py-24 sm:py-32">
+        <section className="cta-trigger py-24 sm:py-32">
           <div className="mx-auto max-w-5xl px-6">
             <div className="relative overflow-hidden rounded-[3rem] border bg-card p-12 lg:p-24 text-center">
               <div className="absolute inset-0 -z-10 bg-linear-to-b from-primary/5 to-transparent" />
-              <h2 className="mb-6 text-4xl font-bold sm:text-7xl">
-                Level up your workflow.
+              <h2 className="cta-reveal-item opacity-0 mb-6 text-4xl font-bold sm:text-7xl">
+                Build your network.
               </h2>
-              <h3 className="sr-only tracking-tight">Volt - The ultimate workspace for design engineers</h3>
-              <p className="mx-auto mb-12 max-w-2xl text-xl text-muted-foreground">
-                Join thousands of design engineers using Volt to stay ahead of the UI curve. Curated weekly.
+              <h3 className="sr-only tracking-tight">Volt - The personal knowledge operating system</h3>
+              <p className="cta-reveal-item opacity-0 mx-auto mb-12 max-w-2xl text-xl text-muted-foreground">
+                Stop hoarding forgotten links. Start capturing context, establishing connections, and building your digital second brain with Volt.
               </p>
-              <Link
-                href="/explore"
-                className="inline-flex h-16 items-center justify-center rounded-full bg-primary px-12 text-lg font-bold text-primary-foreground shadow-xl shadow-primary/20 transition-[transform,shadow,background-color] hover:scale-105"
-              >
-                Access the Library
-              </Link>
+              <div className="cta-reveal-item opacity-0">
+                <Link
+                  href="/explore"
+                  className="inline-flex h-16 items-center justify-center rounded-full bg-primary px-12 text-lg font-bold text-primary-foreground shadow-xl shadow-primary/20 transition-[transform,shadow,background-color] hover:scale-105"
+                >
+                  Access Workspace
+                </Link>
+              </div>
             </div>
           </div>
         </section>
@@ -104,15 +191,21 @@ export default function LandingPage() {
                 <span className="text-2xl font-bold tracking-tighter">Volt</span>
               </div>
               <nav className="flex flex-wrap justify-center gap-x-10 gap-y-4">
-                {['Explore', 'Components', 'Patterns', 'Docs', 'GitHub', 'Twitter'].map((item) => (
-                  <Link key={item} href="#" className="text-base font-medium text-muted-foreground hover:text-foreground transition-colors">
-                    {item}
+                {[
+                  { name: 'Resources', href: '/resources' },
+                  { name: 'Categories', href: '/categories' },
+                  { name: 'Projects', href: '/projects' },
+                  { name: 'Notes', href: '/notes' },
+                  { name: 'Dashboard', href: '/explore' }
+                ].map((item) => (
+                  <Link key={item.name} href={item.href} className="text-base font-medium text-muted-foreground hover:text-foreground transition-colors">
+                    {item.name}
                   </Link>
                 ))}
               </nav>
               <div className="h-px w-full max-w-xs bg-border" />
               <p className="text-base text-muted-foreground">
-                © 2026 Volt. Built for the design engineering community.
+                © 2026 Volt. Your personal knowledge operating system.
               </p>
             </div>
           </div>

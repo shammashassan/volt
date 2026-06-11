@@ -9,10 +9,14 @@ import {
   UsersIcon,
   LibraryIcon,
   LayoutGrid,
-  Layers
+  Layers,
+  FolderOpen,
+  FileText,
+  Tag,
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
+import { NavSecondary } from "@/components/nav-secondary"
 import { NavUser } from "@/components/nav-user"
 import {
   Sidebar,
@@ -27,34 +31,57 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { authClient } from "@/lib/auth-client"
 import { ICON_MAP } from "@/lib/icons"
+import { getCategoriesAction } from "@/lib/actions/categories"
+import { Category } from "@/lib/types"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname()
   const { data: session } = authClient.useSession()
-  const [categories, setCategories] = useState<any[]>([])
+  const [categories, setCategories] = useState<Category[]>([])
+  const [isMounted, setIsMounted] = useState(false)
 
-  const user = session?.user as any
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
+  const user = session?.user as { role?: string } | undefined
   const isAdmin = user?.role === "admin"
 
   useEffect(() => {
     async function fetchCategories() {
       try {
-        const response = await fetch('/api/categories')
-        const data = await response.json()
-        setCategories(data)
+        const result = await getCategoriesAction()
+        if (result.success && Array.isArray(result.data)) {
+          setCategories(result.data)
+        } else {
+          setCategories([])
+        }
       } catch (error) {
         console.error("Failed to fetch categories:", error)
+        setCategories([])
       }
     }
     fetchCategories()
   }, [])
 
-  const navMainItems = [
+  const categorySubItems = (Array.isArray(categories) ? categories : []).map(category => ({
+    title: category.name || category.title || "Untitled Category",
+    url: `/categories/${category.id}`,
+    isActive: pathname === `/categories/${category.id}`,
+  }))
+
+  const platformItems = [
     {
-      title: "Explore",
+      title: "Dashboard",
       url: "/explore",
       icon: LayoutGrid,
       isActive: pathname === "/explore",
+    },
+    {
+      title: "Resources",
+      url: "/resources",
+      icon: LibraryIcon,
+      isActive: pathname === "/resources",
     },
     {
       title: "CLI Commands",
@@ -62,37 +89,42 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       icon: SquareTerminal,
       isActive: pathname === "/commands",
     },
+    {
+      title: "Workspace",
+      url: "/projects",
+      icon: FolderOpen,
+      isActive: ["/projects", "/notes"].includes(pathname),
+      items: [
+        { title: "Projects", url: "/projects", isActive: pathname === "/projects" },
+        { title: "Notes", url: "/notes", isActive: pathname === "/notes" },
+      ],
+    },
+    {
+      title: "Organize",
+      url: "/categories",
+      icon: Layers,
+      isActive: ["/categories", "/tags", "/people"].includes(pathname),
+      items: [
+        { title: "Categories", url: "/categories", isActive: pathname === "/categories" },
+        { title: "Tags", url: "/tags", isActive: pathname === "/tags" },
+        { title: "People", url: "/people", isActive: pathname === "/people" },
+      ],
+    },
+    // Categories collapsible — only rendered when there are DB categories
+    ...(categorySubItems.length > 0
+      ? [{
+        title: "Categories",
+        url: "/categories",
+        icon: BookOpen,
+        isActive: categorySubItems.some(c => c.isActive),
+        items: categorySubItems,
+      }]
+      : []),
   ]
 
-  if (isAdmin) {
-    navMainItems.push(
-      {
-        title: "Manage Categories",
-        url: "/categories",
-        icon: Layers,
-        isActive: pathname === "/categories",
-      },
-      {
-        title: "Manage Resources",
-        url: "/resources",
-        icon: LibraryIcon,
-        isActive: pathname === "/resources",
-      },
-      {
-        title: "Manage Users",
-        url: "/users",
-        icon: UsersIcon,
-        isActive: pathname === "/users",
-      }
-    )
-  }
-
-  const categoryItems = categories.map(category => ({
-    title: category.title,
-    url: `/category/${category.id}`,
-    icon: ICON_MAP[category.icon] || BookOpen,
-    isActive: pathname === `/category/${category.id}`,
-  }))
+  const adminItems = isAdmin
+    ? [{ title: "Manage Users", url: "/users", icon: UsersIcon }]
+    : []
 
   return (
     <Sidebar
@@ -118,10 +150,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
+
       <SidebarContent>
-        <NavMain items={navMainItems} label="Platform" />
-        <NavMain items={categoryItems} label="Categories" />
+        <NavMain items={platformItems} label="Platform" />
+
+        {isMounted && adminItems.length > 0 && (
+          <NavSecondary items={adminItems} label="Admin" className="mt-auto" />
+        )}
       </SidebarContent>
+
       <SidebarFooter>
         <NavUser />
       </SidebarFooter>

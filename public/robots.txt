@@ -8,10 +8,13 @@ Disallow: /pending-approval
 # Protected dashboard routes
 Disallow: /account
 Disallow: /categories
-Disallow: /category
 Disallow: /commands
 Disallow: /explore
 Disallow: /resources
+Disallow: /projects
+Disallow: /notes
+Disallow: /people
+Disallow: /tags
 Disallow: /users
 
 # API routes

@@ -14,6 +14,12 @@ export async function proxy(request: NextRequest) {
         return NextResponse.next();
     }
 
+    // Skip redirection check for Next.js Server Actions, allowing them to handle auth internally
+    const isServerAction = request.headers.get("next-action") !== null;
+    if (isServerAction) {
+        return NextResponse.next();
+    }
+
     // getCookieCache fetches the session from the client's cookie cache,
     // avoiding database connection establishment and query on every page navigation.
     const session = await getCookieCache(request);
@@ -40,7 +46,7 @@ export async function proxy(request: NextRequest) {
     }
 
     // Session exists, handle redirects
-    const user = session.user as any;
+    const user = session.user as { isApproved?: boolean; role?: string };
     const isApproved = user.isApproved;
     const role = user.role;
 

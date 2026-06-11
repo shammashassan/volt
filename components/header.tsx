@@ -2,48 +2,20 @@
 import Link from 'next/link'
 import { Logo } from '@/components/logo'
 import { Menu, X } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 import React from 'react'
 import { cn } from '@/lib/utils'
 import { ModeToggle } from './mode-toggle'
 
 export const HeroHeader = () => {
-    const [menuItems, setMenuItems] = React.useState([
-        { name: 'Explore', href: '/explore' }
-    ])
+    const menuItems = [
+        { name: 'Dashboard', href: '/explore' },
+        { name: 'Resources', href: '/resources' },
+        { name: 'Categories', href: '/categories' },
+        { name: 'Projects', href: '/projects' },
+        { name: 'Notes', href: '/notes' },
+    ]
     const [menuState, setMenuState] = React.useState(false)
     const [isScrolled, setIsScrolled] = React.useState(false)
-
-    React.useEffect(() => {
-        async function fetchTopCategories() {
-            try {
-                const response = await fetch('/api/categories')
-                const categories = await response.json()
-                
-                // Sort by order (ascending) primarily, then by resourceCount (descending)
-                const topCategories = categories
-                    .sort((a: any, b: any) => {
-                        if ((a.order || 0) !== (b.order || 0)) {
-                            return (a.order || 0) - (b.order || 0)
-                        }
-                        return (b.resourceCount || 0) - (a.resourceCount || 0)
-                    })
-                    .slice(0, 4)
-                    .map((cat: any) => ({
-                        name: cat.title,
-                        href: `/category/${cat.id}`
-                    }))
-
-                setMenuItems([
-                    { name: 'Explore', href: '/explore' },
-                    ...topCategories
-                ])
-            } catch (error) {
-                console.error("Failed to fetch top categories:", error)
-            }
-        }
-        fetchTopCategories()
-    }, [])
 
     React.useEffect(() => {
         const handleScroll = () => {

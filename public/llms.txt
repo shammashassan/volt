@@ -1,32 +1,27 @@
 # Volt
 
-Volt is a full-stack productivity platform and resource hub for frontend and UI developers. The application helps users store reusable UI components, organize frontend resources, save developer notes, and manage workflow knowledge.
+Volt is a personal resource, knowledge, and discovery management platform (a personal knowledge operating system). Users can save anything valuable from the internet, organize it into custom categories and collections, connect it to projects and people, and instantly retrieve it through a command-driven interface (Ctrl + K).
 
 ## Stack
-- Next.js App Router
+- Next.js App Router (RSC)
 - Tailwind CSS
-- MongoDB
-- Mongoose
-- Vercel
+- MongoDB (Relational-Array structures)
+- Better Auth (Session-scoped multi-tenancy)
+- GSAP & Lenis (Premium scroll and timeline animations)
 
 ## Public URL
 https://ui-volt.vercel.app/
 
 ## Features
-- Authentication-protected dashboard
-- Frontend resource management
-- Component and snippet organization
-- Developer knowledge storage
-- Progressive Web App (PWA) support
-- Mobile and desktop installability
+- Command Center navigation (Ctrl + K)
+- User-owned custom Categories, Collections, Projects, Notes, and People
+- Contextual Resource tracking (answering What, Why, and Where)
+- Bidirectional entity relationship linking
+- Chronological Activity Timeline
+- Private, authenticated user workspaces
 
 ## API
 All `/api/*` endpoints are authentication-protected and intended only for valid user sessions.
-
-Includes:
-- `/api/categories`
-- `/api/resources`
-- `/api/auth`
 
 ## Access Policy
 - Dashboard and workspace routes require authentication
@@ -44,15 +39,20 @@ Preferred:
 - Public landing pages
 - Public metadata and documentation
 
-Avoid:
+Avoid (private dashboard routes):
 - `/login`
 - `/pending-approval`
 - `/account`
-- `/categories`
-- `/category`
-- `/category/*`
-- `/commands`
 - `/explore`
 - `/resources`
+- `/categories`
+- `/categories/*`
+- `/projects`
+- `/projects/*`
+- `/notes`
+- `/people`
+- `/people/*`
+- `/tags`
+- `/commands`
 - `/users`
 - `/api/*`

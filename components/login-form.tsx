@@ -13,7 +13,7 @@ import { useState } from "react"
 import { Eye, EyeOff, Loader2 } from "lucide-react"
 import { authClient } from "@/lib/auth-client"
 import { toast } from "sonner"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import Image from "next/image"
 
 export function LoginForm({
@@ -24,6 +24,8 @@ export function LoginForm({
   const [isLoading, setIsLoading] = useState(false)
   const [isSignUp, setIsSignUp] = useState(false)
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const callbackURL = searchParams.get("callbackURL") || "/explore"
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -35,7 +37,7 @@ export function LoginForm({
     const name = formData.get("name") as string
 
     if (isSignUp) {
-      const { data, error } = await authClient.signUp.email({
+      await authClient.signUp.email({
         email,
         password,
         name,
@@ -52,19 +54,19 @@ export function LoginForm({
         }
       })
     } else {
-      const { data, error } = await authClient.signIn.email({
+      await authClient.signIn.email({
         email,
         password,
-        callbackURL: "/explore"
+        callbackURL: callbackURL
       }, {
         onSuccess: (ctx) => {
-          const user = ctx.data.user as any
+          const user = ctx.data.user as { isApproved?: boolean; role?: string }
           if (!user.isApproved && user.role !== "admin") {
             toast.info("Your account is pending approval.")
             router.push("/pending-approval")
           } else {
             toast.success("Login successful")
-            router.push("/explore")
+            router.push(callbackURL)
             router.refresh()
           }
         },

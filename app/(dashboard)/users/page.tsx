@@ -1,9 +1,7 @@
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
-import { UserManagement } from "@/components/UserManagement";
-import { UsersIcon } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
+import { UserManagement, UserData } from "@/components/UserManagement";
+
 
 export default async function UsersPage() {
   const result = await auth.api.listUsers({
@@ -14,6 +12,6 @@ export default async function UsersPage() {
   const users = result.users;
 
   return (
-    <UserManagement initialUsers={users as any} />
+    <UserManagement initialUsers={users as unknown as UserData[]} />
   );
 }

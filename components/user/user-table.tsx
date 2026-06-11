@@ -20,18 +20,37 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { 
-  MoreHorizontal, 
-  CheckCircle2, 
-  Ban, 
-  Unlock, 
-  ShieldCheck, 
+import {
+  MoreHorizontal,
+  CheckCircle2,
+  Ban,
+  Unlock,
+  ShieldCheck,
   ShieldAlert,
   Trash2,
-  Mail
+  Mail,
+  User
 } from "lucide-react"
 
-export function UserTable({ users, onApprove, onSetRole, onBan, onDelete, currentUserId }: any) {
+interface UserData {
+  id: string
+  name: string
+  email: string
+  role: string
+  isApproved: boolean
+  banned?: boolean
+}
+
+interface UserTableProps {
+  users: UserData[]
+  onApprove: (id: string) => Promise<void> | void
+  onSetRole: (id: string, role: string) => Promise<void> | void
+  onBan: (id: string, isBanned: boolean) => Promise<void> | void
+  onDelete: (id: string) => Promise<void> | void
+  currentUserId?: string
+}
+
+export function UserTable({ users, onApprove, onSetRole, onBan, onDelete, currentUserId }: UserTableProps) {
   return (
     <Table>
       <TableHeader className="bg-muted/50">
@@ -43,39 +62,43 @@ export function UserTable({ users, onApprove, onSetRole, onBan, onDelete, curren
         </TableRow>
       </TableHeader>
       <TableBody>
-        {users.map((user: any) => (
+        {users.map((user: UserData) => (
           <TableRow key={user.id} className="hover:bg-muted/30 transition-colors">
             <TableCell>
               <div className="flex flex-col">
                 <span className="font-bold text-foreground/90">{user.name}</span>
                 <span className="text-xs text-muted-foreground flex items-center gap-1">
-                    <Mail className="size-3" />
-                    {user.email}
+                  <Mail className="size-3" />
+                  {user.email}
                 </span>
               </div>
             </TableCell>
             <TableCell>
-              <Badge variant="outline" className="capitalize font-bold tracking-tight">
-                {user.role === "admin" && <ShieldCheck className="mr-1 size-3" />}
+              <Badge variant="outline" className="capitalize">
+                {user.role === "admin" ? (
+                  <ShieldCheck className="mr-1 size-3" />
+                ) : (
+                  <User className="mr-1 size-3" />
+                )}
                 {user.role}
               </Badge>
             </TableCell>
             <TableCell>
               <div className="flex gap-2">
                 {!user.isApproved && (
-                    <Badge variant="outline" className="bg-amber-500/10 text-amber-500 border-amber-500/20 hover:bg-amber-500/20 transition-colors">
-                        Pending
-                    </Badge>
+                  <Badge variant="warning">
+                    Pending
+                  </Badge>
                 )}
                 {user.isApproved && (
-                    <Badge variant="outline" className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20">
-                        Approved
-                    </Badge>
+                  <Badge variant="success">
+                    Approved
+                  </Badge>
                 )}
                 {user.banned && (
-                    <Badge variant="destructive" className="bg-red-500/10 text-red-500 border-red-500/20">
-                        Banned
-                    </Badge>
+                  <Badge variant="destructive">
+                    Banned
+                  </Badge>
                 )}
               </div>
             </TableCell>
@@ -114,7 +137,7 @@ export function UserTable({ users, onApprove, onSetRole, onBan, onDelete, curren
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
-                <Badge variant="outline" className="text-[10px] uppercase font-bold text-muted-foreground/40">
+                <Badge variant="outline">
                   You
                 </Badge>
               )}
@@ -122,6 +145,6 @@ export function UserTable({ users, onApprove, onSetRole, onBan, onDelete, curren
           </TableRow>
         ))}
       </TableBody>
-    </Table>
+    </Table >
   )
 }

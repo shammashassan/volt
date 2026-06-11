@@ -1,7 +1,6 @@
 import Link from "next/link"
 import {
   MoreHorizontal,
-  Plus,
   type LucideIcon,
   Trash2,
   Folder,
