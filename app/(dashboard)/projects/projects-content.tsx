@@ -191,16 +191,31 @@ export function ProjectsContent({ initialProjects }: ProjectsContentProps) {
       {/* Main Content section */}
       <section className="px-4 lg:px-6">
         <div className="max-w-7xl flex flex-col gap-6">
-          {/* Filters/Tabs */}
-          <Tabs value={filter} onValueChange={(val) => setFilter(val as "all" | ProjectStatus)} className="w-full">
-            <TabsList variant="line" className="w-full justify-start border-b border-border/20 p-0 h-auto gap-4 rounded-none">
+          {/* Mobile filter using Select */}
+          <div className="sm:hidden w-full">
+            <Select value={filter} onValueChange={(val) => setFilter(val as "all" | ProjectStatus)}>
+              <SelectTrigger className="w-full h-10 font-medium">
+                <SelectValue placeholder="Filter Projects" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All ({projects.length})</SelectItem>
+                <SelectItem value="active">Active ({projects.filter((p) => p.status === "active").length})</SelectItem>
+                <SelectItem value="completed">Completed ({projects.filter((p) => p.status === "completed").length})</SelectItem>
+                <SelectItem value="paused">Paused ({projects.filter((p) => p.status === "paused").length})</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Desktop filters using TabsList */}
+          <Tabs value={filter} onValueChange={(val) => setFilter(val as "all" | ProjectStatus)} className="hidden sm:block w-full">
+            <TabsList className="grid grid-cols-4 max-w-[480px]">
               {(["all", "active", "completed", "paused"] as const).map((status) => {
                 const count = status === "all" ? projects.length : projects.filter((p) => p.status === status).length
                 return (
                   <TabsTrigger
                     key={status}
                     value={status}
-                    className="pb-2 text-xs font-bold uppercase tracking-wider relative data-active:text-primary group-data-[variant=line]/tabs-list:data-active:after:bg-primary"
+                    className="text-xs font-bold uppercase tracking-wider"
                   >
                     {status} <span className="ml-1 opacity-60 font-medium">({count})</span>
                   </TabsTrigger>

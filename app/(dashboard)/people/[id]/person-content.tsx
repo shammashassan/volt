@@ -11,6 +11,7 @@ import { ResourceCard } from "@/components/resource-card"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { useRouter } from "next/navigation"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Empty, EmptyHeader, EmptyTitle, EmptyDescription, EmptyContent, EmptyMedia } from "@/components/ui/empty"
 
 interface PersonContentProps {
@@ -30,6 +31,7 @@ const TYPE_CONFIG: Record<PersonType, { label: string; variant: "secondary" | "o
 export function PersonContent({ person, resources, notes }: PersonContentProps) {
   const router = useRouter()
   const typeConfig = TYPE_CONFIG[person.type] || { label: "Developer", variant: "primary" as const }
+  const [activeTab, setActiveTab] = useState("resources")
 
   return (
     <div className="flex flex-1 flex-col gap-6 pb-12">
@@ -104,8 +106,21 @@ export function PersonContent({ person, resources, notes }: PersonContentProps) 
       {/* Main Content (Tabs) */}
       <section className="px-4 lg:px-6">
         <div className="max-w-7xl flex flex-col gap-6">
-          <Tabs defaultValue="resources" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 max-w-[400px] mb-4">
+          {/* Mobile Select dropdown */}
+          <div className="md:hidden w-full mb-4">
+            <Select value={activeTab} onValueChange={setActiveTab}>
+              <SelectTrigger className="w-full h-10 font-medium">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="resources">Resources ({resources.length})</SelectItem>
+                <SelectItem value="notes">Notes ({notes.length})</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="hidden md:grid w-full grid-cols-2 max-w-[400px] mb-4">
               <TabsTrigger value="resources" className="gap-2">
                 Resources
                 <Badge variant="secondary" className="h-5 px-1.5 min-w-[20px] justify-center">

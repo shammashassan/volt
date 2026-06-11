@@ -14,6 +14,7 @@ import { toast } from "sonner"
 import { authClient } from "@/lib/auth-client"
 import { useRouter } from "next/navigation"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -42,6 +43,7 @@ export function UserManagement({ initialUsers }: { initialUsers: UserData[] }) {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [userToDelete, setUserToDelete] = useState<string | null>(null)
   const router = useRouter()
+  const [activeTab, setActiveTab] = useState("active")
   const { data: session } = authClient.useSession()
   const currentUserId = session?.user?.id
 
@@ -161,8 +163,21 @@ export function UserManagement({ initialUsers }: { initialUsers: UserData[] }) {
       {/* Main Content section */}
       <section className="px-4 lg:px-6">
         <div className="max-w-7xl flex flex-col gap-6">
-          <Tabs defaultValue="active" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 max-w-[400px] mb-4">
+          {/* Mobile Select dropdown */}
+          <div className="md:hidden w-full mb-4">
+            <Select value={activeTab} onValueChange={setActiveTab}>
+              <SelectTrigger className="w-full h-10 font-medium">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="active">Active Users ({activeUsers.length})</SelectItem>
+                <SelectItem value="pending">Signup Requests ({pendingUsers.length})</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="hidden md:grid w-full grid-cols-2 max-w-[400px] mb-4">
               <TabsTrigger value="active" className="gap-2">
                 Active Users
                 <Badge variant="secondary">

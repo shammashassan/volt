@@ -15,6 +15,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuGroup } from "@/components/ui/dropdown-menu"
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 interface TagsContentProps {
   resources: Resource[]
@@ -35,6 +36,7 @@ export function TagsContent({ resources, notes, people }: TagsContentProps) {
   const [searchQuery, setSearchQuery] = useState("")
   const [sortBy, setSortBy] = useState<"popular" | "alpha" | "date">("popular")
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc")
+  const [activeTab, setActiveTab] = useState("resources")
   const router = useRouter()
 
   // Calculate tag counts and track the latest entity date for sorting
@@ -311,8 +313,22 @@ export function TagsContent({ resources, notes, people }: TagsContentProps) {
                 </TooltipProvider>
               </div>
 
-              <Tabs defaultValue="resources" className="w-full">
-                <TabsList className="grid w-full grid-cols-3 max-w-[500px] mb-4">
+              {/* Mobile Select dropdown */}
+              <div className="md:hidden w-full mb-4">
+                <Select value={activeTab} onValueChange={setActiveTab}>
+                  <SelectTrigger className="w-full h-10 font-medium">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="resources">Resources ({filteredEntities.resources.length})</SelectItem>
+                    <SelectItem value="notes">Notes ({filteredEntities.notes.length})</SelectItem>
+                    <SelectItem value="people">People ({filteredEntities.people.length})</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                <TabsList className="hidden md:grid w-full grid-cols-3 max-w-[500px] mb-4">
                   <TabsTrigger value="resources" className="gap-2">
                     Resources
                     <Badge variant="secondary" className="h-5 px-1.5 min-w-[20px] justify-center">

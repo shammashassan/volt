@@ -41,6 +41,7 @@ import {
 import Link from "next/link"
 import { Resource, Note } from "@/lib/types"
 import { Resource as DataResource } from "@/lib/data"
+import { ExploreMobileTabs } from "./explore-mobile-tabs"
 
 // ─── Cached Data Components ──────────────────────────────────────────────────
 
@@ -235,88 +236,11 @@ async function ExploreDashboardBody({ userId }: { userId: string }) {
       <Separator className="mx-4 lg:mx-6" />
 
       {/* Mobile tabs: Added / Viewed / Most Used */}
-      <Tabs defaultValue="added" className="px-4 lg:px-6 flex flex-col gap-4 lg:hidden">
-        <div className="flex items-center justify-between">
-          <TabsList>
-            <TabsTrigger value="added">
-              <PlusIcon />
-              Recently Added
-            </TabsTrigger>
-            {recentlyViewed.length > 0 && (
-              <TabsTrigger value="viewed">
-                <ClockIcon />
-                Recently Viewed
-              </TabsTrigger>
-            )}
-            <TabsTrigger value="used">
-              <FlameIcon />
-              Most Used
-            </TabsTrigger>
-          </TabsList>
-          <Button variant="ghost" size="sm" asChild>
-            <Link href="/resources">
-              All <ArrowRightIcon data-icon="inline-end" />
-            </Link>
-          </Button>
-        </div>
-
-        <TabsContent value="added" className="grid grid-cols-1 gap-4 sm:grid-cols-2 mt-0">
-          {(recentlyAdded as unknown as Resource[]).map((resource: Resource) => (
-            <ResourceCard
-              key={resource.id || resource._id?.toString()}
-              resource={resource as unknown as DataResource}
-            />
-          ))}
-        </TabsContent>
-
-        {recentlyViewed.length > 0 && (
-          <TabsContent value="viewed" className="grid grid-cols-1 gap-4 sm:grid-cols-2 mt-0">
-            {(recentlyViewed as unknown as Resource[]).map((resource: Resource) => (
-              <ResourceCard
-                key={resource.id || resource._id?.toString()}
-                resource={resource as unknown as DataResource}
-              />
-            ))}
-          </TabsContent>
-        )}
-
-        <TabsContent value="used" className="mt-0">
-          <Card>
-            <CardContent className="flex flex-col gap-1 pt-4">
-              {(mostUsed as unknown as Resource[]).map((res: Resource, idx: number) => (
-                <a
-                  key={res.id || res._id?.toString()}
-                  href={res.url || res.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-between p-2 rounded-md hover:bg-accent transition-colors group"
-                >
-                  <div className="flex items-center gap-3 min-w-0">
-                    <span className="text-xs font-mono text-muted-foreground w-5 shrink-0 tabular-nums">
-                      {String(idx + 1).padStart(2, "0")}
-                    </span>
-                    <span className="text-sm truncate group-hover:text-primary transition-colors">
-                      {res.title || res.name}
-                    </span>
-                  </div>
-                  <Badge variant="secondary" className="shrink-0 ml-2 tabular-nums">
-                    {res.useCount}
-                  </Badge>
-                </a>
-              ))}
-              {mostUsed.length === 0 && (
-                <Alert>
-                  <TrendingUpIcon />
-                  <AlertTitle>No activity yet</AlertTitle>
-                  <AlertDescription>
-                    Usage increments on link clicks.
-                  </AlertDescription>
-                </Alert>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+      <ExploreMobileTabs
+        recentlyAdded={recentlyAdded as unknown as Resource[]}
+        recentlyViewed={recentlyViewed as unknown as Resource[]}
+        mostUsed={mostUsed as unknown as Resource[]}
+      />
 
       {/* Desktop: Recently Viewed (2/3) + Most Used (1/3), then Recently Added */}
       <div className="hidden lg:flex flex-col gap-10">
@@ -425,7 +349,45 @@ async function ExploreDashboardBody({ userId }: { userId: string }) {
   )
 }
 
-// ─── Skeleton ────────────────────────────────────────────────────────────────
+// ─── Skeletons ────────────────────────────────────────────────────────────────
+
+function ExploreHeroSkeleton() {
+  return (
+    <div className="flex flex-col gap-4 px-4 py-6 lg:px-6 lg:py-8 border-b bg-linear-to-t from-primary/5 to-card">
+      <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
+        <div className="flex flex-col gap-3 max-w-2xl w-full">
+          <Badge variant="outline" className="w-fit gap-1.5 opacity-50">
+            <SparklesIcon className="size-3 animate-pulse text-muted-foreground" />
+            Volt Personal OS v2
+          </Badge>
+          <div className="flex flex-col gap-2 w-full">
+            <div className="flex items-center gap-2">
+              <span className="text-2xl font-semibold md:text-3xl">Welcome back,</span>
+              <Skeleton className="h-8 w-32 rounded-md" />
+            </div>
+            <div className="space-y-2 mt-1">
+              <Skeleton className="h-4 w-full max-w-md rounded-md" />
+              <Skeleton className="h-4 w-3/4 max-w-sm rounded-md" />
+            </div>
+          </div>
+        </div>
+        <div className="shrink-0">
+          <SearchCTAButton />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function ExploreStatsSkeleton() {
+  return (
+    <div className="grid gap-4 grid-cols-1 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
+      {Array.from({ length: 4 }).map((_, i) => (
+        <Skeleton key={i} className="h-[104px] rounded-xl" />
+      ))}
+    </div>
+  )
+}
 
 function ExploreSkeleton() {
   return (
@@ -444,9 +406,9 @@ function ExploreSkeleton() {
   )
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+// ─── Async Wrappers ───────────────────────────────────────────────────────────
 
-export default async function ExplorePage() {
+async function ExploreHeroWrapper() {
   let user: { id: string; name?: string | null }
   try {
     user = await getSessionUser()
@@ -455,56 +417,75 @@ export default async function ExplorePage() {
   }
 
   return (
-    <div className="@container/main flex flex-1 flex-col gap-6 pb-12">
-
-      {/* Hero — matches dashboard-01 header style */}
-      <div className="flex flex-col gap-4 px-4 py-6 lg:px-6 lg:py-8 border-b bg-linear-to-t from-primary/5 to-card">
-        <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
-          <div className="flex flex-col gap-3 max-w-2xl">
-            <Badge variant="outline" className="w-fit gap-1.5">
-              <SparklesIcon className="size-3" />
-              Volt Personal OS v2
-            </Badge>
-            <div className="flex flex-col gap-1">
-              <h1 className="text-2xl font-semibold md:text-3xl">
-                Welcome back,{" "}
-                <span className="text-primary">{user.name || "Developer"}</span>
-              </h1>
-              <p className="text-sm text-muted-foreground leading-relaxed max-w-lg">
-                Your personalized, text-indexed operating system. Capture web
-                resources, write markdown notes, track projects, and link
-                relationships in a unified workspace.
-              </p>
-            </div>
-          </div>
-          <div className="shrink-0">
-            <SearchCTAButton />
+    <div className="flex flex-col gap-4 px-4 py-6 lg:px-6 lg:py-8 border-b bg-linear-to-t from-primary/5 to-card">
+      <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
+        <div className="flex flex-col gap-3 max-w-2xl">
+          <Badge variant="outline" className="w-fit gap-1.5">
+            <SparklesIcon className="size-3" />
+            Volt Personal OS v2
+          </Badge>
+          <div className="flex flex-col gap-1">
+            <h1 className="text-2xl font-semibold md:text-3xl">
+              Welcome back,{" "}
+              <span className="text-primary">{user.name || "Developer"}</span>
+            </h1>
+            <p className="text-sm text-muted-foreground leading-relaxed max-w-lg">
+              Your personalized, text-indexed operating system. Capture web
+              resources, write markdown notes, track projects, and link
+              relationships in a unified workspace.
+            </p>
           </div>
         </div>
+        <div className="shrink-0">
+          <SearchCTAButton />
+        </div>
       </div>
+    </div>
+  )
+}
 
-      {/* Stats — gradient card row matching section-cards.tsx */}
+async function ExploreStatsWrapper() {
+  let user: { id: string; name?: string | null }
+  try {
+    user = await getSessionUser()
+  } catch {
+    redirect("/login")
+  }
+
+  return <DashboardStats userId={user.id} />
+}
+
+async function ExploreBodyWrapper() {
+  let user: { id: string; name?: string | null }
+  try {
+    user = await getSessionUser()
+  } catch {
+    redirect("/login")
+  }
+
+  return <ExploreDashboardBody userId={user.id} />
+}
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
+
+export default function ExplorePage() {
+  return (
+    <div className="@container/main flex flex-1 flex-col gap-6 pb-12">
+      <Suspense fallback={<ExploreHeroSkeleton />}>
+        <ExploreHeroWrapper />
+      </Suspense>
+
       <section className="px-4 lg:px-6">
-        <Suspense
-          fallback={
-            <div className="grid gap-4 grid-cols-1 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
-              {Array.from({ length: 4 }).map((_, i) => (
-                <Skeleton key={i} className="h-[104px] rounded-xl" />
-              ))}
-            </div>
-          }
-        >
-          <DashboardStats userId={user.id} />
+        <Suspense fallback={<ExploreStatsSkeleton />}>
+          <ExploreStatsWrapper />
         </Suspense>
       </section>
 
       <Separator className="mx-4 lg:mx-6" />
 
-      {/* Main body */}
       <Suspense fallback={<ExploreSkeleton />}>
-        <ExploreDashboardBody userId={user.id} />
+        <ExploreBodyWrapper />
       </Suspense>
-
     </div>
   )
 }

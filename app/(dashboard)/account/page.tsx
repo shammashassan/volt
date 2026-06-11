@@ -53,19 +53,21 @@ export default function AccountPage() {
 
   const router = useRouter()
   const contentRef = useRef<HTMLDivElement>(null)
-
   // GSAP animation on tab change
   useGSAP(
     () => {
       if (contentRef.current) {
-        gsap.fromTo(
-          contentRef.current.querySelectorAll('[data-slot="tabs-content"]'),
-          { opacity: 0, y: 15 },
-          { opacity: 1, y: 0, duration: 0.4, ease: "power2.out", stagger: 0.1 }
-        )
+        const targets = contentRef.current.querySelectorAll('[data-slot="tabs-content"]')
+        if (targets && targets.length > 0) {
+          gsap.fromTo(
+            targets,
+            { opacity: 0, y: 15 },
+            { opacity: 1, y: 0, duration: 0.4, ease: "power2.out", stagger: 0.1 }
+          )
+        }
       }
     },
-    { dependencies: [activeTab] }
+    { dependencies: [activeTab], scope: contentRef }
   )
 
   useEffect(() => {

@@ -6,10 +6,63 @@ import { CategoryActions } from "./category-actions"
 import { auth } from "@/lib/auth"
 import { headers } from "next/headers"
 import { redirect } from "next/navigation"
+import { Suspense } from "react"
+import { Skeleton } from "@/components/ui/skeleton"
 
-export default async function CategoryPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id: categoryId } = await params
-  
+function CategorySkeleton() {
+  return (
+    <div className="flex flex-1 flex-col pb-12 animate-pulse">
+      {/* Header section */}
+      <section className="px-4 pt-8 lg:px-6">
+        <div className="flex flex-wrap gap-6 items-start justify-between max-w-7xl">
+          {/* Category info */}
+          <div className="flex flex-col gap-2 min-w-0">
+            <div className="flex items-center gap-4">
+              {/* Icon skeleton */}
+              <Skeleton className="h-12 w-12 rounded-xl shrink-0" />
+              <div className="flex items-center gap-2 min-w-0">
+                {/* Title skeleton */}
+                <Skeleton className="h-9 w-48 md:h-10 rounded" />
+                {/* Badge skeleton */}
+                <Skeleton className="h-6 w-20 rounded-full shrink-0" />
+              </div>
+            </div>
+            {/* Description skeleton */}
+            <Skeleton className="h-6 w-80 max-w-2xl mt-2 rounded" />
+          </div>
+
+          {/* Button skeleton */}
+          <div className="flex items-center gap-2 w-full sm:w-auto shrink-0">
+            <Skeleton className="h-10 w-28 rounded-md" />
+            <Skeleton className="h-10 w-32 rounded-md" />
+          </div>
+
+          {/* Grid skeleton */}
+          <div className="basis-full w-full mt-6">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="rounded-xl border border-border/40 bg-card/60 overflow-hidden">
+                  <Skeleton className="aspect-video w-full rounded-none" />
+                  <div className="px-4 py-3 flex flex-col gap-2">
+                    <Skeleton className="h-5 w-3/4 rounded" />
+                    <Skeleton className="h-3.5 w-full rounded" />
+                    <Skeleton className="h-3.5 w-5/6 rounded" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  )
+}
+
+interface CategoryPageContentProps {
+  categoryId: string
+}
+
+async function CategoryPageContent({ categoryId }: CategoryPageContentProps) {
   const session = await auth.api.getSession({
     headers: await headers()
   })
@@ -24,11 +77,6 @@ export default async function CategoryPage({ params }: { params: Promise<{ id: s
     getCategories(userId)
   ])
 
-  const user = session.user as any
-  const isAdmin = user?.role === "admin"
-
-  const categoryResources = resources.filter((r) => r.category === categoryId)
-
   if (!category) {
     return (
       <div className="flex flex-1 items-center justify-center p-4">
@@ -37,6 +85,9 @@ export default async function CategoryPage({ params }: { params: Promise<{ id: s
     )
   }
 
+  const user = session.user as any
+  const isAdmin = user?.role === "admin"
+  const categoryResources = resources.filter((r) => r.category === categoryId)
   const Icon = (category.icon && ICON_MAP[category.icon as keyof typeof ICON_MAP]) || FileText
 
   return (
@@ -76,5 +127,15 @@ export default async function CategoryPage({ params }: { params: Promise<{ id: s
         </div>
       </section>
     </div>
+  )
+}
+
+export default async function CategoryPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id: categoryId } = await params
+
+  return (
+    <Suspense fallback={<CategorySkeleton />}>
+      <CategoryPageContent categoryId={categoryId} />
+    </Suspense>
   )
 }
