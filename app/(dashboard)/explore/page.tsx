@@ -3,7 +3,7 @@ import { Suspense } from "react"
 import { redirect } from "next/navigation"
 import { cacheLife, cacheTag } from "next/cache"
 import { getSessionUser } from "@/lib/auth-utils"
-import { getStats, getFavorites, getRecentlyViewed, getRecentlyAdded, getMostUsed } from "@/lib/db"
+import { getStats, getFavorites, getRecentlyViewed, getRecentlyAdded, getMostUsed, getCategoriesWithCounts } from "@/lib/db"
 import { DashboardStats } from "@/components/dashboard-stats"
 import { CategoryExplorer } from "@/components/category-explorer"
 import { ResourceCard } from "@/components/resource-card"
@@ -50,13 +50,14 @@ async function ExploreDashboardBody({ userId }: { userId: string }) {
   cacheLife("minutes")
   cacheTag(`explore-body-${userId}`)
 
-  const [stats, favorites, recentlyViewed, recentlyAdded, mostUsed] =
+  const [stats, favorites, recentlyViewed, recentlyAdded, mostUsed, categories] =
     await Promise.all([
       getStats(userId),
       getFavorites(userId),
       getRecentlyViewed(userId, 4),
       getRecentlyAdded(userId, 6),
       getMostUsed(userId, 6),
+      getCategoriesWithCounts(userId),
     ])
 
   const isEmpty =
@@ -155,7 +156,7 @@ async function ExploreDashboardBody({ userId }: { userId: string }) {
           </Button>
         </div>
         <div className="px-4 lg:px-6">
-          <CategoryExplorer />
+          <CategoryExplorer initialCategories={categories} />
         </div>
       </section>
 

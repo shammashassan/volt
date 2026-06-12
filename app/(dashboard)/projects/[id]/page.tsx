@@ -1,4 +1,4 @@
-import { getProjectById, getResources, getNotes } from "@/lib/db"
+import { getProjectById, getResourcesByProjectId, getNotesByProjectId } from "@/lib/db"
 import { ProjectContent } from "./project-content"
 import { auth } from "@/lib/auth"
 import { headers } from "next/headers"
@@ -74,19 +74,15 @@ async function ProjectDetailContentWrapper({ id }: { id: string }) {
   }
   const userId = session.user.id
   
-  const [project, allResources, allNotes] = await Promise.all([
+  const [project, linkedResources, linkedNotes] = await Promise.all([
     getProjectById(id, userId),
-    getResources(userId),
-    getNotes(userId)
+    getResourcesByProjectId(id, userId),
+    getNotesByProjectId(id, userId)
   ])
 
   if (!project) {
     notFound()
   }
-
-  // Filter linked resources and notes
-  const linkedResources = allResources.filter(r => r.projectIds?.includes(id))
-  const linkedNotes = allNotes.filter(n => n.relatedProjects?.includes(id))
 
   return (
     <ProjectContent 

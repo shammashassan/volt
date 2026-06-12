@@ -16,10 +16,18 @@ interface CategoryWithCount extends Category {
   resourceCount?: number
 }
 
-export function CategoryExplorer() {
-  const [categories, setCategories] = useState<CategoryWithCount[]>([])
+interface CategoryExplorerProps {
+  initialCategories?: CategoryWithCount[]
+}
+
+export function CategoryExplorer({ initialCategories }: CategoryExplorerProps) {
+  const [categories, setCategories] = useState<CategoryWithCount[]>(initialCategories || [])
 
   useEffect(() => {
+    if (initialCategories) {
+      setCategories(initialCategories)
+      return
+    }
     async function fetchCategories() {
       try {
         const result = await getCategoriesAction()
@@ -34,7 +42,7 @@ export function CategoryExplorer() {
       }
     }
     fetchCategories()
-  }, [])
+  }, [initialCategories])
 
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 px-4 lg:px-6">

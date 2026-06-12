@@ -47,6 +47,52 @@ const globalWithIndexes = global as typeof globalThis & {
   _mongoIndexesEnsured?: boolean;
 };
 
+export function mapResourceDoc(r: any): Resource {
+  return {
+    ...r,
+    _id: r._id?.toString(),
+    id: r._id?.toString() || r.id || "",
+    name: r.title || r.name || "",
+    link: r.url || r.link || "",
+    category: r.categoryId || r.category || "",
+    description: r.description || "",
+    featured: r.favorite || r.featured || false,
+    logo: r.logo || "",
+    order: r.order || 0,
+    title: r.title || r.name || "",
+    url: r.url || r.link || "",
+    categoryId: r.categoryId || r.category || "",
+    favorite: r.favorite || r.featured || false,
+    tags: r.tags || [],
+    projectIds: r.projectIds || [],
+    personIds: r.personIds || [],
+    useCount: r.useCount || 0,
+    status: r.status || "saved",
+    type: r.type || "website",
+    userId: r.userId || "",
+    createdAt: r.createdAt || new Date(),
+    updatedAt: r.updatedAt || new Date()
+  };
+}
+
+export function mapNoteDoc(n: any): Note {
+  return {
+    ...n,
+    _id: n._id?.toString(),
+    id: n._id?.toString() || n.id || "",
+    title: n.title || "",
+    content: n.content || "",
+    tags: n.tags || [],
+    userId: n.userId || "",
+    pinned: !!n.pinned,
+    relatedResources: n.relatedResources || [],
+    relatedProjects: n.relatedProjects || [],
+    relatedPeople: n.relatedPeople || [],
+    createdAt: n.createdAt || new Date(),
+    updatedAt: n.updatedAt || new Date()
+  };
+}
+
 export const getDb = cache(async () => {
   const client = await clientPromise;
   const db = client.db();
@@ -58,10 +104,17 @@ export const getDb = cache(async () => {
       db.collection("resources").createIndex({ userId: 1, favorite: 1 }),
       db.collection("resources").createIndex({ userId: 1, recentlyViewedAt: -1 }),
       db.collection("resources").createIndex({ userId: 1, useCount: -1, recentlyUsedAt: -1 }),
+      db.collection("resources").createIndex({ userId: 1, order: 1, createdAt: -1 }),
+      db.collection("resources").createIndex({ userId: 1, categoryId: 1 }),
+      db.collection("resources").createIndex({ userId: 1, category: 1 }),
+      db.collection("resources").createIndex({ userId: 1, projectIds: 1 }),
+      db.collection("resources").createIndex({ userId: 1, personIds: 1 }),
       db.collection("resources").createIndex({ title: "text", url: "text", tags: "text", description: "text", whySaved: "text", notes: "text" }),
       
       // Notes indexes
       db.collection("notes").createIndex({ userId: 1, pinned: -1, updatedAt: -1 }),
+      db.collection("notes").createIndex({ userId: 1, relatedProjects: 1 }),
+      db.collection("notes").createIndex({ userId: 1, relatedPeople: 1 }),
       db.collection("notes").createIndex({ title: "text", content: "text", tags: "text" }),
       
       // People indexes
@@ -100,34 +153,66 @@ export const getCategories = cache(async (userId: string): Promise<Category[]> =
   }))) as unknown as Category[];
 });
 
+export const getCategoriesWithCounts = cache(async (userId: string) => {
+  const db = await getDb();
+  const [categories, counts] = await Promise.all([
+    getCategories(userId),
+    db.collection("resources").aggregate([
+      { $match: { userId } },
+      {
+        $group: {
+          _id: { $ifNull: [ "$categoryId", "$category" ] },
+          count: { $sum: 1 }
+        }
+      }
+    ]).toArray()
+  ]);
+
+  const countMap = new Map<string, number>();
+  counts.forEach((c: any) => {
+    const idStr = c._id?.toString() || "";
+    countMap.set(idStr, c.count);
+  });
+
+  return categories.map(cat => {
+    const idCount = cat.id ? (countMap.get(cat.id) || 0) : 0;
+    const oidCount = (cat as any)._id ? (countMap.get((cat as any)._id) || 0) : 0;
+    return {
+      ...cat,
+      resourceCount: idCount + oidCount
+    };
+  });
+});
+
 export const getResources = cache(async (userId: string): Promise<Resource[]> => {
   const db = await getDb();
   const resources = await db.collection("resources").find({ userId }).sort({ order: 1, createdAt: -1 }).toArray();
-  return serialize(resources.map(r => ({
-    ...r,
-    _id: r._id?.toString(),
-    id: r._id?.toString() || r.id || "",
-    name: r.title || r.name || "",
-    link: r.url || r.link || "",
-    category: r.categoryId || r.category || "",
-    description: r.description || "",
-    featured: r.favorite || r.featured || false,
-    logo: r.logo || "",
-    order: r.order || 0,
-    title: r.title || r.name || "",
-    url: r.url || r.link || "",
-    categoryId: r.categoryId || r.category || "",
-    favorite: r.favorite || r.featured || false,
-    tags: r.tags || [],
-    projectIds: r.projectIds || [],
-    personIds: r.personIds || [],
-    useCount: r.useCount || 0,
-    status: r.status || "saved",
-    type: r.type || "website",
-    userId: r.userId || "",
-    createdAt: r.createdAt || new Date(),
-    updatedAt: r.updatedAt || new Date()
-  }))) as unknown as Resource[];
+  return serialize(resources.map(mapResourceDoc)) as unknown as Resource[];
+});
+
+export const getResourcesByCategoryId = cache(async (categoryId: string, userId: string): Promise<Resource[]> => {
+  const db = await getDb();
+  const query = {
+    userId,
+    $or: [
+      { category: categoryId },
+      { categoryId }
+    ]
+  };
+  const resources = await db.collection("resources").find(query).sort({ order: 1, createdAt: -1 }).toArray();
+  return serialize(resources.map(mapResourceDoc)) as unknown as Resource[];
+});
+
+export const getResourcesByProjectId = cache(async (projectId: string, userId: string): Promise<Resource[]> => {
+  const db = await getDb();
+  const resources = await db.collection("resources").find({ userId, projectIds: projectId }).sort({ order: 1, createdAt: -1 }).toArray();
+  return serialize(resources.map(mapResourceDoc)) as unknown as Resource[];
+});
+
+export const getResourcesByPersonId = cache(async (personId: string, userId: string): Promise<Resource[]> => {
+  const db = await getDb();
+  const resources = await db.collection("resources").find({ userId, personIds: personId }).sort({ order: 1, createdAt: -1 }).toArray();
+  return serialize(resources.map(mapResourceDoc)) as unknown as Resource[];
 });
 
 export const getCategoryById = cache(async (id: string, userId: string): Promise<Category | null> => {
@@ -158,21 +243,19 @@ export const getCategoryById = cache(async (id: string, userId: string): Promise
 export const getNotes = cache(async (userId: string): Promise<Note[]> => {
   const db = await getDb();
   const notes = await db.collection("notes").find({ userId }).sort({ pinned: -1, updatedAt: -1 }).toArray();
-  return serialize(notes.map(n => ({
-    ...n,
-    _id: n._id?.toString(),
-    id: n._id?.toString() || n.id || "",
-    title: n.title || "",
-    content: n.content || "",
-    tags: n.tags || [],
-    userId: n.userId || "",
-    pinned: !!n.pinned,
-    relatedResources: n.relatedResources || [],
-    relatedProjects: n.relatedProjects || [],
-    relatedPeople: n.relatedPeople || [],
-    createdAt: n.createdAt || new Date(),
-    updatedAt: n.updatedAt || new Date()
-  }))) as unknown as Note[];
+  return serialize(notes.map(mapNoteDoc)) as unknown as Note[];
+});
+
+export const getNotesByProjectId = cache(async (projectId: string, userId: string): Promise<Note[]> => {
+  const db = await getDb();
+  const notes = await db.collection("notes").find({ userId, relatedProjects: projectId }).sort({ pinned: -1, updatedAt: -1 }).toArray();
+  return serialize(notes.map(mapNoteDoc)) as unknown as Note[];
+});
+
+export const getNotesByPersonId = cache(async (personId: string, userId: string): Promise<Note[]> => {
+  const db = await getDb();
+  const notes = await db.collection("notes").find({ userId, relatedPeople: personId }).sort({ pinned: -1, updatedAt: -1 }).toArray();
+  return serialize(notes.map(mapNoteDoc)) as unknown as Note[];
 });
 
 export const getProjects = cache(async (userId: string): Promise<Project[]> => {

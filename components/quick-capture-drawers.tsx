@@ -412,7 +412,7 @@ function QuickCaptureDrawers({
                       </SelectTrigger>
                       <SelectContent>
                         {categories.map((c) => (
-                          <SelectItem key={c.id || c._id?.toString()} value={c._id?.toString() || c.id || ""}>
+                          <SelectItem key={c.id || c._id?.toString()} value={c.id || c._id?.toString() || ""}>
                             {c.name || c.title}
                           </SelectItem>
                         ))}

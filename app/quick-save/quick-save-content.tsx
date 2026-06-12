@@ -45,7 +45,7 @@ function detectResourceType(urlStr: string): ResourceType {
 export function QuickSaveContent({ categories, initialUrl = "", initialTitle = "" }: QuickSaveContentProps) {
   const [url, setUrl] = useState(initialUrl)
   const [title, setTitle] = useState(initialTitle)
-  const [categoryId, setCategoryId] = useState(categories[0]?.id || "")
+  const [categoryId, setCategoryId] = useState(categories[0]?.id || categories[0]?._id?.toString() || "")
   const [resourceType, setResourceType] = useState<ResourceType>(() => detectResourceType(initialUrl))
   const [tagsInput, setTagsInput] = useState("")
   const [whySaved, setWhySaved] = useState("")

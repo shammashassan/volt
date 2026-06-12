@@ -264,7 +264,7 @@ export function ResourcesContent({
       const matchedCat = categories.find(
         (c) => (c._id?.toString() || c.id) === rawCatId || c.id === rawCatId || c._id?.toString() === rawCatId
       )
-      setFormCategoryId(matchedCat ? (matchedCat._id?.toString() || matchedCat.id || "none") : (rawCatId || "none"))
+      setFormCategoryId(matchedCat ? (matchedCat.id || matchedCat._id?.toString() || "none") : (rawCatId || "none"))
     }
     setFormTags((resource.tags || []).join(", "))
     setFormNotes(resource.notes || "")
@@ -600,7 +600,7 @@ export function ResourcesContent({
                     <SelectContent>
                       <SelectItem value="none">Uncategorized</SelectItem>
                       {categories.map((cat) => (
-                        <SelectItem key={cat._id?.toString() || cat.id} value={cat._id?.toString() || cat.id || ""}>
+                        <SelectItem key={cat.id || cat._id?.toString()} value={cat.id || cat._id?.toString() || ""}>
                           {cat.name}
                         </SelectItem>
                       ))}

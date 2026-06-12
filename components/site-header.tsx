@@ -20,12 +20,20 @@ import { Home } from "lucide-react"
 import { Category } from "@/lib/types"
 import { getCategoriesAction } from "@/lib/actions/categories"
 
-export function SiteHeader() {
+interface SiteHeaderProps {
+  initialCategories?: Category[]
+}
+
+export function SiteHeader({ initialCategories }: SiteHeaderProps) {
   const pathname = usePathname()
-  const [categories, setCategories] = useState<Category[]>([])
+  const [categories, setCategories] = useState<Category[]>(initialCategories || [])
   const isHome = pathname === "/"
 
   useEffect(() => {
+    if (initialCategories) {
+      setCategories(initialCategories)
+      return
+    }
     async function fetchCategories() {
       try {
         const result = await getCategoriesAction()
@@ -40,7 +48,7 @@ export function SiteHeader() {
       }
     }
     fetchCategories()
-  }, [])
+  }, [initialCategories])
 
   const categoryId = pathname.split("/").pop()
   const category = Array.isArray(categories) ? categories.find(c => c.id === categoryId) : undefined

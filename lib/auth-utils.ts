@@ -1,7 +1,8 @@
 import { headers } from "next/headers";
 import { auth } from "./auth";
+import { cache } from "react";
 
-export async function getSessionUser() {
+export const getSessionUser = cache(async () => {
   const session = await auth.api.getSession({
     headers: await headers()
   });
@@ -9,7 +10,7 @@ export async function getSessionUser() {
     throw new Error("Unauthorized");
   }
   return session.user;
-}
+});
 
 export async function checkApprovedUser() {
   const user = await getSessionUser();

@@ -1,4 +1,4 @@
-import { getResources, getCategoryById, getCategories } from "@/lib/db"
+import { getResourcesByCategoryId, getCategoryById, getCategories } from "@/lib/db"
 import { Badge } from "@/components/ui/badge"
 import { FileText } from "lucide-react"
 import { ICON_MAP } from "@/lib/icons"
@@ -73,7 +73,7 @@ async function CategoryPageContent({ categoryId }: CategoryPageContentProps) {
 
   const [category, resources, categories] = await Promise.all([
     getCategoryById(categoryId, userId),
-    getResources(userId),
+    getResourcesByCategoryId(categoryId, userId),
     getCategories(userId)
   ])
 
@@ -87,7 +87,7 @@ async function CategoryPageContent({ categoryId }: CategoryPageContentProps) {
 
   const user = session.user as any
   const isAdmin = user?.role === "admin"
-  const categoryResources = resources.filter((r) => r.category === categoryId)
+  const categoryResources = resources
   const Icon = (category.icon && ICON_MAP[category.icon as keyof typeof ICON_MAP]) || FileText
 
   return (

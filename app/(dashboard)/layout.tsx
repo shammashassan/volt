@@ -4,12 +4,25 @@ import { SiteFooter } from "@/components/site-footer"
 import { SiteHeader } from "@/components/site-header"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { QuickCaptureProvider } from "@/components/quick-capture-drawers"
+import { getCategories } from "@/lib/db"
+import { auth } from "@/lib/auth"
+import { headers } from "next/headers"
+import { redirect } from "next/navigation"
 
-export default function DashboardLayout({
+export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const session = await auth.api.getSession({
+    headers: await headers()
+  })
+  if (!session) {
+    redirect("/login")
+  }
+  const userId = session.user.id
+  const categories = await getCategories(userId)
+
   return (
     <div className="[--header-height:calc(--spacing(14))] flex min-h-screen w-full">
       <QuickCaptureProvider>
@@ -17,13 +30,13 @@ export default function DashboardLayout({
           <Suspense fallback={
             <header className="sticky top-0 z-50 flex h-(--header-height) shrink-0 items-center gap-2 border-b bg-background/80 backdrop-blur-md transition-all ease-linear w-full px-4 lg:px-6" />
           }>
-            <SiteHeader />
+            <SiteHeader initialCategories={categories} />
           </Suspense>
           <div className="flex flex-1">
             <Suspense fallback={
               <div className="w-64 border-r bg-sidebar h-screen hidden md:block" />
             }>
-              <AppSidebar variant="inset" collapsible="icon" />
+              <AppSidebar variant="inset" collapsible="icon" initialCategories={categories} />
             </Suspense>
             <SidebarInset className="bg-background overflow-hidden">
               <div className="flex flex-1 flex-col pt-0">

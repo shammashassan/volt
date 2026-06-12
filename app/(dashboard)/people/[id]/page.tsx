@@ -1,4 +1,4 @@
-import { getPersonById, getResources, getNotes } from "@/lib/db"
+import { getPersonById, getResourcesByPersonId, getNotesByPersonId } from "@/lib/db"
 import { PersonContent } from "./person-content"
 import { auth } from "@/lib/auth"
 import { headers } from "next/headers"
@@ -69,19 +69,15 @@ async function PersonDetailContentWrapper({ id }: { id: string }) {
   }
   const userId = session.user.id
   
-  const [person, allResources, allNotes] = await Promise.all([
+  const [person, linkedResources, linkedNotes] = await Promise.all([
     getPersonById(id, userId),
-    getResources(userId),
-    getNotes(userId)
+    getResourcesByPersonId(id, userId),
+    getNotesByPersonId(id, userId)
   ])
 
   if (!person) {
     notFound()
   }
-
-  // Filter linked resources and notes
-  const linkedResources = allResources.filter(r => r.personIds?.includes(id))
-  const linkedNotes = allNotes.filter(n => n.relatedPeople?.includes(id))
 
   return (
     <PersonContent 

@@ -34,10 +34,14 @@ import { ICON_MAP } from "@/lib/icons"
 import { getCategoriesAction } from "@/lib/actions/categories"
 import { Category } from "@/lib/types"
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
+  initialCategories?: Category[]
+}
+
+export function AppSidebar({ initialCategories, ...props }: AppSidebarProps) {
   const pathname = usePathname()
   const { data: session } = authClient.useSession()
-  const [categories, setCategories] = useState<Category[]>([])
+  const [categories, setCategories] = useState<Category[]>(initialCategories || [])
   const [isMounted, setIsMounted] = useState(false)
 
   useEffect(() => {
@@ -48,6 +52,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const isAdmin = user?.role === "admin"
 
   useEffect(() => {
+    if (initialCategories) {
+      setCategories(initialCategories)
+      return
+    }
     async function fetchCategories() {
       try {
         const result = await getCategoriesAction()
@@ -62,7 +70,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       }
     }
     fetchCategories()
-  }, [])
+  }, [initialCategories])
 
   const categorySubItems = (Array.isArray(categories) ? categories : []).map(category => ({
     title: category.name || category.title || "Untitled Category",

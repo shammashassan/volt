@@ -98,14 +98,29 @@ export async function deleteCategoryAction(idOrOldId: string) {
     const db = client.db();
 
     const query: Record<string, unknown> = { userId: user.id };
-    let categoryMatchQuery: Record<string, unknown> = {};
     if (ObjectId.isValid(idOrOldId)) {
       query._id = new ObjectId(idOrOldId);
-      categoryMatchQuery = { categoryId: idOrOldId };
     } else {
       query.id = idOrOldId;
-      categoryMatchQuery = { $or: [{ category: idOrOldId }, { categoryId: idOrOldId }] };
     }
+
+    const categoryDoc = await db.collection("categories").findOne(query);
+    if (!categoryDoc) {
+      return { success: false, error: "Category not found" };
+    }
+
+    const slugId = categoryDoc.id || "";
+    const oidStr = categoryDoc._id.toString();
+
+    // Check if category has resources referencing it by either slug or _id
+    const categoryMatchQuery = {
+      $or: [
+        { category: slugId },
+        { category: oidStr },
+        { categoryId: slugId },
+        { categoryId: oidStr }
+      ].filter(q => Object.values(q)[0] !== "")
+    };
 
     // Check if category has resources
     const resourcesCount = await db.collection("resources").countDocuments({ 
@@ -116,7 +131,7 @@ export async function deleteCategoryAction(idOrOldId: string) {
       return { success: false, error: "Cannot delete category that contains resources" };
     }
 
-    await db.collection("categories").deleteOne(query);
+    await db.collection("categories").deleteOne({ _id: categoryDoc._id });
     revalidatePath("/explore");
     revalidatePath("/categories");
     updateTag(`explore-body-${user.id}`);
@@ -152,10 +167,14 @@ export async function getCategoriesAction() {
       countMap.set(idStr, c.count);
     });
 
-    const categoriesWithCounts = categories.map(cat => ({
-      ...cat,
-      resourceCount: countMap.get((cat as any)._id || cat.id || "") || 0
-    }));
+    const categoriesWithCounts = categories.map(cat => {
+      const idCount = cat.id ? (countMap.get(cat.id) || 0) : 0;
+      const oidCount = (cat as any)._id ? (countMap.get((cat as any)._id) || 0) : 0;
+      return {
+        ...cat,
+        resourceCount: idCount + oidCount
+      };
+    });
 
     return { success: true, data: categoriesWithCounts };
   } catch (error) {
