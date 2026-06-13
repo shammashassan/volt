@@ -5,6 +5,7 @@ import { useState, useMemo, useEffect } from "react"
 import { Note, Resource, Project, Person } from "@/lib/types"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
@@ -75,6 +76,11 @@ import {
   BookOpen,
   ExternalLink,
   ChevronRight,
+  ListTodo,
+  Heading1,
+  Heading2,
+  Heading3,
+  List,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -95,6 +101,7 @@ export function NotesContent({
   const resourcesAnchor = useComboboxAnchor()
   const projectsAnchor = useComboboxAnchor()
   const peopleAnchor = useComboboxAnchor()
+  const textareaRef = React.useRef<HTMLTextAreaElement>(null)
   const [notes, setNotes] = useState<Note[]>(initialNotes)
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedTag, setSelectedTag] = useState<string | null>(null)
@@ -143,6 +150,122 @@ export function NotesContent({
   React.useEffect(() => {
     setNotes(initialNotes)
   }, [initialNotes])
+
+  const insertMarkdown = (syntax: string) => {
+    const textarea = textareaRef.current
+    if (!textarea) return
+
+    const start = textarea.selectionStart
+    const end = textarea.selectionEnd
+    const text = formContent
+
+    // Find the full start and end lines that cover the selection
+    let lineStart = text.lastIndexOf("\n", start - 1) + 1
+    let lineEnd = text.indexOf("\n", end)
+    if (lineEnd === -1) lineEnd = text.length
+
+    const selectedLinesText = text.substring(lineStart, lineEnd)
+    const lines = selectedLinesText.split("\n")
+
+    let prefix = ""
+    let placeholder = ""
+    switch (syntax) {
+      case "h1":
+        prefix = "# "
+        placeholder = "Heading 1"
+        break
+      case "h2":
+        prefix = "## "
+        placeholder = "Heading 2"
+        break
+      case "h3":
+        prefix = "### "
+        placeholder = "Heading 3"
+        break
+      case "bullet":
+        prefix = "- "
+        placeholder = "List item"
+        break
+      case "checklist":
+        prefix = "- [ ] "
+        placeholder = "Todo item"
+        break
+      default:
+        prefix = syntax
+        placeholder = ""
+    }
+
+    // Clean and format each line in the selection
+    const formattedLines = lines.map((line) => {
+      if (line.trim() === "") {
+        return prefix + placeholder
+      }
+      // Remove any existing header/list/checklist prefix to prevent stacking
+      const cleaned = line.replace(/^\s*(?:#+\s+|[-*]\s+(?:\[[ xX]\]\s*)?|\[[ xX]\]\s*)/, "")
+      return prefix + cleaned
+    })
+
+    const replacement = formattedLines.join("\n")
+    const before = text.substring(0, lineStart)
+    const after = text.substring(lineEnd)
+
+    const newContent = before + replacement + after
+    setFormContent(newContent)
+
+    // Select the newly formatted text
+    const newSelectionStart = lineStart
+    const newSelectionEnd = lineStart + replacement.length
+
+    setTimeout(() => {
+      textarea.focus()
+      textarea.setSelectionRange(newSelectionStart, newSelectionEnd)
+    }, 0)
+  }
+
+  const handleToggleCheckbox = async (lineIndex: number, checked: boolean) => {
+    const lines = formContent.split("\n")
+    if (lineIndex < 0 || lineIndex >= lines.length) return
+
+    const line = lines[lineIndex]
+    const match = line.match(/^(\s*(?:[-*]\s+)?\[)([ xX])(\]\s*(.*))/)
+    if (!match) return
+
+    const prefix = match[1]
+    const suffix = match[3]
+
+    const newChar = checked ? "x" : " "
+    lines[lineIndex] = `${prefix}${newChar}${suffix}`
+    const updatedContent = lines.join("\n")
+
+    setFormContent(updatedContent)
+
+    if (selectedNote) {
+      setSelectedNote({
+        ...selectedNote,
+        content: updatedContent,
+      })
+    }
+
+    const noteId = selectedNote?._id?.toString() || selectedNote?.id
+    if (noteId) {
+      setNotes((prevNotes) =>
+        prevNotes.map((n) => {
+          const id = n._id?.toString() || n.id
+          if (id === noteId) {
+            return { ...n, content: updatedContent }
+          }
+          return n
+        })
+      )
+    }
+
+    if (!isEditing && !isCreating && noteId) {
+      const result = await updateNoteAction(noteId, { content: updatedContent })
+      if (!result.success) {
+        toast.error(result.error || "Failed to update checkbox state")
+      }
+    }
+  }
 
   const allTags = useMemo(() => {
     const tagsSet = new Set<string>()
@@ -286,6 +409,30 @@ export function NotesContent({
     return (
       <div className="flex flex-col gap-1.5 leading-relaxed">
         {lines.map((line, idx) => {
+          const checkboxMatch = line.match(/^\s*(?:[-*]\s+)?\[([ xX])\]\s*(.*)/)
+          if (checkboxMatch) {
+            const isChecked = checkboxMatch[1].toLowerCase() === "x"
+            const labelText = checkboxMatch[2]
+            return (
+              <div key={idx} className="flex items-center gap-2 py-0.5 select-none">
+                <Checkbox
+                  id={`checkbox-${idx}`}
+                  checked={isChecked}
+                  onCheckedChange={(c) => handleToggleCheckbox(idx, !!c)}
+                  className="size-4 shrink-0 transition-all"
+                />
+                <label
+                  htmlFor={`checkbox-${idx}`}
+                  className={cn(
+                    "text-foreground/80 text-sm leading-7 cursor-pointer",
+                    isChecked && "line-through text-muted-foreground/60"
+                  )}
+                >
+                  {labelText}
+                </label>
+              </div>
+            )
+          }
           if (line.startsWith("# "))
             return (
               <h1 key={idx} className="text-2xl sm:text-3xl font-bold tracking-tight mt-6 first:mt-0 text-foreground">
@@ -644,12 +791,95 @@ export function NotesContent({
                   {renderMarkdown(formContent)}
                 </div>
               ) : (
-                <Textarea
-                  value={formContent}
-                  onChange={(e) => setFormContent(e.target.value)}
-                  placeholder={"# Heading\n\nStart writing your note…"}
-                  rows={14}
-                />
+                <div className="flex flex-col gap-3">
+                  {/* Formatting Toolbar */}
+                  <div className="flex items-center gap-1 p-1 bg-muted/30 border border-border rounded-lg max-w-fit select-none">
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="size-8 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted"
+                          onClick={() => insertMarkdown("h1")}
+                        >
+                          <Heading1 className="size-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Heading 1</TooltipContent>
+                    </Tooltip>
+
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="size-8 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted"
+                          onClick={() => insertMarkdown("h2")}
+                        >
+                          <Heading2 className="size-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Heading 2</TooltipContent>
+                    </Tooltip>
+
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="size-8 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted"
+                          onClick={() => insertMarkdown("h3")}
+                        >
+                          <Heading3 className="size-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Heading 3</TooltipContent>
+                    </Tooltip>
+
+                    <Separator orientation="vertical" className="h-4 mx-1" />
+
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="size-8 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted"
+                          onClick={() => insertMarkdown("bullet")}
+                        >
+                          <List className="size-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Bullet List</TooltipContent>
+                    </Tooltip>
+
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="size-8 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted"
+                          onClick={() => insertMarkdown("checklist")}
+                        >
+                          <ListTodo className="size-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Checklist</TooltipContent>
+                    </Tooltip>
+                  </div>
+
+                  <Textarea
+                    ref={textareaRef}
+                    value={formContent}
+                    onChange={(e) => setFormContent(e.target.value)}
+                    placeholder={"# Heading\n\nStart writing your note…"}
+                    rows={14}
+                  />
+                </div>
               )}
 
               <Separator />
