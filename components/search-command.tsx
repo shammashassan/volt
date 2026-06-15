@@ -33,7 +33,7 @@ import { Kbd } from "@/components/ui/kbd"
 import { RESOURCE_TYPES } from "@/lib/resource-types"
 
 const typeItems = RESOURCE_TYPES.map(t => ({
-  value: t.value,
+  path: `/resources?type=${t.value}`,
   label: `${t.label} Resources`,
   icon: t.icon,
 }))
@@ -247,8 +247,8 @@ export function SearchCommand() {
                 const Icon = item.icon;
                 return (
                   <CommandItem
-                    key={item.value}
-                    onSelect={() => onSelectEntity(`/resources?type=${item.value}`)}
+                    key={item.path}
+                    onSelect={() => onSelectEntity(item.path)}
                     className="flex items-center gap-2"
                   >
                     <Icon className="mr-2 size-4 text-muted-foreground" />
