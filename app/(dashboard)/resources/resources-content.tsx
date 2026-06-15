@@ -6,7 +6,6 @@ import { ResourceCard } from "@/components/resource-card"
 import { Resource, Category, Project, Person, ResourceStatus, ResourceType } from "@/lib/types"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -49,7 +48,7 @@ import {
   SelectItem,
 } from "@/components/ui/select"
 import { Toggle } from "@/components/ui/toggle"
-import { Empty, EmptyHeader, EmptyTitle, EmptyDescription, EmptyContent, EmptyMedia } from "@/components/ui/empty"
+import { Empty, EmptyHeader, EmptyTitle, EmptyDescription, EmptyMedia } from "@/components/ui/empty"
 import {
   addResourceAction,
   updateResourceAction,
@@ -70,10 +69,6 @@ import {
   Folder,
   User,
   Layers,
-  Globe,
-  FileText,
-  Bookmark,
-  Wrench,
 } from "lucide-react"
 
 import { RESOURCE_TYPES, STATUS_OPTIONS } from "@/lib/resource-types"
@@ -118,7 +113,7 @@ export function ResourcesContent({
       setFilters({ q: searchValue || null })
     }, 300)
     return () => clearTimeout(handler)
-  }, [searchValue])
+  }, [searchValue, setFilters])
 
   // Sync local search input value if URL changes externally
   useEffect(() => {
@@ -385,7 +380,7 @@ export function ResourcesContent({
 
           <div className="flex flex-wrap gap-3 items-center">
             {/* Type Filter */}
-            <Select value={filterType || "all"} onValueChange={(val) => setFilters({ type: val === "all" ? null : (val as any) })}>
+            <Select value={filterType || "all"} onValueChange={(val) => setFilters({ type: val === "all" ? null : (val as ResourceType) })}>
               <SelectTrigger className="w-[140px] h-10 bg-background/50 border-border/60">
                 <SelectValue placeholder="All Types" />
               </SelectTrigger>
@@ -400,7 +395,7 @@ export function ResourcesContent({
             </Select>
 
             {/* Status Filter */}
-            <Select value={filterStatus || "all"} onValueChange={(val) => setFilters({ status: val === "all" ? null : (val as any) })}>
+            <Select value={filterStatus || "all"} onValueChange={(val) => setFilters({ status: val === "all" ? null : (val as ResourceStatus) })}>
               <SelectTrigger className="w-[140px] h-10 bg-background/50 border-border/60">
                 <SelectValue placeholder="All Status" />
               </SelectTrigger>
