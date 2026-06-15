@@ -28,11 +28,12 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useSearchParams } from "next/navigation"
 import { authClient } from "@/lib/auth-client"
 import { ICON_MAP } from "@/lib/icons"
 import { getCategoriesAction } from "@/lib/actions/categories"
 import { Category } from "@/lib/types"
+import { RESOURCE_TYPES } from "@/lib/resource-types"
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   initialCategories?: Category[]
@@ -40,6 +41,15 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
 
 export function AppSidebar({ initialCategories, ...props }: AppSidebarProps) {
   const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const activeTypeParam = searchParams?.get("type") || null
+
+  const typeSubItems = RESOURCE_TYPES.map(type => ({
+    title: type.label,
+    url: `/resources?type=${type.value}`,
+    isActive: pathname === "/resources" && activeTypeParam === type.value,
+  }))
+
   const { data: session } = authClient.useSession()
   const [categories, setCategories] = useState<Category[]>(initialCategories || [])
   const [isMounted, setIsMounted] = useState(false)
@@ -117,6 +127,13 @@ export function AppSidebar({ initialCategories, ...props }: AppSidebarProps) {
         { title: "Tags", url: "/tags", isActive: pathname === "/tags" },
         { title: "People", url: "/people", isActive: pathname === "/people" },
       ],
+    },
+    {
+      title: "Types",
+      url: "/resources",
+      icon: Tag,
+      isActive: pathname === "/resources" && activeTypeParam !== null,
+      items: typeSubItems,
     },
     // Categories collapsible — only rendered when there are DB categories
     ...(categorySubItems.length > 0
