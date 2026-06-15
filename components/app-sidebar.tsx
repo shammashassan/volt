@@ -11,7 +11,6 @@ import {
   LayoutGrid,
   Layers,
   FolderOpen,
-  FileText,
   Tag,
 } from "lucide-react"
 
@@ -30,7 +29,6 @@ import {
 import Link from "next/link"
 import { usePathname, useSearchParams } from "next/navigation"
 import { authClient } from "@/lib/auth-client"
-import { ICON_MAP } from "@/lib/icons"
 import { getCategoriesAction } from "@/lib/actions/categories"
 import { Category } from "@/lib/types"
 import { RESOURCE_TYPES } from "@/lib/resource-types"
@@ -99,7 +97,7 @@ export function AppSidebar({ initialCategories, ...props }: AppSidebarProps) {
       title: "Resources",
       url: "/resources",
       icon: LibraryIcon,
-      isActive: pathname === "/resources",
+      isActive: pathname === "/resources" && activeTypeParam === null,
     },
     {
       title: "CLI Commands",
