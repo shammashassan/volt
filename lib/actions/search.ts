@@ -91,7 +91,11 @@ export async function searchAction(query: string) {
         notes: mapId<Note>(notes as any),
         projects: mapId<Project>(projects as any),
         people: mapId<Person>(people as any),
-        categories: mapId<Category>(categories as any)
+        categories: categories.map(cat => ({
+          ...cat,
+          _id: cat._id?.toString() ?? "",
+          id: cat.id || (cat._id?.toString() ?? "")
+        }))
       })
     };
   } catch (error) {
