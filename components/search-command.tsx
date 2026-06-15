@@ -30,6 +30,13 @@ import { trackResourceViewAction } from "@/lib/actions"
 import { searchAction } from "@/lib/actions/search"
 import { Category, Resource, Note, Project, Person } from "@/lib/types"
 import { Kbd } from "@/components/ui/kbd"
+import { RESOURCE_TYPES } from "@/lib/resource-types"
+
+const typeItems = RESOURCE_TYPES.map(t => ({
+  value: t.value,
+  label: `${t.label} Resources`,
+  icon: t.icon,
+}))
 
 export function SearchCommand() {
   const [open, setOpen] = React.useState(false)
@@ -174,9 +181,14 @@ export function SearchCommand() {
     ? quickActionItems
     : quickActionItems.filter(item => item.label.toLowerCase().includes(searchQuery.toLowerCase()));
 
+  const filteredTypes = searchQuery.trim() === ""
+    ? typeItems
+    : typeItems.filter(item => item.label.toLowerCase().includes(searchQuery.toLowerCase()));
+
   const hasAnyMatches =
     filteredQuickCreate.length > 0 ||
     filteredQuickActions.length > 0 ||
+    filteredTypes.length > 0 ||
     hasResults;
 
   return (
@@ -226,6 +238,27 @@ export function SearchCommand() {
             </CommandGroup>
           )}
 
+          {filteredQuickActions.length > 0 && filteredTypes.length > 0 && <CommandSeparator />}
+
+          {/* Resource Types */}
+          {filteredTypes.length > 0 && (
+            <CommandGroup heading="Resource Types">
+              {filteredTypes.map(item => {
+                const Icon = item.icon;
+                return (
+                  <CommandItem
+                    key={item.value}
+                    onSelect={() => onSelectEntity(`/resources?type=${item.value}`)}
+                    className="flex items-center gap-2"
+                  >
+                    <Icon className="mr-2 size-4 text-muted-foreground" />
+                    <span>{item.label}</span>
+                  </CommandItem>
+                )
+              })}
+            </CommandGroup>
+          )}
+
           {searchQuery.trim() !== "" && hasResults && <CommandSeparator />}
 
           {isLoading && (
@@ -249,7 +282,7 @@ export function SearchCommand() {
                 return (
                   <CommandItem
                     key={catId}
-                    onSelect={() => onSelectEntity(`/categories/${catId}`)}
+                    onSelect={() => onSelectEntity(`/categories/${category.id || catId}`)}
                     className="flex items-center gap-2"
                   >
                     <Icon className="size-4 text-muted-foreground/85" />
