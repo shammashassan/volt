@@ -402,6 +402,101 @@ export function NotesContent({
   }
 
   // Lightweight markdown renderer
+  // Helper to parse inline markdown elements: links, bold, italic, plain URLs
+  const parseInlineContent = (text: string, isMuted = false) => {
+    if (!text) return ""
+    // Matches:
+    // 1. Markdown link: \[([^\]]+)\]\((https?:\/\/[^\s)]+)\)
+    // 2. Bold: \*\*([^*]+)\*\*
+    // 3. Italic: \*([^*]+)\*
+    // 4. Plain URL: (https?:\/\/[^\s()<>]+)
+    const regex = /(\[[^\]]+\]\(https?:\/\/[^\s)]+\)|\*\*[^*]+\*\*|\*[^*]+\*|https?:\/\/[^\s()<>]+)/g
+    const parts = text.split(regex)
+    if (parts.length === 1) return text
+
+    return parts.map((part, index) => {
+      // 1. Markdown link
+      const mdMatch = part.match(/^\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)$/)
+      if (mdMatch) {
+        const [, linkText, url] = mdMatch
+        return (
+          <a
+            key={index}
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={cn(
+              "inline-flex items-center gap-0.5 font-medium hover:underline underline-offset-4 transition-all",
+              isMuted
+                ? "text-muted-foreground/50 line-through decoration-muted-foreground/20"
+                : "text-primary hover:text-primary/80 decoration-primary/40 hover:decoration-primary"
+            )}
+          >
+            {linkText}
+            <ExternalLink className="size-3 opacity-60 inline shrink-0" />
+          </a>
+        )
+      }
+
+      // 2. Bold
+      if (part.startsWith("**") && part.endsWith("**")) {
+        return (
+          <strong
+            key={index}
+            className={cn(
+              "font-semibold",
+              isMuted ? "text-muted-foreground/60 line-through" : "text-foreground"
+            )}
+          >
+            {part.slice(2, -2)}
+          </strong>
+        )
+      }
+
+      // 3. Italic
+      if (part.startsWith("*") && part.endsWith("*")) {
+        return (
+          <em
+            key={index}
+            className={cn(
+              "italic",
+              isMuted ? "text-muted-foreground/60 line-through" : "text-foreground/90"
+            )}
+          >
+            {part.slice(1, -1)}
+          </em>
+        )
+      }
+
+      // 4. Plain URL
+      const urlMatch = part.match(/^https?:\/\/[^\s()<>]+$/)
+      if (urlMatch) {
+        const url = urlMatch[0]
+        const displayUrl = url.replace(/^(https?:\/\/)?(www\.)?/, "")
+        return (
+          <a
+            key={index}
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={cn(
+              "inline-flex items-center gap-0.5 font-medium hover:underline underline-offset-4 transition-all",
+              isMuted
+                ? "text-muted-foreground/50 line-through decoration-muted-foreground/20"
+                : "text-primary hover:text-primary/80 decoration-primary/40 hover:decoration-primary"
+            )}
+          >
+            {displayUrl}
+            <ExternalLink className="size-3 opacity-60 inline shrink-0" />
+          </a>
+        )
+      }
+
+      return part
+    })
+  }
+
+  // Lightweight markdown renderer
   const renderMarkdown = (content: string) => {
     if (!content)
       return <p className="italic text-muted-foreground text-sm">No content yet.</p>
@@ -428,7 +523,7 @@ export function NotesContent({
                     isChecked && "line-through text-muted-foreground/60"
                   )}
                 >
-                  {labelText}
+                  {parseInlineContent(labelText, isChecked)}
                 </label>
               </div>
             )
@@ -436,32 +531,32 @@ export function NotesContent({
           if (line.startsWith("# "))
             return (
               <h1 key={idx} className="text-2xl sm:text-3xl font-bold tracking-tight mt-6 first:mt-0 text-foreground">
-                {line.slice(2)}
+                {parseInlineContent(line.slice(2))}
               </h1>
             )
           if (line.startsWith("## "))
             return (
               <h2 key={idx} className="text-lg sm:text-xl font-semibold mt-5 text-foreground">
-                {line.slice(3)}
+                {parseInlineContent(line.slice(3))}
               </h2>
             )
           if (line.startsWith("### "))
             return (
               <h3 key={idx} className="text-base font-semibold mt-4 text-foreground">
-                {line.slice(4)}
+                {parseInlineContent(line.slice(4))}
               </h3>
             )
           if (line.startsWith("- ") || line.startsWith("* "))
             return (
               <li key={idx} className="ml-5 list-disc text-foreground/80 text-sm leading-7">
-                {line.slice(2)}
+                {parseInlineContent(line.slice(2))}
               </li>
             )
           if (line.trim() === "")
             return <div key={idx} className="h-3" />
           return (
             <p key={idx} className="text-foreground/80 text-sm leading-7">
-              {line}
+              {parseInlineContent(line)}
             </p>
           )
         })}
@@ -541,7 +636,7 @@ export function NotesContent({
       )}
 
       {/* Note list */}
-      <ScrollArea className="flex-1 min-h-0">
+      <ScrollArea className="flex-1 min-h-0 [&_[data-slot=scroll-area-viewport]>div]:!block [&_[data-slot=scroll-area-viewport]>div]:!min-w-0 [&_[data-slot=scroll-area-viewport]]:overflow-x-hidden">
         <div className="flex flex-col gap-1 p-2 sm:p-3">
           {filteredNotes.length === 0 ? (
             <Empty className="py-16">
@@ -568,7 +663,7 @@ export function NotesContent({
                   key={noteId}
                   onClick={() => handleSelectNote(note)}
                   className={cn(
-                    "group relative rounded-xl px-3 sm:px-4 py-3 cursor-pointer transition-all duration-100 active:scale-[0.99]",
+                    "group relative rounded-xl px-3 sm:px-4 py-3 cursor-pointer transition-all duration-100 active:scale-[0.99] min-w-0",
                     isSelected
                       ? "bg-accent border border-border"
                       : "hover:bg-accent/50 border border-transparent"
@@ -579,9 +674,9 @@ export function NotesContent({
                     <div className="absolute top-3 right-3 size-2 rounded-full bg-amber-400" />
                   )}
 
-                  <div className="flex items-start justify-between gap-2 mb-1 pr-3">
+                  <div className="flex items-start justify-between gap-2 mb-1 pr-3 min-w-0">
                     <p className={cn(
-                      "text-sm font-semibold truncate leading-snug",
+                      "text-sm font-semibold truncate leading-snug flex-1 min-w-0",
                       isSelected ? "text-foreground" : "text-foreground/90"
                     )}>
                       {note.title || "Untitled Note"}

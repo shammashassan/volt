@@ -507,7 +507,7 @@ export function ResourcesContent({
           </Empty>
         ) : (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 max-w-7xl">
-            {filteredResources.map((res) => (
+            {filteredResources.map((res, index) => (
               <ResourceCard
                 key={res._id?.toString() || res.id}
                 resource={{
@@ -516,6 +516,7 @@ export function ResourcesContent({
                   name: res.title || res.name || "",
                   link: res.url || res.link || "",
                 }}
+                priority={index < 6}
                 onEdit={() => handleCardClick(res)}
                 onDelete={(e) => handleCardDelete(res, e)}
               />

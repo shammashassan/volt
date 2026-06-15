@@ -172,10 +172,11 @@ async function ExploreDashboardBody({ userId }: { userId: string }) {
 
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {(favorites.resources as unknown as Resource[]).map(
-              (resource: Resource) => (
+              (resource: Resource, index: number) => (
                 <ResourceCard
                   key={resource.id || resource._id?.toString()}
                   resource={resource as unknown as DataResource}
+                  priority={index < 3}
                 />
               )
             )}
@@ -255,10 +256,11 @@ async function ExploreDashboardBody({ userId }: { userId: string }) {
             </div>
             {recentlyViewed.length > 0 ? (
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                {(recentlyViewed as unknown as Resource[]).map((resource: Resource) => (
+                {(recentlyViewed as unknown as Resource[]).map((resource: Resource, index: number) => (
                   <ResourceCard
                     key={resource.id || resource._id?.toString()}
                     resource={resource as unknown as DataResource}
+                    priority={index < 4}
                   />
                 ))}
               </div>
@@ -336,10 +338,11 @@ async function ExploreDashboardBody({ userId }: { userId: string }) {
             </Button>
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 px-4 lg:px-6">
-            {(recentlyAdded as unknown as Resource[]).map((resource: Resource) => (
+            {(recentlyAdded as unknown as Resource[]).map((resource: Resource, index: number) => (
               <ResourceCard
                 key={resource.id || resource._id?.toString()}
                 resource={resource as unknown as DataResource}
+                priority={index < 3}
               />
             ))}
           </div>

@@ -20,7 +20,9 @@ import {
   StarIcon,
   FolderIcon,
   UserIcon,
-  BriefcaseIcon
+  BriefcaseIcon,
+  SettingsIcon,
+  CommandIcon
 } from "lucide-react"
 import { ICON_MAP } from "@/lib/icons"
 import { useQuickCapture } from "./quick-capture-drawers"
@@ -156,7 +158,12 @@ export function SearchCommand() {
   const quickActionItems = [
     { path: "/explore", label: "Go to Dashboard", icon: LayoutDashboardIcon },
     { path: "/resources", label: "Open Resources", icon: StarIcon },
-    { path: "/categories", label: "Open Categories", icon: FolderIcon }
+    { path: "/categories", label: "Open Categories", icon: FolderIcon },
+    { path: "/projects", label: "Open Projects", icon: BriefcaseIcon },
+    { path: "/notes", label: "Open Notes", icon: FileTextIcon },
+    { path: "/people", label: "Open People", icon: UserIcon },
+    { path: "/commands", label: "Open Commands", icon: CommandIcon },
+    { path: "/settings", label: "Open Settings", icon: SettingsIcon },
   ];
 
   const filteredQuickCreate = searchQuery.trim() === ""

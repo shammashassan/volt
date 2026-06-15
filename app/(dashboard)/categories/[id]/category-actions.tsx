@@ -85,7 +85,7 @@ export function CategoryActions({ categoryId, categories, resources, isAdmin }: 
 
       {/* Add Resource Dialog */}
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-[425px] overflow-y-auto max-h-[90vh] no-scrollbar">
           <DialogHeader>
             <DialogTitle>Add Resource</DialogTitle>
             <DialogDescription>
