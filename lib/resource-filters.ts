@@ -1,5 +1,5 @@
 import { createParser, parseAsString, parseAsBoolean } from 'nuqs'
-import { ResourceType, ResourceStatus } from './types'
+import { ResourceType, ResourceStatus } from '@/lib/types'
 import { RESOURCE_TYPES, STATUS_OPTIONS, getResourceTypeInfo } from './resource-types'
 
 const validTypes = RESOURCE_TYPES.map(t => t.value)
@@ -30,8 +30,8 @@ export const resourceFilterParsers = {
 }
 
 export interface ResourceFilters {
-  type?: string | null
-  status?: string | null
+  type?: ResourceType | null
+  status?: ResourceStatus | null
   favorite?: boolean
   q?: string | null
 }
