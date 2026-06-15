@@ -39,6 +39,13 @@ export interface ResourceFilters {
 export function getResourcesPageTitle(filters: ResourceFilters): string {
   const parts: string[] = []
   
+  if (filters.status) {
+    const statusOpt = STATUS_OPTIONS.find(s => s.value === filters.status)
+    if (statusOpt) {
+      parts.push(statusOpt.label)
+    }
+  }
+  
   if (filters.favorite) {
     parts.push("Starred")
   }
