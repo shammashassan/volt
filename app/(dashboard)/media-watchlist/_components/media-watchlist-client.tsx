@@ -13,6 +13,7 @@ import { useQueryState } from "nuqs";
 import { createWatchlistItemAction } from "../_actions/create-watchlist-item";
 import { updateWatchlistItemAction } from "../_actions/update-watchlist-item";
 import { deleteWatchlistItemAction } from "../_actions/delete-watchlist-item";
+import { Kbd } from "@/components/ui/kbd";
 
 interface MediaWatchlistClientProps {
   initialItems: WatchlistItem[];
@@ -150,9 +151,8 @@ export function MediaWatchlistClient({ initialItems }: MediaWatchlistClientProps
           <h1 className="text-2xl font-bold tracking-tight">Media Watchlist</h1>
           <p className="text-xs text-muted-foreground mt-0.5">
             Track movies, series, and anime. Press{" "}
-            <kbd className="pointer-events-none inline-flex h-4 select-none items-center gap-1 rounded border bg-muted px-1 font-mono text-[9px] font-medium text-muted-foreground shadow-xs">
-              <span>⌘</span>K
-            </kbd>{" "}
+            <Kbd>Ctrl</Kbd>+
+            <Kbd>M</Kbd>{" "}
             to search.
           </p>
         </div>

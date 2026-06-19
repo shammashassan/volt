@@ -26,10 +26,10 @@ export function AddMediaDialog({ open, onOpenChange, onSelect }: AddMediaDialogP
   const [error, setError] = useState<string | null>(null);
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Keyboard shortcut watcher (⌘K or Ctrl+K)
+  // Keyboard shortcut watcher (⌘M or Ctrl+M)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
+      if (e.key === "m" && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
         onOpenChange(true);
       }
@@ -122,19 +122,19 @@ export function AddMediaDialog({ open, onOpenChange, onSelect }: AddMediaDialogP
                 onSelect={() => onSelect(item)}
                 className="cursor-pointer p-2 flex items-center gap-3 hover:bg-accent/40 rounded-md transition-colors"
               >
-                <div className="relative h-12 w-8 bg-muted/40 rounded overflow-hidden flex-shrink-0 flex items-center justify-center">
+                <div className="relative h-12 w-8 bg-muted/40 rounded overflow-hidden shrink-0 flex items-center justify-center">
                   {item.posterUrl ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={item.posterUrl} alt={item.title} className="object-cover h-full w-full" />
                   ) : (
-                    <Film className="h-4 w-4 text-muted-foreground/50 stroke-[1]" />
+                    <Film className="h-4 w-4 text-muted-foreground/50 stroke-1" />
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <span className="font-semibold text-xs leading-tight truncate">{item.title}</span>
                     {item.releaseYear && (
-                      <span className="text-[10px] text-muted-foreground flex-shrink-0">({item.releaseYear})</span>
+                      <span className="text-[10px] text-muted-foreground shrink-0">({item.releaseYear})</span>
                     )}
                   </div>
                   <div className="flex gap-1.5 mt-1">
