@@ -3,7 +3,6 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { WatchlistItem, SearchResult, WatchlistStatus } from "../_types/watchlist.types";
 import { WatchlistGrid } from "./watchlist-grid";
-import { EmptyState } from "./empty-state";
 import { AddMediaDialog } from "./add-media-dialog";
 import { Button } from "@/components/ui/button";
 import { Plus, Search, Film, Star, Filter } from "lucide-react";
@@ -288,33 +287,57 @@ export function MediaWatchlistClient({ initialItems }: MediaWatchlistClientProps
       </section>
 
       {/* Results / List State */}
-      {filteredItems.length === 0 ? (
-        items.length === 0 ? (
-          <EmptyState onAddMedia={() => setSearchOpen(true)} />
-        ) : (
-          <div className="flex flex-col items-center justify-center p-12 text-center border rounded-2xl h-60 bg-muted/20 select-none">
-            <Search className="h-8 w-8 text-muted-foreground/50 mb-2 stroke-[1.5]" />
-            <p className="text-xs text-muted-foreground">No media matches the selected filters.</p>
-            <Button
-              variant="link"
-              className="text-xs mt-2 cursor-pointer"
-              onClick={() => {
-                setStatusFilter(null);
-                setTypeFilter(null);
-              }}
-            >
-              Clear Filters
-            </Button>
-          </div>
-        )
-      ) : (
-        <WatchlistGrid
-          items={filteredItems}
-          onUpdateStatus={handleUpdateStatus}
-          onUpdateRating={handleUpdateRating}
-          onDelete={handleDelete}
-        />
-      )}
+      <section className="px-4 lg:px-6">
+        <div className="max-w-7xl">
+          {filteredItems.length === 0 ? (
+            items.length === 0 ? (
+              <Empty className="py-24 border border-dashed rounded-3xl bg-card/10">
+                <EmptyHeader>
+                  <EmptyMedia variant="icon">
+                    <Film />
+                  </EmptyMedia>
+                  <EmptyTitle>No media yet</EmptyTitle>
+                  <EmptyDescription>
+                    Track movies, series, and anime in one place.
+                  </EmptyDescription>
+                </EmptyHeader>
+                <Button onClick={() => setSearchOpen(true)} className="mt-4" size="sm">
+                  Add Media
+                </Button>
+              </Empty>
+            ) : (
+              <Empty className="py-24 border border-dashed rounded-3xl bg-card/10">
+                <EmptyHeader>
+                  <EmptyMedia variant="icon">
+                    <Filter />
+                  </EmptyMedia>
+                  <EmptyTitle>No media matches the selected filters</EmptyTitle>
+                  <EmptyDescription>Try resetting your filters.</EmptyDescription>
+                </EmptyHeader>
+                <Button
+                  variant="link"
+                  className="text-xs mt-2 cursor-pointer"
+                  onClick={() => {
+                    setStatusFilter("all");
+                    setTypeFilter("all");
+                    setSearchValue("");
+                    setRatedFilter(null);
+                  }}
+                >
+                  Clear Filters
+                </Button>
+              </Empty>
+            )
+          ) : (
+            <WatchlistGrid
+              items={filteredItems}
+              onUpdateStatus={handleUpdateStatus}
+              onUpdateRating={handleUpdateRating}
+              onDelete={handleDelete}
+            />
+          )}
+        </div>
+      </section>
 
       {/* Command Search Dialog */}
       <AddMediaDialog open={searchOpen} onOpenChange={setSearchOpen} onSelect={handleAddMedia} />
