@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/auth-utils";
-import { SearchResult } from "@/app/(dashboard)/media-watchlist/_types/watchlist.types";
+import { SearchResult, WatchlistMediaType } from "@/app/(dashboard)/media-watchlist/_types/watchlist.types";
 
 interface TmdbItem {
   id: number;
@@ -29,10 +29,154 @@ interface AniListItem {
   };
 }
 
+function parseYear(dateStr?: string): number | undefined {
+  if (!dateStr) return undefined;
+  const year = new Date(dateStr).getFullYear();
+  return isNaN(year) ? undefined : year;
+}
+
+// 1. Modular TMDb Client & Mapper Service
+async function searchTmdb(
+  query: string,
+  filterType: string,
+  token?: string,
+  key?: string
+): Promise<SearchResult[]> {
+  const hasAuth = !!(token || key);
+  if (!hasAuth) {
+    throw new Error("TMDB Auth credentials missing");
+  }
+
+  const baseUrl = "https://api.themoviedb.org/3/search/multi";
+  const url = token 
+    ? `${baseUrl}?query=${encodeURIComponent(query)}&include_adult=false&language=en-US&page=1`
+    : `${baseUrl}?api_key=${key}&query=${encodeURIComponent(query)}&include_adult=false&language=en-US&page=1`;
+
+  const headers: HeadersInit = {};
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  // 5s Request Timeout
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+  try {
+    const res = await fetch(url, { headers, signal: controller.signal });
+    if (!res.ok) throw new Error(`TMDB HTTP Error: ${res.status}`);
+    const data = (await res.json()) as { results?: TmdbItem[] };
+
+    const results: SearchResult[] = [];
+    for (const item of data.results || []) {
+      const type = item.media_type === "tv" ? "series" : (item.media_type as WatchlistMediaType);
+      
+      // Consistently enforce filterType check
+      if (filterType !== "all" && filterType !== type) {
+        continue;
+      }
+
+      if (type === "movie") {
+        results.push({
+          externalId: item.id.toString(),
+          source: "tmdb",
+          type: "movie",
+          title: item.title || item.original_title || "",
+          posterUrl: item.poster_path ? `https://image.tmdb.org/t/p/w342${item.poster_path}` : null,
+          releaseYear: parseYear(item.release_date),
+        });
+      } else if (type === "series") {
+        results.push({
+          externalId: item.id.toString(),
+          source: "tmdb",
+          type: "series",
+          title: item.name || item.original_name || "",
+          posterUrl: item.poster_path ? `https://image.tmdb.org/t/p/w342${item.poster_path}` : null,
+          releaseYear: parseYear(item.first_air_date),
+        });
+      }
+    }
+    return results;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
+// 2. Modular AniList Client & Mapper Service
+async function searchAniList(query: string): Promise<SearchResult[]> {
+  const queryStr = `
+    query ($search: String) {
+      Page(page: 1, perPage: 15) {
+        media(search: $search, type: ANIME) {
+          id
+          title {
+            english
+            romaji
+            native
+          }
+          coverImage {
+            large
+          }
+          startDate {
+            year
+          }
+        }
+      }
+    }
+  `;
+
+  // 5s Request Timeout
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+  try {
+    const response = await fetch("https://graphql.anilist.co", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
+        query: queryStr,
+        variables: { search: query },
+      }),
+      signal: controller.signal,
+    });
+
+    if (!response.ok) throw new Error(`AniList HTTP Error: ${response.status}`);
+    const data = (await response.json()) as {
+      data?: {
+        Page?: {
+          media?: AniListItem[];
+        };
+      };
+    };
+
+    const results: SearchResult[] = [];
+    for (const media of data.data?.Page?.media || []) {
+      results.push({
+        externalId: media.id.toString(),
+        source: "anilist",
+        type: "anime",
+        title: media.title.english || media.title.romaji || media.title.native || "",
+        posterUrl: media.coverImage.large || null,
+        releaseYear: media.startDate?.year || undefined,
+      });
+    }
+    return results;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
+// 3. Simplified Endpoint Router
 export async function GET(req: NextRequest) {
   try {
-    // Validate session
-    await getSessionUser();
+    // Validate session with correct HTTP 401 response
+    try {
+      await getSessionUser();
+    } catch {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
     const searchParams = req.nextUrl.searchParams;
     const query = searchParams.get("q") || "";
@@ -45,133 +189,37 @@ export async function GET(req: NextRequest) {
     const promises: Promise<SearchResult[]>[] = [];
     const warnings: string[] = [];
 
-    // TMDb search (Movies & Series)
-    const tmdbKey = process.env.TMDB_API_KEY || "";
-    const tmdbToken = process.env.TMDB_READ_TOKEN || "";
-
+    // TMDb Request
     if (filterType === "all" || filterType === "movie" || filterType === "series") {
+      const tmdbKey = process.env.TMDB_API_KEY || "";
+      const tmdbToken = process.env.TMDB_READ_TOKEN || "";
+
       if (tmdbKey || tmdbToken) {
         promises.push(
-          (async () => {
-            try {
-              const url = `https://api.themoviedb.org/3/search/multi?query=${encodeURIComponent(query)}&include_adult=false&language=en-US&page=1`;
-              const headers: HeadersInit = {};
-              if (tmdbToken) {
-                headers["Authorization"] = `Bearer ${tmdbToken}`;
-              } else if (tmdbKey) {
-                // Fallback query param for key
-                return fetchTmdbWithKey(query, tmdbKey);
-              }
-
-              const res = await fetch(url, { headers });
-              if (!res.ok) throw new Error("TMDB Response Error");
-              const data = (await res.json()) as { results?: TmdbItem[] };
-              
-              const results: SearchResult[] = [];
-              for (const item of data.results || []) {
-                if (item.media_type === "movie" && (filterType === "all" || filterType === "movie")) {
-                  results.push({
-                    externalId: item.id.toString(),
-                    source: "tmdb",
-                    type: "movie",
-                    title: item.title || item.original_title || "",
-                    posterUrl: item.poster_path ? `https://image.tmdb.org/t/p/w342${item.poster_path}` : null,
-                    releaseYear: item.release_date ? new Date(item.release_date).getFullYear() : undefined,
-                  });
-                } else if (item.media_type === "tv" && (filterType === "all" || filterType === "series")) {
-                  results.push({
-                    externalId: item.id.toString(),
-                    source: "tmdb",
-                    type: "series",
-                    title: item.name || item.original_name || "",
-                    posterUrl: item.poster_path ? `https://image.tmdb.org/t/p/w342${item.poster_path}` : null,
-                    releaseYear: item.first_air_date ? new Date(item.first_air_date).getFullYear() : undefined,
-                  });
-                }
-              }
-              return results;
-            } catch (err) {
-              console.error("TMDB fetch error:", err);
-              warnings.push("TMDb unavailable");
-              return [];
-            }
-          })()
+          searchTmdb(query, filterType, tmdbToken, tmdbKey).catch((err) => {
+            console.error("TMDB fetch error:", err);
+            warnings.push("TMDb unavailable");
+            return [];
+          })
         );
       } else {
-        warnings.push("TMDb API key not configured");
+        warnings.push("TMDb API credentials not configured");
       }
     }
 
-    // AniList search (Anime)
+    // AniList Request
     if (filterType === "all" || filterType === "anime") {
       promises.push(
-        (async () => {
-          try {
-            const queryStr = `
-              query ($search: String) {
-                Page(page: 1, perPage: 15) {
-                  media(search: $search, type: ANIME) {
-                    id
-                    title {
-                      english
-                      romaji
-                      native
-                    }
-                    coverImage {
-                      large
-                    }
-                    startDate {
-                      year
-                    }
-                  }
-                }
-              }
-            `;
-            const response = await fetch("https://graphql.anilist.co", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Accept: "application/json",
-              },
-              body: JSON.stringify({
-                query: queryStr,
-                variables: { search: query },
-              }),
-            });
-
-            if (!response.ok) throw new Error("AniList Response Error");
-            const data = (await response.json()) as {
-              data?: {
-                Page?: {
-                  media?: AniListItem[];
-                };
-              };
-            };
-            const results: SearchResult[] = [];
-            for (const media of data.data?.Page?.media || []) {
-              results.push({
-                externalId: media.id.toString(),
-                source: "anilist",
-                type: "anime",
-                title: media.title.english || media.title.romaji || media.title.native || "",
-                posterUrl: media.coverImage.large || null,
-                releaseYear: media.startDate?.year || undefined,
-              });
-            }
-            return results;
-          } catch (err) {
-            console.error("AniList fetch error:", err);
-            warnings.push("AniList unavailable");
-            return [];
-          }
-        })()
+        searchAniList(query).catch((err) => {
+          console.error("AniList fetch error:", err);
+          warnings.push("AniList unavailable");
+          return [];
+        })
       );
     }
 
     const allResultsLists = await Promise.all(promises);
     const mergedResults = allResultsLists.flat();
-
-    // Sort and truncate to a max of 20 results
     const truncatedResults = mergedResults.slice(0, 20);
 
     return NextResponse.json({
@@ -182,34 +230,4 @@ export async function GET(req: NextRequest) {
     const message = error instanceof Error ? error.message : "Internal Search Error";
     return NextResponse.json({ error: message }, { status: 500 });
   }
-}
-
-async function fetchTmdbWithKey(query: string, key: string): Promise<SearchResult[]> {
-  const url = `https://api.themoviedb.org/3/search/multi?api_key=${key}&query=${encodeURIComponent(query)}&include_adult=false&language=en-US&page=1`;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error("TMDB API Key Request Failed");
-  const data = (await res.json()) as { results?: TmdbItem[] };
-  const results: SearchResult[] = [];
-  for (const item of data.results || []) {
-    if (item.media_type === "movie") {
-      results.push({
-        externalId: item.id.toString(),
-        source: "tmdb",
-        type: "movie",
-        title: item.title || item.original_title || "",
-        posterUrl: item.poster_path ? `https://image.tmdb.org/t/p/w342${item.poster_path}` : null,
-        releaseYear: item.release_date ? new Date(item.release_date).getFullYear() : undefined,
-      });
-    } else if (item.media_type === "tv") {
-      results.push({
-        externalId: item.id.toString(),
-        source: "tmdb",
-        type: "series",
-        title: item.name || item.original_name || "",
-        posterUrl: item.poster_path ? `https://image.tmdb.org/t/p/w342${item.poster_path}` : null,
-        releaseYear: item.first_air_date ? new Date(item.first_air_date).getFullYear() : undefined,
-      });
-    }
-  }
-  return results;
 }
