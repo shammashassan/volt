@@ -127,7 +127,12 @@ export const getDb = cache(async () => {
       
       // Categories indexes
       db.collection("categories").createIndex({ userId: 1, name: 1 }),
-      db.collection("categories").createIndex({ name: "text", description: "text" })
+      db.collection("categories").createIndex({ name: "text", description: "text" }),
+
+      // Watchlist indexes
+      db.collection("watchlist").createIndex({ userId: 1, source: 1, externalId: 1 }, { unique: true }),
+      db.collection("watchlist").createIndex({ userId: 1, status: 1, type: 1 }),
+      db.collection("watchlist").createIndex({ userId: 1, updatedAt: -1 })
     ]).catch(err => console.error("Error ensuring database indexes:", err));
     
     globalWithIndexes._mongoIndexesEnsured = true;
