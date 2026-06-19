@@ -2,7 +2,6 @@
 
 import React, { useState, useMemo, useEffect } from "react";
 import { WatchlistItem, SearchResult, WatchlistStatus } from "../_types/watchlist.types";
-import { WatchlistFilters } from "./watchlist-filters";
 import { WatchlistGrid } from "./watchlist-grid";
 import { EmptyState } from "./empty-state";
 import { AddMediaDialog } from "./add-media-dialog";
@@ -220,12 +219,73 @@ export function MediaWatchlistClient({ initialItems }: MediaWatchlistClientProps
       </section>
 
       {/* Filter Toolbar */}
-      <WatchlistFilters
-        currentStatus={statusFilter}
-        currentType={typeFilter}
-        onStatusChange={setStatusFilter}
-        onTypeChange={setTypeFilter}
-      />
+      <section className="px-4 lg:px-6">
+        <div className="p-4 border border-border/40 bg-card/30 backdrop-blur-sm rounded-2xl flex flex-col gap-4 lg:flex-row lg:items-center max-w-7xl">
+          {/* Search */}
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+            <Input
+              placeholder="Search watchlist..."
+              className="pl-9 h-10 border-border/60 bg-background/50 focus-visible:ring-primary/20"
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+            />
+          </div>
+
+          <div className="flex flex-wrap gap-3 items-center">
+            {/* Status Filter */}
+            <Select
+              value={statusFilter || "all"}
+              onValueChange={(val) => setStatusFilter(val === "all" ? null : val)}
+            >
+              <SelectTrigger className="w-[140px] h-10 bg-background/50 border-border/60">
+                <SelectValue placeholder="All Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Status</SelectItem>
+                {(Object.keys(WATCHLIST_STATUS_LABELS) as WatchlistStatus[]).map((key) => {
+                  const option = WATCHLIST_STATUS_LABELS[key];
+                  return (
+                    <SelectItem key={key} value={key}>
+                      <span className="flex items-center gap-2">
+                        <span className="text-[10px]">{option.icon}</span>
+                        <span>{option.label}</span>
+                      </span>
+                    </SelectItem>
+                  );
+                })}
+              </SelectContent>
+            </Select>
+
+            {/* Type Filter */}
+            <Select
+              value={typeFilter || "all"}
+              onValueChange={(val) => setTypeFilter(val === "all" ? null : val)}
+            >
+              <SelectTrigger className="w-[140px] h-10 bg-background/50 border-border/60">
+                <SelectValue placeholder="All Types" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Types</SelectItem>
+                <SelectItem value="movie">Movie</SelectItem>
+                <SelectItem value="series">Series</SelectItem>
+                <SelectItem value="anime">Anime</SelectItem>
+              </SelectContent>
+            </Select>
+
+            {/* Rated Toggle */}
+            <Toggle
+              pressed={ratedFilter || false}
+              onPressedChange={(pressed) => setRatedFilter(pressed || null)}
+              variant="outline"
+              className="h-10 px-3 bg-background/50 border-border/60 data-[state=on]:bg-primary/10 data-[state=on]:text-primary data-[state=on]:border-primary/20"
+            >
+              <Star className={`size-3.5 mr-2 ${ratedFilter ? "fill-current" : ""}`} />
+              <span>Rated</span>
+            </Toggle>
+          </div>
+        </div>
+      </section>
 
       {/* Results / List State */}
       {filteredItems.length === 0 ? (
@@ -239,8 +299,8 @@ export function MediaWatchlistClient({ initialItems }: MediaWatchlistClientProps
               variant="link"
               className="text-xs mt-2 cursor-pointer"
               onClick={() => {
-                setStatusFilter("all");
-                setTypeFilter("all");
+                setStatusFilter(null);
+                setTypeFilter(null);
               }}
             >
               Clear Filters
