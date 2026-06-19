@@ -69,11 +69,11 @@ export function MediaWatchlistClient({ initialItems }: MediaWatchlistClientProps
     return items.filter((item) => {
       const title = (item.metadata?.title || "").toLowerCase();
       const matchesSearch = !q || title.includes(q.toLowerCase());
-      
+
       const matchesStatus = statusFilter === "all" || !statusFilter || item.status === statusFilter;
       const matchesType = typeFilter === "all" || !typeFilter || item.type === typeFilter;
       const matchesRated = !ratedFilter || (item.rating !== undefined && item.rating !== null);
-      
+
       return matchesSearch && matchesStatus && matchesType && matchesRated;
     });
   }, [items, q, statusFilter, typeFilter, ratedFilter]);
@@ -277,7 +277,6 @@ export function MediaWatchlistClient({ initialItems }: MediaWatchlistClientProps
               pressed={ratedFilter || false}
               onPressedChange={(pressed) => setRatedFilter(pressed || null)}
               variant="outline"
-              className="h-10 px-3 bg-background/50 border-border/60 data-[state=on]:bg-primary/10 data-[state=on]:text-primary data-[state=on]:border-primary/20"
             >
               <Star className={`size-3.5 mr-2 ${ratedFilter ? "fill-current" : ""}`} />
               <span>Rated</span>
