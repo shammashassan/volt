@@ -12,6 +12,7 @@ import {
   Layers,
   FolderOpen,
   Tag,
+  Film,
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -114,6 +115,12 @@ export function AppSidebar({ initialCategories, ...props }: AppSidebarProps) {
         { title: "Projects", url: "/projects", isActive: pathname === "/projects" },
         { title: "Notes", url: "/notes", isActive: pathname === "/notes" },
       ],
+    },
+    {
+      title: "Media Watchlist",
+      url: "/media-watchlist",
+      icon: Film,
+      isActive: pathname === "/media-watchlist",
     },
     {
       title: "Organize",
