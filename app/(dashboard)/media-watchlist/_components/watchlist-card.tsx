@@ -81,7 +81,7 @@ export function WatchlistCard({ item, onUpdateStatus, onUpdateRating, onDelete }
           }
         }}
         className={cn(
-          "group relative overflow-hidden aspect-[2/3] w-full border bg-card shadow-sm transition-all duration-150 ease-in-out scale-100 select-none rounded-xl cursor-pointer",
+          "group relative overflow-hidden aspect-2/3 w-full border bg-card shadow-sm transition-all duration-150 ease-in-out scale-100 select-none rounded-xl cursor-pointer",
           isHovered && "scale-[1.02] -translate-y-[2.5px]"
         )}
       >
@@ -297,11 +297,11 @@ export function WatchlistCard({ item, onUpdateStatus, onUpdateRating, onDelete }
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
+              variant="destructive"
               onClick={() => {
                 onDelete(item._id!);
                 setDeleteOpen(false);
               }}
-              className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
             >
               Delete
             </AlertDialogAction>
