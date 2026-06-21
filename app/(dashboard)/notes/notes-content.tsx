@@ -636,7 +636,7 @@ export function NotesContent({
       )}
 
       {/* Note list */}
-      <ScrollArea className="flex-1 min-h-0 [&_[data-slot=scroll-area-viewport]>div]:!block [&_[data-slot=scroll-area-viewport]>div]:!min-w-0 [&_[data-slot=scroll-area-viewport]]:overflow-x-hidden">
+      <ScrollArea className="flex-1 min-h-0 [&_[data-slot=scroll-area-viewport]>div]:block! [&_[data-slot=scroll-area-viewport]>div]:min-w-0! **:data-[slot=scroll-area-viewport]:overflow-x-hidden">
         <div className="flex flex-col gap-1 p-2 sm:p-3">
           {filteredNotes.length === 0 ? (
             <Empty className="py-16">
@@ -1316,7 +1316,7 @@ export function NotesContent({
                           .map((proj) => (
                             <button
                               key={proj._id?.toString() || proj.id}
-                              onClick={() => router.push(`/project/${proj._id?.toString() || proj.id}`)}
+                              onClick={() => router.push(`/projects/${proj._id?.toString() || proj.id}`)}
                               className="group flex items-center gap-3 rounded-xl border border-border px-3 sm:px-4 py-3 hover:border-primary/40 hover:bg-accent/50 active:bg-accent transition-all text-left"
                             >
                               <div className="size-8 sm:size-9 rounded-lg bg-amber-500/10 text-amber-500 flex items-center justify-center shrink-0">
