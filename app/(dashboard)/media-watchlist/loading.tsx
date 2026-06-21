@@ -48,7 +48,7 @@ export default function WatchlistLoading() {
             {Array.from({ length: 16 }).map((_, idx) => (
               <div
                 key={idx}
-                className="relative overflow-hidden aspect-[2/3] w-full border bg-card rounded-xl"
+                className="relative overflow-hidden aspect-2/3 w-full border bg-card rounded-xl"
               >
                 {/* Poster Image Skeleton */}
                 <Skeleton className="h-full w-full rounded-none" />
