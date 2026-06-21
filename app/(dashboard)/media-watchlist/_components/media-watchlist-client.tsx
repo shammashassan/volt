@@ -60,9 +60,11 @@ export function MediaWatchlistClient({ initialItems }: MediaWatchlistClientProps
   }, [searchValue, setQ]);
 
   // Sync local search input value if URL changes externally
-  useEffect(() => {
+  const [prevQ, setPrevQ] = useState(q);
+  if (q !== prevQ) {
+    setPrevQ(q);
     setSearchValue(q || "");
-  }, [q]);
+  }
 
   // Filter Logic
   const filteredItems = useMemo(() => {

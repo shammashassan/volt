@@ -86,7 +86,7 @@ export function AddMediaDialog({ open, onOpenChange, onSelect }: AddMediaDialogP
         value={query}
         onValueChange={handleQueryChange}
       />
-      <CommandList className="max-h-[380px] overflow-y-auto">
+      <CommandList className="max-h-[50vh] sm:max-h-[380px] overflow-y-auto">
         {loading && (
           <div className="p-4 space-y-3">
             {Array.from({ length: 3 }).map((_, idx) => (

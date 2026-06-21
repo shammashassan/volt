@@ -32,11 +32,12 @@ export function WatchlistCard({ item, onUpdateStatus, onUpdateRating, onDelete }
   const [statusPopoverOpen, setStatusPopoverOpen] = useState(false);
   const [ratingPopoverOpen, setRatingPopoverOpen] = useState(false);
   const [tempRating, setTempRating] = useState<number | null>(item.rating || null);
-  const [isHovered, setIsHovered] = useState(false);
-
-  useEffect(() => {
+  const [prevRating, setPrevRating] = useState<number | null>(item.rating || null);
+  if (item.rating !== prevRating) {
+    setPrevRating(item.rating || null);
     setTempRating(item.rating || null);
-  }, [item.rating]);
+  }
+  const [isHovered, setIsHovered] = useState(false);
 
   useEffect(() => {
     if (!isHovered) return;
@@ -81,7 +82,7 @@ export function WatchlistCard({ item, onUpdateStatus, onUpdateRating, onDelete }
           }
         }}
         className={cn(
-          "group relative overflow-hidden aspect-[2/3] w-full border bg-card shadow-sm transition-all duration-150 ease-in-out scale-100 select-none rounded-xl cursor-pointer",
+          "group relative overflow-hidden aspect-2/3 w-full border bg-card shadow-sm transition-all duration-150 ease-in-out scale-100 select-none rounded-xl cursor-pointer",
           isHovered && "scale-[1.02] -translate-y-[2.5px]"
         )}
       >
