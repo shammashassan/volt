@@ -1,4 +1,3 @@
-import React from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function WatchlistLoading() {
@@ -38,6 +37,32 @@ export default function WatchlistLoading() {
             <Skeleton className="h-10 w-[140px] bg-muted/65 rounded-md" />
             {/* Rated Toggle */}
             <Skeleton className="h-10 w-20 bg-muted/65 rounded-md" />
+          </div>
+        </div>
+      </section>
+
+      {/* Results / List State */}
+      <section className="px-4 lg:px-6">
+        <div className="max-w-7xl">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4">
+            {Array.from({ length: 16 }).map((_, idx) => (
+              <div
+                key={idx}
+                className="relative overflow-hidden aspect-[2/3] w-full border bg-card rounded-xl"
+              >
+                {/* Poster Image Skeleton */}
+                <Skeleton className="h-full w-full rounded-none" />
+
+                {/* Bottom Badges */}
+                {/* Status icon badge */}
+                <Skeleton className="absolute bottom-2 left-2 h-7 w-7 rounded-full bg-muted/80" />
+
+                {/* Rating value badge (rendered on ~66% of cards for realism) */}
+                {idx % 3 !== 0 && (
+                  <Skeleton className="absolute bottom-2 right-2 h-7 w-10 rounded-full bg-muted/80" />
+                )}
+              </div>
+            ))}
           </div>
         </div>
       </section>

@@ -231,7 +231,7 @@ export function MediaWatchlistClient({ initialItems }: MediaWatchlistClientProps
             />
           </div>
 
-          <div className="flex flex-wrap gap-3 items-center">
+          <div className="flex flex-wrap gap-3 items-center w-full lg:w-auto">
             {/* Status Filter */}
             <Select
               value={statusFilter || "all"}
