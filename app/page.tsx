@@ -129,9 +129,9 @@ export default function LandingPage() {
                   ))}
                 </div>
               </div>
-              <div className="why-cards-trigger relative aspect-auto lg:aspect-square rounded-[2.5rem] border bg-background p-6 shadow-2xl lg:p-10 overflow-hidden group">
+              <div className="why-cards-trigger relative rounded-[2.5rem] border bg-background p-6 lg:p-8 shadow-2xl overflow-hidden group w-full">
                 <div className="absolute inset-0 bg-linear-to-tr from-primary/5 to-transparent" />
-                <div className="relative flex flex-col justify-center gap-4 sm:gap-6 z-10 lg:h-full">
+                <div className="relative flex flex-col justify-center gap-4 lg:gap-4.5 z-10">
                   {[
                     { id: "res", title: "Resources", desc: "Save websites, repositories, podcasts, and articles.", icon: Library },
                     { id: "cat", title: "Categories & Collections", desc: "Build tailored structures and custom groupings.", icon: Layers },
@@ -141,8 +141,8 @@ export default function LandingPage() {
                   ].map((entity) => {
                     const Icon = entity.icon
                     return (
-                      <div key={entity.id} className="entity-card-reveal opacity-0 flex items-center gap-4 rounded-2xl border bg-muted/40 p-4 sm:p-5 transition-[background-color,transform] duration-300 hover:bg-muted/80 hover:translate-x-2">
-                        <div className="flex size-12 sm:size-14 shrink-0 items-center justify-center rounded-xl bg-background text-primary shadow-sm ring-1 ring-border">
+                      <div key={entity.id} className="entity-card-reveal opacity-0 flex items-center gap-4 rounded-2xl border bg-muted/40 p-3.5 sm:p-4 transition-[background-color,transform] duration-300 hover:bg-muted/80 hover:translate-x-2">
+                        <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-background text-primary shadow-sm ring-1 ring-border">
                           <Icon className="size-6" />
                         </div>
                         <div className="min-w-0">

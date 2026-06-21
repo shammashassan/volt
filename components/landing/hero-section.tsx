@@ -89,7 +89,7 @@ export function HeroSection() {
 
           <div className="hero-para opacity-0 max-w-2xl mx-auto">
             <p className="text-lg text-muted-foreground sm:text-xl">
-              Not another bookmark manager. Volt is a personal knowledge operating system to capture resources, write notes, link projects, and retrieve everything instantly.
+              Not another bookmark manager. Volt is a personal knowledge operating system to capture resources, write notes, link projects, track media watchlists, and retrieve everything instantly.
             </p>
           </div>
 
