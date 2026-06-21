@@ -31,11 +31,12 @@ export function WatchlistCard({ item, onUpdateStatus, onUpdateRating, onDelete }
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [statusPopoverOpen, setStatusPopoverOpen] = useState(false);
   const [ratingPopoverOpen, setRatingPopoverOpen] = useState(false);
-  const [tempRating, setTempRating] = useState<number | null>(item.rating || null);
-  const [prevRating, setPrevRating] = useState<number | null>(item.rating || null);
-  if (item.rating !== prevRating) {
-    setPrevRating(item.rating || null);
-    setTempRating(item.rating || null);
+  const currentRating = item.rating ?? null;
+  const [tempRating, setTempRating] = useState<number | null>(currentRating);
+  const [prevRating, setPrevRating] = useState<number | null>(currentRating);
+  if (currentRating !== prevRating) {
+    setPrevRating(currentRating);
+    setTempRating(currentRating);
   }
   const [isHovered, setIsHovered] = useState(false);
 

@@ -48,8 +48,8 @@ export function MediaWatchlistClient({ initialItems }: MediaWatchlistClientProps
     serialize: (v) => (v ? "true" : ""),
   });
 
-  // Local input state to prevent typing lag
-  const [searchValue, setSearchValue] = useState(q || "");
+  const currentQ = q ?? "";
+  const [searchValue, setSearchValue] = useState(currentQ);
 
   // Debouncing search updates to URL
   useEffect(() => {
@@ -60,10 +60,10 @@ export function MediaWatchlistClient({ initialItems }: MediaWatchlistClientProps
   }, [searchValue, setQ]);
 
   // Sync local search input value if URL changes externally
-  const [prevQ, setPrevQ] = useState(q);
-  if (q !== prevQ) {
-    setPrevQ(q);
-    setSearchValue(q || "");
+  const [prevQ, setPrevQ] = useState(currentQ);
+  if (currentQ !== prevQ) {
+    setPrevQ(currentQ);
+    setSearchValue(currentQ);
   }
 
   // Filter Logic
