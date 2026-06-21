@@ -13,7 +13,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "Volt",
-  description: "Volt v2.0 - The UI Dev's Second Brain. The ultimate workspace for design engineers.",
+  description: "Volt v2.0 - The personal knowledge operating system. Save, organize, and link resources, notes, categories, people, and media watchlists.",
   manifest: "/site.webmanifest",
   verification: {
     google: "-Yn2JXXqhEK1dVAiHMaEM_OapfXKA3OHM32EwznOG5o"

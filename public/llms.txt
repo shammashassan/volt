@@ -14,11 +14,12 @@ https://ui-volt.vercel.app/
 
 ## Features
 - Command Center navigation (Ctrl + K)
-- User-owned custom Categories, Collections, Projects, Notes, and People
+- User-owned custom Categories, Collections, Projects, Notes, People, and Media Watchlists
 - Contextual Resource tracking (answering What, Why, and Where)
 - Bidirectional entity relationship linking
 - Chronological Activity Timeline
 - Private, authenticated user workspaces
+- Real-time TMDB and AniList media search and status tracking
 
 ## API
 All `/api/*` endpoints are authentication-protected and intended only for valid user sessions.
@@ -52,6 +53,7 @@ Avoid (private dashboard routes):
 - `/notes`
 - `/people`
 - `/people/*`
+- `/media-watchlist`
 - `/tags`
 - `/commands`
 - `/users`

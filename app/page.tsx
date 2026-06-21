@@ -10,7 +10,8 @@ import {
   Library,
   Layers,
   FolderOpen,
-  Users
+  Users,
+  Film
 } from 'lucide-react'
 import Link from 'next/link'
 import { LenisProvider } from '@/components/lenis-provider'
@@ -136,6 +137,7 @@ export default function LandingPage() {
                     { id: "cat", title: "Categories & Collections", desc: "Build tailored structures and custom groupings.", icon: Layers },
                     { id: "proj", title: "Projects & Notes", desc: "Document insights and associate with workspaces.", icon: FolderOpen },
                     { id: "peop", title: "People", desc: "Link resources to creators, mentors, and authors.", icon: Users },
+                    { id: "mw", title: "Media Watchlist", desc: "Track movies, series, and anime with TMDb & AniList.", icon: Film },
                   ].map((entity) => {
                     const Icon = entity.icon
                     return (
