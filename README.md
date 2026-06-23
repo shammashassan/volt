@@ -3,11 +3,10 @@
 </p>
 
 <p align="center">
-  <img src="https://shieldcn.dev/badge/status-active-zinc?variant=secondary" alt="Status" />
-  <img src="https://shieldcn.dev/badge/stack-next.js-zinc?logo=nextdotjs&variant=secondary" alt="Next.js" />
-  <img src="https://shieldcn.dev/badge/database-mongodb-zinc?logo=mongodb&variant=secondary" alt="MongoDB" />
-  <img src="https://shieldcn.dev/badge/auth-better--auth-zinc?logo=ri:FingerprintLine&variant=secondary" alt="Better Auth" />
-  <img src="https://shieldcn.dev/badge/license-MIT-zinc?variant=secondary" alt="License" />
+  <a href="https://github.com/shammashassan/volt/stargazers"><img src="https://shieldcn.dev/github/stars/shammashassan/volt.svg?variant=secondary" alt="GitHub Stars" /></a>
+  <a href="https://github.com/shammashassan/volt/commits/master"><img src="https://shieldcn.dev/github/last-commit/shammashassan/volt.svg?variant=secondary" alt="Last Commit" /></a>
+  <a href="https://github.com/shammashassan/volt/pulls"><img src="https://shieldcn.dev/github/open-prs/shammashassan/volt.svg?variant=secondary" alt="Open PRs" /></a>
+  <a href="https://github.com/shammashassan/volt/blob/master/LICENSE"><img src="https://shieldcn.dev/github/license/shammashassan/volt.svg?variant=secondary" alt="License" /></a>
 </p>
 
 ---
@@ -40,9 +39,13 @@ Volt is built with a premium, state-of-the-art developer stack:
 - **Database**: [MongoDB](https://www.mongodb.com/) (Mongoose schemas with index optimizations)
 - **Authentication**: [Better Auth](https://www.better-auth.com/)
 - **Animations**: [GSAP](https://gsap.com/) & [Lenis Smooth Scroll](https://lenis.darkroom.engineering/)
-
 ---
 
+## 📈 Activity & Stars
+
+![Star History Chart](https://shieldcn.dev/chart/github/stars/shammashassan/volt.svg?theme=zinc)
+
+---
 
 ## ⚡ Getting Started
 
