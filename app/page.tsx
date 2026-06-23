@@ -1,12 +1,13 @@
 "use client"
 
-import React, { useRef } from 'react'
+import React, { useRef, useState, useEffect } from 'react'
+import { Preloader } from '@/components/landing/preloader'
 import { HeroHeader } from '@/components/header'
 import { HeroSection } from '@/components/landing/hero-section'
 import { FeatureGrid } from '@/components/landing/feature-grid'
 import {
   CheckCircle,
-  Rocket,
+  Command,
   Library,
   Layers,
   FolderOpen,
@@ -24,6 +25,19 @@ gsap.registerPlugin(useGSAP, ScrollTrigger)
 
 export default function LandingPage() {
   const pageRef = useRef<HTMLDivElement>(null)
+  const [isLoading, setIsLoading] = useState(true)
+
+  // Lock scroll while preloader is active
+  useEffect(() => {
+    if (isLoading) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [isLoading])
 
   useGSAP(() => {
     const mm = gsap.matchMedia()
@@ -94,6 +108,10 @@ export default function LandingPage() {
   }, { scope: pageRef })
 
   return (
+    <>
+      {isLoading && (
+        <Preloader onComplete={() => setIsLoading(false)} />
+      )}
     <LenisProvider>
       <div ref={pageRef} className="relative min-h-screen bg-background selection:bg-primary/30">
         <HeroHeader />
@@ -188,7 +206,7 @@ export default function LandingPage() {
             <div className="flex flex-col items-center gap-8">
               <div className="flex items-center gap-3">
                 <div className="flex size-10 items-center justify-center rounded-xl bg-primary text-primary-foreground">
-                  <Rocket className="size-6" />
+                  <Command className="size-6" />
                 </div>
                 <span className="text-2xl font-bold tracking-tighter">Volt</span>
               </div>
@@ -214,5 +232,6 @@ export default function LandingPage() {
         </footer>
       </div>
     </LenisProvider>
+    </>
   )
 }

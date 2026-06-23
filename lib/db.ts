@@ -23,11 +23,11 @@ export function serialize<T>(obj: T): any {
     if (typeof (obj as any).toHexString === "function") {
       return (obj as any).toHexString();
     }
-    
+
     // Fallback checking for ObjectId-like objects
     if (
-      (obj as any)._bsontype === "ObjectID" || 
-      (obj as any).constructor?.name === "ObjectID" || 
+      (obj as any)._bsontype === "ObjectID" ||
+      (obj as any).constructor?.name === "ObjectID" ||
       (obj as any).constructor?.name === "ObjectId"
     ) {
       return (obj as any).toString();
@@ -96,7 +96,7 @@ export function mapNoteDoc(n: any): Note {
 export const getDb = cache(async () => {
   const client = await clientPromise;
   const db = client.db();
-  
+
   if (!globalWithIndexes._mongoIndexesEnsured) {
     Promise.all([
       // Resources indexes
@@ -110,21 +110,21 @@ export const getDb = cache(async () => {
       db.collection("resources").createIndex({ userId: 1, projectIds: 1 }),
       db.collection("resources").createIndex({ userId: 1, personIds: 1 }),
       db.collection("resources").createIndex({ title: "text", url: "text", tags: "text", description: "text", whySaved: "text", notes: "text" }),
-      
+
       // Notes indexes
       db.collection("notes").createIndex({ userId: 1, pinned: -1, updatedAt: -1 }),
       db.collection("notes").createIndex({ userId: 1, relatedProjects: 1 }),
       db.collection("notes").createIndex({ userId: 1, relatedPeople: 1 }),
       db.collection("notes").createIndex({ title: "text", content: "text", tags: "text" }),
-      
+
       // People indexes
       db.collection("people").createIndex({ userId: 1, name: 1 }),
       db.collection("people").createIndex({ name: "text", notes: "text", tags: "text" }),
-      
+
       // Projects indexes
       db.collection("projects").createIndex({ userId: 1, updatedAt: -1 }),
       db.collection("projects").createIndex({ name: "text", description: "text" }),
-      
+
       // Categories indexes
       db.collection("categories").createIndex({ userId: 1, name: 1 }),
       db.collection("categories").createIndex({ name: "text", description: "text" }),
@@ -134,7 +134,7 @@ export const getDb = cache(async () => {
       db.collection("watchlist").createIndex({ userId: 1, status: 1, type: 1 }),
       db.collection("watchlist").createIndex({ userId: 1, updatedAt: -1 })
     ]).catch(err => console.error("Error ensuring database indexes:", err));
-    
+
     globalWithIndexes._mongoIndexesEnsured = true;
   }
   return db;
@@ -166,7 +166,7 @@ export const getCategoriesWithCounts = cache(async (userId: string) => {
       { $match: { userId } },
       {
         $group: {
-          _id: { $ifNull: [ "$categoryId", "$category" ] },
+          _id: { $ifNull: ["$categoryId", "$category"] },
           count: { $sum: 1 }
         }
       }
@@ -325,7 +325,7 @@ export const getFavorites = cache(async (userId: string) => {
   const db = await getDb();
   const resources = await db.collection("resources").find({ userId, favorite: true }).limit(6).toArray();
   const notes = await db.collection("notes").find({ userId, pinned: true }).limit(6).toArray();
-  
+
   return serialize({
     resources: resources.map(r => ({
       ...r,
@@ -507,3 +507,124 @@ export const getPersonById = cache(async (id: string, userId: string): Promise<P
     updatedAt: person.updatedAt || new Date()
   }) as unknown as Person;
 });
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Dashboard additions — append these to the bottom of lib/db.ts
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * getInboxCount
+ * Resources that have no category assigned yet — shown in the Inbox widget.
+ * A resource is "uncategorized" when both legacy `category` and `categoryId`
+ * are absent, empty, or explicitly null.
+ */
+export const getInboxCount = cache(async (userId: string): Promise<number> => {
+  const db = await getDb();
+  return db.collection("resources").countDocuments({
+    userId,
+    $or: [
+      { categoryId: { $exists: false } },
+      { categoryId: null },
+      { categoryId: "" },
+    ],
+    // Also exclude resources where the legacy `category` field carries a value,
+    // so a resource only counts as inbox if BOTH fields are empty.
+    $nor: [
+      { category: { $exists: true, $ne: "" } },
+    ],
+  });
+});
+
+/**
+ * getRecentlyValuable
+ * Resources the user has actually clicked / used recently, ordered by recency
+ * of use first, then total use count as a tiebreaker.
+ * Distinct from getMostUsed (which ranks by all-time count) — this surfaces
+ * resources the user returned to recently, which may be lower-count but higher
+ * current relevance.
+ */
+export const getRecentlyValuable = cache(
+  async (userId: string, limit = 5): Promise<Resource[]> => {
+    const db = await getDb();
+    const resources = await db
+      .collection("resources")
+      .find({ userId, useCount: { $gt: 0 } })
+      .sort({ recentlyUsedAt: -1, useCount: -1 })
+      .limit(limit)
+      .toArray();
+
+    return serialize(resources.map(mapResourceDoc)) as unknown as Resource[];
+  }
+);
+
+/**
+ * getRecommendedResources
+ * Surfaces resources the user saved but has never (or rarely) opened —
+ * the "you bookmarked this, remember?" prompt. Sorted by save date descending
+ * so the most recently saved-but-unvisited items appear first.
+ *
+ * Heuristic: recentlyViewedAt doesn't exist on the document.
+ */
+export const getRecommendedResources = cache(
+  async (userId: string, limit = 3): Promise<Resource[]> => {
+    const db = await getDb();
+    const resources = await db
+      .collection("resources")
+      .find({
+        userId,
+        recentlyViewedAt: { $exists: false },
+        // Exclude archived resources from recommendations
+        status: { $ne: "archived" },
+      })
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .toArray();
+
+    return serialize(resources.map(mapResourceDoc)) as unknown as Resource[];
+  }
+);
+
+/**
+ * getSpotlightResource
+ * Picks one resource to feature prominently. Priority order:
+ *   1. A favorited resource with the highest use count
+ *   2. Any resource with the highest use count (if no favorites with usage)
+ *   3. The most recently added favorite
+ *   4. null — no spotlight available
+ */
+export const getSpotlightResource = cache(
+  async (userId: string): Promise<Resource | null> => {
+    const db = await getDb();
+
+    // Try: favorite + most used
+    let doc = await db
+      .collection("resources")
+      .find({ userId, favorite: true, useCount: { $gt: 0 } })
+      .sort({ useCount: -1 })
+      .limit(1)
+      .next();
+
+    // Fallback: any most-used resource
+    if (!doc) {
+      doc = await db
+        .collection("resources")
+        .find({ userId, useCount: { $gt: 0 } })
+        .sort({ useCount: -1 })
+        .limit(1)
+        .next();
+    }
+
+    // Fallback: most recently added favorite
+    if (!doc) {
+      doc = await db
+        .collection("resources")
+        .find({ userId, favorite: true })
+        .sort({ createdAt: -1 })
+        .limit(1)
+        .next();
+    }
+
+    if (!doc) return null;
+    return serialize(mapResourceDoc(doc)) as unknown as Resource;
+  }
+);

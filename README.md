@@ -1,12 +1,13 @@
 <p align="center">
-  <img src="https://shieldcn.dev/header/glow.svg?title=Volt&subtitle=Personal%20Knowledge%20Operating%20System&theme=zinc&logo=rocket" alt="Volt Header Banner" width="100%" />
+  <img src="https://shieldcn.dev/header/glow.svg?title=Volt&subtitle=Personal%20Knowledge%20Operating%20System&theme=zinc&logo=command" alt="Volt Header Banner" width="100%" />
 </p>
 
 <p align="center">
-  <a href="https://github.com/shammashassan/volt/stargazers"><img src="https://shieldcn.dev/github/stars/shammashassan/volt.svg?variant=secondary" alt="GitHub Stars" /></a>
-  <a href="https://github.com/shammashassan/volt/commits/master"><img src="https://shieldcn.dev/github/last-commit/shammashassan/volt.svg?variant=secondary" alt="Last Commit" /></a>
-  <a href="https://github.com/shammashassan/volt/pulls"><img src="https://shieldcn.dev/github/open-prs/shammashassan/volt.svg?variant=secondary" alt="Open PRs" /></a>
-  <a href="https://github.com/shammashassan/volt/blob/master/LICENSE"><img src="https://shieldcn.dev/github/license/shammashassan/volt.svg?variant=secondary" alt="License" /></a>
+  <img src="https://shieldcn.dev/badge/status-active-zinc?variant=secondary" alt="Status" />
+  <img src="https://shieldcn.dev/badge/stack-next.js-zinc?logo=nextdotjs&variant=secondary" alt="Next.js" />
+  <img src="https://shieldcn.dev/badge/database-mongodb-zinc?logo=mongodb&variant=secondary" alt="MongoDB" />
+  <img src="https://shieldcn.dev/badge/auth-better--auth-zinc?logo=ri:FingerprintLine&variant=secondary" alt="Better Auth" />
+  <img src="https://shieldcn.dev/badge/license-MIT-zinc?variant=secondary" alt="License" />
 </p>
 
 ---
@@ -42,11 +43,6 @@ Volt is built with a premium, state-of-the-art developer stack:
 
 ---
 
-## 📈 Activity & Stars
-
-![Star History Chart](https://shieldcn.dev/chart/github/stars/shammashassan/volt.svg?theme=zinc)
-
----
 
 ## ⚡ Getting Started
 
@@ -63,6 +59,9 @@ MONGODB_URI=your_mongodb_connection_string
 # Better Auth Configuration
 BETTER_AUTH_SECRET=your_auth_secret
 BETTER_AUTH_URL=http://localhost:3000
+
+# Client App URL (Required for client-side authentication redirects & API configuration)
+NEXT_PUBLIC_APP_URL=http://localhost:3000
 
 # Media Watchlist API Keys (Optional - for TMDb integration)
 TMDB_API_KEY=your_tmdb_api_key
