@@ -9,6 +9,8 @@
   <a href="https://github.com/shammashassan/volt/blob/master/LICENSE"><img src="https://shieldcn.dev/github/license/shammashassan/volt.svg?variant=secondary" alt="License" /></a>
 </p>
 
+> ⚠️ Volt is currently under active development. Features and APIs may change between releases.
+
 ---
 
 ## 🚀 About Volt
@@ -93,6 +95,12 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 | `Ctrl + K` or `⌘ + K` | Toggle Global Command Center (Search categories, notes, projects) |
 | `Ctrl + M` or `⌘ + M` | Open Media Watchlist Search Dialog (TMDb / AniList proxy) |
 | `Esc` | Close active dialog / popover |
+
+---
+
+## 📄 License
+
+This project is licensed under the Apache License 2.0. See the [LICENSE](LICENSE) file for details.
 
 ---
 

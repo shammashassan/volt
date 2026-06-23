@@ -21,7 +21,9 @@ import {
   UserIcon,
   BriefcaseIcon,
   SettingsIcon,
-  CommandIcon
+  CommandIcon,
+  FilmIcon,
+  SquareTerminal
 } from "lucide-react"
 import { ICON_MAP } from "@/lib/icons"
 import { useQuickCapture } from "./quick-capture-drawers"
@@ -168,7 +170,8 @@ export function SearchCommand() {
     { path: "/projects", label: "Open Projects", icon: BriefcaseIcon },
     { path: "/notes", label: "Open Notes", icon: FileTextIcon },
     { path: "/people", label: "Open People", icon: UserIcon },
-    { path: "/commands", label: "Open Commands", icon: CommandIcon },
+    { path: "/media-watchlist", label: "Open Watchlist", icon: FilmIcon },
+    { path: "/commands", label: "Open Commands", icon: SquareTerminal },
     { path: "/settings", label: "Open Settings", icon: SettingsIcon },
   ];
 
