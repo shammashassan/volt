@@ -1,5 +1,5 @@
 import { createParser, parseAsString, parseAsBoolean } from 'nuqs'
-import { ResourceType, ResourceStatus } from '@/lib/types'
+import { ResourceType, ResourceStatus, Category } from '@/lib/types'
 import { RESOURCE_TYPES, STATUS_OPTIONS, getResourceTypeInfo } from './resource-types'
 
 const validTypes = RESOURCE_TYPES.map(t => t.value)
@@ -20,6 +20,7 @@ export const parseResourceStatus = createParser({
 
 export const parseResourceFavorite = parseAsBoolean
 export const parseSearchQuery = parseAsString
+export const parseResourceCategory = parseAsString
 
 // Centralized export for useQueryStates
 export const resourceFilterParsers = {
@@ -27,6 +28,7 @@ export const resourceFilterParsers = {
   status: parseResourceStatus,
   favorite: parseResourceFavorite,
   q: parseSearchQuery,
+  category: parseResourceCategory,
 }
 
 export interface ResourceFilters {
@@ -34,9 +36,10 @@ export interface ResourceFilters {
   status?: ResourceStatus | null
   favorite?: boolean
   q?: string | null
+  category?: string | null
 }
 
-export function getResourcesPageTitle(filters: ResourceFilters): string {
+export function getResourcesPageTitle(filters: ResourceFilters, categories?: Category[]): string {
   const parts: string[] = []
   
   if (filters.status) {
@@ -48,6 +51,19 @@ export function getResourcesPageTitle(filters: ResourceFilters): string {
   
   if (filters.favorite) {
     parts.push("Starred")
+  }
+  
+  if (filters.category) {
+    if (filters.category === "none") {
+      parts.push("Uncategorized")
+    } else if (categories) {
+      const category = categories.find(
+        c => c.id === filters.category || c._id?.toString() === filters.category
+      )
+      if (category) {
+        parts.push(category.name)
+      }
+    }
   }
   
   if (filters.type) {
