@@ -1,12 +1,15 @@
-'use client'
+import React, { useRef } from 'react'
 import Link from 'next/link'
 import { Logo } from '@/components/logo'
 import { Menu, X } from 'lucide-react'
-import React from 'react'
 import { cn } from '@/lib/utils'
 import { ModeToggle } from './mode-toggle'
+import { gsap } from 'gsap'
+import { useGSAP } from '@gsap/react'
 
-export const HeroHeader = () => {
+gsap.registerPlugin(useGSAP)
+
+export const HeroHeader = ({ startReveal = false }: { startReveal?: boolean }) => {
     const menuItems = [
         { name: 'Dashboard', href: '/explore' },
         { name: 'Resources', href: '/resources' },
@@ -16,6 +19,7 @@ export const HeroHeader = () => {
     ]
     const [menuState, setMenuState] = React.useState(false)
     const [isScrolled, setIsScrolled] = React.useState(false)
+    const containerRef = useRef<HTMLDivElement>(null)
 
     React.useEffect(() => {
         const handleScroll = () => {
@@ -24,14 +28,46 @@ export const HeroHeader = () => {
         window.addEventListener('scroll', handleScroll)
         return () => window.removeEventListener('scroll', handleScroll)
     }, [])
+
+    useGSAP(() => {
+        if (!startReveal) return
+
+        // Respect system preference
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            gsap.set('.nav-container', { opacity: 1, y: 0 })
+            gsap.set('.nav-item-anim', { opacity: 1, y: 0 })
+            return
+        }
+
+        const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
+
+        tl.fromTo('.nav-container', {
+            y: -30,
+            opacity: 0
+        }, {
+            y: 0,
+            opacity: 1,
+            duration: 1.6
+        })
+        .fromTo('.nav-item-anim', {
+            y: -10,
+            opacity: 0
+        }, {
+            y: 0,
+            opacity: 1,
+            duration: 1.2,
+            stagger: 0.08
+        }, '<+0.4')
+    }, { scope: containerRef, dependencies: [startReveal] })
+
     return (
-        <header>
+        <header ref={containerRef}>
             <nav
                 data-state={menuState && 'active'}
                 className="fixed z-20 w-full px-2">
-                <div className={cn('mx-auto mt-2 max-w-6xl px-6 transition-[max-width,padding,background-color,border-color] duration-300 lg:px-12', isScrolled && 'bg-background/80 max-w-4xl rounded-2xl border backdrop-blur-md lg:px-5')}>
+                <div className={cn('nav-container opacity-0 mx-auto mt-2 max-w-6xl px-6 transition-[max-width,padding,background-color,border-color] duration-300 lg:px-12', isScrolled && 'bg-background/80 max-w-4xl rounded-2xl border backdrop-blur-md lg:px-5')}>
                     <div className="relative flex flex-wrap items-center justify-between gap-6 py-3 lg:gap-0 lg:py-4">
-                        <div className="flex w-full justify-between lg:w-auto">
+                        <div className="nav-item-anim opacity-0 flex w-full justify-between lg:w-auto">
                             <Link
                                 href="/"
                                 aria-label="home"
@@ -51,7 +87,7 @@ export const HeroHeader = () => {
                         <div className="absolute inset-0 m-auto hidden size-fit lg:block">
                             <ul className="flex gap-8 text-sm">
                                 {menuItems.map((item, index) => (
-                                    <li key={index}>
+                                    <li key={index} className="nav-item-anim opacity-0">
                                         <Link
                                             href={item.href}
                                             className="text-muted-foreground hover:text-accent-foreground font-medium block duration-150">
@@ -62,7 +98,7 @@ export const HeroHeader = () => {
                             </ul>
                         </div>
 
-                        <div className="bg-background in-data-[state=active]:block lg:in-data-[state=active]:flex mb-6 hidden w-full flex-wrap items-center justify-end gap-8 rounded-3xl border p-6 shadow-2xl shadow-zinc-300/20 md:flex-nowrap lg:m-0 lg:flex lg:w-fit lg:gap-6 lg:border-transparent lg:bg-transparent lg:p-0 lg:shadow-none dark:shadow-none dark:lg:bg-transparent">
+                        <div className="nav-item-anim opacity-0 bg-background in-data-[state=active]:block lg:in-data-[state=active]:flex mb-6 hidden w-full flex-wrap items-center justify-end gap-8 rounded-3xl border p-6 shadow-2xl shadow-zinc-300/20 md:flex-nowrap lg:m-0 lg:flex lg:w-fit lg:gap-6 lg:border-transparent lg:bg-transparent lg:p-0 lg:shadow-none dark:shadow-none dark:lg:bg-transparent">
                             <div className="lg:hidden">
                                 <ul className="flex flex-col gap-6 text-base">
                                     {menuItems.map((item, index) => (

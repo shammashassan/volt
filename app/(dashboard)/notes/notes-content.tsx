@@ -113,6 +113,11 @@ export function NotesContent({
   const [isSaving, setIsSaving] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const [noteToDelete, setNoteToDelete] = useState<string | null>(null)
+  const [pendingNavigation, setPendingNavigation] = useState<{
+    action: () => void;
+    title: string;
+    description: string;
+  } | null>(null)
 
   // Mobile-only: tracks which "screen" is active — list or detail
   const [mobileDetailOpen, setMobileDetailOpen] = useState(false)
@@ -147,9 +152,122 @@ export function NotesContent({
   const [formRelatedProjects, setFormRelatedProjects] = useState<string[]>([])
   const [formRelatedPeople, setFormRelatedPeople] = useState<string[]>([])
 
+  const isDirty = useMemo(() => {
+    if (isCreating) {
+      return (
+        formTitle.trim() !== "" ||
+        formContent.trim() !== "" ||
+        formTags.trim() !== "" ||
+        formPinned !== false ||
+        formRelatedResources.length > 0 ||
+        formRelatedProjects.length > 0 ||
+        formRelatedPeople.length > 0
+      )
+    }
+
+    if (!selectedNote) return false
+
+    const areArraysEqual = (a: string[], b: string[]) => {
+      if (a.length !== b.length) return false
+      const sortedA = [...a].sort()
+      const sortedB = [...b].sort()
+      return sortedA.every((val, idx) => val === sortedB[idx])
+    }
+
+    const originalTags = (selectedNote.tags || []).join(", ")
+    const normalizeTags = (tagsStr: string) =>
+      tagsStr
+        .split(",")
+        .map((t) => t.trim())
+        .filter((t) => t !== "")
+        .sort()
+        .join(",")
+
+    return (
+      formTitle !== (selectedNote.title || "") ||
+      formContent !== (selectedNote.content || "") ||
+      normalizeTags(formTags) !== normalizeTags(originalTags) ||
+      formPinned !== !!selectedNote.pinned ||
+      !areArraysEqual(formRelatedResources, selectedNote.relatedResources || []) ||
+      !areArraysEqual(formRelatedProjects, selectedNote.relatedProjects || []) ||
+      !areArraysEqual(formRelatedPeople, selectedNote.relatedPeople || [])
+    )
+  }, [
+    isCreating,
+    selectedNote,
+    formTitle,
+    formContent,
+    formTags,
+    formPinned,
+    formRelatedResources,
+    formRelatedProjects,
+    formRelatedPeople,
+  ])
+
+  // Warning before unload/page refresh
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (isDirty) {
+        e.preventDefault()
+        e.returnValue = ""
+      }
+    }
+    window.addEventListener("beforeunload", handleBeforeUnload)
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload)
+  }, [isDirty])
+
+  // Click interceptor for all local <a> link navigations
+  useEffect(() => {
+    if (!isDirty) return
+
+    const handleAnchorClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement
+      const anchor = target.closest("a")
+
+      if (anchor) {
+        const href = anchor.getAttribute("href")
+        if (href && (href.startsWith("/") || href.startsWith(window.location.origin))) {
+          if (anchor.target === "_blank") return
+          if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return
+
+          e.preventDefault()
+          e.stopPropagation()
+
+          setPendingNavigation({
+            action: () => {
+              router.push(href)
+            },
+            title: "Leave with unsaved changes?",
+            description: "You have unsaved changes in your note. Are you sure you want to leave this page and lose them?"
+          })
+        }
+      }
+    }
+
+    document.addEventListener("click", handleAnchorClick, true)
+    return () => document.removeEventListener("click", handleAnchorClick, true)
+  }, [isDirty, router])
+
+  const triggerBack = () => {
+    if (isDirty) {
+      setPendingNavigation({
+        action: () => {
+          handleBack()
+          setPendingNavigation(null)
+        },
+        title: "Discard unsaved changes?",
+        description: "You have unsaved changes. Discarding will permanently lose them."
+      })
+    } else {
+      handleBack()
+    }
+  }
+
   React.useEffect(() => {
     setNotes(initialNotes)
   }, [initialNotes])
+
+
 
   const insertMarkdown = (syntax: string) => {
     const textarea = textareaRef.current
@@ -335,7 +453,7 @@ export function NotesContent({
     setMobileDetailOpen(false)
   }
 
-  const handleSave = async () => {
+  const handleSave = React.useCallback(async () => {
     if (!formTitle.trim()) {
       toast.error("Note title is required")
       return
@@ -378,7 +496,37 @@ export function NotesContent({
       }
     }
     setIsSaving(false)
-  }
+  }, [
+    formTitle,
+    formContent,
+    formTags,
+    formPinned,
+    formRelatedResources,
+    formRelatedProjects,
+    formRelatedPeople,
+    isCreating,
+    selectedNote,
+    router,
+  ])
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") {
+        const showEditor = isEditing || isCreating
+        if (showEditor) {
+          e.preventDefault()
+          if (isDirty && !isSaving) {
+            handleSave()
+          }
+        }
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown)
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown)
+    }
+  }, [isEditing, isCreating, isDirty, isSaving, handleSave])
 
   const handleDelete = async (noteId: string) => {
     setIsDeleting(true)
@@ -576,7 +724,7 @@ export function NotesContent({
       {/* Header */}
       <div className="flex items-center justify-between px-4 sm:px-5 py-3 sm:py-4 border-b border-border shrink-0">
         <div className="flex items-center gap-2 sm:gap-2.5">
-          <BookOpen className="size-4 sm:size-5 text-primary" />
+          <BookOpen className="size-4 sm:size-5 text-primary" aria-hidden="true" />
           <span className="text-sm sm:text-base font-semibold">Notes</span>
           <Badge variant="secondary" className="text-xs tabular-nums h-5 px-2">
             {filteredNotes.length}
@@ -584,8 +732,8 @@ export function NotesContent({
         </div>
         <Tooltip>
           <TooltipTrigger asChild>
-            <Button size="icon" variant="ghost" className="size-9" onClick={handleOpenCreate}>
-              <Plus />
+            <Button size="icon" variant="ghost" className="size-9" onClick={handleOpenCreate} aria-label="New note">
+              <Plus aria-hidden="true" />
             </Button>
           </TooltipTrigger>
           <TooltipContent>New note</TooltipContent>
@@ -602,7 +750,7 @@ export function NotesContent({
             className="h-9 text-sm"
           />
           <InputGroupAddon align="inline-end">
-            <Search className="size-4 text-muted-foreground" />
+            <Search className="size-4 text-muted-foreground" aria-hidden="true" />
           </InputGroupAddon>
         </InputGroup>
       </div>
@@ -642,7 +790,7 @@ export function NotesContent({
             <Empty className="py-16">
               <EmptyHeader>
                 <EmptyMedia variant="icon">
-                  <FileText />
+                  <FileText aria-hidden="true" />
                 </EmptyMedia>
                 <EmptyTitle>No notes</EmptyTitle>
                 <EmptyDescription>
@@ -661,9 +809,17 @@ export function NotesContent({
               return (
                 <div
                   key={noteId}
+                  role="button"
+                  tabIndex={0}
                   onClick={() => handleSelectNote(note)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault()
+                      handleSelectNote(note)
+                    }
+                  }}
                   className={cn(
-                    "group relative rounded-xl px-3 sm:px-4 py-3 cursor-pointer transition-all duration-100 active:scale-[0.99] min-w-0",
+                    "group relative rounded-xl px-3 sm:px-4 py-3 cursor-pointer transition-all duration-100 active:scale-[0.99] min-w-0 text-left w-full",
                     isSelected
                       ? "bg-accent border border-border"
                       : "hover:bg-accent/50 border border-transparent"
@@ -682,7 +838,7 @@ export function NotesContent({
                       {note.title || "Untitled Note"}
                     </p>
                     {/* Mobile: show chevron hint */}
-                    <ChevronRight className="size-3.5 text-muted-foreground/40 mt-0.5 shrink-0 sm:hidden" />
+                    <ChevronRight className="size-3.5 text-muted-foreground/40 mt-0.5 shrink-0 sm:hidden" aria-hidden="true" />
                   </div>
 
                   <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed mb-2.5">
@@ -725,8 +881,9 @@ export function NotesContent({
                                   router.refresh()
                                 }
                               }}
+                              aria-label={note.pinned ? "Unpin note" : "Pin note"}
                             >
-                              <Pin className={cn("size-3.5", note.pinned && "fill-amber-400 text-amber-400")} />
+                              <Pin className={cn("size-3.5", note.pinned && "fill-amber-400 text-amber-400")} aria-hidden="true" />
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>{note.pinned ? "Unpin" : "Pin"}</TooltipContent>
@@ -740,8 +897,9 @@ export function NotesContent({
                             e.stopPropagation()
                             if (noteId) setNoteToDelete(noteId)
                           }}
+                          aria-label="Delete note"
                         >
-                          <Trash2 className="size-3.5" />
+                          <Trash2 className="size-3.5" aria-hidden="true" />
                         </Button>
                       </div>
 
@@ -762,7 +920,7 @@ export function NotesContent({
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogMedia className="bg-destructive/10 text-destructive">
-              <Trash2 />
+              <Trash2 aria-hidden="true" />
             </AlertDialogMedia>
             <AlertDialogTitle>Delete note?</AlertDialogTitle>
             <AlertDialogDescription>
@@ -780,6 +938,31 @@ export function NotesContent({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Controlled unsaved changes navigation confirmation dialog */}
+      <AlertDialog open={!!pendingNavigation} onOpenChange={(open) => { if (!open) setPendingNavigation(null) }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{pendingNavigation?.title}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {pendingNavigation?.description}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (pendingNavigation) {
+                  pendingNavigation.action()
+                  setPendingNavigation(null)
+                }
+              }}
+            >
+              Continue
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 
@@ -792,7 +975,7 @@ export function NotesContent({
           <Empty>
             <EmptyHeader>
               <EmptyMedia variant="icon">
-                <BookOpen />
+                <BookOpen aria-hidden="true" />
               </EmptyMedia>
               <EmptyTitle>Select a note</EmptyTitle>
               <EmptyDescription>
@@ -801,7 +984,7 @@ export function NotesContent({
             </EmptyHeader>
             <EmptyContent>
               <Button onClick={handleOpenCreate} className="gap-2">
-                <Plus data-icon="inline-start" />
+                <Plus data-icon="inline-start" aria-hidden="true" />
                 New note
               </Button>
             </EmptyContent>
@@ -822,9 +1005,10 @@ export function NotesContent({
                 variant="ghost"
                 size="icon"
                 className="size-9 shrink-0"
-                onClick={handleBack}
+                onClick={triggerBack}
+                aria-label="Back"
               >
-                <ArrowLeft />
+                <ArrowLeft aria-hidden="true" />
               </Button>
               <span className="text-sm font-semibold truncate">
                 {isCreating ? "New Note" : "Edit Note"}
@@ -840,11 +1024,11 @@ export function NotesContent({
                 onValueChange={(v) => { if (v) setEditorMode(v as "write" | "preview") }}
               >
                 <ToggleGroupItem value="write">
-                  <PenBox />
+                  <PenBox aria-hidden="true" />
                   <span className="hidden sm:inline">Write</span>
                 </ToggleGroupItem>
                 <ToggleGroupItem value="preview">
-                  <Eye />
+                  <Eye aria-hidden="true" />
                   <span className="hidden sm:inline">Preview</span>
                 </ToggleGroupItem>
               </ToggleGroup>
@@ -854,16 +1038,16 @@ export function NotesContent({
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={handleBack}
+                onClick={triggerBack}
               >
                 Cancel
               </Button>
               <Button
                 size="sm"
                 onClick={handleSave}
-                disabled={isSaving}
+                disabled={isSaving || !isDirty}
               >
-                {isSaving ? <Spinner className="size-4" /> : <Save data-icon="inline-start" />}
+                {isSaving ? <Spinner className="size-4" /> : <Save data-icon="inline-start" aria-hidden="true" />}
                 {isCreating ? "Create" : "Save"}
               </Button>
             </div>
@@ -876,6 +1060,9 @@ export function NotesContent({
                 value={formTitle}
                 onChange={(e) => setFormTitle(e.target.value)}
                 placeholder="Note title…"
+                name="note-title"
+                autoComplete="off"
+                aria-label="Note title"
                 className="w-full text-xl sm:text-2xl font-bold bg-transparent border-none outline-none placeholder:text-muted-foreground/40 text-foreground"
               />
 
@@ -897,8 +1084,9 @@ export function NotesContent({
                           size="icon"
                           className="size-8 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted"
                           onClick={() => insertMarkdown("h1")}
+                          aria-label="Heading 1"
                         >
-                          <Heading1 className="size-4" />
+                          <Heading1 className="size-4" aria-hidden="true" />
                         </Button>
                       </TooltipTrigger>
                       <TooltipContent>Heading 1</TooltipContent>
@@ -912,8 +1100,9 @@ export function NotesContent({
                           size="icon"
                           className="size-8 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted"
                           onClick={() => insertMarkdown("h2")}
+                          aria-label="Heading 2"
                         >
-                          <Heading2 className="size-4" />
+                          <Heading2 className="size-4" aria-hidden="true" />
                         </Button>
                       </TooltipTrigger>
                       <TooltipContent>Heading 2</TooltipContent>
@@ -927,8 +1116,9 @@ export function NotesContent({
                           size="icon"
                           className="size-8 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted"
                           onClick={() => insertMarkdown("h3")}
+                          aria-label="Heading 3"
                         >
-                          <Heading3 className="size-4" />
+                          <Heading3 className="size-4" aria-hidden="true" />
                         </Button>
                       </TooltipTrigger>
                       <TooltipContent>Heading 3</TooltipContent>
@@ -944,8 +1134,9 @@ export function NotesContent({
                           size="icon"
                           className="size-8 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted"
                           onClick={() => insertMarkdown("bullet")}
+                          aria-label="Bullet List"
                         >
-                          <List className="size-4" />
+                          <List className="size-4" aria-hidden="true" />
                         </Button>
                       </TooltipTrigger>
                       <TooltipContent>Bullet List</TooltipContent>
@@ -959,8 +1150,9 @@ export function NotesContent({
                           size="icon"
                           className="size-8 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted"
                           onClick={() => insertMarkdown("checklist")}
+                          aria-label="Checklist"
                         >
-                          <ListTodo className="size-4" />
+                          <ListTodo className="size-4" aria-hidden="true" />
                         </Button>
                       </TooltipTrigger>
                       <TooltipContent>Checklist</TooltipContent>
@@ -973,6 +1165,9 @@ export function NotesContent({
                     onChange={(e) => setFormContent(e.target.value)}
                     placeholder={"# Heading\n\nStart writing your note…"}
                     rows={14}
+                    name="note-content"
+                    autoComplete="off"
+                    aria-label="Note content"
                   />
                 </div>
               )}
@@ -981,11 +1176,14 @@ export function NotesContent({
 
               {/* Tags */}
               <div className="flex items-center gap-2">
-                <Tag className="size-3.5 text-muted-foreground shrink-0" />
+                <Tag className="size-3.5 text-muted-foreground shrink-0" aria-hidden="true" />
                 <input
                   value={formTags}
                   onChange={(e) => setFormTags(e.target.value)}
                   placeholder="Add tags, separated by commas…"
+                  name="note-tags"
+                  autoComplete="off"
+                  aria-label="Note tags"
                   className="flex-1 text-sm bg-transparent border-none outline-none placeholder:text-muted-foreground/40 text-foreground/80 min-w-0"
                 />
               </div>
@@ -1011,6 +1209,11 @@ export function NotesContent({
                       items={resources.map((r) => r._id?.toString() || r.id || "")}
                       value={formRelatedResources}
                       onValueChange={setFormRelatedResources}
+                      filter={(item, query) => {
+                        const res = resources.find((r) => (r._id?.toString() || r.id) === item)
+                        const name = res ? (res.title || res.name || "") : item
+                        return name.toLowerCase().includes(query.toLowerCase())
+                      }}
                     >
                       <ComboboxChips ref={resourcesAnchor} className="w-full min-h-9">
                         <ComboboxValue>
@@ -1046,6 +1249,11 @@ export function NotesContent({
                       items={projects.map((p) => p._id?.toString() || p.id || "")}
                       value={formRelatedProjects}
                       onValueChange={setFormRelatedProjects}
+                      filter={(item, query) => {
+                        const proj = projects.find((p) => (p._id?.toString() || p.id) === item)
+                        const name = proj ? (proj.name || "") : item
+                        return name.toLowerCase().includes(query.toLowerCase())
+                      }}
                     >
                       <ComboboxChips ref={projectsAnchor} className="w-full min-h-9">
                         <ComboboxValue>
@@ -1081,6 +1289,11 @@ export function NotesContent({
                       items={people.map((p) => p._id?.toString() || p.id || "")}
                       value={formRelatedPeople}
                       onValueChange={setFormRelatedPeople}
+                      filter={(item, query) => {
+                        const person = people.find((p) => (p._id?.toString() || p.id) === item)
+                        const name = person ? (person.name || "") : item
+                        return name.toLowerCase().includes(query.toLowerCase())
+                      }}
                     >
                       <ComboboxChips ref={peopleAnchor} className="w-full min-h-9">
                         <ComboboxValue>

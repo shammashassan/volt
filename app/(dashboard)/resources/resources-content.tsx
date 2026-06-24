@@ -647,6 +647,11 @@ export function ResourcesContent({
                     items={projects.map((p) => p._id?.toString() || p.id || "")}
                     value={formProjectIds}
                     onValueChange={setFormProjectIds}
+                    filter={(item, query) => {
+                      const proj = projects.find((p) => (p._id?.toString() || p.id) === item)
+                      const name = proj ? (proj.name || "") : item
+                      return name.toLowerCase().includes(query.toLowerCase())
+                    }}
                   >
                     <ComboboxChips ref={projectsAnchor} className="w-full">
                       <ComboboxValue>
@@ -692,6 +697,11 @@ export function ResourcesContent({
                     items={people.map((p) => p._id?.toString() || p.id || "")}
                     value={formPersonIds}
                     onValueChange={setFormPersonIds}
+                    filter={(item, query) => {
+                      const person = people.find((p) => (p._id?.toString() || p.id) === item)
+                      const name = person ? (person.name || "") : item
+                      return name.toLowerCase().includes(query.toLowerCase())
+                    }}
                   >
                     <ComboboxChips ref={peopleAnchor} className="w-full">
                       <ComboboxValue>

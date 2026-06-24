@@ -101,6 +101,7 @@ export function LoginForm({
                       name="name"
                       type="text"
                       placeholder="John Doe"
+                      autoComplete="name"
                       required
                       className="h-11"
                     />
@@ -113,6 +114,8 @@ export function LoginForm({
                     name="email"
                     type="email"
                     placeholder="name@example.com"
+                    autoComplete="email"
+                    spellCheck={false}
                     required
                     className="h-11"
                   />
@@ -126,6 +129,7 @@ export function LoginForm({
                       id="password"
                       name="password"
                       type={showPassword ? "text" : "password"}
+                      autoComplete={isSignUp ? "new-password" : "current-password"}
                       required
                       className="h-11 pr-10"
                     />
@@ -135,11 +139,12 @@ export function LoginForm({
                       size="icon"
                       className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                       onClick={() => setShowPassword(!showPassword)}
+                      aria-label={showPassword ? "Hide password" : "Show password"}
                     >
                       {showPassword ? (
-                        <EyeOff className="h-4 w-4 text-muted-foreground" />
+                        <EyeOff className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
                       ) : (
-                        <Eye className="h-4 w-4 text-muted-foreground" />
+                        <Eye className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
                       )}
                     </Button>
                   </div>

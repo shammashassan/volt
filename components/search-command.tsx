@@ -21,7 +21,6 @@ import {
   UserIcon,
   BriefcaseIcon,
   SettingsIcon,
-  CommandIcon,
   FilmIcon,
   SquareTerminal
 } from "lucide-react"
@@ -199,14 +198,14 @@ export function SearchCommand() {
         onClick={() => setOpen(true)}
         className="flex h-9 w-64 items-center gap-2 rounded-md border border-input bg-muted/40 px-3 text-sm text-muted-foreground transition-all hover:bg-muted"
       >
-        <SearchIcon className="size-4" />
-        <span className="flex-1 text-left font-medium">Search anything</span>
+        <SearchIcon className="size-4" aria-hidden="true" />
+        <span className="flex-1 text-left font-medium">Search anything…</span>
         <Kbd>⌘</Kbd>
       </button>
 
       <CommandDialog open={open} onOpenChange={setOpen} shouldFilter={false}>
         <CommandInput
-          placeholder="Type to search resources, notes, projects, people..."
+          placeholder="Type to search resources, notes, projects, people…"
           value={searchQuery}
           onValueChange={setSearchQuery}
         />
@@ -216,7 +215,7 @@ export function SearchCommand() {
             <CommandGroup heading="Quick Create">
               {filteredQuickCreate.map(item => (
                 <CommandItem key={item.type} onSelect={() => handleQuickCreate(item.type)}>
-                  <PlusIcon className="mr-2 size-4 text-primary" />
+                  <PlusIcon className="mr-2 size-4 text-primary" aria-hidden="true" />
                   <span>{item.label}</span>
                 </CommandItem>
               ))}
@@ -232,7 +231,7 @@ export function SearchCommand() {
                 const Icon = item.icon;
                 return (
                   <CommandItem key={item.path} onSelect={() => onSelectEntity(item.path)}>
-                    <Icon className="mr-2 size-4" />
+                    <Icon className="mr-2 size-4" aria-hidden="true" />
                     <span>{item.label}</span>
                   </CommandItem>
                 )
@@ -253,7 +252,7 @@ export function SearchCommand() {
                     onSelect={() => onSelectEntity(item.path)}
                     className="flex items-center gap-2"
                   >
-                    <Icon className="mr-2 size-4 text-muted-foreground" />
+                    <Icon className="mr-2 size-4 text-muted-foreground" aria-hidden="true" />
                     <span>{item.label}</span>
                   </CommandItem>
                 )
@@ -265,7 +264,7 @@ export function SearchCommand() {
 
           {isLoading && (
             <div className="py-6 text-center text-sm text-muted-foreground">
-              Searching...
+              Searching…
             </div>
           )}
 
@@ -287,7 +286,7 @@ export function SearchCommand() {
                     onSelect={() => onSelectEntity(`/categories/${category.id || catId}`)}
                     className="flex items-center gap-2"
                   >
-                    <Icon className="size-4 text-muted-foreground/85" />
+                    <Icon className="size-4 text-muted-foreground/85" aria-hidden="true" />
                     <span className="font-medium text-foreground">{category.name || category.title}</span>
                   </CommandItem>
                 )
@@ -307,7 +306,7 @@ export function SearchCommand() {
                     className="flex items-center justify-between"
                   >
                     <div className="flex items-center gap-2">
-                      <ExternalLinkIcon className="size-4 text-muted-foreground/60" />
+                      <ExternalLinkIcon className="size-4 text-muted-foreground/60" aria-hidden="true" />
                       <span className="font-medium text-foreground">{resource.title || resource.name}</span>
                     </div>
                     <div className="flex items-center gap-2">
@@ -332,7 +331,7 @@ export function SearchCommand() {
                     onSelect={() => onSelectEntity(`/notes`)} // Notes layout splits in Phase 5
                     className="flex items-center gap-2"
                   >
-                    <FileTextIcon className="size-4 text-muted-foreground/70" />
+                    <FileTextIcon className="size-4 text-muted-foreground/70" aria-hidden="true" />
                     <span className="font-medium text-foreground">{note.title}</span>
                   </CommandItem>
                 )
@@ -351,7 +350,7 @@ export function SearchCommand() {
                     onSelect={() => onSelectEntity(`/projects/${projId}`)}
                     className="flex items-center gap-2"
                   >
-                    <BriefcaseIcon className="size-4 text-muted-foreground/70" />
+                    <BriefcaseIcon className="size-4 text-muted-foreground/70" aria-hidden="true" />
                     <span className="font-medium text-foreground">{project.name}</span>
                   </CommandItem>
                 )
@@ -370,7 +369,7 @@ export function SearchCommand() {
                     onSelect={() => onSelectEntity(`/people/${personId}`)}
                     className="flex items-center gap-2"
                   >
-                    <UserIcon className="size-4 text-muted-foreground/75" />
+                    <UserIcon className="size-4 text-muted-foreground/75" aria-hidden="true" />
                     <span className="font-medium text-foreground">{person.name}</span>
                   </CommandItem>
                 )

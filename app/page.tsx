@@ -26,6 +26,19 @@ gsap.registerPlugin(useGSAP, ScrollTrigger)
 export default function LandingPage() {
   const pageRef = useRef<HTMLDivElement>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [startReveal, setStartReveal] = useState(false)
+
+  // Respect system reduced-motion preference and session-based preloader bypass immediately on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      const alreadyShown = sessionStorage.getItem('volt_preloader_shown') === 'true'
+      if (reducedMotion || alreadyShown) {
+        setStartReveal(true)
+        setIsLoading(false)
+      }
+    }
+  }, [])
 
   // Lock scroll while preloader is active
   useEffect(() => {
@@ -40,6 +53,8 @@ export default function LandingPage() {
   }, [isLoading])
 
   useGSAP(() => {
+    if (!startReveal) return
+
     const mm = gsap.matchMedia()
 
     mm.add("(prefers-reduced-motion: reduce)", () => {
@@ -52,9 +67,9 @@ export default function LandingPage() {
 
     mm.add("(prefers-reduced-motion: no-preference)", () => {
       // Set initial state
-      gsap.set(".why-reveal-item", { opacity: 0, y: 30 })
-      gsap.set(".entity-card-reveal", { opacity: 0, y: 35 })
-      gsap.set(".cta-reveal-item", { opacity: 0, y: 35 })
+      gsap.set(".why-reveal-item", { opacity: 0, y: 50 })
+      gsap.set(".entity-card-reveal", { opacity: 0, y: 50 })
+      gsap.set(".cta-reveal-item", { opacity: 0, y: 50 })
 
       // Small delay to let Next.js rendering and page heights completely settle
       const timer = setTimeout(() => {
@@ -62,8 +77,8 @@ export default function LandingPage() {
         gsap.to(".why-reveal-item", {
           opacity: 1,
           y: 0,
-          duration: 0.8,
-          stagger: 0.15,
+          duration: 1.5,
+          stagger: 0.22,
           ease: "power3.out",
           scrollTrigger: {
             trigger: ".why-trigger",
@@ -76,8 +91,8 @@ export default function LandingPage() {
         gsap.to(".entity-card-reveal", {
           opacity: 1,
           y: 0,
-          duration: 0.7,
-          stagger: 0.12,
+          duration: 1.2,
+          stagger: 0.18,
           ease: "power3.out",
           scrollTrigger: {
             trigger: ".why-cards-trigger",
@@ -90,8 +105,8 @@ export default function LandingPage() {
         gsap.to(".cta-reveal-item", {
           opacity: 1,
           y: 0,
-          duration: 0.8,
-          stagger: 0.15,
+          duration: 1.6,
+          stagger: 0.22,
           ease: "power3.out",
           scrollTrigger: {
             trigger: ".cta-trigger",
@@ -105,27 +120,33 @@ export default function LandingPage() {
 
       return () => clearTimeout(timer)
     })
-  }, { scope: pageRef })
+  }, { scope: pageRef, dependencies: [startReveal] })
 
   return (
     <>
       {isLoading && (
-        <Preloader onComplete={() => setIsLoading(false)} />
+        <Preloader 
+          onComplete={() => {
+            setIsLoading(false)
+            sessionStorage.setItem('volt_preloader_shown', 'true')
+          }} 
+          onExitStart={() => setStartReveal(true)} 
+        />
       )}
     <LenisProvider>
       <div ref={pageRef} className="relative min-h-screen bg-background selection:bg-primary/30">
-        <HeroHeader />
+        <HeroHeader startReveal={startReveal} />
 
-        <HeroSection />
+        <HeroSection startReveal={startReveal} />
 
-        <FeatureGrid />
+        <FeatureGrid startReveal={startReveal} />
 
         {/* Why Section */}
         <section className="why-trigger bg-muted/30 py-24 sm:py-40">
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
             <div className="mx-auto grid max-w-2xl grid-cols-1 gap-x-12 gap-y-16 lg:max-w-none lg:grid-cols-2 lg:items-center">
               <div className="flex flex-col gap-8">
-                <h2 className="why-reveal-item opacity-0 text-4xl font-bold tracking-tight sm:text-6xl">
+                <h2 className="why-reveal-item opacity-0 text-4xl font-bold tracking-tight sm:text-6xl text-balance">
                   Knowledge over raw data
                 </h2>
                 <p className="why-reveal-item opacity-0 text-xl leading-relaxed text-muted-foreground">
@@ -141,7 +162,7 @@ export default function LandingPage() {
                     "Activity timelines"
                   ].map((item, i) => (
                     <div key={i} className="flex items-center gap-3">
-                      <CheckCircle className="size-6 text-primary" />
+                      <CheckCircle className="size-6 text-primary" aria-hidden="true" />
                       <span className="text-lg font-medium">{item}</span>
                     </div>
                   ))}
@@ -161,7 +182,7 @@ export default function LandingPage() {
                     return (
                       <div key={entity.id} className="entity-card-reveal opacity-0 flex items-center gap-4 rounded-2xl border bg-muted/40 p-3.5 sm:p-4 transition-[background-color,transform] duration-300 hover:bg-muted/80 hover:translate-x-2">
                         <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-background text-primary shadow-sm ring-1 ring-border">
-                          <Icon className="size-6" />
+                          <Icon className="size-6" aria-hidden="true" />
                         </div>
                         <div className="min-w-0">
                           <h4 className="truncate text-lg font-bold">{entity.title}</h4>
@@ -181,7 +202,7 @@ export default function LandingPage() {
           <div className="mx-auto max-w-5xl px-6">
             <div className="relative overflow-hidden rounded-[3rem] border bg-card p-12 lg:p-24 text-center">
               <div className="absolute inset-0 -z-10 bg-linear-to-b from-primary/5 to-transparent" />
-              <h2 className="cta-reveal-item opacity-0 mb-6 text-4xl font-bold sm:text-7xl">
+              <h2 className="cta-reveal-item opacity-0 mb-6 text-4xl font-bold sm:text-7xl text-balance">
                 Build your network.
               </h2>
               <h3 className="sr-only tracking-tight">Volt - The personal knowledge operating system</h3>
@@ -191,7 +212,7 @@ export default function LandingPage() {
               <div className="cta-reveal-item opacity-0">
                 <Link
                   href="/explore"
-                  className="inline-flex h-16 items-center justify-center rounded-full bg-primary px-12 text-lg font-bold text-primary-foreground shadow-xl shadow-primary/20 transition-[transform,shadow,background-color] hover:scale-105"
+                  className="inline-flex h-16 items-center justify-center rounded-full bg-primary px-12 text-lg font-bold text-primary-foreground shadow-xl shadow-primary/20 transition-[transform,shadow,background-color] hover:scale-105 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
                 >
                   Access Workspace
                 </Link>
@@ -206,7 +227,7 @@ export default function LandingPage() {
             <div className="flex flex-col items-center gap-8">
               <div className="flex items-center gap-3">
                 <div className="flex size-10 items-center justify-center rounded-xl bg-primary text-primary-foreground">
-                  <Command className="size-6" />
+                  <Command className="size-6" aria-hidden="true" />
                 </div>
                 <span className="text-2xl font-bold tracking-tighter">Volt</span>
               </div>
@@ -218,7 +239,7 @@ export default function LandingPage() {
                   { name: 'Notes', href: '/notes' },
                   { name: 'Dashboard', href: '/explore' }
                 ].map((item) => (
-                  <Link key={item.name} href={item.href} className="text-base font-medium text-muted-foreground hover:text-foreground transition-colors">
+                  <Link key={item.name} href={item.href} className="text-base font-medium text-muted-foreground hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-md px-1">
                     {item.name}
                   </Link>
                 ))}

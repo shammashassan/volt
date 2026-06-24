@@ -68,32 +68,35 @@ const features = [
   }
 ]
 
-export function FeatureGrid() {
+export function FeatureGrid({ startReveal = false }: { startReveal?: boolean }) {
   const containerRef = useRef<HTMLDivElement>(null)
 
   useGSAP(() => {
+    if (!startReveal) return
+
     const mm = gsap.matchMedia()
 
     mm.add("(prefers-reduced-motion: reduce)", () => {
       // Instant reveal for accessibility
       gsap.set(".grid-header-reveal, .bento-card-reveal", {
         opacity: 1,
-        y: 0
+        y: 0,
+        scale: 1
       })
     })
 
     mm.add("(prefers-reduced-motion: no-preference)", () => {
       // Set initial styles for animations
-      gsap.set(".grid-header-reveal", { opacity: 0, y: 30 })
-      gsap.set(".bento-card-reveal", { opacity: 0, y: 40 })
+      gsap.set(".grid-title-reveal, .grid-subtitle-reveal", { opacity: 0, y: 20 })
 
       // Small delay to let Next.js rendering and page heights completely settle
       const timer = setTimeout(() => {
-        // Animate header
-        gsap.to(".grid-header-reveal", {
+        // Animate header with clean fade-in-up reveal
+        gsap.to([".grid-title-reveal", ".grid-subtitle-reveal"], {
           opacity: 1,
           y: 0,
-          duration: 0.8,
+          duration: 1.8,
+          stagger: 0.22,
           ease: "power3.out",
           scrollTrigger: {
             trigger: ".grid-header-reveal",
@@ -102,24 +105,31 @@ export function FeatureGrid() {
           }
         })
 
-        // Animate cards with stagger
-        gsap.to(".bento-card-reveal", {
-          opacity: 1,
-          y: 0,
-          duration: 0.8,
-          stagger: 0.12,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: ".bento-grid-reveal",
-            start: "top 85%",
-            once: true
-          }
+        // Animate cards individually according to their scroll position
+        const cards = gsap.utils.toArray<HTMLElement>(".bento-card-reveal")
+        cards.forEach((card) => {
+          gsap.fromTo(card, {
+            opacity: 0,
+            y: 80,
+            scale: 0.96
+          }, {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            duration: 1.5,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: card,
+              start: "top 90%",
+              once: true
+            }
+          })
         })
       }, 100)
 
       return () => clearTimeout(timer)
     })
-  }, { scope: containerRef })
+  }, { scope: containerRef, dependencies: [startReveal] })
 
   return (
     <section
@@ -127,11 +137,11 @@ export function FeatureGrid() {
       id="features"
       className="mx-auto max-w-7xl px-6 py-24 sm:py-32"
     >
-      <div className="grid-header-reveal opacity-0 mb-20 text-center">
-        <h2 className="mb-4 text-4xl font-bold tracking-tight sm:text-6xl">
+      <div className="grid-header-reveal mb-20 text-center">
+        <h2 className="grid-title-reveal opacity-0 mb-4 text-4xl font-bold tracking-tight sm:text-6xl will-change-[transform,opacity]">
           Designed for context, not storage
         </h2>
-        <p className="mx-auto max-w-2xl text-lg text-muted-foreground sm:text-xl">
+        <p className="grid-subtitle-reveal opacity-0 mx-auto max-w-2xl text-lg text-muted-foreground sm:text-xl will-change-[transform,opacity]">
           Volt shifts the focus from hoarding bookmarks to building a connected second brain that keeps your knowledge retrievable.
         </p>
       </div>

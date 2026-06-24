@@ -21,46 +21,145 @@ const GitHubIcon = ({ className }: { className?: string }) => (
   </svg>
 )
 
-export function HeroSection() {
+export function HeroSection({ startReveal = false }: { startReveal?: boolean }) {
   const containerRef = useRef<HTMLDivElement>(null)
 
-  useGSAP(() => {
-    const tl = gsap.timeline({ defaults: { ease: 'power4.out' } })
+  // Mouse spotlight coordinates tracking
+  useGSAP((context, contextSafe) => {
+    if (!startReveal) return
 
+    const section = containerRef.current
+    if (!section) return
+
+    // Respect system preference
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      return
+    }
+
+    let rect = section.getBoundingClientRect()
+    let offsetLeft = rect.left + window.scrollX
+    let offsetTop = rect.top + window.scrollY
+
+    const updateOffsets = () => {
+      rect = section.getBoundingClientRect()
+      offsetLeft = rect.left + window.scrollX
+      offsetTop = rect.top + window.scrollY
+    }
+
+    window.addEventListener('resize', updateOffsets)
+
+    if (!contextSafe) return
+
+    // Use quickTo for buttery smooth performance animating transform x and y directly on the GPU
+    const xTo = gsap.quickTo('.spotlight-glow', 'x', { duration: 0.6, ease: 'power2.out' })
+    const yTo = gsap.quickTo('.spotlight-glow', 'y', { duration: 0.6, ease: 'power2.out' })
+
+    const handleMouseMove = contextSafe((e: MouseEvent) => {
+      const x = e.pageX - offsetLeft
+      const y = e.pageY - offsetTop
+      xTo(x)
+      yTo(y)
+    })
+
+    window.addEventListener('mousemove', handleMouseMove)
+    return () => {
+      window.removeEventListener('resize', updateOffsets)
+      window.removeEventListener('mousemove', handleMouseMove)
+    }
+  }, { scope: containerRef, dependencies: [startReveal] })
+
+  useGSAP(() => {
+    if (!startReveal) return
+
+    // Respect system preference
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      gsap.set('.bg-glow-1, .bg-glow-2, .bg-glow-3, .spotlight-glow', { opacity: 1, scale: 1 })
+      gsap.set('.hero-badge, .hero-title-word, .hero-para, .hero-btn', { opacity: 1, y: 0, scale: 1 })
+      return
+    }
+
+    const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
+
+    // Ambient glow entrance animations (GPU layers, pure opacity fades to prevent re-rasterizing CSS filters)
+    tl.fromTo('.bg-glow-1', {
+      opacity: 0
+    }, {
+      opacity: 1,
+      duration: 2.2,
+      ease: 'power3.out'
+    }, 0)
+
+    tl.fromTo(['.bg-glow-2', '.bg-glow-3'], {
+      opacity: 0
+    }, {
+      opacity: 1,
+      duration: 2.5,
+      stagger: 0.15,
+      ease: 'power2.out'
+    }, 0.1)
+
+    // Dynamic theme spotlight glow fade-in (opacity-only)
+    tl.fromTo('.spotlight-glow', {
+      opacity: 0
+    }, {
+      opacity: () => {
+        const isDark = document.documentElement.classList.contains('dark')
+        return isDark ? 0.35 : 0.12
+      },
+      duration: 2.0,
+      ease: 'power3.out'
+    }, 0.1)
+
+    // Entrance sequence
     tl.fromTo('.hero-badge', {
       opacity: 0,
-      y: 20,
+      y: 12,
+      scale: 0.97
     }, {
       opacity: 1,
       y: 0,
-      duration: 0.8,
-    })
-      .fromTo('.hero-title', {
-        opacity: 0,
-        y: 35,
-      }, {
-        opacity: 1,
-        y: 0,
-        duration: 1.0,
-      }, '-=0.6')
-      .fromTo('.hero-para', {
-        opacity: 0,
-        y: 15,
-      }, {
-        opacity: 1,
-        y: 0,
-        duration: 0.8,
-      }, '-=0.7')
-      .fromTo('.hero-btn', {
-        opacity: 0,
-        y: 15,
-      }, {
-        opacity: 1,
-        y: 0,
-        stagger: 0.12,
-        duration: 0.8,
-      }, '-=0.6')
-  }, { scope: containerRef })
+      scale: 1,
+      duration: 1.6,
+    }, 0.1)
+
+    // Stagger reveal the title words using refined, tighter slide and stagger timings
+    tl.fromTo('.hero-title-word', {
+      y: 8,
+      opacity: 0
+    }, {
+      y: 0,
+      opacity: 1,
+      duration: 1.6,
+      stagger: 0.08,
+      ease: 'power3.out'
+    }, '<+0.15')
+
+    // Fade-in-up paragraph
+    tl.fromTo('.hero-para', {
+      opacity: 0,
+      y: 8
+    }, {
+      opacity: 1,
+      y: 0,
+      duration: 1.5,
+      ease: 'power3.out'
+    }, '<+0.35')
+
+    tl.fromTo('.hero-btn', {
+      opacity: 0,
+      y: 10,
+      scale: 0.98
+    }, {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      stagger: 0.15,
+      duration: 1.4,
+    }, '<+0.25')
+  }, { scope: containerRef, dependencies: [startReveal] })
+
+  const titleWords1 = "A searchable network".split(" ")
+  const titleWords2 = "of your knowledge.".split(" ")
 
   return (
     <section
@@ -77,17 +176,21 @@ export function HeroSection() {
             Volt v2.0 • Personal Knowledge OS
           </div>
 
-          <div className="hero-title opacity-0">
-            <h1 className="text-4xl font-bold tracking-tight sm:text-6xl lg:text-7xl max-w-4xl mx-auto leading-tight">
-              A searchable network
-              <br />
-              <span className="bg-linear-to-r from-primary to-primary/40 bg-clip-text text-transparent">
-                of your knowledge.
+          <h1 className="text-4xl font-bold tracking-tight sm:text-6xl lg:text-7xl max-w-4xl mx-auto leading-tight text-center">
+            {titleWords1.map((word, idx) => (
+              <span key={idx} className="hero-title-word inline-block mr-[0.25em] opacity-0 will-change-[transform,opacity]">
+                {word}
               </span>
-            </h1>
-          </div>
+            ))}
+            <br className="w-full hidden sm:block" />
+            {titleWords2.map((word, idx) => (
+              <span key={idx} className="hero-title-word inline-block mr-[0.25em] opacity-0 bg-linear-to-r from-primary to-primary/40 bg-clip-text text-transparent font-extrabold will-change-[transform,opacity]">
+                {word}
+              </span>
+            ))}
+          </h1>
 
-          <div className="hero-para opacity-0 max-w-2xl mx-auto">
+          <div className="hero-para opacity-0 max-w-2xl mx-auto will-change-[transform,opacity]">
             <p className="text-lg text-muted-foreground sm:text-xl">
               Not another bookmark manager. Volt is a personal knowledge operating system to capture resources, write notes, link projects, track media watchlists, and retrieve everything instantly.
             </p>
@@ -96,10 +199,10 @@ export function HeroSection() {
           <div className="mt-4 flex flex-wrap items-center justify-center gap-4">
             <Link
               href="/explore"
-              className="hero-btn opacity-0 inline-flex h-14 items-center justify-center gap-2 rounded-full border border-transparent bg-primary px-10 text-base font-semibold text-primary-foreground shadow-lg shadow-primary/20 transition-[transform,shadow,background-color] hover:scale-105 active:scale-95"
+              className="group hero-btn opacity-0 inline-flex h-14 items-center justify-center gap-2 rounded-full border border-transparent bg-primary px-10 text-base font-semibold text-primary-foreground shadow-lg shadow-primary/20 transition-[transform,shadow,background-color] hover:scale-105 active:scale-95"
             >
               Open Workspace
-              <ArrowRight className="size-5" />
+              <ArrowRight className="size-5 transition-transform duration-200 group-hover:translate-x-1" />
             </Link>
             <Link
               href="https://github.com"
@@ -114,9 +217,38 @@ export function HeroSection() {
       </div>
 
       <div className="absolute inset-0 -z-10 overflow-hidden">
-        <div className="absolute left-1/2 top-0 h-[800px] w-[800px] -translate-x-1/2 rounded-full bg-primary/5 blur-[80px]" />
-        <div className="absolute right-0 top-1/4 h-[400px] w-[400px] rounded-full bg-primary/10 blur-[60px]" />
-        <div className="absolute left-0 bottom-0 h-[600px] w-[600px] rounded-full bg-primary/5 blur-[70px]" />
+        {/* Static Hardware-Accelerated Grid Background */}
+        <div 
+          className="absolute inset-0 opacity-20 dark:opacity-35 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:24px_24px]" 
+        />
+        
+        {/* GPU-Accelerated Spotlight Glow (no blend mode composition overhead, no layout thrashing) */}
+        <div 
+          className="spotlight-glow absolute pointer-events-none w-[1000px] h-[1000px] -left-[500px] -top-[500px] rounded-full opacity-0 will-change-transform"
+          style={{
+            background: 'radial-gradient(circle, rgba(120,119,198,0.15) 0%, transparent 65%)',
+          }}
+        />
+        
+        {/* Glow Orbs (using pure radial-gradients, avoiding expensive CSS blur filters entirely) */}
+        <div 
+          className="bg-glow-1 absolute left-1/2 top-0 h-[800px] w-[800px] -translate-x-1/2 rounded-full will-change-transform"
+          style={{
+            background: 'radial-gradient(circle, rgba(99,102,241,0.04) 0%, transparent 70%)',
+          }}
+        />
+        <div 
+          className="bg-glow-2 absolute right-0 top-1/4 h-[400px] w-[400px] rounded-full will-change-transform"
+          style={{
+            background: 'radial-gradient(circle, rgba(99,102,241,0.06) 0%, transparent 70%)',
+          }}
+        />
+        <div 
+          className="bg-glow-3 absolute left-0 bottom-0 h-[600px] w-[600px] rounded-full will-change-transform"
+          style={{
+            background: 'radial-gradient(circle, rgba(99,102,241,0.03) 0%, transparent 70%)',
+          }}
+        />
       </div>
     </section>
   )

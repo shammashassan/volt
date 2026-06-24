@@ -375,15 +375,15 @@ function QuickCaptureDrawers({
                 <FieldGroup>
                   <Field>
                     <FieldLabel htmlFor="res-title">Title *</FieldLabel>
-                    <Input id="res-title" placeholder="e.g. Next.js Best Practices" value={resTitle} onChange={e => setResTitle(e.target.value)} required />
+                    <Input id="res-title" name="title" autoComplete="off" placeholder="e.g. Next.js Best Practices" value={resTitle} onChange={e => setResTitle(e.target.value)} required />
                   </Field>
                   <Field>
                     <FieldLabel htmlFor="res-url">URL *</FieldLabel>
-                    <Input id="res-url" placeholder="https://..." value={resUrl} onChange={e => setResUrl(e.target.value)} required />
+                    <Input id="res-url" name="url" autoComplete="off" placeholder="https://…" value={resUrl} onChange={e => setResUrl(e.target.value)} required />
                   </Field>
                   <Field>
                     <FieldLabel htmlFor="res-desc">Description</FieldLabel>
-                    <Textarea id="res-desc" placeholder="Briefly describe why this resource is useful..." className="min-h-[80px]" value={resDescription} onChange={e => setResDescription(e.target.value)} />
+                    <Textarea id="res-desc" name="description" autoComplete="off" placeholder="Briefly describe why this resource is useful…" className="min-h-[80px]" value={resDescription} onChange={e => setResDescription(e.target.value)} />
                   </Field>
                   <Field>
                     <FieldLabel htmlFor="res-type">Type</FieldLabel>
@@ -421,15 +421,15 @@ function QuickCaptureDrawers({
                   </Field>
                   <Field>
                     <FieldLabel htmlFor="res-tags">Tags (comma separated)</FieldLabel>
-                    <Input id="res-tags" placeholder="react, animation, tailwind" value={resTags} onChange={e => setResTags(e.target.value)} />
+                    <Input id="res-tags" name="tags" autoComplete="off" placeholder="react, animation, tailwind" value={resTags} onChange={e => setResTags(e.target.value)} />
                   </Field>
                   <Field>
                     <FieldLabel htmlFor="res-why">Why Saved?</FieldLabel>
-                    <Input id="res-why" placeholder="e.g. Great for interactive headers" value={resWhySaved} onChange={e => setResWhySaved(e.target.value)} />
+                    <Input id="res-why" name="why-saved" autoComplete="off" placeholder="e.g. Great for interactive headers" value={resWhySaved} onChange={e => setResWhySaved(e.target.value)} />
                   </Field>
                   <Field>
                     <FieldLabel htmlFor="res-notes">Notes</FieldLabel>
-                    <Textarea id="res-notes" placeholder="Write any quick thoughts..." className="min-h-[80px]" value={resNotes} onChange={e => setResNotes(e.target.value)} />
+                    <Textarea id="res-notes" name="notes" autoComplete="off" placeholder="Write any quick thoughts…" className="min-h-[80px]" value={resNotes} onChange={e => setResNotes(e.target.value)} />
                   </Field>
 
                   {/* Related Projects */}
@@ -441,6 +441,11 @@ function QuickCaptureDrawers({
                       items={projects.map((p) => p._id?.toString() || p.id || "")}
                       value={resProjectIds}
                       onValueChange={setResProjectIds}
+                      filter={(item, query) => {
+                        const proj = projects.find((p) => (p._id?.toString() || p.id) === item)
+                        const name = proj ? (proj.name || "") : item
+                        return name.toLowerCase().includes(query.toLowerCase())
+                      }}
                     >
                       <ComboboxChips ref={resProjectsAnchor} className="w-full">
                         <ComboboxValue>
@@ -454,7 +459,7 @@ function QuickCaptureDrawers({
                                   </ComboboxChip>
                                 )
                               })}
-                              <ComboboxChipsInput placeholder="Link projects..." />
+                              <ComboboxChipsInput placeholder="Link projects…" />
                             </React.Fragment>
                           )}
                         </ComboboxValue>
@@ -484,6 +489,11 @@ function QuickCaptureDrawers({
                       items={people.map((p) => p._id?.toString() || p.id || "")}
                       value={resPersonIds}
                       onValueChange={setResPersonIds}
+                      filter={(item, query) => {
+                        const person = people.find((p) => (p._id?.toString() || p.id) === item)
+                        const name = person ? (person.name || "") : item
+                        return name.toLowerCase().includes(query.toLowerCase())
+                      }}
                     >
                       <ComboboxChips ref={resPeopleAnchor} className="w-full">
                         <ComboboxValue>
@@ -497,7 +507,7 @@ function QuickCaptureDrawers({
                                   </ComboboxChip>
                                 )
                               })}
-                              <ComboboxChipsInput placeholder="Link people..." />
+                              <ComboboxChipsInput placeholder="Link people…" />
                             </React.Fragment>
                           )}
                         </ComboboxValue>
@@ -524,7 +534,7 @@ function QuickCaptureDrawers({
               <SheetClose asChild>
                 <Button type="button" variant="outline">Cancel</Button>
               </SheetClose>
-              <Button type="submit" disabled={submitting}>{submitting ? "Saving..." : "Save Resource"}</Button>
+              <Button type="submit" disabled={submitting}>{submitting ? "Saving…" : "Save Resource"}</Button>
             </SheetFooter>
           </form>
         </SheetContent>
@@ -543,11 +553,11 @@ function QuickCaptureDrawers({
                 <FieldGroup>
                   <Field>
                     <FieldLabel htmlFor="note-title">Title *</FieldLabel>
-                    <Input id="note-title" placeholder="e.g. GSAP ScrollTrigger Snippet" value={noteTitle} onChange={e => setNoteTitle(e.target.value)} required />
+                    <Input id="note-title" name="title" autoComplete="off" placeholder="e.g. GSAP ScrollTrigger Snippet" value={noteTitle} onChange={e => setNoteTitle(e.target.value)} required />
                   </Field>
                   <Field>
                     <FieldLabel htmlFor="note-content">Content *</FieldLabel>
-                    <Textarea id="note-content" placeholder="Write markdown content or details..." className="min-h-[150px] font-mono text-sm" value={noteContent} onChange={e => setNoteContent(e.target.value)} required />
+                    <Textarea id="note-content" name="content" autoComplete="off" placeholder="Write markdown content or details…" className="min-h-[150px] font-mono text-sm" value={noteContent} onChange={e => setNoteContent(e.target.value)} required />
                   </Field>
                   <div className="flex items-center space-x-2 pt-2">
                     <Checkbox id="note-pinned" checked={notePinned} onCheckedChange={(checked) => setNotePinned(checked === true)} />
@@ -555,7 +565,7 @@ function QuickCaptureDrawers({
                   </div>
                   <Field>
                     <FieldLabel htmlFor="note-tags">Tags (comma separated)</FieldLabel>
-                    <Input id="note-tags" placeholder="tips, setup, hooks" value={noteTags} onChange={e => setNoteTags(e.target.value)} />
+                    <Input id="note-tags" name="tags" autoComplete="off" placeholder="tips, setup, hooks" value={noteTags} onChange={e => setNoteTags(e.target.value)} />
                   </Field>
 
                   {/* Related Resources */}
@@ -567,6 +577,11 @@ function QuickCaptureDrawers({
                       items={resources.map((r) => r._id?.toString() || r.id || "")}
                       value={noteRelatedResources}
                       onValueChange={setNoteRelatedResources}
+                      filter={(item, query) => {
+                        const r = resources.find((res) => (res._id?.toString() || res.id) === item)
+                        const name = r ? (r.title || r.name || "") : item
+                        return name.toLowerCase().includes(query.toLowerCase())
+                      }}
                     >
                       <ComboboxChips ref={noteResourcesAnchor} className="w-full">
                         <ComboboxValue>
@@ -580,7 +595,7 @@ function QuickCaptureDrawers({
                                   </ComboboxChip>
                                 )
                               })}
-                              <ComboboxChipsInput placeholder="Link resources..." />
+                              <ComboboxChipsInput placeholder="Link resources…" />
                             </React.Fragment>
                           )}
                         </ComboboxValue>
@@ -610,6 +625,11 @@ function QuickCaptureDrawers({
                       items={projects.map((p) => p._id?.toString() || p.id || "")}
                       value={noteRelatedProjects}
                       onValueChange={setNoteRelatedProjects}
+                      filter={(item, query) => {
+                        const proj = projects.find((p) => (p._id?.toString() || p.id) === item)
+                        const name = proj ? (proj.name || "") : item
+                        return name.toLowerCase().includes(query.toLowerCase())
+                      }}
                     >
                       <ComboboxChips ref={noteProjectsAnchor} className="w-full">
                         <ComboboxValue>
@@ -623,7 +643,7 @@ function QuickCaptureDrawers({
                                   </ComboboxChip>
                                 )
                               })}
-                              <ComboboxChipsInput placeholder="Link projects..." />
+                              <ComboboxChipsInput placeholder="Link projects…" />
                             </React.Fragment>
                           )}
                         </ComboboxValue>
@@ -653,6 +673,11 @@ function QuickCaptureDrawers({
                       items={people.map((p) => p._id?.toString() || p.id || "")}
                       value={noteRelatedPeople}
                       onValueChange={setNoteRelatedPeople}
+                      filter={(item, query) => {
+                        const person = people.find((p) => (p._id?.toString() || p.id) === item)
+                        const name = person ? (person.name || "") : item
+                        return name.toLowerCase().includes(query.toLowerCase())
+                      }}
                     >
                       <ComboboxChips ref={notePeopleAnchor} className="w-full">
                         <ComboboxValue>
@@ -666,7 +691,7 @@ function QuickCaptureDrawers({
                                   </ComboboxChip>
                                 )
                               })}
-                              <ComboboxChipsInput placeholder="Link people..." />
+                              <ComboboxChipsInput placeholder="Link people…" />
                             </React.Fragment>
                           )}
                         </ComboboxValue>
@@ -693,7 +718,7 @@ function QuickCaptureDrawers({
               <SheetClose asChild>
                 <Button type="button" variant="outline">Cancel</Button>
               </SheetClose>
-              <Button type="submit" disabled={submitting}>{submitting ? "Saving..." : "Save Note"}</Button>
+              <Button type="submit" disabled={submitting}>{submitting ? "Saving…" : "Save Note"}</Button>
             </SheetFooter>
           </form>
         </SheetContent>
@@ -712,11 +737,11 @@ function QuickCaptureDrawers({
                 <FieldGroup>
                   <Field>
                     <FieldLabel htmlFor="cat-name">Category Name *</FieldLabel>
-                    <Input id="cat-name" placeholder="e.g. Polish" value={catName} onChange={e => setCatName(e.target.value)} required />
+                    <Input id="cat-name" name="name" autoComplete="off" placeholder="e.g. Polish" value={catName} onChange={e => setCatName(e.target.value)} required />
                   </Field>
                   <Field>
                     <FieldLabel htmlFor="cat-description">Description</FieldLabel>
-                    <Textarea id="cat-description" placeholder="A brief description of this section..." value={catDescription} onChange={e => setCatDescription(e.target.value)} />
+                    <Textarea id="cat-description" name="description" autoComplete="off" placeholder="A brief description of this section…" value={catDescription} onChange={e => setCatDescription(e.target.value)} />
                   </Field>
                   <Field>
                     <FieldLabel htmlFor="cat-color">Color Hex</FieldLabel>
@@ -751,7 +776,7 @@ function QuickCaptureDrawers({
               <SheetClose asChild>
                 <Button type="button" variant="outline">Cancel</Button>
               </SheetClose>
-              <Button type="submit" disabled={submitting}>{submitting ? "Saving..." : "Save Category"}</Button>
+              <Button type="submit" disabled={submitting}>{submitting ? "Saving…" : "Save Category"}</Button>
             </SheetFooter>
           </form>
         </SheetContent>
@@ -770,15 +795,15 @@ function QuickCaptureDrawers({
                 <FieldGroup>
                   <Field>
                     <FieldLabel htmlFor="proj-name">Project Name *</FieldLabel>
-                    <Input id="proj-name" placeholder="e.g. Portfolio Redesign" value={projName} onChange={e => setProjName(e.target.value)} required />
+                    <Input id="proj-name" name="name" autoComplete="off" placeholder="e.g. Portfolio Redesign" value={projName} onChange={e => setProjName(e.target.value)} required />
                   </Field>
                   <Field>
                     <FieldLabel htmlFor="proj-desc">Description</FieldLabel>
-                    <Textarea id="proj-desc" placeholder="Scope, milestones, or project goals..." className="min-h-[100px]" value={projDescription} onChange={e => setProjDescription(e.target.value)} />
+                    <Textarea id="proj-desc" name="description" autoComplete="off" placeholder="Scope, milestones, or project goals…" className="min-h-[100px]" value={projDescription} onChange={e => setProjDescription(e.target.value)} />
                   </Field>
                   <Field>
-                    <FieldLabel htmlFor="proj-url">Live URL <span className="text-muted-foreground/50 font-normal">(optional)</span></FieldLabel>
-                    <Input id="proj-url" placeholder="https://my-project.vercel.app" value={projUrl} onChange={e => setProjUrl(e.target.value)} />
+                    <FieldLabel htmlFor="proj-url">Project URL</FieldLabel>
+                    <Input id="proj-url" name="url" autoComplete="off" type="url" placeholder="https://…" value={projUrl} onChange={e => setProjUrl(e.target.value)} />
                   </Field>
                   <Field>
                     <FieldLabel htmlFor="proj-status">Status</FieldLabel>
@@ -789,7 +814,7 @@ function QuickCaptureDrawers({
                       <SelectContent>
                         <SelectItem value="active">Active</SelectItem>
                         <SelectItem value="completed">Completed</SelectItem>
-                        <SelectItem value="paused">Paused</SelectItem>
+                        <SelectItem value="archived">Archived</SelectItem>
                       </SelectContent>
                     </Select>
                   </Field>
@@ -800,7 +825,7 @@ function QuickCaptureDrawers({
               <SheetClose asChild>
                 <Button type="button" variant="outline">Cancel</Button>
               </SheetClose>
-              <Button type="submit" disabled={submitting}>{submitting ? "Saving..." : "Save Project"}</Button>
+              <Button type="submit" disabled={submitting}>{submitting ? "Saving…" : "Save Project"}</Button>
             </SheetFooter>
           </form>
         </SheetContent>
@@ -819,7 +844,7 @@ function QuickCaptureDrawers({
                 <FieldGroup>
                   <Field>
                     <FieldLabel htmlFor="person-name">Full Name / Brand *</FieldLabel>
-                    <Input id="person-name" placeholder="e.g. Sarah Connor" value={personName} onChange={e => setPersonName(e.target.value)} required />
+                    <Input id="person-name" name="name" autoComplete="off" placeholder="e.g. Sarah Connor" value={personName} onChange={e => setPersonName(e.target.value)} required />
                   </Field>
                   <Field>
                     <FieldLabel htmlFor="person-role">Type</FieldLabel>
@@ -838,15 +863,15 @@ function QuickCaptureDrawers({
                   </Field>
                   <Field>
                     <FieldLabel htmlFor="person-links">Profile URLs (comma separated)</FieldLabel>
-                    <Input id="person-links" placeholder="https://github.com/..., https://twitter.com/..." value={personLinks} onChange={e => setPersonLinks(e.target.value)} />
+                    <Input id="person-links" name="links" autoComplete="off" placeholder="https://github.com/…, https://twitter.com/…" value={personLinks} onChange={e => setPersonLinks(e.target.value)} />
                   </Field>
                   <Field>
                     <FieldLabel htmlFor="person-notes">Notes</FieldLabel>
-                    <Textarea id="person-notes" placeholder="Contact details, bios, or design specialties..." value={personNotes} onChange={e => setPersonNotes(e.target.value)} />
+                    <Textarea id="person-notes" name="notes" autoComplete="off" placeholder="Contact details, bios, or design specialties…" value={personNotes} onChange={e => setPersonNotes(e.target.value)} />
                   </Field>
                   <Field>
                     <FieldLabel htmlFor="person-tags">Tags (comma separated)</FieldLabel>
-                    <Input id="person-tags" placeholder="freelancer, interactive, 3d" value={personTags} onChange={e => setPersonTags(e.target.value)} />
+                    <Input id="person-tags" name="tags" autoComplete="off" placeholder="freelancer, interactive, 3d" value={personTags} onChange={e => setPersonTags(e.target.value)} />
                   </Field>
                 </FieldGroup>
               </div>
@@ -855,7 +880,7 @@ function QuickCaptureDrawers({
               <SheetClose asChild>
                 <Button type="button" variant="outline">Cancel</Button>
               </SheetClose>
-              <Button type="submit" disabled={submitting}>{submitting ? "Saving..." : "Save Person"}</Button>
+              <Button type="submit" disabled={submitting}>{submitting ? "Saving…" : "Save Person"}</Button>
             </SheetFooter>
           </form>
         </SheetContent>
