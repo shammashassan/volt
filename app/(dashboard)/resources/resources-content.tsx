@@ -167,16 +167,26 @@ export function ResourcesContent({
       const matchesStatus = !filterStatus || resStatus === filterStatus
       const matchesFav = !filterFavorite || resFav
 
-      return matchesSearch && matchesType && matchesStatus && matchesFav
+      const rawCatId = res.categoryId || res.category || "none"
+      const matchedCat = categories.find(
+        (c) => (c._id?.toString() || c.id) === rawCatId || c.id === rawCatId || c._id?.toString() === rawCatId
+      )
+      const resolvedCatId = matchedCat ? (matchedCat.id || matchedCat._id?.toString() || "none") : "none"
+
+      const filterCategory = filters.category
+      const matchesCategory = !filterCategory || resolvedCatId === filterCategory
+
+      return matchesSearch && matchesType && matchesStatus && matchesFav && matchesCategory
     })
-  }, [resources, searchQuery, filterType, filterStatus, filterFavorite])
+  }, [resources, searchQuery, filterType, filterStatus, filterFavorite, filters.category, categories])
 
   const pageTitle = getResourcesPageTitle({
     type: filterType,
     status: filterStatus,
     favorite: filterFavorite ?? undefined,
+    category: filters.category,
     q: searchQuery
-  })
+  }, categories)
 
   // Open sheet for edit
   const handleCardClick = async (resource: Resource) => {
@@ -406,6 +416,25 @@ export function ResourcesContent({
                     {s.label}
                   </SelectItem>
                 ))}
+              </SelectContent>
+            </Select>
+
+            {/* Category Filter */}
+            <Select value={filters.category || "all"} onValueChange={(val) => setFilters({ category: val === "all" ? null : val })}>
+              <SelectTrigger className="w-[160px] h-10 bg-background/50 border-border/60">
+                <SelectValue placeholder="All Categories" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Categories</SelectItem>
+                <SelectItem value="none">Uncategorized</SelectItem>
+                {categories.map((cat) => {
+                  const catId = cat.id || cat._id?.toString() || ""
+                  return (
+                    <SelectItem key={catId} value={catId}>
+                      {cat.name}
+                    </SelectItem>
+                  )
+                })}
               </SelectContent>
             </Select>
 
