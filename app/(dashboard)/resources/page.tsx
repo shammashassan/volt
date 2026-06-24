@@ -43,6 +43,7 @@ function ResourcesSkeleton() {
             {/* Select dropdown skeletons */}
             <Skeleton className="h-10 w-[140px] rounded-md" />
             <Skeleton className="h-10 w-[140px] rounded-md" />
+            <Skeleton className="h-10 w-[160px] rounded-md" />
             {/* Star toggle skeleton */}
             <Skeleton className="h-10 w-[90px] rounded-md" />
           </div>
