@@ -205,7 +205,7 @@ export function HeroSection({ startReveal = false }: { startReveal?: boolean }) 
               <ArrowRight className="size-5 transition-transform duration-200 group-hover:translate-x-1" />
             </Link>
             <Link
-              href="https://github.com"
+              href="https://github.com/shammashassan/volt"
               target="_blank"
               className="hero-btn opacity-0 inline-flex h-14 items-center justify-center gap-2 rounded-full border bg-background px-10 text-base font-semibold transition-[background-color,border-color] hover:bg-muted"
             >

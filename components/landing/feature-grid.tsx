@@ -21,50 +21,50 @@ const features = [
   {
     id: "command",
     title: "Command Center (Ctrl + K)",
-    description: "The primary way to navigate and execute. Search resources, capture quick notes, and trigger actions in milliseconds.",
+    description: "The core interaction engine of Volt. Press Ctrl + K from anywhere to perform instant fuzzy searches, capture rapid thoughts, navigate categories, and trigger workspace commands entirely via keyboard.",
     icon: Command,
     image: "/images/categories/search.png",
     className: "md:col-span-2"
   },
   {
     id: "connections",
-    title: "Connected Relationships",
-    description: "Form networks between resources, notes, projects, and people. Knowledge isn't isolated—it grows through connections.",
+    title: "Bidirectional Connections",
+    description: "Link resources to notes, notes to projects, and projects to people. Volt ensures your knowledge is mapped in a web of relationships rather than isolated files.",
     icon: GitFork,
     image: "/images/categories/enhance.png",
     className: "md:col-span-1"
   },
   {
     id: "context",
-    title: "Context-First Resources",
-    description: "Every saved link answers three critical questions: What is this? Why was it saved? Where is it being used?",
+    title: "Context-First Curation",
+    description: "Every saved link goes beyond the URL, capturing the creator/author, associated projects, custom tags, and a description of why it matters.",
     icon: HelpCircle,
     image: "/images/categories/agents.png",
     className: "md:col-span-1"
   },
   {
     id: "ownership",
-    title: "User-Owned Structure",
-    description: "Start with an empty canvas. You define the categories, tags, and collections that match your unique mental model.",
+    title: "Self-Defined Structure",
+    description: "A completely custom structure tailored to you. Start with a clean slate and build your own nested categories, custom collections, and tag namespaces that match your exact mental model.",
     icon: Layers,
     image: "/images/categories/build.png",
     className: "md:col-span-2"
   },
   {
-    id: "timeline",
-    title: "Activity Timeline",
-    description: "A chronological footprint of your digital discoveries. Revisit when you saved a resource or added a note.",
-    icon: History,
-    image: "/images/categories/start.png",
-    className: "md:col-span-1"
-  },
-  {
     id: "associations",
-    title: "Smart Recommendations",
-    description: "Find related resources instantly based on shared tags, overlapping categories, and linked projects automatically.",
+    title: "Smart Relationships",
+    description: "Uncover hidden links. Volt automatically suggests related notes, overlapping resources, and connected categories based on tags, projects, and bidirectional linkages.",
     icon: Sparkles,
     image: "/images/categories/polish.png",
     className: "md:col-span-2"
+  },
+  {
+    id: "timeline",
+    title: "Activity Footprint",
+    description: "A chronological timeline tracking your learning speed and input history, acting as a supporting registry of what you captured and when.",
+    icon: History,
+    image: "/images/categories/start.png",
+    className: "md:col-span-1"
   }
 ]
 

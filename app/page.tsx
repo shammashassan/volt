@@ -5,6 +5,8 @@ import { Preloader } from '@/components/landing/preloader'
 import { HeroHeader } from '@/components/header'
 import { HeroSection } from '@/components/landing/hero-section'
 import { FeatureGrid } from '@/components/landing/feature-grid'
+import { HowItWorks } from '@/components/landing/how-it-works'
+import { FaqSection } from '@/components/landing/faq-section'
 import {
   CheckCircle,
   Command,
@@ -12,7 +14,7 @@ import {
   Layers,
   FolderOpen,
   Users,
-  Film
+  BookOpen
 } from 'lucide-react'
 import Link from 'next/link'
 import { LenisProvider } from '@/components/lenis-provider'
@@ -141,6 +143,8 @@ export default function LandingPage() {
 
         <FeatureGrid startReveal={startReveal} />
 
+        <HowItWorks startReveal={startReveal} />
+
         {/* Why Section */}
         <section className="why-trigger bg-muted/30 py-24 sm:py-40">
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
@@ -176,7 +180,7 @@ export default function LandingPage() {
                     { id: "cat", title: "Categories & Collections", desc: "Build tailored structures and custom groupings.", icon: Layers },
                     { id: "proj", title: "Projects & Notes", desc: "Document insights and associate with workspaces.", icon: FolderOpen },
                     { id: "peop", title: "People", desc: "Link resources to creators, mentors, and authors.", icon: Users },
-                    { id: "mw", title: "Media Watchlist", desc: "Track movies, series, and anime with TMDb & AniList.", icon: Film },
+                    { id: "mw", title: "Learning & Media Log", desc: "Track books, online courses, papers, and media items.", icon: BookOpen },
                   ].map((entity) => {
                     const Icon = entity.icon
                     return (
@@ -196,6 +200,8 @@ export default function LandingPage() {
             </div>
           </div>
         </section>
+
+        <FaqSection startReveal={startReveal} />
 
         {/* Final CTA */}
         <section className="cta-trigger py-24 sm:py-32">
@@ -222,32 +228,46 @@ export default function LandingPage() {
         </section>
 
         {/* Footer */}
-        <footer className="border-t py-20 bg-muted/10">
-          <div className="mx-auto max-w-7xl px-6 text-center">
-            <div className="flex flex-col items-center gap-8">
+        <footer className="border-t py-16 bg-muted/10">
+          <div className="mx-auto max-w-7xl px-6">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-6 border-b border-border/40 pb-10">
               <div className="flex items-center gap-3">
                 <div className="flex size-10 items-center justify-center rounded-xl bg-primary text-primary-foreground">
                   <Command className="size-6" aria-hidden="true" />
                 </div>
                 <span className="text-2xl font-bold tracking-tighter">Volt</span>
               </div>
-              <nav className="flex flex-wrap justify-center gap-x-10 gap-y-4">
+              <nav className="flex flex-wrap justify-center gap-x-8 gap-y-2">
                 {[
-                  { name: 'Resources', href: '/resources' },
-                  { name: 'Categories', href: '/categories' },
-                  { name: 'Projects', href: '/projects' },
-                  { name: 'Notes', href: '/notes' },
-                  { name: 'Dashboard', href: '/explore' }
+                  { name: 'Features', href: '#features' },
+                  { name: 'Workflow', href: '#workflow' },
+                  { name: 'FAQ', href: '#faq' },
+                  { name: 'Privacy Policy', href: '/privacy' },
+                  { name: 'Terms of Service', href: '/terms' }
                 ].map((item) => (
-                  <Link key={item.name} href={item.href} className="text-base font-medium text-muted-foreground hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-md px-1">
+                  <Link 
+                    key={item.name} 
+                    href={item.href} 
+                    className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-md px-1"
+                  >
                     {item.name}
                   </Link>
                 ))}
               </nav>
-              <div className="h-px w-full max-w-xs bg-border" />
-              <p className="text-base text-muted-foreground">
+            </div>
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-10 text-center sm:text-left">
+              <p className="text-sm text-muted-foreground">
                 © 2026 Volt. Your personal knowledge operating system.
               </p>
+              <div className="flex items-center gap-4">
+                <a href="https://github.com/shammashassan/volt" target="_blank" rel="noopener noreferrer" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  GitHub
+                </a>
+                <span className="text-border">•</span>
+                <a href="https://x.com" target="_blank" rel="noopener noreferrer" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Twitter
+                </a>
+              </div>
             </div>
           </div>
         </footer>
