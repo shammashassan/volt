@@ -3,11 +3,12 @@
 import { useEffect, useState } from "react";
 import { BellIcon, RefreshCcwIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Empty,
   EmptyContent,
@@ -17,14 +18,17 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty";
 import { Notification } from "@/features/notifications/schemas/notification";
-import { getNotificationsAction, markNotificationReadAction } from "@/features/notifications/actions/notifications";
+import {
+  getNotificationsAction,
+  markNotificationReadAction,
+} from "@/features/notifications/actions/notifications";
 import { useRouter } from "next/navigation";
 
-function Dot({ className }: { className?: string }) {
+function Dot() {
   return (
     <svg
       aria-hidden="true"
-      className={className}
+      className="text-primary"
       fill="currentColor"
       height="6"
       viewBox="0 0 6 6"
@@ -38,20 +42,20 @@ function Dot({ className }: { className?: string }) {
 
 export function EmptyMuted({ onRefresh }: { onRefresh?: () => void }) {
   return (
-    <Empty className="h-full bg-muted/30 py-8 border-0 rounded-none">
-      <EmptyHeader className="max-w-xs">
-        <EmptyMedia variant="icon" className="bg-primary/10 text-primary">
-          <BellIcon className="size-4" />
+    <Empty className="py-8 border-0">
+      <EmptyHeader>
+        <EmptyMedia variant="icon">
+          <BellIcon />
         </EmptyMedia>
-        <EmptyTitle className="text-sm font-semibold">No Notifications</EmptyTitle>
-        <EmptyDescription className="max-w-[220px] text-pretty text-xs text-muted-foreground/80">
+        <EmptyTitle>No Notifications</EmptyTitle>
+        <EmptyDescription className="max-w-[200px] text-pretty">
           You&apos;re all caught up. New notifications will appear here.
         </EmptyDescription>
       </EmptyHeader>
       {onRefresh && (
-        <EmptyContent className="mt-2">
-          <Button variant="outline" size="sm" onClick={onRefresh} className="h-8 gap-1.5 cursor-pointer">
-            <RefreshCcwIcon className="size-3" />
+        <EmptyContent>
+          <Button variant="outline" size="sm" onClick={onRefresh}>
+            <RefreshCcwIcon data-icon="inline-start" />
             Refresh
           </Button>
         </EmptyContent>
@@ -64,6 +68,7 @@ export function NotificationMenu() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const router = useRouter();
   const unreadCount = notifications.filter((n) => !n.readAt).length;
+  const hasNotifications = notifications.length > 0;
 
   const fetchNotifications = async () => {
     const res = await getNotificationsAction();
@@ -74,45 +79,38 @@ export function NotificationMenu() {
 
   useEffect(() => {
     fetchNotifications();
-    const interval = setInterval(fetchNotifications, 60000); // Poll every 60s
+    const interval = setInterval(fetchNotifications, 60000);
     return () => clearInterval(interval);
   }, []);
 
   const handleMarkAllAsRead = async () => {
-    const unread = notifications.filter(n => !n.readAt);
+    const unread = notifications.filter((n) => !n.readAt);
     if (unread.length === 0) return;
-    await Promise.all(unread.map(n => markNotificationReadAction(n._id as string)));
+    await Promise.all(
+      unread.map((n) => markNotificationReadAction(n._id as string))
+    );
     setNotifications(
-      notifications.map((notification) => ({
-        ...notification,
-        readAt: notification.readAt || new Date(),
-      })),
+      notifications.map((n) => ({ ...n, readAt: n.readAt || new Date() }))
     );
   };
 
   const handleNotificationClick = async (id: string, link?: string) => {
     await markNotificationReadAction(id);
     setNotifications(
-      notifications.map((notification) =>
-        notification._id === id
-          ? { ...notification, readAt: new Date() }
-          : notification,
-      ),
+      notifications.map((n) =>
+        n._id === id ? { ...n, readAt: new Date() } : n
+      )
     );
-    if (link) {
-      router.push(link);
-    }
+    if (link) router.push(link);
   };
 
   const getRelativeTime = (date: Date) => {
     const rtf = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
-    const elapsed = new Date(date).getTime() - new Date().getTime();
-    
+    const elapsed = new Date(date).getTime() - Date.now();
     const seconds = Math.round(elapsed / 1000);
     const minutes = Math.round(seconds / 60);
     const hours = Math.round(minutes / 60);
     const days = Math.round(hours / 24);
-
     if (Math.abs(days) > 0) return rtf.format(days, "day");
     if (Math.abs(hours) > 0) return rtf.format(hours, "hour");
     if (Math.abs(minutes) > 0) return rtf.format(minutes, "minute");
@@ -120,100 +118,94 @@ export function NotificationMenu() {
   };
 
   return (
-    <Popover>
-      <PopoverTrigger asChild>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
         <Button
           aria-label="Open notifications"
-          className="relative size-8 rounded-full text-muted-foreground shadow-none cursor-pointer"
           size="icon"
           variant="ghost"
+          className="relative"
         >
-          <BellIcon aria-hidden="true" size={16} />
+          <BellIcon aria-hidden="true" />
           {unreadCount > 0 && (
-            <div
+            <span
               aria-hidden="true"
-              className="absolute top-0.5 right-0.5 size-1.5 rounded-full bg-primary"
+              className="absolute top-1 right-1 size-1.5 rounded-full bg-primary"
             />
           )}
         </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-80 p-1" align="end">
-        <div className="flex items-baseline justify-between gap-4 px-3 py-2">
-          <div className="font-semibold text-sm">Notifications</div>
-          {unreadCount > 0 && (
-            <button
-              className="font-medium text-xs hover:underline cursor-pointer text-muted-foreground hover:text-foreground"
-              onClick={handleMarkAllAsRead}
-              type="button"
-            >
-              Mark all as read
-            </button>
-          )}
+      </DropdownMenuTrigger>
+
+      <DropdownMenuContent className="w-80 p-0" align="end">
+        {/* Header */}
+        <div className="flex items-center justify-between px-3 py-2.5">
+          <span className="text-sm font-semibold">Notifications</span>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-auto px-0 text-xs text-muted-foreground font-medium hover:text-foreground hover:bg-transparent"
+            disabled={unreadCount === 0}
+            onClick={handleMarkAllAsRead}
+          >
+            Mark all as read
+          </Button>
         </div>
-        <div
-          aria-orientation="horizontal"
-          className="-mx-1 my-1 h-px bg-border"
-          role="separator"
-          tabIndex={-1}
-        />
-        {notifications.length === 0 ? (
+
+        <Separator />
+
+        {/* Body */}
+        {!hasNotifications ? (
           <EmptyMuted onRefresh={fetchNotifications} />
         ) : (
-          <>
-            <div className="max-h-[300px] overflow-y-auto space-y-0.5">
-              {notifications.slice(0, 5).map((notification) => (
-                <div
-                  className="rounded-md px-3 py-2 text-sm transition-colors hover:bg-accent relative"
-                  key={notification._id as string}
-                >
-                  <div className="relative flex items-start pe-3">
-                    <div className="flex-1 space-y-0.5">
-                      <button
-                        className="text-left text-foreground/80 after:absolute after:inset-0 cursor-pointer"
-                        onClick={() => handleNotificationClick(notification._id as string, notification.link)}
-                        type="button"
-                      >
-                        <span className="font-medium text-foreground hover:underline">
-                          {notification.title}
-                        </span>{" "}
-                        <span className="text-muted-foreground/90">
-                          {notification.message}
-                        </span>
-                      </button>
-                      <div className="text-muted-foreground/60 text-[10px]">
-                        {getRelativeTime(notification.createdAt)}
-                      </div>
-                    </div>
-                    {!notification.readAt && (
-                      <div className="absolute end-0 self-center">
-                        <span className="sr-only">Unread</span>
-                        <Dot className="text-primary" />
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div
-              aria-orientation="horizontal"
-              className="-mx-1 my-1 h-px bg-border"
-              role="separator"
-              tabIndex={-1}
-            />
-            <div className="p-1">
-              <Button
-                variant="ghost"
-                className="w-full text-xs h-8 text-muted-foreground hover:text-foreground font-medium cursor-pointer"
-                onClick={() => {
-                  router.push("/notifications");
-                }}
+          <div className="max-h-[300px] overflow-y-auto">
+            {notifications.slice(0, 5).map((notification) => (
+              <button
+                key={notification._id as string}
+                type="button"
+                className="w-full text-left px-3 py-2.5 text-sm transition-colors hover:bg-accent relative flex items-start gap-2"
+                onClick={() =>
+                  handleNotificationClick(
+                    notification._id as string,
+                    notification.link
+                  )
+                }
               >
-                Read all
-              </Button>
-            </div>
-          </>
+                <div className="flex-1 flex flex-col gap-0.5 min-w-0 pe-3">
+                  <span className="font-medium text-foreground leading-snug">
+                    {notification.title}
+                  </span>
+                  <span className="text-muted-foreground text-xs leading-snug truncate">
+                    {notification.message}
+                  </span>
+                  <span className="text-muted-foreground/60 text-[10px] mt-0.5">
+                    {getRelativeTime(notification.createdAt)}
+                  </span>
+                </div>
+                {!notification.readAt && (
+                  <div className="absolute end-3 top-1/2 -translate-y-1/2">
+                    <span className="sr-only">Unread</span>
+                    <Dot />
+                  </div>
+                )}
+              </button>
+            ))}
+          </div>
         )}
-      </PopoverContent>
-    </Popover>
+
+        <Separator />
+
+        {/* Footer */}
+        <div className="p-1">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="w-full text-xs text-muted-foreground font-medium"
+            onClick={() => router.push("/notifications")}
+          >
+            View all notifications
+          </Button>
+        </div>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }

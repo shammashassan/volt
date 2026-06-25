@@ -23,7 +23,7 @@ export function ModeToggle() {
   return (
     <Toggle
       variant="outline"
-      className="group data-[state=on]:hover:bg-muted size-9 data-[state=on]:bg-transparent"
+      className="group data-[state=on]:hover:bg-muted data-[state=on]:bg-transparent"
       pressed={isDark}
       onPressedChange={() => setTheme(isDark ? "light" : "dark")}
       aria-label={`Switch to ${isDark ? "light" : "dark"} mode`}
