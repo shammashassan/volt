@@ -192,7 +192,7 @@ export function HeroSection({ startReveal = false }: { startReveal?: boolean }) 
 
           <div className="hero-para opacity-0 max-w-2xl mx-auto will-change-[transform,opacity]">
             <p className="text-lg text-muted-foreground sm:text-xl">
-              Not another bookmark manager. Volt is a personal knowledge operating system to capture resources, write notes, link projects, track media watchlists, and retrieve everything instantly.
+              Not another bookmark manager. Volt is a personal knowledge operating system to capture resources, write notes, create reminders, link projects, track media watchlists, and retrieve everything instantly.
             </p>
           </div>
 
@@ -218,32 +218,32 @@ export function HeroSection({ startReveal = false }: { startReveal?: boolean }) 
 
       <div className="absolute inset-0 -z-10 overflow-hidden">
         {/* Static Hardware-Accelerated Grid Background */}
-        <div 
-          className="absolute inset-0 opacity-20 dark:opacity-35 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:24px_24px]" 
+        <div
+          className="absolute inset-0 opacity-20 dark:opacity-35 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-size-[24px_24px]"
         />
-        
+
         {/* GPU-Accelerated Spotlight Glow (no blend mode composition overhead, no layout thrashing) */}
-        <div 
+        <div
           className="spotlight-glow absolute pointer-events-none w-[1000px] h-[1000px] -left-[500px] -top-[500px] rounded-full opacity-0 will-change-transform"
           style={{
             background: 'radial-gradient(circle, rgba(120,119,198,0.15) 0%, transparent 65%)',
           }}
         />
-        
+
         {/* Glow Orbs (using pure radial-gradients, avoiding expensive CSS blur filters entirely) */}
-        <div 
+        <div
           className="bg-glow-1 absolute left-1/2 top-0 h-[800px] w-[800px] -translate-x-1/2 rounded-full will-change-transform"
           style={{
             background: 'radial-gradient(circle, rgba(99,102,241,0.04) 0%, transparent 70%)',
           }}
         />
-        <div 
+        <div
           className="bg-glow-2 absolute right-0 top-1/4 h-[400px] w-[400px] rounded-full will-change-transform"
           style={{
             background: 'radial-gradient(circle, rgba(99,102,241,0.06) 0%, transparent 70%)',
           }}
         />
-        <div 
+        <div
           className="bg-glow-3 absolute left-0 bottom-0 h-[600px] w-[600px] rounded-full will-change-transform"
           style={{
             background: 'radial-gradient(circle, rgba(99,102,241,0.03) 0%, transparent 70%)',

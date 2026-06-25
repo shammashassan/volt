@@ -66,7 +66,7 @@ export function HowItWorks({ startReveal = false }: { startReveal?: boolean }) {
       id: "capture",
       stepNum: "01",
       title: "Capture",
-      desc: "Instantly save web links, code repositories, quick notes, key figures, and ongoing projects before they get lost.",
+      desc: "Instantly save web links, code repositories, quick notes, reminders, key figures, and ongoing projects before they get lost.",
       icon: PlusCircle,
       bullets: ["Quick-save bookmarks", "Jot down text thoughts", "Associate with creators/people"]
     },
