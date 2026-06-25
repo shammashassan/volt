@@ -1,8 +1,6 @@
 import { getRemindersAction } from '@/features/reminders/actions/reminders';
 import { RemindersContent } from './reminders-content';
 
-export const dynamic = 'force-dynamic';
-
 export default async function RemindersPage() {
   const result = await getRemindersAction();
   const initialReminders = result.success && result.data ? result.data : [];

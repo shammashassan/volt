@@ -19,7 +19,7 @@ interface RemindersContentProps {
 export function RemindersContent({ initialReminders }: RemindersContentProps) {
   const [reminders, setReminders] = useState<Reminder[]>(initialReminders);
   const [inputText, setInputText] = useState('');
-  const [priority, setPriority] = useState<ReminderPriority>('P3');
+  const [priority, setPriority] = useState<ReminderPriority>('medium');
 
   const pending = reminders.filter(r => r.status === 'pending');
   const completed = reminders.filter(r => r.status === 'completed');
@@ -61,10 +61,9 @@ export function RemindersContent({ initialReminders }: RemindersContentProps) {
 
   const getPriorityColor = (p: ReminderPriority) => {
     switch (p) {
-      case 'P1': return 'bg-destructive/10 text-destructive border-destructive/20';
-      case 'P2': return 'bg-amber-500/10 text-amber-500 border-amber-500/20';
-      case 'P3': return 'bg-blue-500/10 text-blue-500 border-blue-500/20';
-      default: return 'bg-slate-500/10 text-slate-500 border-slate-500/20';
+      case 'high': return 'bg-destructive/10 text-destructive border-destructive/20';
+      case 'medium': return 'bg-amber-500/10 text-amber-500 border-amber-500/20';
+      default: return 'bg-blue-500/10 text-blue-500 border-blue-500/20';
     }
   };
 
@@ -95,10 +94,9 @@ export function RemindersContent({ initialReminders }: RemindersContentProps) {
               <SelectValue placeholder="Priority" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="P1">P1 (High)</SelectItem>
-              <SelectItem value="P2">P2 (Medium)</SelectItem>
-              <SelectItem value="P3">P3 (Normal)</SelectItem>
-              <SelectItem value="P4">P4 (Low)</SelectItem>
+              <SelectItem value="high">High</SelectItem>
+              <SelectItem value="medium">Medium</SelectItem>
+              <SelectItem value="low">Low</SelectItem>
             </SelectContent>
           </Select>
           <Button type="submit">

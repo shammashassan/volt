@@ -1,8 +1,6 @@
 import { getNotificationsAction } from '@/features/notifications/actions/notifications';
 import { NotificationsContent } from './notifications-content';
 
-export const dynamic = 'force-dynamic';
-
 export default async function NotificationsPage() {
   const result = await getNotificationsAction();
   const initialNotifications = result.success && result.data ? result.data : [];

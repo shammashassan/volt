@@ -1,6 +1,6 @@
 import { BaseDocument } from '@/features/shared/types';
 
-export type ReminderPriority = 'P1' | 'P2' | 'P3' | 'P4';
+export type ReminderPriority = 'high' | 'medium' | 'low';
 export type ReminderStatus = 'pending' | 'completed' | 'cancelled' | 'expired';
 
 export interface ReminderAttachment {
