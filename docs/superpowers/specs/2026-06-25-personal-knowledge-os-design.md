@@ -16,15 +16,17 @@ Presentation (Experience)
 ├── Header Notifications (Popover Bell with GSAP micro-animations)
 └── Calendar Feed (Standard provider-agnostic ICS subscription)
 
-Domain Services
+Domain Services & Event Bus
+├── EventBus (In-memory dispatcher for domain events like ReminderCompleted)
 ├── ReminderService (Reminder business logic, parsing, and status transitions)
 ├── NotificationService (Centralized generation for in-app events)
 ├── WatchlistService (Metadata sync, provider adapter orchestration)
 └── CalendarService (ICS generation)
 
-Persistence Layer
+Persistence Layer (Repositories)
+├── Repositories (ReminderRepository, NotificationRepository, SearchIndexRepository)
 ├── MongoDB Collections (reminders, notifications, job_metrics, search_index)
-└── Watchlist Provider Adapters (TMDbProvider, AniListProvider)
+└── Watchlist Provider Adapters (TMDbProvider, AniListProvider implementing WatchlistProvider)
 
 Automation & Scheduler
 ├── Scheduler (Cron-triggered, priority-based execution)
@@ -34,7 +36,34 @@ Automation & Scheduler
 
 ---
 
-## Proposed Database Schemas
+## Shared Database Standards & Types
+
+To ensure type-safety and consistency, all database models inherit from a standardized base interface, and utilize typed ID aliases.
+
+```typescript
+// Strongly Typed IDs
+export type UserId = string;
+export type ReminderId = string;
+export type NotificationId = string;
+export type NoteId = string;
+export type ProjectId = string;
+export type ResourceId = string;
+export type PersonId = string;
+export type WatchlistId = string;
+
+// Shared Base Document
+export interface BaseDocument {
+  _id?: string | ObjectId;
+  userId: UserId;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt?: Date; // Enables standard Soft Deletes across the OS
+}
+```
+
+---
+
+## Database Schemas
 
 ### 1. Reminders Collection (`reminders`)
 Reminders are lightweight action items distinct from static notes.
@@ -48,9 +77,7 @@ export interface ReminderAttachment {
   id: string; // Target document string ID
 }
 
-export interface Reminder {
-  _id?: string | ObjectId;
-  userId: string;
+export interface Reminder extends BaseDocument {
   title: string;
   description?: string;
   status: ReminderStatus;
@@ -68,9 +95,6 @@ export interface Reminder {
     frequency: "daily" | "weekly" | "monthly" | "yearly" | "none";
     interval?: number; // e.g., every 2 weeks
   };
-  
-  createdAt: Date;
-  updatedAt: Date;
 }
 ```
 
@@ -88,14 +112,11 @@ export const NotificationTypes = {
 
 export type NotificationType = typeof NotificationTypes[keyof typeof NotificationTypes];
 
-export interface Notification {
-  _id?: string | ObjectId;
-  userId: string;
+export interface Notification extends BaseDocument {
   title: string;
   message: string;
   type: NotificationType;
   link?: string; // Target link for click-to-navigate, e.g., "/media-watchlist?id=123"
-  createdAt: Date;
   readAt?: Date;
   dismissedAt?: Date;
   archivedAt?: Date;
@@ -106,8 +127,7 @@ export interface Notification {
 Tracks scheduler runs to verify system health.
 
 ```typescript
-export interface JobMetric {
-  _id?: string | ObjectId;
+export interface JobMetric extends BaseDocument {
   jobName: string;
   startedAt: Date;
   finishedAt: Date;
@@ -128,8 +148,7 @@ Add a provider-agnostic `sync` block to handle backgrounds updates and add `paus
 ```typescript
 export type WatchlistStatus = "planning" | "upcoming" | "watching" | "completed" | "dropped" | "paused";
 
-export interface WatchlistItem {
-  // Existing fields...
+export interface WatchlistItem extends BaseDocument {
   status: WatchlistStatus;
   
   sync?: {
@@ -157,14 +176,12 @@ export interface WatchlistItem {
 Provides a highly optimized, single-collection index for multi-entity search.
 
 ```typescript
-export interface SearchIndexEntry {
-  _id?: string | ObjectId;
-  userId: string;
+export interface SearchIndexEntry extends BaseDocument {
   title: string;
   description?: string;
   entityType: "note" | "project" | "resource" | "reminder" | "watchlist" | "person";
   entityId: string; // References target document _id
-  updatedAt: Date;
+  searchVersion: number; // For schema/indexing migration support
 }
 ```
 
@@ -188,75 +205,68 @@ export interface UserPreferences {
 
 ---
 
-## Domain Services Layer
+## Domain Services & Repository Layers
 
-### 1. ReminderService
-Contains the core business logic for reminders:
-*   `createReminder(data: Partial<Reminder>): Promise<Reminder>`
-*   `updateReminder(id: string, updates: Partial<Reminder>): Promise<Reminder>`
-*   `processDueReminders(): Promise<number>`: Scans for reminders with status `pending`, triggers `NotificationService.create()`, and marks status/recurrence.
+### 1. Repository Pattern
+To isolate business logic from database frameworks (like MongoDB), domain services access data through strict Repository interfaces:
+*   `ReminderRepository`: Defines `findDue()`, `create()`, `update()`, `softDelete()`, `hardDelete()`.
+*   `NotificationRepository`: Defines `findUnread()`, `create()`, `markRead()`, `softDelete()`.
+*   `SearchIndexRepository`: Defines `upsert()`, `search()`, `rebuildIndex()`.
 
-### 2. NotificationService
-Centralizes notification delivery:
-*   `createNotification(data: Partial<Notification>): Promise<Notification>`: Creates in-app notifications and formats/dispatches them. (Emails, push alerts, or webhooks can be easily plugged in here later).
-*   `markAsRead(notificationId: string): Promise<void>`
-*   `archiveOldNotifications(): Promise<number>`
+### 2. Event Bus & Decoupling
+To prevent direct, tightly coupled dependency lines between services:
+*   We establish a simple in-memory **Event Bus**.
+*   **Workflow**: When a service triggers an action, it publishes a Domain Event:
+    *   `ReminderService` completes a reminder $\rightarrow$ publishes `ReminderCompleted` event.
+    *   `EventBus` dispatches `ReminderCompleted` $\rightarrow$ triggers `NotificationService` (dispatches notification) and `SearchIndexRepository` (updates search entry).
+*   Allows adding analytics or other integrations later without modifying the core service.
 
-### 3. WatchlistService
-Handles metadata syncing using a pluggable provider strategy:
-*   **Adapter Interface**:
-    ```typescript
-    interface WatchlistProvider {
-      search(query: string): Promise<SearchResult[]>;
-      sync(providerId: string): Promise<Partial<WatchlistItem["metadata"]>>;
-    }
-    ```
-*   **Registry**: Registers `TMDbProvider` and `AniListProvider`.
-*   `syncMetadata(): Promise<number>`: Selects stale watchlist items, invokes corresponding provider, updates posters/dates, and dispatches release notifications.
-
-### 4. CalendarService
-Aggregates timeline items (reminders, watchlist releases, air dates) into a standard iCalendar (ICS) string.
-*   Constructs unique event `UID`s based on `entityType-entityId`.
-*   Exposes properties: `LastModified`, `Created`, `Updated`, and a direct workspace target `URL`.
+### 3. Service Interfaces
+*   **ReminderService**: `createReminder()`, `updateReminder()`, `processDueReminders()`.
+*   **NotificationService**: `createNotification()`, `markAsRead()`, `archiveOldNotifications()`.
+*   **WatchlistService**: Resolves pluggable `WatchlistProvider` adapters (TMDb, AniList) to fetch releases and next air dates, updating metadata and broadcasting events.
+*   **CalendarService**: Generates RFC 5545 compliance ICS strings, ensuring unique event `UID`s, `LastModified`, `Created`, `Updated` and target `URL` links.
 
 ---
 
-## Automation Layer: Unified Priority-Based Job Scheduler
+## Automation Layer: Job Registry Scheduler
 
-### 1. Job Registry Execution
-Exposes `/api/cron/scheduler`. Authenticates and iterates through registered jobs in priority order (lowest priority value run first):
-*   **Priority 1**: `ReminderJob` (Triggers time-sensitive alerts).
-*   **Priority 2**: `WatchlistSyncJob` (Syncs movie/anime releases).
-*   **Priority 3**: `DigestJob` (Generates daily/weekly summaries).
-*   **Priority 4**: `CleanupJob` (Deletes logs older than 90 days).
+### 1. Job Priorities & Retry Policy
+Exposes `/api/cron/scheduler`. Authenticates and runs jobs from the registry in priority order (1 = highest priority):
+1.  **Priority 1**: `ReminderJob` (Retry policy: 0 retries).
+2.  **Priority 2**: `WatchlistSyncJob` (Retry policy: 3 retries, backoff retry strategy).
+3.  **Priority 3**: `DigestJob` (Retry policy: 1 retry).
+4.  **Priority 4**: `CleanupJob` (Retry policy: 0 retries; permanently deletes soft-deleted reminders and notifications past retention date).
 
 ---
 
-## Proposed Experience Layer Changes
+## Codebase Organization (Feature Modules)
+To keep the codebase maintainable, files are organized as modular feature capsules under `features/`:
+```text
+features/
+├── reminders/
+│   ├── services/       # Business logic (ReminderService)
+│   ├── repositories/   # Data persistence interface and MongoDB adapter
+│   ├── schemas/        # Zod and TS model definitions
+│   ├── actions/        # Server Actions
+│   └── components/     # Timeline, Calendar views, Checklist UI
+├── notifications/
+│   └── ...
+├── watchlist/
+│   └── ...
+└── search/
+    └── ...
+```
 
-### 1. Header Bell Popover
-*   Pulls notifications using TanStack Query (refreshes every 60 seconds).
-*   Bell button click opens a shadcn popover displaying 5 most recent unread items.
-*   GSAP timeline triggers a bell ringing/shaking animation when unread notifications change.
+---
 
-### 2. Notification Center (`/notifications`)
-*   Linear-like notification list grouped by Today, Yesterday, Earlier, and Archived.
-*   Interactive cards with actions to mark read, delete, or "Jump" directly to the source target (Note, Project, etc.).
+## Experience Layer UI Features
 
-### 3. Standalone Reminders UI (`/reminders`)
-*   Stand-alone dashboard containing reminders sorted by Overdue, Today, and Upcoming.
-*   **Today Timeline**: High-density chronological view mapping all day's activities:
-    ```text
-    08:00 ── Morning Digest
-    09:00 ── [P1] Renew domain
-    14:00 ── [P3] Sync with design team
-    ```
-*   **Chrono-Node Capture Bar**: Direct quick add input parsing strings like `"Buy milk tomorrow 10am"` with a Server Action LLM fallback if Chrono-Node fails.
-
-### 4. Configurable Bento Dashboard Widgets
-*   **Inbox**: Shows overdue counts, unread notifications, and immediate next focus action items.
-*   **My Day**: High-density checklist of P1-P4 reminders due today.
-*   **Upcoming Releases**: List of films/anime airing in the next 14 days.
+1.  **Header Bell Popover**: Displays 5 most recent unread notifications with a GSAP timeline trigger ring/shake animation on hover/updates.
+2.  **Notification Center (`/notifications`)**: Linear layout grouped by Today, Yesterday, Earlier, and Archived. Includes quick mark-read, delete, and "Jump" source navigation.
+3.  **Standalone Reminders UI (`/reminders`)**: Contains checklists and a **Today Timeline** mapping activities chronologically.
+4.  **Chrono-Node Capture Bar**: Local NLP input bar with Gemini LLM Server Action fallback if local parsing fails.
+5.  **Dashboard Widgets**: Inbox widget ("What should I do next?"), My Day widget, and Upcoming Releases list.
 
 ---
 
@@ -264,11 +274,11 @@ Exposes `/api/cron/scheduler`. Authenticates and iterates through registered job
 
 ### Automated Verification
 *   **Chrono Parser Suite**: Verify date extraction strings.
-*   **Scheduler Simulation**: Verify job priorities and metric logging on execution.
-*   **ICS Validator**: Verify CalDAV compliance (UID, LastModified, URL).
+*   **Scheduler Simulation**: Verify job priorities, retry loops, and metrics.
+*   **ICS Validator**: Verify CalDAV compatibility (UID, LastModified, URL).
 
 ### Manual Verification
-*   Verify drag-and-drop reminder list ordering updates `sortOrder`.
+*   Verify drag-and-drop reminder list updates `sortOrder`.
 *   Test command palette multi-entity search accuracy via `search_index`.
 *   Verify dashboard layout customization by changing `dashboardLayout` array.
 
