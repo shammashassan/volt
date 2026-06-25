@@ -9,6 +9,14 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Combobox,
+  ComboboxContent,
+  ComboboxEmpty,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+} from "@/components/ui/combobox";
 import { createReminderFromTextAction, updateReminderAction, deleteReminderAction } from "@/features/reminders/actions/reminders";
 import { Plus, Trash2, Calendar, Clock } from "lucide-react";
 import { toast } from "sonner";
@@ -196,36 +204,44 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
 
                 <div className="flex items-center gap-1.5">
                   <span className="text-muted-foreground/80 font-medium lowercase">link project:</span>
-                  <Select value={selectedProjectId} onValueChange={setSelectedProjectId}>
-                    <SelectTrigger className="w-[150px] h-8 text-xs">
-                      <SelectValue placeholder="Select Project" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="none">None</SelectItem>
-                      {projects.map((p) => (
-                        <SelectItem key={p._id} value={p._id}>
-                          {p.name || p.title || "Untitled Project"}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Combobox
+                    items={[{ _id: "none", name: "None" }, ...projects]}
+                    value={selectedProjectId}
+                    onValueChange={(val) => setSelectedProjectId(val || "none")}
+                  >
+                    <ComboboxInput placeholder="Select Project" />
+                    <ComboboxContent>
+                      <ComboboxEmpty>No projects found.</ComboboxEmpty>
+                      <ComboboxList>
+                        {(project) => (
+                          <ComboboxItem key={project._id} value={project._id}>
+                            {project.name || project.title || "Untitled Project"}
+                          </ComboboxItem>
+                        )}
+                      </ComboboxList>
+                    </ComboboxContent>
+                  </Combobox>
                 </div>
 
                 <div className="flex items-center gap-1.5">
                   <span className="text-muted-foreground/80 font-medium lowercase">link note:</span>
-                  <Select value={selectedNoteId} onValueChange={setSelectedNoteId}>
-                    <SelectTrigger className="w-[150px] h-8 text-xs">
-                      <SelectValue placeholder="Select Note" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="none">None</SelectItem>
-                      {notes.map((n) => (
-                        <SelectItem key={n._id} value={n._id}>
-                          {n.title}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Combobox
+                    items={[{ _id: "none", title: "None" }, ...notes]}
+                    value={selectedNoteId}
+                    onValueChange={(val) => setSelectedNoteId(val || "none")}
+                  >
+                    <ComboboxInput placeholder="Select Note" />
+                    <ComboboxContent>
+                      <ComboboxEmpty>No notes found.</ComboboxEmpty>
+                      <ComboboxList>
+                        {(note) => (
+                          <ComboboxItem key={note._id} value={note._id}>
+                            {note.title}
+                          </ComboboxItem>
+                        )}
+                      </ComboboxList>
+                    </ComboboxContent>
+                  </Combobox>
                 </div>
               </div>
             </form>
