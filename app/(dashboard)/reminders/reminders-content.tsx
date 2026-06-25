@@ -153,23 +153,33 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
 
   const handleStatusChange = async (id: string, completedStatus: boolean) => {
     const nextStatus: ReminderStatus = completedStatus ? "completed" : "pending";
+    const originalReminders = reminders;
+
+    // Optimistically update local state immediately so checkbox checks and item fades out instantly
+    setReminders((prev) => prev.map((r) => (r._id === id ? { ...r, status: nextStatus } : r)));
+
     const res = await updateReminderAction(id, { status: nextStatus });
     if (res.success && res.data) {
-      setReminders((prev) => prev.map((r) => (r._id === id ? { ...r, status: nextStatus } : r)));
       toast.success(completedStatus ? "Reminder completed" : "Reminder pending");
-      // revalidateTag('reminders') in the server action handles cache invalidation
     } else {
+      // Revert if request fails
+      setReminders(originalReminders);
       toast.error("Failed to update status");
     }
   };
 
   const handleDelete = async (id: string) => {
+    const originalReminders = reminders;
+
+    // Optimistically update local state immediately so item fades out instantly
+    setReminders((prev) => prev.filter((r) => r._id !== id));
+
     const res = await deleteReminderAction(id);
     if (res.success) {
-      setReminders((prev) => prev.filter((r) => r._id !== id));
       toast.success("Reminder deleted");
-      // revalidateTag('reminders') in the server action handles cache invalidation
     } else {
+      // Revert if request fails
+      setReminders(originalReminders);
       toast.error("Failed to delete reminder");
     }
   };
