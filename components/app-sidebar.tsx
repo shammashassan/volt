@@ -110,10 +110,11 @@ export function AppSidebar({ initialCategories, ...props }: AppSidebarProps) {
       title: "Workspace",
       url: "/projects",
       icon: FolderOpen,
-      isActive: ["/projects", "/notes"].includes(pathname),
+      isActive: ["/projects", "/notes", "/reminders"].includes(pathname),
       items: [
         { title: "Projects", url: "/projects", isActive: pathname === "/projects" },
         { title: "Notes", url: "/notes", isActive: pathname === "/notes" },
+        { title: "Reminders", url: "/reminders", isActive: pathname === "/reminders" },
       ],
     },
     {
