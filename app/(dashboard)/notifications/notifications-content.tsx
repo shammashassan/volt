@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Notification } from "@/features/notifications/schemas/notification";
 import { Button } from "@/components/ui/button";
 import {
@@ -42,6 +42,10 @@ function NotificationIcon({ type }: { type: string }) {
 
 export function NotificationsContent({ initialNotifications }: NotificationsContentProps) {
   const [notifications, setNotifications] = useState<Notification[]>(initialNotifications);
+
+  useEffect(() => {
+    setNotifications(initialNotifications);
+  }, [initialNotifications]);
 
   const unread = notifications.filter((n) => !n.readAt);
 

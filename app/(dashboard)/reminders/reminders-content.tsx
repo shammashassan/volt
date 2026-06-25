@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Reminder, ReminderPriority, ReminderStatus } from "@/features/reminders/schemas/reminder";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,6 +35,10 @@ const PRIORITY_VARIANT: Record<ReminderPriority, "destructive" | "secondary" | "
 
 export function RemindersContent({ initialReminders }: RemindersContentProps) {
   const [reminders, setReminders] = useState<Reminder[]>(initialReminders);
+
+  useEffect(() => {
+    setReminders(initialReminders);
+  }, [initialReminders]);
   const [inputText, setInputText] = useState("");
   const [priority, setPriority] = useState<ReminderPriority>("medium");
 

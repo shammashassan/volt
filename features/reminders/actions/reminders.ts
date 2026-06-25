@@ -3,7 +3,7 @@
 import { ReminderRepository } from '../repositories/reminder.repository';
 import { Reminder, ReminderStatus, ReminderPriority, ReminderAttachment } from '../schemas/reminder';
 import { getSessionUser, getErrorMessage } from '@/lib/auth-utils';
-import { updateTag } from 'next/cache';
+import { updateTag, revalidatePath } from 'next/cache';
 import { parseReminderText } from '@/lib/utils/parser';
 import { ReminderService } from '../services/reminder.service';
 
@@ -45,6 +45,8 @@ export async function createReminderAction(payload: {
     updateTag('reminders');
     updateTag(`reminders-${user.id}`);
     updateTag(`explore-body-${user.id}`);
+    revalidatePath('/reminders');
+    revalidatePath('/explore');
     return { success: true, data: JSON.parse(JSON.stringify(reminder)) as Reminder };
   } catch (err) {
     return { success: false, error: getErrorMessage(err) };
@@ -68,6 +70,8 @@ export async function createReminderFromTextAction(text: string, priority: Remin
     updateTag('reminders');
     updateTag(`reminders-${user.id}`);
     updateTag(`explore-body-${user.id}`);
+    revalidatePath('/reminders');
+    revalidatePath('/explore');
     return { success: true, data: JSON.parse(JSON.stringify(reminder)) as Reminder };
   } catch (err) {
     return { success: false, error: getErrorMessage(err) };
@@ -85,6 +89,8 @@ export async function updateReminderAction(id: string, updates: Partial<Reminder
     updateTag('reminders');
     updateTag(`reminders-${user.id}`);
     updateTag(`explore-body-${user.id}`);
+    revalidatePath('/reminders');
+    revalidatePath('/explore');
     return { success: true, data: JSON.parse(JSON.stringify(reminder)) as Reminder };
   } catch (err) {
     return { success: false, error: getErrorMessage(err) };
@@ -99,6 +105,8 @@ export async function deleteReminderAction(id: string) {
     updateTag('reminders');
     updateTag(`reminders-${user.id}`);
     updateTag(`explore-body-${user.id}`);
+    revalidatePath('/reminders');
+    revalidatePath('/explore');
     return { success: true, data: success };
   } catch (err) {
     return { success: false, error: getErrorMessage(err) };

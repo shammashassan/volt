@@ -83,6 +83,12 @@ export function NotificationMenu() {
     return () => clearInterval(interval);
   }, []);
 
+  const handleOpenChange = (open: boolean) => {
+    if (open) {
+      fetchNotifications();
+    }
+  };
+
   const handleMarkAllAsRead = async () => {
     const unread = notifications.filter((n) => !n.readAt);
     if (unread.length === 0) return;
@@ -118,7 +124,7 @@ export function NotificationMenu() {
   };
 
   return (
-    <DropdownMenu>
+    <DropdownMenu onOpenChange={handleOpenChange}>
       <DropdownMenuTrigger asChild>
         <Button
           aria-label="Open notifications"

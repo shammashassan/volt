@@ -3,7 +3,7 @@
 import { NotificationRepository } from '../repositories/notification.repository';
 import { Notification } from '../schemas/notification';
 import { getSessionUser, getErrorMessage } from '@/lib/auth-utils';
-import { updateTag } from 'next/cache';
+import { updateTag, revalidatePath } from 'next/cache';
 
 const repo = new NotificationRepository();
 
@@ -30,6 +30,8 @@ export async function markNotificationReadAction(id: string) {
     updateTag('notifications');
     updateTag(`notifications-${user.id}`);
     updateTag(`explore-body-${user.id}`);
+    revalidatePath('/notifications');
+    revalidatePath('/explore');
     return { success: true, data: success };
   } catch (err) {
     return { success: false, error: getErrorMessage(err) };
@@ -44,6 +46,8 @@ export async function archiveNotificationAction(id: string) {
     updateTag('notifications');
     updateTag(`notifications-${user.id}`);
     updateTag(`explore-body-${user.id}`);
+    revalidatePath('/notifications');
+    revalidatePath('/explore');
     return { success: true, data: success };
   } catch (err) {
     return { success: false, error: getErrorMessage(err) };
@@ -58,6 +62,8 @@ export async function deleteNotificationAction(id: string) {
     updateTag('notifications');
     updateTag(`notifications-${user.id}`);
     updateTag(`explore-body-${user.id}`);
+    revalidatePath('/notifications');
+    revalidatePath('/explore');
     return { success: true, data: success };
   } catch (err) {
     return { success: false, error: getErrorMessage(err) };
