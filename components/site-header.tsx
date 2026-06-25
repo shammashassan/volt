@@ -5,6 +5,7 @@ import { Separator } from "@/components/ui/separator"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import { SearchCommand } from "@/components/search-command"
 import { ModeToggle } from "@/components/mode-toggle"
+import { HeaderBell } from "@/components/header-bell"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -86,6 +87,7 @@ export function SiteHeader({ initialCategories }: SiteHeaderProps) {
 
         <div className="flex items-center gap-2 sm:gap-4">
           <SearchCommand />
+          <HeaderBell />
           <ModeToggle />
         </div>
       </div>
