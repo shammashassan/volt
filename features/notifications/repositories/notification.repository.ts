@@ -4,7 +4,7 @@ import { ObjectId } from 'mongodb';
 import { UserId } from '@/features/shared/types';
 
 export class NotificationRepository {
-  private async getCollection() {
+  async getCollection() {
     const db = await getDb();
     return db.collection<Notification>('notifications');
   }
