@@ -4,6 +4,8 @@ import { useState, useEffect, Fragment } from "react";
 import { Reminder, ReminderPriority, ReminderStatus, ReminderAttachment } from "@/features/reminders/schemas/reminder";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -97,10 +99,33 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
   const [reminders, setReminders] = useState<Reminder[]>(initialReminders);
   const [checkingIds, setCheckingIds] = useState<Record<string, boolean>>({});
   const [uncheckingIds, setUncheckingIds] = useState<Record<string, boolean>>({});
+  const [orderByPriority, setOrderByPriority] = useState(false);
 
   useEffect(() => {
     setReminders(initialReminders);
   }, [initialReminders]);
+
+  const PRIORITY_ORDER: Record<ReminderPriority, number> = {
+    high: 1,
+    medium: 2,
+    low: 3,
+  };
+
+  const getSortedPending = () => {
+    const list = [...pending];
+    if (orderByPriority) {
+      return list.sort((a, b) => PRIORITY_ORDER[a.priority] - PRIORITY_ORDER[b.priority]);
+    }
+    return list.sort((a, b) => new Date(a.triggerAt).getTime() - new Date(b.triggerAt).getTime());
+  };
+
+  const getSortedCompleted = () => {
+    const list = [...completed];
+    if (orderByPriority) {
+      return list.sort((a, b) => PRIORITY_ORDER[a.priority] - PRIORITY_ORDER[b.priority]);
+    }
+    return list.sort((a, b) => new Date(a.triggerAt).getTime() - new Date(b.triggerAt).getTime());
+  };
 
   const [inputText, setInputText] = useState("");
   const [priority, setPriority] = useState<ReminderPriority>("medium");
@@ -340,26 +365,38 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
 
             <Card>
               <Tabs defaultValue="pending">
-                <CardHeader className="flex flex-row items-center justify-between pb-3">
+                <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3">
                   <CardTitle>Tasks</CardTitle>
-                  <TabsList>
-                    <TabsTrigger value="pending">
-                      Active
-                      {pending.length > 0 && (
-                        <Badge variant="outline">
-                          {pending.length}
-                        </Badge>
-                      )}
-                    </TabsTrigger>
-                    <TabsTrigger value="completed">
-                      Completed
-                      {completed.length > 0 && (
-                        <Badge variant="outline">
-                          {completed.length}
-                        </Badge>
-                      )}
-                    </TabsTrigger>
-                  </TabsList>
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2">
+                      <Switch
+                        id="priority-view"
+                        checked={orderByPriority}
+                        onCheckedChange={setOrderByPriority}
+                      />
+                      <Label htmlFor="priority-view" className="text-xs font-medium text-muted-foreground select-none cursor-pointer">
+                        Order by priority
+                      </Label>
+                    </div>
+                    <TabsList>
+                      <TabsTrigger value="pending">
+                        Active
+                        {pending.length > 0 && (
+                          <Badge variant="outline">
+                            {pending.length}
+                          </Badge>
+                        )}
+                      </TabsTrigger>
+                      <TabsTrigger value="completed">
+                        Completed
+                        {completed.length > 0 && (
+                          <Badge variant="outline">
+                            {completed.length}
+                          </Badge>
+                        )}
+                      </TabsTrigger>
+                    </TabsList>
+                  </div>
                 </CardHeader>
                 <CardContent className="p-5 pt-0">
                   <TabsContent value="pending" className="mt-0">
@@ -368,80 +405,82 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
                         No tasks to do.
                       </p>
                     ) : (
-                      <ItemGroup className="gap-2.5">
-                        <AnimatePresence initial={false}>
-                          {pending.map((r) => (
-                            <motion.div
-                              key={r._id as string}
-                              layout
-                              initial={{ opacity: 0, y: 10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              exit={{ opacity: 0, x: -10, height: 0, marginTop: 0, marginBottom: 0, overflow: "hidden" }}
-                              transition={{
-                                type: "spring",
-                                stiffness: 500,
-                                damping: 40,
-                                opacity: { duration: 0.15 },
-                                height: { duration: 0.2 }
-                              }}
-                            >
-                              <Item variant="outline">
-                                <ItemMedia>
-                                  <Checkbox
-                                    checked={!!checkingIds[r._id as string] || r.status === "completed"}
-                                    onCheckedChange={(checked) => {
-                                      if (checked) {
-                                        handleCheckActive(r._id as string);
-                                      } else {
-                                        handleStatusChange(r._id as string, false);
-                                      }
-                                    }}
-                                  />
-                                  {getPriorityIcon(r.priority)}
-                                </ItemMedia>
-                                <ItemContent>
-                                  <ItemTitle className={cn("font-semibold transition-all duration-300", (checkingIds[r._id as string] || r.status === "completed") && "line-through text-muted-foreground/60")}>{r.title}</ItemTitle>
-                                  <ItemDescription className="flex flex-wrap items-center gap-x-2.5 gap-y-1 mt-0.5">
-                                    <span className="text-xs text-muted-foreground flex items-center gap-1">
-                                      <Calendar className="size-3" />
-                                      {new Date(r.triggerAt).toLocaleString([], {
-                                        dateStyle: "short",
-                                        timeStyle: "short",
-                                      })}
-                                    </span>
-                                    {r.attachments && r.attachments.length > 0 && (
-                                      <span className="flex flex-wrap gap-1.5">
-                                        {r.attachments.map((a, i) => {
-                                          const linkPath = a.type === 'note' ? `/notes?id=${a.id}` : a.type === 'project' ? `/projects/${a.id}` : a.type === 'person' ? `/people/${a.id}` : a.type === 'resource' ? '/resources' : '/media-watchlist';
-                                          return (
-                                            <Link
-                                              key={i}
-                                              href={linkPath}
-                                              className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-muted text-[10px] font-semibold text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors border border-border/40 line-clamp-1"
-                                            >
-                                              <span className="opacity-60 font-bold">{a.type}:</span>
-                                              <span className="truncate max-w-[120px]">{a.title}</span>
-                                            </Link>
-                                          );
+                      <ScrollArea className="h-[500px] w-full">
+                        <ItemGroup className="gap-2.5 pr-3.5 pb-4">
+                          <AnimatePresence initial={false}>
+                            {getSortedPending().map((r) => (
+                              <motion.div
+                                key={r._id as string}
+                                layout
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, x: -10, height: 0, marginTop: 0, marginBottom: 0, overflow: "hidden" }}
+                                transition={{
+                                  type: "spring",
+                                  stiffness: 500,
+                                  damping: 40,
+                                  opacity: { duration: 0.15 },
+                                  height: { duration: 0.2 }
+                                }}
+                              >
+                                <Item variant="outline">
+                                  <ItemMedia>
+                                    <Checkbox
+                                      checked={!!checkingIds[r._id as string] || r.status === "completed"}
+                                      onCheckedChange={(checked) => {
+                                        if (checked) {
+                                          handleCheckActive(r._id as string);
+                                        } else {
+                                          handleStatusChange(r._id as string, false);
+                                        }
+                                      }}
+                                    />
+                                    {getPriorityIcon(r.priority)}
+                                  </ItemMedia>
+                                  <ItemContent>
+                                    <ItemTitle className={cn("font-semibold transition-all duration-300", (checkingIds[r._id as string] || r.status === "completed") && "line-through text-muted-foreground/60")}>{r.title}</ItemTitle>
+                                    <ItemDescription className="flex flex-wrap items-center gap-x-2.5 gap-y-1 mt-0.5">
+                                      <span className="text-xs text-muted-foreground flex items-center gap-1">
+                                        <Calendar className="size-3" />
+                                        {new Date(r.triggerAt).toLocaleString([], {
+                                          dateStyle: "short",
+                                          timeStyle: "short",
                                         })}
                                       </span>
-                                    )}
-                                  </ItemDescription>
-                                </ItemContent>
-                                <ItemActions>
-                                  <Button
-                                    onClick={() => handleDelete(r._id as string)}
-                                    variant="ghost"
-                                    size="icon"
-                                  >
-                                    <Trash2 />
-                                  </Button>
-                                </ItemActions>
-                              </Item>
-                            </motion.div>
-                          ))}
-                        </AnimatePresence>
-                      </ItemGroup>
+                                      {r.attachments && r.attachments.length > 0 && (
+                                        <span className="flex flex-wrap gap-1.5">
+                                          {r.attachments.map((a, i) => {
+                                            const linkPath = a.type === 'note' ? `/notes?id=${a.id}` : a.type === 'project' ? `/projects/${a.id}` : a.type === 'person' ? `/people/${a.id}` : a.type === 'resource' ? '/resources' : '/media-watchlist';
+                                            return (
+                                              <Link
+                                                key={i}
+                                                href={linkPath}
+                                                className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-muted text-[10px] font-semibold text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors border border-border/40 line-clamp-1"
+                                              >
+                                                <span className="opacity-60 font-bold">{a.type}:</span>
+                                                <span className="truncate max-w-[120px]">{a.title}</span>
+                                              </Link>
+                                            );
+                                          })}
+                                        </span>
+                                      )}
+                                    </ItemDescription>
+                                  </ItemContent>
+                                  <ItemActions>
+                                    <Button
+                                      onClick={() => handleDelete(r._id as string)}
+                                      variant="ghost"
+                                      size="icon"
+                                    >
+                                      <Trash2 />
+                                    </Button>
+                                  </ItemActions>
+                                </Item>
+                              </motion.div>
+                            ))}
+                          </AnimatePresence>
+                        </ItemGroup>
+                      </ScrollArea>
                     )}
                   </TabsContent>
 
@@ -451,80 +490,82 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
                         No completed tasks.
                       </p>
                     ) : (
-                      <ItemGroup className="gap-2.5 opacity-80">
-                        <AnimatePresence initial={false}>
-                          {completed.map((r) => (
-                            <motion.div
-                              key={r._id as string}
-                              layout
-                              initial={{ opacity: 0, y: 10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              exit={{ opacity: 0, x: -10, height: 0, marginTop: 0, marginBottom: 0, overflow: "hidden" }}
-                              transition={{
-                                type: "spring",
-                                stiffness: 500,
-                                damping: 40,
-                                opacity: { duration: 0.15 },
-                                height: { duration: 0.2 }
-                              }}
-                            >
-                              <Item variant="outline">
-                                <ItemMedia>
-                                  <Checkbox
-                                    checked={!uncheckingIds[r._id as string] && r.status === "completed"}
-                                    onCheckedChange={(checked) => {
-                                      if (!checked) {
-                                        handleCheckCompleted(r._id as string);
-                                      } else {
-                                        handleStatusChange(r._id as string, true);
-                                      }
-                                    }}
-                                  />
-                                  {getPriorityIcon(r.priority)}
-                                </ItemMedia>
-                                <ItemContent>
-                                  <ItemTitle className={cn("transition-all duration-300", (uncheckingIds[r._id as string] || r.status === "pending") ? "font-semibold text-foreground" : "line-through text-muted-foreground")}>{r.title}</ItemTitle>
-                                  <ItemDescription className="flex flex-wrap items-center gap-x-2.5 gap-y-1 mt-0.5">
-                                    <span className="text-xs text-muted-foreground/50 flex items-center gap-1 line-through">
-                                      <Calendar className="size-3" />
-                                      {new Date(r.triggerAt).toLocaleString([], {
-                                        dateStyle: "short",
-                                        timeStyle: "short",
-                                      })}
-                                    </span>
-                                    {r.attachments && r.attachments.length > 0 && (
-                                      <span className="flex flex-wrap gap-1.5 mt-0.5">
-                                        {r.attachments.map((a, i) => {
-                                          const linkPath = a.type === 'note' ? `/notes?id=${a.id}` : a.type === 'project' ? `/projects/${a.id}` : a.type === 'person' ? `/people/${a.id}` : a.type === 'resource' ? '/resources' : '/media-watchlist';
-                                          return (
-                                            <Link
-                                              key={i}
-                                              href={linkPath}
-                                              className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-muted/40 text-[10px] font-semibold text-muted-foreground/60 hover:bg-primary/5 hover:text-primary transition-colors border border-border/20 line-through line-clamp-1"
-                                            >
-                                              <span className="opacity-40 font-bold">{a.type}:</span>
-                                              <span className="truncate max-w-[120px]">{a.title}</span>
-                                            </Link>
-                                          );
+                      <ScrollArea className="h-[500px] w-full">
+                        <ItemGroup className="gap-2.5 opacity-80 pr-3.5 pb-4">
+                          <AnimatePresence initial={false}>
+                            {getSortedCompleted().map((r) => (
+                              <motion.div
+                                key={r._id as string}
+                                layout
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, x: -10, height: 0, marginTop: 0, marginBottom: 0, overflow: "hidden" }}
+                                transition={{
+                                  type: "spring",
+                                  stiffness: 500,
+                                  damping: 40,
+                                  opacity: { duration: 0.15 },
+                                  height: { duration: 0.2 }
+                                }}
+                              >
+                                <Item variant="outline">
+                                  <ItemMedia>
+                                    <Checkbox
+                                      checked={!uncheckingIds[r._id as string] && r.status === "completed"}
+                                      onCheckedChange={(checked) => {
+                                        if (!checked) {
+                                          handleCheckCompleted(r._id as string);
+                                        } else {
+                                          handleStatusChange(r._id as string, true);
+                                        }
+                                      }}
+                                    />
+                                    {getPriorityIcon(r.priority)}
+                                  </ItemMedia>
+                                  <ItemContent>
+                                    <ItemTitle className={cn("transition-all duration-300", (uncheckingIds[r._id as string] || r.status === "pending") ? "font-semibold text-foreground" : "line-through text-muted-foreground")}>{r.title}</ItemTitle>
+                                    <ItemDescription className="flex flex-wrap items-center gap-x-2.5 gap-y-1 mt-0.5">
+                                      <span className="text-xs text-muted-foreground/50 flex items-center gap-1 line-through">
+                                        <Calendar className="size-3" />
+                                        {new Date(r.triggerAt).toLocaleString([], {
+                                          dateStyle: "short",
+                                          timeStyle: "short",
                                         })}
                                       </span>
-                                    )}
-                                  </ItemDescription>
-                                </ItemContent>
-                                <ItemActions>
-                                  <Button
-                                    onClick={() => handleDelete(r._id as string)}
-                                    variant="ghost"
-                                    size="icon"
-                                  >
-                                    <Trash2 />
-                                  </Button>
-                                </ItemActions>
-                              </Item>
-                            </motion.div>
-                          ))}
-                        </AnimatePresence>
-                      </ItemGroup>
+                                      {r.attachments && r.attachments.length > 0 && (
+                                        <span className="flex flex-wrap gap-1.5 mt-0.5">
+                                          {r.attachments.map((a, i) => {
+                                            const linkPath = a.type === 'note' ? `/notes?id=${a.id}` : a.type === 'project' ? `/projects/${a.id}` : a.type === 'person' ? `/people/${a.id}` : a.type === 'resource' ? '/resources' : '/media-watchlist';
+                                            return (
+                                              <Link
+                                                key={i}
+                                                href={linkPath}
+                                                className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-muted/40 text-[10px] font-semibold text-muted-foreground/60 hover:bg-primary/5 hover:text-primary transition-colors border border-border/20 line-through line-clamp-1"
+                                              >
+                                                <span className="opacity-40 font-bold">{a.type}:</span>
+                                                <span className="truncate max-w-[120px]">{a.title}</span>
+                                              </Link>
+                                            );
+                                          })}
+                                        </span>
+                                      )}
+                                    </ItemDescription>
+                                  </ItemContent>
+                                  <ItemActions>
+                                    <Button
+                                      onClick={() => handleDelete(r._id as string)}
+                                      variant="ghost"
+                                      size="icon"
+                                    >
+                                      <Trash2 />
+                                    </Button>
+                                  </ItemActions>
+                                </Item>
+                              </motion.div>
+                            ))}
+                          </AnimatePresence>
+                        </ItemGroup>
+                      </ScrollArea>
                     )}
                   </TabsContent>
                 </CardContent>
