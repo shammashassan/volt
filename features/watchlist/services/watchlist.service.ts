@@ -31,8 +31,36 @@ export class WatchlistService {
       try {
         const details = await provider.sync(item.externalId, item.type);
         
-        // Determine release checks
-        const upcomingReleased = details.releaseDate && new Date(details.releaseDate) <= now && item.status === 'planning';
+        // Determine release and episode checks based on media type
+        const isMovie = item.type === 'movie';
+        const isEpisodic = item.type === 'series' || item.type === 'anime';
+        
+        let upcomingReleased = false;
+        let newEpisodeAired = false;
+        let airedEpisodeNumber: number | undefined = undefined;
+
+        if (isMovie) {
+          upcomingReleased = !!(details.releaseDate && new Date(details.releaseDate) <= now && item.status === 'planning');
+        } else if (isEpisodic) {
+          // Transition status to upcoming on release, but don't notify if user is not watching yet
+          upcomingReleased = !!(details.releaseDate && new Date(details.releaseDate) <= now && item.status === 'planning');
+          
+          // Trigger episode alert if status is 'watching' and a new episode has aired
+          if (item.status === 'watching' && item.metadata?.nextEpisodeNumber) {
+            const storedEpisode = item.metadata.nextEpisodeNumber;
+            const fetchedEpisode = details.nextEpisodeNumber;
+            const storedDate = item.metadata.nextEpisodeDate;
+
+            if (fetchedEpisode && fetchedEpisode > storedEpisode) {
+              newEpisodeAired = true;
+              airedEpisodeNumber = storedEpisode;
+            } else if (!fetchedEpisode && storedDate && new Date(storedDate) <= now) {
+              // Next episode is null/undefined, meaning the final episode has aired
+              newEpisodeAired = true;
+              airedEpisodeNumber = storedEpisode;
+            }
+          }
+        }
         
         const updates: any = {
           metadata: {
@@ -57,12 +85,25 @@ export class WatchlistService {
         if (upcomingReleased) {
           updates.status = 'upcoming'; // Transition state
           
-          // Trigger notification
+          if (isMovie) {
+            // Trigger movie release notification
+            await NotificationService.createNotification(
+              item.userId,
+              `Released: ${item.metadata?.title || 'Watchlist Item'}`,
+              `Your planning item ${item.metadata?.title || ''} is officially released!`,
+              'watchlist.release',
+              '/media-watchlist'
+            );
+          }
+        }
+
+        if (newEpisodeAired && airedEpisodeNumber !== undefined) {
+          // Trigger new episode alert
           await NotificationService.createNotification(
             item.userId,
-            `Released: ${item.metadata?.title || 'Watchlist Item'}`,
-            `Your planning item ${item.metadata?.title || ''} is officially released!`,
-            'watchlist.release',
+            `New Episode: ${item.metadata?.title || 'Series'}`,
+            `Episode ${airedEpisodeNumber} of ${item.metadata?.title || ''} is now airing!`,
+            'watchlist.episode',
             '/media-watchlist'
           );
         }
