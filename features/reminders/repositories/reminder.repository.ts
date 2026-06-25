@@ -4,7 +4,7 @@ import { ObjectId } from 'mongodb';
 import { UserId } from '@/features/shared/types';
 
 export class ReminderRepository {
-  private async getCollection() {
+  async getCollection() {
     const db = await getDb();
     return db.collection<Reminder>('reminders');
   }
