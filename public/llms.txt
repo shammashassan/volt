@@ -20,6 +20,8 @@ https://ui-volt.vercel.app/
 - Chronological Activity Timeline
 - Private, authenticated user workspaces
 - Real-time TMDB and AniList media search and status tracking
+- Reminders Checklist & Timeline with natural language date parsing and priority grouping
+- Integrated Notification Center for real-time workspace alerts and cron execution metrics
 
 ## API
 All `/api/*` endpoints are authentication-protected and intended only for valid user sessions.
@@ -47,6 +49,8 @@ Avoid (private dashboard routes):
 - `/pending-approval`
 - `/account`
 - `/explore`
+- `/reminders`
+- `/notifications`
 - `/resources`
 - `/categories`
 - `/categories/*`

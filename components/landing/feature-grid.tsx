@@ -8,7 +8,9 @@ import {
   HelpCircle,
   Layers,
   History,
-  Sparkles
+  Sparkles,
+  ListTodo,
+  Bell
 } from 'lucide-react'
 import { gsap } from 'gsap'
 import { useGSAP } from '@gsap/react'
@@ -64,6 +66,22 @@ const features = [
     description: "A chronological timeline tracking your learning speed and input history, acting as a supporting registry of what you captured and when.",
     icon: History,
     image: "/images/categories/start.png",
+    className: "md:col-span-1"
+  },
+  {
+    id: "reminders",
+    title: "Checklist & Day Timeline",
+    description: "Manage actionable tasks with smart priority filters, seamless transition animations, and a visual daily timeline mapping out your agenda.",
+    icon: ListTodo,
+    image: "/images/categories/maps.png",
+    className: "md:col-span-2"
+  },
+  {
+    id: "notifications",
+    title: "Notification Center",
+    description: "Stay updated on automated background actions, cron execution status, and workspace events with real-time in-app alerts.",
+    icon: Bell,
+    image: "/images/categories/customize.png",
     className: "md:col-span-1"
   }
 ]

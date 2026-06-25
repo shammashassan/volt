@@ -17,6 +17,8 @@ Disallow: /notes
 Disallow: /people
 Disallow: /tags
 Disallow: /users
+Disallow: /reminders
+Disallow: /notifications
 
 # API routes
 Disallow: /api/
