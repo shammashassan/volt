@@ -279,7 +279,6 @@ export function MediaWatchlistClient({ initialItems }: MediaWatchlistClientProps
               pressed={ratedFilter || false}
               onPressedChange={(pressed) => setRatedFilter(pressed || null)}
               variant="outline"
-              className="h-10"
             >
               <Star className={`size-3.5 mr-2 ${ratedFilter ? "fill-current" : ""}`} />
               <span>Rated</span>

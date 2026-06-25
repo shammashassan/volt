@@ -6,6 +6,7 @@ export type ReminderStatus = 'pending' | 'completed' | 'cancelled' | 'expired';
 export interface ReminderAttachment {
   type: 'note' | 'project' | 'person' | 'resource' | 'watchlist';
   id: string;
+  title?: string;
 }
 
 export interface Reminder extends BaseDocument {

@@ -53,7 +53,7 @@ export async function createReminderAction(payload: {
   }
 }
 
-export async function createReminderFromTextAction(text: string, priority: ReminderPriority) {
+export async function createReminderFromTextAction(text: string, priority: ReminderPriority, attachments?: ReminderAttachment[]) {
   try {
     const user = await getSessionUser();
     const parsed = await parseReminderText(text);
@@ -64,7 +64,7 @@ export async function createReminderFromTextAction(text: string, priority: Remin
       title: parsed.title,
       priority,
       triggerAt,
-      attachments: []
+      attachments: attachments || []
     });
 
     updateTag('reminders');
