@@ -4,6 +4,12 @@ export interface JobResult {
   itemsProcessed: number;
 }
 
+/**
+ * Job priorities:
+ * 1 = ReminderJob (highest, runs first)
+ * 2 = WatchlistSyncJob
+ * 4 = CleanupJob (lowest, runs last)
+ */
 export interface Job {
   name: string;
   priority: number; // 1 = highest, running first

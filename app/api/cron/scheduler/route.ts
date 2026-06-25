@@ -2,12 +2,22 @@ import { NextRequest, NextResponse } from 'next/server';
 import { JobRegistry, Job } from '@/features/automation/registry';
 import { ReminderService } from '@/features/reminders/services/reminder.service';
 import { NotificationService } from '@/features/notifications/services/notification.service';
+import { WatchlistService } from '@/features/watchlist/services/watchlist.service';
 
 class ReminderJob implements Job {
   name = 'ReminderJob';
   priority = 1;
   async run() {
     const itemsProcessed = await ReminderService.processDueReminders();
+    return { itemsProcessed };
+  }
+}
+
+class WatchlistSyncJob implements Job {
+  name = 'WatchlistSyncJob';
+  priority = 2;
+  async run() {
+    const itemsProcessed = await WatchlistService.syncPendingMetadata();
     return { itemsProcessed };
   }
 }
@@ -30,6 +40,7 @@ export async function GET(req: NextRequest) {
 
     const registry = new JobRegistry([
       new ReminderJob(),
+      new WatchlistSyncJob(),
       new CleanupJob()
     ]);
 
