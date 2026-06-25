@@ -39,6 +39,8 @@ All `/api/*` endpoints are authentication-protected and intended only for valid 
 Preferred:
 - Public landing pages
 - Public metadata and documentation
+- `/privacy` (Privacy Policy)
+- `/terms` (Terms of Service)
 
 Avoid (private dashboard routes):
 - `/login`
