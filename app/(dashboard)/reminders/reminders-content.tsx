@@ -371,8 +371,6 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
                     <Toggle
                       pressed={orderByPriority}
                       onPressedChange={setOrderByPriority}
-                      variant="outline"
-                      size="sm"
                       aria-label="Toggle sort by priority"
                     >
                       <ArrowUpDown />
@@ -405,7 +403,7 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
                         No tasks to do.
                       </p>
                     ) : (
-                      <ScrollArea className="h-[500px] w-full">
+                      <ScrollArea className="max-h-[500px] w-full">
                         <ItemGroup className="gap-2.5 pr-3.5 pb-4">
                           <AnimatePresence initial={false}>
                             {getSortedPending().map((r) => (
@@ -490,7 +488,7 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
                         No completed tasks.
                       </p>
                     ) : (
-                      <ScrollArea className="h-[500px] w-full">
+                      <ScrollArea className="max-h-[500px] w-full">
                         <ItemGroup className="gap-2.5 opacity-80 pr-3.5 pb-4">
                           <AnimatePresence initial={false}>
                             {getSortedCompleted().map((r) => (
