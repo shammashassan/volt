@@ -39,22 +39,27 @@ export class WatchlistService {
         let newEpisodeAired = false;
         let airedEpisodeNumber: number | undefined = undefined;
 
+        const releasedNotified = item.sync?.releasedNotified || false;
+        const lastNotifiedEpisode = item.sync?.lastNotifiedEpisode || 0;
+
         if (isMovie) {
-          upcomingReleased = !!(details.releaseDate && new Date(details.releaseDate) <= now && item.status === 'planning');
+          upcomingReleased = !!(
+            details.releaseDate && 
+            new Date(details.releaseDate) <= now && 
+            item.status === 'planning' && 
+            !releasedNotified
+          );
         } else if (isEpisodic) {
-          // Transition status to upcoming on release, but don't notify if user is not watching yet
-          upcomingReleased = !!(details.releaseDate && new Date(details.releaseDate) <= now && item.status === 'planning');
-          
           // Trigger episode alert if status is 'watching' and a new episode has aired
           if (item.status === 'watching' && item.metadata?.nextEpisodeNumber) {
             const storedEpisode = item.metadata.nextEpisodeNumber;
             const fetchedEpisode = details.nextEpisodeNumber;
             const storedDate = item.metadata.nextEpisodeDate;
 
-            if (fetchedEpisode && fetchedEpisode > storedEpisode) {
+            if (fetchedEpisode && fetchedEpisode > storedEpisode && storedEpisode > lastNotifiedEpisode) {
               newEpisodeAired = true;
               airedEpisodeNumber = storedEpisode;
-            } else if (!fetchedEpisode && storedDate && new Date(storedDate) <= now) {
+            } else if (!fetchedEpisode && storedDate && new Date(storedDate) <= now && storedEpisode > lastNotifiedEpisode) {
               // Next episode is null/undefined, meaning the final episode has aired
               newEpisodeAired = true;
               airedEpisodeNumber = storedEpisode;
@@ -77,24 +82,22 @@ export class WatchlistService {
             provider: item.source,
             providerId: item.externalId,
             version: (item.sync?.version || 0) + 1,
-            failedAttempts: 0
+            failedAttempts: 0,
+            releasedNotified: upcomingReleased ? true : releasedNotified,
+            lastNotifiedEpisode: newEpisodeAired && airedEpisodeNumber !== undefined ? airedEpisodeNumber : lastNotifiedEpisode
           },
           updatedAt: now
         };
 
-        if (upcomingReleased) {
-          updates.status = 'upcoming'; // Transition state
-          
-          if (isMovie) {
-            // Trigger movie release notification
-            await NotificationService.createNotification(
-              item.userId,
-              `Released: ${item.metadata?.title || 'Watchlist Item'}`,
-              `Your planning item ${item.metadata?.title || ''} is officially released!`,
-              'watchlist.release',
-              '/media-watchlist'
-            );
-          }
+        if (upcomingReleased && isMovie) {
+          // Trigger movie release notification
+          await NotificationService.createNotification(
+            item.userId,
+            `Released: ${item.metadata?.title || 'Watchlist Item'}`,
+            `Your planning item ${item.metadata?.title || ''} is officially released!`,
+            'watchlist.release',
+            '/media-watchlist'
+          );
         }
 
         if (newEpisodeAired && airedEpisodeNumber !== undefined) {
