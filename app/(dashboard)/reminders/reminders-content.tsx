@@ -68,6 +68,29 @@ const PRIORITY_VARIANT: Record<ReminderPriority, "destructive" | "secondary" | "
   low: "outline",
 };
 
+const getPriorityIcon = (priority: ReminderPriority) => {
+  switch (priority) {
+    case "high":
+      return (
+        <span className="flex size-7 shrink-0 items-center justify-center rounded-md bg-destructive/10 text-destructive">
+          <ArrowUp className="size-4" />
+        </span>
+      );
+    case "medium":
+      return (
+        <span className="flex size-7 shrink-0 items-center justify-center rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400">
+          <Minus className="size-4" />
+        </span>
+      );
+    case "low":
+      return (
+        <span className="flex size-7 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">
+          <ArrowDown className="size-4" />
+        </span>
+      );
+  }
+};
+
 export function RemindersContent({ initialReminders, notes, projects }: RemindersContentProps) {
   const [reminders, setReminders] = useState<Reminder[]>(initialReminders);
 
@@ -285,7 +308,7 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
                     <TabsTrigger value="pending">
                       Active
                       {pending.length > 0 && (
-                        <Badge variant="secondary" className="ml-1.5 px-1.5 py-0 text-[10px]">
+                        <Badge variant="outline">
                           {pending.length}
                         </Badge>
                       )}
@@ -293,7 +316,7 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
                     <TabsTrigger value="completed">
                       Completed
                       {completed.length > 0 && (
-                        <Badge variant="secondary" className="ml-1.5 px-1.5 py-0 text-[10px]">
+                        <Badge variant="outline">
                           {completed.length}
                         </Badge>
                       )}
@@ -317,9 +340,7 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
                                   handleStatusChange(r._id as string, !!checked)
                                 }
                               />
-                              {r.priority === "high" && <ArrowUp className="size-4 text-destructive" />}
-                              {r.priority === "medium" && <Minus className="size-4 text-muted-foreground" />}
-                              {r.priority === "low" && <ArrowDown className="size-4 text-muted-foreground/50" />}
+                              {getPriorityIcon(r.priority)}
                             </ItemMedia>
                             <ItemContent>
                               <ItemTitle className="font-semibold">{r.title}</ItemTitle>
@@ -381,13 +402,18 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
                                   handleStatusChange(r._id as string, !!checked)
                                 }
                               />
-                              {r.priority === "high" && <ArrowUp className="size-4 text-destructive" />}
-                              {r.priority === "medium" && <Minus className="size-4 text-muted-foreground" />}
-                              {r.priority === "low" && <ArrowDown className="size-4 text-muted-foreground/50" />}
+                              {getPriorityIcon(r.priority)}
                             </ItemMedia>
                             <ItemContent>
                               <ItemTitle className="line-through text-muted-foreground">{r.title}</ItemTitle>
                               <ItemDescription className="flex flex-wrap items-center gap-x-2.5 gap-y-1 mt-0.5">
+                                <span className="text-xs text-muted-foreground/50 flex items-center gap-1 line-through">
+                                  <Calendar className="size-3" />
+                                  {new Date(r.triggerAt).toLocaleString([], {
+                                    dateStyle: "short",
+                                    timeStyle: "short",
+                                  })}
+                                </span>
                                 {r.attachments && r.attachments.length > 0 && (
                                   <span className="flex flex-wrap gap-1.5 mt-0.5">
                                     {r.attachments.map((a, i) => {
