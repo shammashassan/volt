@@ -34,6 +34,7 @@ import { createReminderFromTextAction, updateReminderAction, deleteReminderActio
 import { Plus, Trash2, Calendar, Clock, ChevronDown, ChevronUp, ArrowUp, ArrowDown, Minus } from "lucide-react";
 import { toast } from "sonner";
 import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Timeline,
   TimelineContent,
@@ -331,57 +332,74 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
                       </p>
                     ) : (
                       <ItemGroup className="gap-2.5">
-                        {pending.map((r) => (
-                          <Item key={r._id as string} variant="outline">
-                            <ItemMedia>
-                              <Checkbox
-                                checked={false}
-                                onCheckedChange={(checked) =>
-                                  handleStatusChange(r._id as string, !!checked)
-                                }
-                              />
-                              {getPriorityIcon(r.priority)}
-                            </ItemMedia>
-                            <ItemContent>
-                              <ItemTitle className="font-semibold">{r.title}</ItemTitle>
-                              <ItemDescription className="flex flex-wrap items-center gap-x-2.5 gap-y-1 mt-0.5">
-                                <span className="text-xs text-muted-foreground flex items-center gap-1">
-                                  <Calendar className="size-3" />
-                                  {new Date(r.triggerAt).toLocaleString([], {
-                                    dateStyle: "short",
-                                    timeStyle: "short",
-                                  })}
-                                </span>
-                                {r.attachments && r.attachments.length > 0 && (
-                                  <span className="flex flex-wrap gap-1.5">
-                                    {r.attachments.map((a, i) => {
-                                      const linkPath = a.type === 'note' ? `/notes?id=${a.id}` : a.type === 'project' ? `/projects/${a.id}` : a.type === 'person' ? `/people/${a.id}` : a.type === 'resource' ? '/resources' : '/media-watchlist';
-                                      return (
-                                        <Link
-                                          key={i}
-                                          href={linkPath}
-                                          className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-muted text-[10px] font-semibold text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors border border-border/40 line-clamp-1"
-                                        >
-                                          <span className="opacity-60 font-bold">{a.type}:</span>
-                                          <span className="truncate max-w-[120px]">{a.title}</span>
-                                        </Link>
-                                      );
-                                    })}
-                                  </span>
-                                )}
-                              </ItemDescription>
-                            </ItemContent>
-                            <ItemActions>
-                              <Button
-                                onClick={() => handleDelete(r._id as string)}
-                                variant="ghost"
-                                size="icon"
-                              >
-                                <Trash2 />
-                              </Button>
-                            </ItemActions>
-                          </Item>
-                        ))}
+                        <AnimatePresence initial={false}>
+                          {pending.map((r) => (
+                            <motion.div
+                              key={r._id as string}
+                              layout
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              exit={{ opacity: 0, x: -10, height: 0, marginTop: 0, marginBottom: 0, overflow: "hidden" }}
+                              transition={{
+                                type: "spring",
+                                stiffness: 500,
+                                damping: 40,
+                                opacity: { duration: 0.15 },
+                                height: { duration: 0.2 }
+                              }}
+                            >
+                              <Item variant="outline">
+                                <ItemMedia>
+                                  <Checkbox
+                                    checked={r.status === "completed"}
+                                    onCheckedChange={(checked) =>
+                                      handleStatusChange(r._id as string, !!checked)
+                                    }
+                                  />
+                                  {getPriorityIcon(r.priority)}
+                                </ItemMedia>
+                                <ItemContent>
+                                  <ItemTitle className="font-semibold">{r.title}</ItemTitle>
+                                  <ItemDescription className="flex flex-wrap items-center gap-x-2.5 gap-y-1 mt-0.5">
+                                    <span className="text-xs text-muted-foreground flex items-center gap-1">
+                                      <Calendar className="size-3" />
+                                      {new Date(r.triggerAt).toLocaleString([], {
+                                        dateStyle: "short",
+                                        timeStyle: "short",
+                                      })}
+                                    </span>
+                                    {r.attachments && r.attachments.length > 0 && (
+                                      <span className="flex flex-wrap gap-1.5">
+                                        {r.attachments.map((a, i) => {
+                                          const linkPath = a.type === 'note' ? `/notes?id=${a.id}` : a.type === 'project' ? `/projects/${a.id}` : a.type === 'person' ? `/people/${a.id}` : a.type === 'resource' ? '/resources' : '/media-watchlist';
+                                          return (
+                                            <Link
+                                              key={i}
+                                              href={linkPath}
+                                              className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-muted text-[10px] font-semibold text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors border border-border/40 line-clamp-1"
+                                            >
+                                              <span className="opacity-60 font-bold">{a.type}:</span>
+                                              <span className="truncate max-w-[120px]">{a.title}</span>
+                                            </Link>
+                                          );
+                                        })}
+                                      </span>
+                                    )}
+                                  </ItemDescription>
+                                </ItemContent>
+                                <ItemActions>
+                                  <Button
+                                    onClick={() => handleDelete(r._id as string)}
+                                    variant="ghost"
+                                    size="icon"
+                                  >
+                                    <Trash2 />
+                                  </Button>
+                                </ItemActions>
+                              </Item>
+                            </motion.div>
+                          ))}
+                        </AnimatePresence>
                       </ItemGroup>
                     )}
                   </TabsContent>
@@ -393,57 +411,74 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
                       </p>
                     ) : (
                       <ItemGroup className="gap-2.5 opacity-80">
-                        {completed.map((r) => (
-                          <Item key={r._id as string} variant="outline">
-                            <ItemMedia>
-                              <Checkbox
-                                checked={true}
-                                onCheckedChange={(checked) =>
-                                  handleStatusChange(r._id as string, !!checked)
-                                }
-                              />
-                              {getPriorityIcon(r.priority)}
-                            </ItemMedia>
-                            <ItemContent>
-                              <ItemTitle className="line-through text-muted-foreground">{r.title}</ItemTitle>
-                              <ItemDescription className="flex flex-wrap items-center gap-x-2.5 gap-y-1 mt-0.5">
-                                <span className="text-xs text-muted-foreground/50 flex items-center gap-1 line-through">
-                                  <Calendar className="size-3" />
-                                  {new Date(r.triggerAt).toLocaleString([], {
-                                    dateStyle: "short",
-                                    timeStyle: "short",
-                                  })}
-                                </span>
-                                {r.attachments && r.attachments.length > 0 && (
-                                  <span className="flex flex-wrap gap-1.5 mt-0.5">
-                                    {r.attachments.map((a, i) => {
-                                      const linkPath = a.type === 'note' ? `/notes?id=${a.id}` : a.type === 'project' ? `/projects/${a.id}` : a.type === 'person' ? `/people/${a.id}` : a.type === 'resource' ? '/resources' : '/media-watchlist';
-                                      return (
-                                        <Link
-                                          key={i}
-                                          href={linkPath}
-                                          className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-muted/40 text-[10px] font-semibold text-muted-foreground/60 hover:bg-primary/5 hover:text-primary transition-colors border border-border/20 line-through line-clamp-1"
-                                        >
-                                          <span className="opacity-40 font-bold">{a.type}:</span>
-                                          <span className="truncate max-w-[120px]">{a.title}</span>
-                                        </Link>
-                                      );
-                                    })}
-                                  </span>
-                                )}
-                              </ItemDescription>
-                            </ItemContent>
-                            <ItemActions>
-                              <Button
-                                onClick={() => handleDelete(r._id as string)}
-                                variant="ghost"
-                                size="icon"
-                              >
-                                <Trash2 />
-                              </Button>
-                            </ItemActions>
-                          </Item>
-                        ))}
+                        <AnimatePresence initial={false}>
+                          {completed.map((r) => (
+                            <motion.div
+                              key={r._id as string}
+                              layout
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              exit={{ opacity: 0, x: -10, height: 0, marginTop: 0, marginBottom: 0, overflow: "hidden" }}
+                              transition={{
+                                type: "spring",
+                                stiffness: 500,
+                                damping: 40,
+                                opacity: { duration: 0.15 },
+                                height: { duration: 0.2 }
+                              }}
+                            >
+                              <Item variant="outline">
+                                <ItemMedia>
+                                  <Checkbox
+                                    checked={r.status === "completed"}
+                                    onCheckedChange={(checked) =>
+                                      handleStatusChange(r._id as string, !!checked)
+                                    }
+                                  />
+                                  {getPriorityIcon(r.priority)}
+                                </ItemMedia>
+                                <ItemContent>
+                                  <ItemTitle className="line-through text-muted-foreground">{r.title}</ItemTitle>
+                                  <ItemDescription className="flex flex-wrap items-center gap-x-2.5 gap-y-1 mt-0.5">
+                                    <span className="text-xs text-muted-foreground/50 flex items-center gap-1 line-through">
+                                      <Calendar className="size-3" />
+                                      {new Date(r.triggerAt).toLocaleString([], {
+                                        dateStyle: "short",
+                                        timeStyle: "short",
+                                      })}
+                                    </span>
+                                    {r.attachments && r.attachments.length > 0 && (
+                                      <span className="flex flex-wrap gap-1.5 mt-0.5">
+                                        {r.attachments.map((a, i) => {
+                                          const linkPath = a.type === 'note' ? `/notes?id=${a.id}` : a.type === 'project' ? `/projects/${a.id}` : a.type === 'person' ? `/people/${a.id}` : a.type === 'resource' ? '/resources' : '/media-watchlist';
+                                          return (
+                                            <Link
+                                              key={i}
+                                              href={linkPath}
+                                              className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-muted/40 text-[10px] font-semibold text-muted-foreground/60 hover:bg-primary/5 hover:text-primary transition-colors border border-border/20 line-through line-clamp-1"
+                                            >
+                                              <span className="opacity-40 font-bold">{a.type}:</span>
+                                              <span className="truncate max-w-[120px]">{a.title}</span>
+                                            </Link>
+                                          );
+                                        })}
+                                      </span>
+                                    )}
+                                  </ItemDescription>
+                                </ItemContent>
+                                <ItemActions>
+                                  <Button
+                                    onClick={() => handleDelete(r._id as string)}
+                                    variant="ghost"
+                                    size="icon"
+                                  >
+                                    <Trash2 />
+                                  </Button>
+                                </ItemActions>
+                              </Item>
+                            </motion.div>
+                          ))}
+                        </AnimatePresence>
                       </ItemGroup>
                     )}
                   </TabsContent>
