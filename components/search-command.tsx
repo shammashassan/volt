@@ -196,11 +196,11 @@ export function SearchCommand() {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="flex h-9 w-64 items-center gap-2 rounded-md border border-input bg-muted/40 px-3 text-sm text-muted-foreground transition-all hover:bg-muted"
+        className="flex h-9 w-9 items-center justify-center rounded-md border border-input bg-muted/40 text-sm text-muted-foreground transition-all hover:bg-muted sm:w-64 sm:justify-start sm:px-3 sm:gap-2"
       >
-        <SearchIcon className="size-4" aria-hidden="true" />
-        <span className="flex-1 text-left font-medium">Search anything…</span>
-        <Kbd>⌘</Kbd>
+        <SearchIcon className="size-4 shrink-0" aria-hidden="true" />
+        <span className="hidden sm:inline-block flex-1 text-left font-medium">Search anything…</span>
+        <Kbd className="hidden sm:inline-flex">⌘</Kbd>
       </button>
 
       <CommandDialog open={open} onOpenChange={setOpen} shouldFilter={false}>
