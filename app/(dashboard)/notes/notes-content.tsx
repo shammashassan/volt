@@ -56,7 +56,7 @@ import {
   useComboboxAnchor,
 } from "@/components/ui/combobox"
 import { toast } from "sonner"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { addNoteAction, updateNoteAction, deleteNoteAction } from "@/lib/actions"
 import {
   Pin,
@@ -98,6 +98,8 @@ export function NotesContent({
   people,
 }: NotesContentProps) {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const urlNoteId = searchParams.get("id") || searchParams.get("noteId")
   const resourcesAnchor = useComboboxAnchor()
   const projectsAnchor = useComboboxAnchor()
   const peopleAnchor = useComboboxAnchor()
@@ -424,6 +426,15 @@ export function NotesContent({
     setFormRelatedPeople(note.relatedPeople || [])
     setMobileDetailOpen(true)
   }
+
+  useEffect(() => {
+    if (urlNoteId && notes.length > 0) {
+      const matchedNote = notes.find((n) => (n._id?.toString() || n.id) === urlNoteId)
+      if (matchedNote && (!selectedNote || (selectedNote._id?.toString() || selectedNote.id) !== urlNoteId)) {
+        handleSelectNote(matchedNote)
+      }
+    }
+  }, [urlNoteId, notes, selectedNote])
 
   const handleOpenCreate = () => {
     setSelectedNote(null)
