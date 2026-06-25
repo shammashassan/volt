@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { createReminderFromTextAction, updateReminderAction, deleteReminderAction } from "@/features/reminders/actions/reminders";
 import { Plus, Trash2, Calendar, Clock } from "lucide-react";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 import {
   Timeline,
   TimelineContent,
@@ -34,6 +35,7 @@ const PRIORITY_VARIANT: Record<ReminderPriority, "destructive" | "secondary" | "
 };
 
 export function RemindersContent({ initialReminders }: RemindersContentProps) {
+  const router = useRouter();
   const [reminders, setReminders] = useState<Reminder[]>(initialReminders);
   const [inputText, setInputText] = useState("");
   const [priority, setPriority] = useState<ReminderPriority>("medium");
@@ -62,6 +64,7 @@ export function RemindersContent({ initialReminders }: RemindersContentProps) {
     if (res.success && res.data) {
       setReminders((prev) => prev.map((r) => (r._id === id ? res.data! : r)));
       toast.success(completedStatus ? "Reminder completed" : "Reminder pending");
+      router.refresh(); // sync with explore page & re-fetch server state
     } else {
       toast.error("Failed to update status");
     }
@@ -72,6 +75,7 @@ export function RemindersContent({ initialReminders }: RemindersContentProps) {
     if (res.success) {
       setReminders((prev) => prev.filter((r) => r._id !== id));
       toast.success("Reminder deleted");
+      router.refresh(); // sync with explore page
     } else {
       toast.error("Failed to delete reminder");
     }

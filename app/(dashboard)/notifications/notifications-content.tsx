@@ -3,7 +3,13 @@
 import { useState } from "react";
 import { Notification } from "@/features/notifications/schemas/notification";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Check, Trash2, ExternalLink, Calendar, Bell, AlertTriangle } from "lucide-react";
@@ -18,6 +24,20 @@ import Link from "next/link";
 
 interface NotificationsContentProps {
   initialNotifications: Notification[];
+}
+
+const TYPE_ICON: Record<string, React.ReactNode> = {
+  "reminder.due": <Calendar />,
+  "watchlist.release": <Bell />,
+  "watchlist.episode": <Bell />,
+};
+
+function NotificationIcon({ type }: { type: string }) {
+  return (
+    <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+      {TYPE_ICON[type] ?? <AlertTriangle />}
+    </div>
+  );
 }
 
 export function NotificationsContent({ initialNotifications }: NotificationsContentProps) {
@@ -36,26 +56,18 @@ export function NotificationsContent({ initialNotifications }: NotificationsCont
       setNotifications((prev) =>
         prev.map((n) => (n._id === id ? { ...n, readAt: new Date() } : n))
       );
-      toast.success("Notification marked as read");
+      toast.success("Marked as read");
     } else {
-      toast.error("Failed to mark notification as read");
+      toast.error("Failed to mark as read");
     }
   };
 
   const handleMarkAllAsRead = async () => {
     const unreadList = notifications.filter((n) => !n.readAt);
     if (unreadList.length === 0) return;
-    const res = await Promise.all(
-      unreadList.map((n) => markNotificationReadAction(n._id as string))
-    );
-    if (res.some((r) => !r.success)) {
-      toast.error("Failed to mark some notifications as read");
-    } else {
-      toast.success("All notifications marked as read");
-    }
-    setNotifications((prev) =>
-      prev.map((n) => ({ ...n, readAt: n.readAt || new Date() }))
-    );
+    await Promise.all(unreadList.map((n) => markNotificationReadAction(n._id as string)));
+    setNotifications((prev) => prev.map((n) => ({ ...n, readAt: n.readAt || new Date() })));
+    toast.success("All notifications marked as read");
   };
 
   const handleDelete = async (id: string) => {
@@ -68,35 +80,20 @@ export function NotificationsContent({ initialNotifications }: NotificationsCont
     }
   };
 
-  const renderIcon = (type: string) => {
-    switch (type) {
-      case "reminder.due":
-        return <Calendar />;
-      case "watchlist.release":
-      case "watchlist.episode":
-        return <Bell />;
-      default:
-        return <AlertTriangle />;
-    }
-  };
-
   const groupNotifications = (list: Notification[]) => {
     const today: Notification[] = [];
     const yesterday: Notification[] = [];
     const older: Notification[] = [];
-
     const todayStr = new Date().toDateString();
-    const yesterdayDate = new Date();
-    yesterdayDate.setDate(yesterdayDate.getDate() - 1);
-    const yesterdayStr = yesterdayDate.toDateString();
-
+    const yDate = new Date();
+    yDate.setDate(yDate.getDate() - 1);
+    const yStr = yDate.toDateString();
     list.forEach((n) => {
-      const dateStr = new Date(n.createdAt).toDateString();
-      if (dateStr === todayStr) today.push(n);
-      else if (dateStr === yesterdayStr) yesterday.push(n);
+      const d = new Date(n.createdAt).toDateString();
+      if (d === todayStr) today.push(n);
+      else if (d === yStr) yesterday.push(n);
       else older.push(n);
     });
-
     return { today, yesterday, older };
   };
 
@@ -105,68 +102,65 @@ export function NotificationsContent({ initialNotifications }: NotificationsCont
   const renderSection = (title: string, list: Notification[]) => {
     if (list.length === 0) return null;
     return (
-      <div className="flex flex-col gap-4">
-        <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground px-1">
+      <div className="flex flex-col gap-3">
+        <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground px-1">
           {title}
         </h3>
-        <div className="flex flex-col gap-3">
-          {list.map((n) => (
-            <Card
-              key={n._id as string}
-              className={!n.readAt ? "border-l-primary border-l-2" : ""}
-            >
-              <CardContent className="flex items-center justify-between gap-4">
-                <div className="flex items-start gap-4">
-                  <div className="mt-0.5 rounded-xl p-2.5 bg-primary/10 text-primary shrink-0">
-                    {renderIcon(n.type)}
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="font-semibold text-sm">{n.title}</span>
-                      {!n.readAt && <Badge variant="secondary">New</Badge>}
-                    </div>
-                    <p className="text-xs text-muted-foreground leading-relaxed max-w-3xl">
-                      {n.message}
-                    </p>
-                    <span className="text-[10px] text-muted-foreground/60 font-medium">
-                      {new Date(n.createdAt).toLocaleDateString()}{" "}
-                      {new Date(n.createdAt).toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </span>
-                  </div>
+        {list.map((n) => (
+          <Card
+            key={n._id as string}
+            className={!n.readAt ? "border-l-2 border-l-primary" : ""}
+          >
+            <CardHeader className="flex-row items-start gap-3">
+              <NotificationIcon type={n.type} />
+              <div className="flex flex-1 flex-col gap-1 min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <CardTitle className="text-sm font-semibold leading-none">
+                    {n.title}
+                  </CardTitle>
+                  {!n.readAt && <Badge variant="secondary">New</Badge>}
                 </div>
-                <div className="flex items-center gap-1.5 shrink-0">
-                  {n.link && (
-                    <Button asChild variant="outline" size="sm">
-                      <Link href={n.link}>
-                        <ExternalLink data-icon="inline-start" />
-                        Go to item
-                      </Link>
-                    </Button>
-                  )}
-                  {!n.readAt && (
-                    <Button
-                      onClick={() => handleMarkRead(n._id as string)}
-                      variant="ghost"
-                      size="icon"
-                    >
-                      <Check />
-                    </Button>
-                  )}
-                  <Button
-                    onClick={() => handleDelete(n._id as string)}
-                    variant="ghost"
-                    size="icon"
-                  >
-                    <Trash2 />
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                <CardDescription className="text-xs leading-relaxed">
+                  {n.message}
+                </CardDescription>
+                <span className="text-[10px] text-muted-foreground/60 font-medium mt-0.5">
+                  {new Date(n.createdAt).toLocaleDateString()}{" "}
+                  {new Date(n.createdAt).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </span>
+              </div>
+            </CardHeader>
+            <CardFooter className="flex justify-end gap-1.5">
+              {n.link && (
+                <Button asChild variant="outline" size="sm">
+                  <Link href={n.link}>
+                    <ExternalLink data-icon="inline-start" />
+                    Go to item
+                  </Link>
+                </Button>
+              )}
+              {!n.readAt && (
+                <Button
+                  onClick={() => handleMarkRead(n._id as string)}
+                  variant="outline"
+                  size="sm"
+                >
+                  <Check data-icon="inline-start" />
+                  Mark read
+                </Button>
+              )}
+              <Button
+                onClick={() => handleDelete(n._id as string)}
+                variant="ghost"
+                size="icon"
+              >
+                <Trash2 />
+              </Button>
+            </CardFooter>
+          </Card>
+        ))}
       </div>
     );
   };

@@ -6,8 +6,10 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { CalendarDays } from 'lucide-react';
 import { Reminder } from '@/features/reminders/schemas/reminder';
 import { getRemindersAction, updateReminderAction } from '@/features/reminders/actions/reminders';
+import { useRouter } from 'next/navigation';
 
 export function MyDayCard() {
+  const router = useRouter();
   const [reminders, setReminders] = useState<Reminder[]>([]);
 
   useEffect(() => {
@@ -28,6 +30,7 @@ export function MyDayCard() {
     const res = await updateReminderAction(id, { status: 'completed' });
     if (res.success) {
       setReminders(prev => prev.filter(r => r._id !== id));
+      router.refresh(); // invalidate server cache so /reminders page reflects the change
     }
   };
 
