@@ -4,7 +4,7 @@ import { useState, useEffect, Fragment } from "react";
 import { Reminder, ReminderPriority, ReminderStatus, ReminderAttachment } from "@/features/reminders/schemas/reminder";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
+import { Toggle } from "@/components/ui/toggle";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -34,7 +34,7 @@ import {
   ItemSeparator,
 } from "@/components/ui/item";
 import { createReminderFromTextAction, updateReminderAction, deleteReminderAction } from "@/features/reminders/actions/reminders";
-import { Plus, Trash2, Calendar, Clock, ChevronDown, ChevronUp, ArrowUp, ArrowDown, Minus } from "lucide-react";
+import { Plus, Trash2, Calendar, Clock, ChevronDown, ChevronUp, ArrowUp, ArrowDown, Minus, ArrowUpDown } from "lucide-react";
 import { toast } from "sonner";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
@@ -368,16 +368,16 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
                 <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3">
                   <CardTitle>Tasks</CardTitle>
                   <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-2">
-                      <Switch
-                        id="priority-view"
-                        checked={orderByPriority}
-                        onCheckedChange={setOrderByPriority}
-                      />
-                      <Label htmlFor="priority-view" className="text-xs font-medium text-muted-foreground select-none cursor-pointer">
-                        Order by priority
-                      </Label>
-                    </div>
+                    <Toggle
+                      pressed={orderByPriority}
+                      onPressedChange={setOrderByPriority}
+                      variant="outline"
+                      size="sm"
+                      aria-label="Toggle sort by priority"
+                    >
+                      <ArrowUpDown />
+                      Priority
+                    </Toggle>
                     <TabsList>
                       <TabsTrigger value="pending">
                         Active
