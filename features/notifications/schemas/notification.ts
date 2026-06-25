@@ -1,0 +1,21 @@
+import { BaseDocument } from '@/features/shared/types';
+
+export const NotificationTypes = {
+  WATCHLIST_RELEASE: 'watchlist.release',
+  WATCHLIST_EPISODE: 'watchlist.episode',
+  REMINDER_DUE: 'reminder.due',
+  PROJECT_DEADLINE: 'project.deadline',
+  SYSTEM: 'system',
+} as const;
+
+export type NotificationType = typeof NotificationTypes[keyof typeof NotificationTypes];
+
+export interface Notification extends BaseDocument {
+  title: string;
+  message: string;
+  type: NotificationType;
+  link?: string;
+  readAt?: Date;
+  dismissedAt?: Date;
+  archivedAt?: Date;
+}

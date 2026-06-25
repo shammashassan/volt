@@ -1,0 +1,29 @@
+import { BaseDocument } from '@/features/shared/types';
+
+export type ReminderPriority = 'P1' | 'P2' | 'P3' | 'P4';
+export type ReminderStatus = 'pending' | 'completed' | 'cancelled' | 'expired';
+
+export interface ReminderAttachment {
+  type: 'note' | 'project' | 'person' | 'resource' | 'watchlist';
+  id: string;
+}
+
+export interface Reminder extends BaseDocument {
+  title: string;
+  description?: string;
+  status: ReminderStatus;
+  priority: ReminderPriority;
+  triggerAt: Date;
+  sortOrder?: number;
+  attachments: ReminderAttachment[];
+  
+  notification: {
+    lastNotifiedAt?: Date;
+    sentAt?: Date;
+  };
+  
+  recurrence?: {
+    frequency: 'daily' | 'weekly' | 'monthly' | 'yearly' | 'none';
+    interval?: number;
+  };
+}
