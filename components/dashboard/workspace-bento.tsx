@@ -15,6 +15,9 @@ import { CategoriesSummaryCard } from "./categories-summary-card"
 import { RecentlyValuable } from "./recently-valuable"
 import { QuickSaveCard } from "./quick-save-card"
 import { ResourceCard } from "@/components/resource-card"
+import { InboxFocusCard } from "./inbox-focus-card"
+import { MyDayCard } from "./my-day-card"
+import { WatchlistUpcomingCard } from "./watchlist-upcoming-card"
 
 import { Resource, Category } from "@/lib/types"
 import { Resource as DataResource } from "@/lib/data"
@@ -36,6 +39,9 @@ interface WorkspaceBentoProps {
     spotlight: Resource | null
     recentlyAdded: Resource[]
     categories: CategoryWithCount[]
+    unreadNotifications: number
+    remindersCount: number
+    releasesCount: number
 }
 
 export function WorkspaceBento({
@@ -51,6 +57,9 @@ export function WorkspaceBento({
     spotlight,
     recentlyAdded,
     categories,
+    unreadNotifications,
+    remindersCount,
+    releasesCount,
 }: WorkspaceBentoProps) {
     const containerRef = useRef<HTMLDivElement>(null)
 
@@ -112,23 +121,39 @@ export function WorkspaceBento({
 
             {/* ── Grid Container ───────────────────────────────────── */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-                {/* Row 1: Command Center & Quick Save */}
-                <div className="workspace-card lg:col-span-2 order-1 lg:order-0">
-                    <CommandCenterCard />
+                {/* Row 0: Focus, My Day, Watchlist Upcoming */}
+                <div className="workspace-card lg:col-span-1 order-1 lg:order-0">
+                    <InboxFocusCard
+                        remindersCount={remindersCount}
+                        releasesCount={releasesCount}
+                        unreadNotifications={unreadNotifications}
+                        inboxCount={inboxCount}
+                    />
                 </div>
                 <div className="workspace-card lg:col-span-1 order-2 lg:order-0">
+                    <MyDayCard />
+                </div>
+                <div className="workspace-card lg:col-span-1 order-3 lg:order-0">
+                    <WatchlistUpcomingCard />
+                </div>
+
+                {/* Row 1: Command Center & Quick Save */}
+                <div className="workspace-card lg:col-span-2 order-4 lg:order-0">
+                    <CommandCenterCard />
+                </div>
+                <div className="workspace-card lg:col-span-1 order-5 lg:order-0">
                     <QuickSaveCard />
                 </div>
 
                 {/* Row 2: Workspace Activity & Workspace Health */}
-                <div className="workspace-card lg:col-span-2 order-3 lg:order-0">
+                <div className="workspace-card lg:col-span-2 order-6 lg:order-0">
                     <ActivityCard
                         recentlyViewed={recentlyViewed}
                         recommended={recommended}
                         spotlight={spotlight}
                     />
                 </div>
-                <div className="workspace-card lg:col-span-1 order-5 lg:order-0">
+                <div className="workspace-card lg:col-span-1 order-8 lg:order-0">
                     <StatsCard
                         resourcesCount={resourcesCount}
                         categoriesCount={categoriesCount}
@@ -138,7 +163,7 @@ export function WorkspaceBento({
                 </div>
 
                 {/* Row 3: Recently Added grid & Categories Summary */}
-                <div className="workspace-card lg:col-span-2 order-4 lg:order-0 flex flex-col gap-3">
+                <div className="workspace-card lg:col-span-2 order-7 lg:order-0 flex flex-col gap-3">
                     <div className="flex items-center justify-between px-1">
                         <h2 className="text-sm font-semibold italic lowercase text-muted-foreground/80">
                             recently added
@@ -165,18 +190,18 @@ export function WorkspaceBento({
                         ))}
                     </div>
                 </div>
-                <div className="workspace-card lg:col-span-1 order-6 lg:order-0">
+                <div className="workspace-card lg:col-span-1 order-9 lg:order-0">
                     <CategoriesSummaryCard categories={categories} />
                 </div>
 
                 {/* Row 4: Most Used Resources & Favorites */}
-                <div className="workspace-card lg:col-span-2 order-7 lg:order-0">
+                <div className="workspace-card lg:col-span-2 order-10 lg:order-0">
                     <RecentlyValuable resources={recentlyValuable} />
                 </div>
-                <div className="workspace-card lg:col-span-1 order-8 lg:order-0">
+                <div className="workspace-card lg:col-span-1 order-11 lg:order-0">
                     <FavoritesListCard resources={favorites} />
                 </div>
             </div>
         </div>
     )
-}
+}

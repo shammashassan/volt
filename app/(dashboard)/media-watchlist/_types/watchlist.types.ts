@@ -1,4 +1,4 @@
-export type WatchlistStatus = "planned" | "watching" | "completed" | "dropped";
+export type WatchlistStatus = "planned" | "planning" | "upcoming" | "watching" | "completed" | "dropped";
 export type WatchlistSource = "tmdb" | "anilist";
 export type WatchlistMediaType = "movie" | "series" | "anime";
 
@@ -14,10 +14,16 @@ export interface WatchlistItem {
     title: string;
     posterUrl?: string;
     releaseYear?: number;
+    releaseDate?: string;
+    nextEpisodeDate?: string;
+    nextEpisodeNumber?: number;
+    runtime?: number;
+    genres?: string[];
   };
   createdAt: Date;
   updatedAt: Date;
 }
+
 
 export interface SearchResult {
   externalId: string;
