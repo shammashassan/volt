@@ -2,6 +2,7 @@
 
 import { useState, useEffect, Fragment } from "react";
 import { Reminder, ReminderPriority, ReminderStatus, ReminderAttachment } from "@/features/reminders/schemas/reminder";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -94,6 +95,8 @@ const getPriorityIcon = (priority: ReminderPriority) => {
 
 export function RemindersContent({ initialReminders, notes, projects }: RemindersContentProps) {
   const [reminders, setReminders] = useState<Reminder[]>(initialReminders);
+  const [checkingIds, setCheckingIds] = useState<Record<string, boolean>>({});
+  const [uncheckingIds, setUncheckingIds] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     setReminders(initialReminders);
@@ -182,6 +185,30 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
       setReminders(originalReminders);
       toast.error("Failed to delete reminder");
     }
+  };
+
+  const handleCheckActive = (id: string) => {
+    setCheckingIds((prev) => ({ ...prev, [id]: true }));
+    setTimeout(() => {
+      handleStatusChange(id, true);
+      setCheckingIds((prev) => {
+        const copy = { ...prev };
+        delete copy[id];
+        return copy;
+      });
+    }, 400);
+  };
+
+  const handleCheckCompleted = (id: string) => {
+    setUncheckingIds((prev) => ({ ...prev, [id]: true }));
+    setTimeout(() => {
+      handleStatusChange(id, false);
+      setUncheckingIds((prev) => {
+        const copy = { ...prev };
+        delete copy[id];
+        return copy;
+      });
+    }, 400);
   };
 
   const getTimelineItems = () => {
@@ -361,15 +388,19 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
                               <Item variant="outline">
                                 <ItemMedia>
                                   <Checkbox
-                                    checked={r.status === "completed"}
-                                    onCheckedChange={(checked) =>
-                                      handleStatusChange(r._id as string, !!checked)
-                                    }
+                                    checked={!!checkingIds[r._id as string] || r.status === "completed"}
+                                    onCheckedChange={(checked) => {
+                                      if (checked) {
+                                        handleCheckActive(r._id as string);
+                                      } else {
+                                        handleStatusChange(r._id as string, false);
+                                      }
+                                    }}
                                   />
                                   {getPriorityIcon(r.priority)}
                                 </ItemMedia>
                                 <ItemContent>
-                                  <ItemTitle className="font-semibold">{r.title}</ItemTitle>
+                                  <ItemTitle className={cn("font-semibold transition-all duration-300", (checkingIds[r._id as string] || r.status === "completed") && "line-through text-muted-foreground/60")}>{r.title}</ItemTitle>
                                   <ItemDescription className="flex flex-wrap items-center gap-x-2.5 gap-y-1 mt-0.5">
                                     <span className="text-xs text-muted-foreground flex items-center gap-1">
                                       <Calendar className="size-3" />
@@ -440,15 +471,19 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
                               <Item variant="outline">
                                 <ItemMedia>
                                   <Checkbox
-                                    checked={r.status === "completed"}
-                                    onCheckedChange={(checked) =>
-                                      handleStatusChange(r._id as string, !!checked)
-                                    }
+                                    checked={!uncheckingIds[r._id as string] && r.status === "completed"}
+                                    onCheckedChange={(checked) => {
+                                      if (!checked) {
+                                        handleCheckCompleted(r._id as string);
+                                      } else {
+                                        handleStatusChange(r._id as string, true);
+                                      }
+                                    }}
                                   />
                                   {getPriorityIcon(r.priority)}
                                 </ItemMedia>
                                 <ItemContent>
-                                  <ItemTitle className="line-through text-muted-foreground">{r.title}</ItemTitle>
+                                  <ItemTitle className={cn("transition-all duration-300", (uncheckingIds[r._id as string] || r.status === "pending") ? "font-semibold text-foreground" : "line-through text-muted-foreground")}>{r.title}</ItemTitle>
                                   <ItemDescription className="flex flex-wrap items-center gap-x-2.5 gap-y-1 mt-0.5">
                                     <span className="text-xs text-muted-foreground/50 flex items-center gap-1 line-through">
                                       <Calendar className="size-3" />
