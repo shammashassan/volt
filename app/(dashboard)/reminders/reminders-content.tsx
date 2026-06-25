@@ -11,6 +11,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { createReminderFromTextAction, updateReminderAction, deleteReminderAction } from "@/features/reminders/actions/reminders";
 import { Plus, Trash2, Calendar, Clock } from "lucide-react";
 import { toast } from "sonner";
+import {
+  Timeline,
+  TimelineContent,
+  TimelineDate,
+  TimelineHeader,
+  TimelineIndicator,
+  TimelineItem,
+  TimelineSeparator,
+  TimelineTitle,
+} from "@/components/ui/timeline";
 
 interface RemindersContentProps {
   initialReminders: Reminder[];
@@ -212,22 +222,29 @@ export function RemindersContent({ initialReminders }: RemindersContentProps) {
                   {timelineItems.length === 0 ? (
                     <p className="text-sm text-muted-foreground text-center py-6">No activities scheduled for today.</p>
                   ) : (
-                    <div className="relative border-l border-border/60 pl-4 ml-2 space-y-5 py-1">
-                      {timelineItems.map((r) => (
-                        <div key={r._id as string} className="relative">
-                          {/* Circle Node */}
-                          <div className={`absolute -left-[22.5px] top-1 size-3 rounded-full border bg-background transition-all ${r.status === "completed" ? "border-emerald-500 bg-emerald-500" : "border-primary bg-primary/20"}`}></div>
-                          <div className="flex flex-col gap-0.5">
-                            <span className="text-[10px] font-bold text-muted-foreground/80">
-                              {new Date(r.triggerAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                            </span>
-                            <span className={`text-xs font-semibold ${r.status === "completed" ? "line-through text-muted-foreground/75" : "text-foreground"}`}>
-                              {r.title}
-                            </span>
-                          </div>
-                        </div>
+                    <Timeline value={timelineItems.filter(r => r.status === "completed").length}>
+                      {timelineItems.map((item, idx) => (
+                        <TimelineItem key={item._id as string} step={idx + 1}>
+                          <TimelineHeader>
+                            <TimelineSeparator />
+                            <TimelineDate>
+                              {new Date(item.triggerAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                            </TimelineDate>
+                            <TimelineTitle className={item.status === "completed" ? "line-through text-muted-foreground/75" : ""}>
+                              {item.title}
+                            </TimelineTitle>
+                            <TimelineIndicator className={item.status === "completed" ? "border-primary bg-primary" : ""} />
+                          </TimelineHeader>
+                          {item.priority && (
+                            <TimelineContent>
+                              <Badge variant="outline" className={`h-4 text-[9px] uppercase font-bold tracking-wider px-1.5 ${item.priority === "high" ? "bg-destructive/10 text-destructive border-destructive/20" : item.priority === "medium" ? "bg-amber-500/10 text-amber-500 border-amber-500/20" : "bg-blue-500/10 text-blue-500 border-blue-500/20"}`}>
+                                {item.priority}
+                              </Badge>
+                            </TimelineContent>
+                          )}
+                        </TimelineItem>
                       ))}
-                    </div>
+                    </Timeline>
                   )}
                 </CardContent>
               </Card>
