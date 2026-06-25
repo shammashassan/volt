@@ -164,7 +164,13 @@ export function QuickSaveCard() {
                                 {loading ? "Saving to Workspace…" : "Save to Workspace"}
                             </Button>
                         </div>
-                    ) : null}
+                    ) : (
+                        <div className="mt-auto flex flex-col gap-1.5 rounded-lg border border-border/40 bg-muted/10 p-3">
+                            <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/50">Tips</p>
+                            <p className="text-[10px] text-muted-foreground/70 leading-relaxed">Paste any URL above — title and description are fetched automatically.</p>
+                            <p className="text-[10px] text-muted-foreground/70 leading-relaxed">Works with docs, articles, tools, GitHub repos, and more.</p>
+                        </div>
+                    )}
                 </div>
             </CardContent>
         </Card>

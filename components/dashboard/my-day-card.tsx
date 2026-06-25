@@ -6,10 +6,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { CalendarDays } from 'lucide-react';
 import { Reminder } from '@/features/reminders/schemas/reminder';
 import { getRemindersAction, updateReminderAction } from '@/features/reminders/actions/reminders';
-import { useRouter } from 'next/navigation';
 
 export function MyDayCard() {
-  const router = useRouter();
   const [reminders, setReminders] = useState<Reminder[]>([]);
 
   useEffect(() => {
@@ -30,24 +28,23 @@ export function MyDayCard() {
     const res = await updateReminderAction(id, { status: 'completed' });
     if (res.success) {
       setReminders(prev => prev.filter(r => r._id !== id));
-      router.refresh(); // invalidate server cache so /reminders page reflects the change
     }
   };
 
   return (
-    <Card className="workspace-card">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-semibold flex items-center gap-1.5">
+    <Card className="h-full flex flex-col border-border/50 bg-card/60 shadow-sm backdrop-blur-sm">
+      <CardHeader className="pb-2 pt-4 px-4">
+        <CardTitle className="text-sm font-semibold italic lowercase flex items-center gap-1.5 text-muted-foreground/90">
           <CalendarDays className="size-4 text-violet-500" />
-          My Day
+          my day
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-2">
+      <CardContent className="flex flex-col gap-2 px-4 pb-4">
         {reminders.length === 0 ? (
           <p className="text-xs text-muted-foreground py-4 text-center">No tasks due today.</p>
         ) : (
           reminders.map(r => (
-            <div key={r._id as string} className="flex items-center gap-2.5 py-1">
+            <div key={r._id as string} className="flex items-center gap-2.5 rounded-md border border-border/40 bg-muted/10 px-2.5 py-2">
               <Checkbox onCheckedChange={() => handleChecked(r._id as string)} />
               <span className="text-xs font-medium text-foreground truncate">{r.title}</span>
             </div>

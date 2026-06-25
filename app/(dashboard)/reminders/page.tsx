@@ -1,8 +1,9 @@
-import { getRemindersAction } from "@/features/reminders/actions/reminders";
+import { getCachedReminders } from "@/features/reminders/queries/reminders";
 import { RemindersContent } from "./reminders-content";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Metadata } from "next";
+import { getSessionUser } from "@/lib/auth-utils";
 
 export const metadata: Metadata = {
   title: "Reminders - Volt",
@@ -45,9 +46,8 @@ function RemindersSkeleton() {
 }
 
 async function RemindersContentWrapper() {
-  const result = await getRemindersAction();
-  const initialReminders = result.success && result.data ? result.data : [];
-
+  const user = await getSessionUser();
+  const initialReminders = await getCachedReminders(user.id);
   return <RemindersContent initialReminders={initialReminders} />;
 }
 

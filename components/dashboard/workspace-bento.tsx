@@ -94,10 +94,10 @@ export function WorkspaceBento({
     return (
         <div
             ref={containerRef}
-            className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 py-6 select-none lg:px-6"
+            className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-5 select-none lg:px-6"
         >
             {/* ── Page Header ─────────────────────────────────────── */}
-            <header className="flex flex-col gap-2 border-b border-border pb-6 md:flex-row md:items-end md:justify-between">
+            <header className="flex flex-col gap-2 border-b border-border pb-5 md:flex-row md:items-end md:justify-between">
                 <div className="flex flex-col gap-1.5">
                     <div className="flex items-center gap-2">
                         <p className="font-mono text-[10px] lowercase tracking-widest text-muted-foreground/50">
@@ -120,7 +120,7 @@ export function WorkspaceBento({
             </header>
 
             {/* ── Grid Container ───────────────────────────────────── */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 {/* Row 0: Focus, My Day, Watchlist Upcoming */}
                 <div className="workspace-card lg:col-span-1 order-1 lg:order-0">
                     <InboxFocusCard
@@ -204,4 +204,4 @@ export function WorkspaceBento({
             </div>
         </div>
     )
-}
+}

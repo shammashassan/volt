@@ -15,7 +15,7 @@ export function CommandCenterCard() {
   }
 
   return (
-    <Card className="flex flex-col gap-5 border-border/50 bg-card/60 p-6 shadow-sm backdrop-blur-sm">
+    <Card className="h-full flex flex-col gap-5 border-border/50 bg-card/60 p-5 shadow-sm backdrop-blur-sm">
       {/* Search trigger */}
       <button
         type="button"

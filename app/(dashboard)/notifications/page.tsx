@@ -1,8 +1,9 @@
-import { getNotificationsAction } from "@/features/notifications/actions/notifications";
+import { getCachedNotifications } from "@/features/notifications/queries/notifications";
 import { NotificationsContent } from "./notifications-content";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Metadata } from "next";
+import { getSessionUser } from "@/lib/auth-utils";
 
 export const metadata: Metadata = {
   title: "Notifications - Volt",
@@ -42,9 +43,8 @@ function NotificationsSkeleton() {
 }
 
 async function NotificationsContentWrapper() {
-  const result = await getNotificationsAction();
-  const initialNotifications = result.success && result.data ? result.data : [];
-
+  const user = await getSessionUser();
+  const initialNotifications = await getCachedNotifications(user.id);
   return <NotificationsContent initialNotifications={initialNotifications} />;
 }
 

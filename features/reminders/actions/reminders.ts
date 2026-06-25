@@ -3,7 +3,7 @@
 import { ReminderRepository } from '../repositories/reminder.repository';
 import { Reminder, ReminderStatus, ReminderPriority, ReminderAttachment } from '../schemas/reminder';
 import { getSessionUser, getErrorMessage } from '@/lib/auth-utils';
-import { revalidatePath } from 'next/cache';
+import { updateTag } from 'next/cache';
 import { parseReminderText } from '@/lib/utils/parser';
 import { ReminderService } from '../services/reminder.service';
 
@@ -42,7 +42,9 @@ export async function createReminderAction(payload: {
       attachments: payload.attachments || []
     });
 
-    revalidatePath('/reminders');
+    updateTag('reminders');
+    updateTag(`reminders-${user.id}`);
+    updateTag(`explore-body-${user.id}`);
     return { success: true, data: JSON.parse(JSON.stringify(reminder)) as Reminder };
   } catch (err) {
     return { success: false, error: getErrorMessage(err) };
@@ -63,7 +65,9 @@ export async function createReminderFromTextAction(text: string, priority: Remin
       attachments: []
     });
 
-    revalidatePath('/reminders');
+    updateTag('reminders');
+    updateTag(`reminders-${user.id}`);
+    updateTag(`explore-body-${user.id}`);
     return { success: true, data: JSON.parse(JSON.stringify(reminder)) as Reminder };
   } catch (err) {
     return { success: false, error: getErrorMessage(err) };
@@ -78,7 +82,9 @@ export async function updateReminderAction(id: string, updates: Partial<Reminder
       ...(updates.triggerAt ? { triggerAt: new Date(updates.triggerAt) } : {})
     });
 
-    revalidatePath('/reminders');
+    updateTag('reminders');
+    updateTag(`reminders-${user.id}`);
+    updateTag(`explore-body-${user.id}`);
     return { success: true, data: JSON.parse(JSON.stringify(reminder)) as Reminder };
   } catch (err) {
     return { success: false, error: getErrorMessage(err) };
@@ -90,7 +96,9 @@ export async function deleteReminderAction(id: string) {
     const user = await getSessionUser();
     const success = await ReminderService.deleteReminder(id, user.id);
 
-    revalidatePath('/reminders');
+    updateTag('reminders');
+    updateTag(`reminders-${user.id}`);
+    updateTag(`explore-body-${user.id}`);
     return { success: true, data: success };
   } catch (err) {
     return { success: false, error: getErrorMessage(err) };

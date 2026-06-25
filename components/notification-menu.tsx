@@ -182,7 +182,7 @@ export function NotificationMenu() {
                   </span>
                 </div>
                 {!notification.readAt && (
-                  <div className="absolute end-3 top-1/2 -translate-y-1/2">
+                  <div className="absolute inset-e-3 top-1/2 -translate-y-1/2">
                     <span className="sr-only">Unread</span>
                     <Dot />
                   </div>
