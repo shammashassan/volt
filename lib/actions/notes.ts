@@ -4,6 +4,9 @@ import { revalidatePath, updateTag } from "next/cache";
 import clientPromise from "../mongodb";
 import { ObjectId } from "mongodb";
 import { getSessionUser, getErrorMessage } from "../auth-utils";
+import { SearchIndexRepository } from "@/features/search/repositories/search-index.repository";
+
+const searchIndexRepo = new SearchIndexRepository();
 
 export async function addNoteAction(data: {
   title: string;
@@ -29,6 +32,16 @@ export async function addNoteAction(data: {
     };
 
     const result = await db.collection("notes").insertOne(note);
+
+    // Upsert into Search Index
+    await searchIndexRepo.upsert({
+      userId: user.id,
+      title: data.title,
+      description: data.content,
+      entityType: 'note',
+      entityId: result.insertedId.toString()
+    });
+
     revalidatePath("/notes");
     updateTag(`explore-body-${user.id}`);
     updateTag(`dashboard-stats-${user.id}`);
@@ -50,6 +63,19 @@ export async function updateNoteAction(id: string, data: Record<string, unknown>
     const query = ObjectId.isValid(id) ? { _id: new ObjectId(id), userId: user.id } : { id, userId: user.id };
 
     await db.collection("notes").updateOne(query, { $set: updateData });
+
+    // Fetch the updated note to update Search Index
+    const updatedNote = await db.collection("notes").findOne(query);
+    if (updatedNote) {
+      await searchIndexRepo.upsert({
+        userId: user.id,
+        title: updatedNote.title || "",
+        description: updatedNote.content || "",
+        entityType: 'note',
+        entityId: id
+      });
+    }
+
     revalidatePath("/notes");
     updateTag(`explore-body-${user.id}`);
     updateTag(`dashboard-stats-${user.id}`);
@@ -68,6 +94,10 @@ export async function deleteNoteAction(id: string) {
     const query = ObjectId.isValid(id) ? { _id: new ObjectId(id), userId: user.id } : { id, userId: user.id };
 
     await db.collection("notes").deleteOne(query);
+
+    // Remove from Search Index
+    await searchIndexRepo.remove(id);
+
     revalidatePath("/notes");
     updateTag(`explore-body-${user.id}`);
     updateTag(`dashboard-stats-${user.id}`);
@@ -76,3 +106,4 @@ export async function deleteNoteAction(id: string) {
     return { success: false, error: getErrorMessage(error) };
   }
 }
+

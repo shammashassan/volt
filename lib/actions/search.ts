@@ -3,6 +3,7 @@
 import { getDb, serialize } from "../db";
 import { getSessionUser, getErrorMessage } from "../auth-utils";
 import type { Resource, Note, Project, Person, Category } from "../types";
+import { ObjectId } from "mongodb";
 
 export async function searchAction(query: string) {
   console.log("[server] searchAction called with query:", query);
@@ -41,32 +42,53 @@ export async function searchAction(query: string) {
     const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const searchRegex = new RegExp(escapedQuery.trim(), "i");
 
-    console.log("[server] executing regex search queries...");
+    console.log("[server] executing search against search_index...");
+    const searchResults = await db.collection("search_index").find({
+      userId,
+      $or: [
+        { title: searchRegex },
+        { description: searchRegex }
+      ],
+      deletedAt: { $exists: false }
+    }).limit(50).toArray();
+
+    // Group matched IDs by entityType
+    const entityIdsByType: Record<string, ObjectId[]> = {
+      resource: [],
+      note: [],
+      project: [],
+      person: []
+    };
+
+    for (const entry of searchResults) {
+      if (entry.entityId && ObjectId.isValid(entry.entityId)) {
+        const type = entry.entityType;
+        if (entityIdsByType[type]) {
+          entityIdsByType[type].push(new ObjectId(entry.entityId));
+        }
+      }
+    }
+
+    console.log("[server] resolved search_index matches:", {
+      resources: entityIdsByType.resource.length,
+      notes: entityIdsByType.note.length,
+      projects: entityIdsByType.project.length,
+      people: entityIdsByType.person.length
+    });
+
     const [resources, notes, projects, people, categories] = await Promise.all([
-      db.collection("resources").find({
-        userId,
-        $or: [
-          { title: searchRegex },
-          { name: searchRegex },
-          { tags: searchRegex },
-          { description: searchRegex }
-        ]
-      }).limit(20).toArray(),
-      db.collection("notes").find({
-        userId,
-        $or: [
-          { title: searchRegex },
-          { content: searchRegex }
-        ]
-      }).limit(10).toArray(),
-      db.collection("projects").find({
-        userId,
-        name: searchRegex
-      }).limit(10).toArray(),
-      db.collection("people").find({
-        userId,
-        name: searchRegex
-      }).limit(10).toArray(),
+      entityIdsByType.resource.length > 0
+        ? db.collection("resources").find({ _id: { $in: entityIdsByType.resource } }).toArray()
+        : Promise.resolve([]),
+      entityIdsByType.note.length > 0
+        ? db.collection("notes").find({ _id: { $in: entityIdsByType.note } }).toArray()
+        : Promise.resolve([]),
+      entityIdsByType.project.length > 0
+        ? db.collection("projects").find({ _id: { $in: entityIdsByType.project } }).toArray()
+        : Promise.resolve([]),
+      entityIdsByType.person.length > 0
+        ? db.collection("people").find({ _id: { $in: entityIdsByType.person } }).toArray()
+        : Promise.resolve([]),
       db.collection("categories").find({
         userId,
         $or: [
@@ -76,7 +98,7 @@ export async function searchAction(query: string) {
       }).limit(10).toArray()
     ]);
 
-    console.log("[server] regex search queries completed. Counts:", {
+    console.log("[server] unified search completed. Resolved document counts:", {
       resources: resources.length,
       notes: notes.length,
       projects: projects.length,
@@ -103,4 +125,5 @@ export async function searchAction(query: string) {
     return { success: false, error: getErrorMessage(error) };
   }
 }
+
 

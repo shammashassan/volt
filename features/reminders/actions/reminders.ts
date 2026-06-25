@@ -5,6 +5,7 @@ import { Reminder, ReminderStatus, ReminderPriority, ReminderAttachment } from '
 import { getSessionUser, getErrorMessage } from '@/lib/auth-utils';
 import { revalidatePath } from 'next/cache';
 import { parseReminderText } from '@/lib/utils/parser';
+import { ReminderService } from '../services/reminder.service';
 
 const repo = new ReminderRepository();
 
@@ -32,15 +33,13 @@ export async function createReminderAction(payload: {
 }) {
   try {
     const user = await getSessionUser();
-    const reminder = await repo.create({
+    const reminder = await ReminderService.createReminder({
       userId: user.id,
       title: payload.title,
       description: payload.description,
-      status: 'pending',
       priority: payload.priority,
       triggerAt: new Date(payload.triggerAt),
-      attachments: payload.attachments || [],
-      notification: {}
+      attachments: payload.attachments || []
     });
 
     revalidatePath('/reminders');
@@ -56,14 +55,12 @@ export async function createReminderFromTextAction(text: string, priority: Remin
     const parsed = parseReminderText(text);
     const triggerAt = parsed.triggerAt || new Date(Date.now() + 24 * 60 * 60 * 1000); // Default to tomorrow
 
-    const reminder = await repo.create({
+    const reminder = await ReminderService.createReminder({
       userId: user.id,
       title: parsed.title,
-      status: 'pending',
       priority,
       triggerAt,
-      attachments: [],
-      notification: {}
+      attachments: []
     });
 
     revalidatePath('/reminders');
@@ -76,7 +73,7 @@ export async function createReminderFromTextAction(text: string, priority: Remin
 export async function updateReminderAction(id: string, updates: Partial<Reminder>) {
   try {
     const user = await getSessionUser();
-    const reminder = await repo.update(id, user.id, {
+    const reminder = await ReminderService.updateReminder(id, user.id, {
       ...updates,
       ...(updates.triggerAt ? { triggerAt: new Date(updates.triggerAt) } : {})
     });
@@ -91,7 +88,7 @@ export async function updateReminderAction(id: string, updates: Partial<Reminder
 export async function deleteReminderAction(id: string) {
   try {
     const user = await getSessionUser();
-    const success = await repo.softDelete(id, user.id);
+    const success = await ReminderService.deleteReminder(id, user.id);
 
     revalidatePath('/reminders');
     return { success: true, data: success };
@@ -99,3 +96,4 @@ export async function deleteReminderAction(id: string) {
     return { success: false, error: getErrorMessage(err) };
   }
 }
+
