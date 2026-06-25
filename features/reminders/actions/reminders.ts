@@ -52,7 +52,7 @@ export async function createReminderAction(payload: {
 export async function createReminderFromTextAction(text: string, priority: ReminderPriority) {
   try {
     const user = await getSessionUser();
-    const parsed = parseReminderText(text);
+    const parsed = await parseReminderText(text);
     const triggerAt = parsed.triggerAt || new Date(Date.now() + 24 * 60 * 60 * 1000); // Default to tomorrow
 
     const reminder = await ReminderService.createReminder({
