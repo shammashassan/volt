@@ -6,101 +6,16 @@
 
 **Architecture:** We decouple business logic from Next.js endpoints and MongoDB drivers by introducing an in-memory Event Bus for domain events, a Repository layer for data persistence, and priority-driven registered scheduler jobs. Shared base models establish standard soft-deletes and type-safe IDs across all feature modules.
 
-**Tech Stack:** Next.js (App Router), TypeScript, MongoDB, Vitest, Chrono-Node.
+**Tech Stack:** Next.js (App Router), TypeScript, MongoDB, Chrono-Node.
 
 ---
 
-### Task 1: Setup Testing Environment
-
-**Files:**
-- Modify: [package.json](file:///c:/Users/ADMIN/Desktop/shammas/website/volt/package.json)
-- Create: [vitest.config.ts](file:///c:/Users/ADMIN/Desktop/shammas/website/volt/vitest.config.ts)
-
-- [ ] **Step 1: Install dev dependencies for testing**
-
-Run:
-```bash
-npm install -D vitest @types/node
-```
-
-- [ ] **Step 2: Add test script to package.json**
-
-Modify `package.json` to include `"test": "vitest run"` in scripts.
-```json
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint",
-    "test": "vitest run"
-  }
-```
-
-- [ ] **Step 3: Create Vitest configuration**
-
-Create `vitest.config.ts` in the workspace root to support path aliases:
-```typescript
-import { defineConfig } from 'vitest/config';
-import path from 'path';
-
-export default defineConfig({
-  test: {
-    environment: 'node',
-  },
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './'),
-    },
-  },
-});
-```
-
-- [ ] **Step 4: Verify test runner works**
-
-Run: `npm run test`
-Expected: Passes/fails gracefully showing "No test files found, exiting with code 0" (or similar).
-
-- [ ] **Step 5: Commit**
-
-```bash
-git add package.json vitest.config.ts
-git commit -m "chore: setup vitest testing environment"
-```
-
----
-
-### Task 2: Standard Base Types & Document Interfaces
+### Task 1: Standard Base Types & Base Document interface
 
 **Files:**
 - Create: [features/shared/types.ts](file:///c:/Users/ADMIN/Desktop/shammas/website/volt/features/shared/types.ts)
-- Test: [features/shared/types.test.ts](file:///c:/Users/ADMIN/Desktop/shammas/website/volt/features/shared/types.test.ts)
 
-- [ ] **Step 1: Write types verification test**
-
-Create `features/shared/types.test.ts`:
-```typescript
-import { describe, it, expect } from 'vitest';
-import { BaseDocument } from './types';
-
-describe('BaseDocument Types', () => {
-  it('should enforce typed properties', () => {
-    const doc: BaseDocument = {
-      userId: 'user-123' as any,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-    expect(doc.userId).toBe('user-123');
-    expect(doc.deletedAt).toBeUndefined();
-  });
-});
-```
-
-- [ ] **Step 2: Run test to verify compilation fail**
-
-Run: `npm run test`
-Expected: Compile failure since `features/shared/types` does not exist.
-
-- [ ] **Step 3: Implement core base interfaces**
+- [ ] **Step 1: Implement core base interfaces**
 
 Create `features/shared/types.ts`:
 ```typescript
@@ -124,52 +39,21 @@ export interface BaseDocument {
 }
 ```
 
-- [ ] **Step 4: Run test to verify passing**
-
-Run: `npm run test`
-Expected: PASS
-
-- [ ] **Step 5: Commit**
+- [ ] **Step 2: Commit**
 
 ```bash
-git add features/shared/types.ts features/shared/types.test.ts
+git add features/shared/types.ts
 git commit -m "feat: add standard base types and base document interface"
 ```
 
 ---
 
-### Task 3: In-Memory Event Bus
+### Task 2: In-Memory Event Bus
 
 **Files:**
 - Create: [features/shared/event-bus.ts](file:///c:/Users/ADMIN/Desktop/shammas/website/volt/features/shared/event-bus.ts)
-- Test: [features/shared/event-bus.test.ts](file:///c:/Users/ADMIN/Desktop/shammas/website/volt/features/shared/event-bus.test.ts)
 
-- [ ] **Step 1: Write event bus unit test**
-
-Create `features/shared/event-bus.test.ts`:
-```typescript
-import { describe, it, expect, vi } from 'vitest';
-import { EventBus } from './event-bus';
-
-describe('EventBus', () => {
-  it('should register listeners and publish events', () => {
-    const bus = EventBus.getInstance();
-    const handler = vi.fn();
-
-    bus.subscribe('test.event', handler);
-    bus.publish('test.event', { foo: 'bar' });
-
-    expect(handler).toHaveBeenCalledWith({ foo: 'bar' });
-  });
-});
-```
-
-- [ ] **Step 2: Run test to verify it fails**
-
-Run: `npm run test`
-Expected: Fail due to missing `event-bus.ts` file/imports.
-
-- [ ] **Step 3: Implement EventBus singleton**
+- [ ] **Step 1: Implement EventBus singleton**
 
 Create `features/shared/event-bus.ts`:
 ```typescript
@@ -215,21 +99,16 @@ export class EventBus {
 }
 ```
 
-- [ ] **Step 4: Run test to verify passing**
-
-Run: `npm run test`
-Expected: PASS
-
-- [ ] **Step 5: Commit**
+- [ ] **Step 2: Commit**
 
 ```bash
-git add features/shared/event-bus.ts features/shared/event-bus.test.ts
+git add features/shared/event-bus.ts
 git commit -m "feat: implement in-memory Event Bus singleton"
 ```
 
 ---
 
-### Task 4: Domain Models & Repositories (Reminders, Notifications)
+### Task 3: Domain Models & Repositories (Reminders, Notifications)
 
 **Files:**
 - Create: [features/reminders/schemas/reminder.ts](file:///c:/Users/ADMIN/Desktop/shammas/website/volt/features/reminders/schemas/reminder.ts)
@@ -241,7 +120,7 @@ git commit -m "feat: implement in-memory Event Bus singleton"
 
 Create `features/reminders/schemas/reminder.ts`:
 ```typescript
-import { BaseDocument, ReminderId } from '@/features/shared/types';
+import { BaseDocument } from '@/features/shared/types';
 
 export type ReminderPriority = 'P1' | 'P2' | 'P3' | 'P4';
 export type ReminderStatus = 'pending' | 'completed' | 'cancelled' | 'expired';
@@ -459,60 +338,13 @@ git commit -m "feat: add reminder & notification schemas and repositories"
 
 ---
 
-### Task 5: Domain Services (ReminderService, NotificationService)
+### Task 4: Domain Services (ReminderService, NotificationService)
 
 **Files:**
 - Create: [features/notifications/services/notification.service.ts](file:///c:/Users/ADMIN/Desktop/shammas/website/volt/features/notifications/services/notification.service.ts)
 - Create: [features/reminders/services/reminder.service.ts](file:///c:/Users/ADMIN/Desktop/shammas/website/volt/features/reminders/services/reminder.service.ts)
-- Test: [features/reminders/services/reminder.service.test.ts](file:///c:/Users/ADMIN/Desktop/shammas/website/volt/features/reminders/services/reminder.service.test.ts)
 
-- [ ] **Step 1: Write ReminderService unit test**
-
-Create `features/reminders/services/reminder.service.test.ts`:
-```typescript
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { ReminderService } from './reminder.service';
-import { EventBus } from '@/features/shared/event-bus';
-
-// Mock DB dependencies
-vi.mock('@/lib/db', () => ({
-  getDb: vi.fn(),
-}));
-
-vi.mock('../repositories/reminder.repository', () => {
-  return {
-    ReminderRepository: vi.fn().mockImplementation(() => ({
-      findDue: vi.fn().mockResolvedValue([
-        { _id: 'rem-1', userId: 'user-1', title: 'Due reminder', priority: 'P1', triggerAt: new Date() }
-      ]),
-      update: vi.fn().mockResolvedValue({}),
-    }))
-  };
-});
-
-describe('ReminderService', () => {
-  beforeEach(() => {
-    EventBus.getInstance().clearAll();
-  });
-
-  it('should publish ReminderCompleted event on processDueReminders', async () => {
-    const bus = EventBus.getInstance();
-    const handler = vi.fn();
-    bus.subscribe('reminder.completed', handler);
-
-    const count = await ReminderService.processDueReminders();
-    expect(count).toBe(1);
-    expect(handler).toHaveBeenCalled();
-  });
-});
-```
-
-- [ ] **Step 2: Run test to verify compilation fail**
-
-Run: `npm run test`
-Expected: Compile failure since `ReminderService` doesn't exist.
-
-- [ ] **Step 3: Implement NotificationService**
+- [ ] **Step 1: Implement NotificationService**
 
 Create `features/notifications/services/notification.service.ts`:
 ```typescript
@@ -563,7 +395,7 @@ export class NotificationService {
 }
 ```
 
-- [ ] **Step 4: Implement ReminderService and connect to EventBus**
+- [ ] **Step 2: Implement ReminderService and connect to EventBus**
 
 Create `features/reminders/services/reminder.service.ts`:
 ```typescript
@@ -617,63 +449,22 @@ export class ReminderService {
 }
 ```
 
-- [ ] **Step 5: Run tests to verify passing**
-
-Run: `npm run test`
-Expected: PASS
-
-- [ ] **Step 6: Commit**
+- [ ] **Step 3: Commit**
 
 ```bash
-git add features/notifications/services/notification.service.ts features/reminders/services/reminder.service.ts features/reminders/services/reminder.service.test.ts
-git commit -m "feat: implement ReminderService, NotificationService and test validations"
+git add features/notifications/services/notification.service.ts features/reminders/services/reminder.service.ts
+git commit -m "feat: implement ReminderService and NotificationService"
 ```
 
 ---
 
-### Task 6: Registry-Based Priority Scheduler & API Route
+### Task 5: Registry-Based Priority Scheduler & API Route
 
 **Files:**
 - Create: [features/automation/registry.ts](file:///c:/Users/ADMIN/Desktop/shammas/website/volt/features/automation/registry.ts)
 - Create: [app/api/cron/scheduler/route.ts](file:///c:/Users/ADMIN/Desktop/shammas/website/volt/app/api/cron/scheduler/route.ts)
-- Test: [features/automation/registry.test.ts](file:///c:/Users/ADMIN/Desktop/shammas/website/volt/features/automation/registry.test.ts)
 
-- [ ] **Step 1: Write Scheduler Registry tests**
-
-Create `features/automation/registry.test.ts`:
-```typescript
-import { describe, it, expect, vi } from 'vitest';
-import { JobRegistry } from './registry';
-
-describe('JobRegistry', () => {
-  it('should run jobs in priority order', async () => {
-    const executionOrder: string[] = [];
-    
-    const jobA = {
-      name: 'JobA',
-      priority: 2,
-      run: async () => { executionOrder.push('A'); return { itemsProcessed: 1 }; }
-    };
-    const jobB = {
-      name: 'JobB',
-      priority: 1,
-      run: async () => { executionOrder.push('B'); return { itemsProcessed: 1 }; }
-    };
-
-    const registry = new JobRegistry([jobA, jobB]);
-    await registry.runAll();
-
-    expect(executionOrder).toEqual(['B', 'A']); // JobB (priority 1) first, then JobA (priority 2)
-  });
-});
-```
-
-- [ ] **Step 2: Run test to verify it fails**
-
-Run: `npm run test`
-Expected: Fail on import error for `registry.ts`.
-
-- [ ] **Step 3: Implement JobRegistry and JobMetric logging**
+- [ ] **Step 1: Implement JobRegistry and JobMetric logging**
 
 Create `features/automation/registry.ts`:
 ```typescript
@@ -745,7 +536,7 @@ export class JobRegistry {
 }
 ```
 
-- [ ] **Step 4: Implement Scheduler Next.js Route handler**
+- [ ] **Step 2: Implement Scheduler Next.js Route handler**
 
 Create `app/api/cron/scheduler/route.ts`:
 ```typescript
@@ -792,57 +583,29 @@ export async function GET(req: NextRequest) {
 }
 ```
 
-- [ ] **Step 5: Run tests to verify passing**
-
-Run: `npm run test`
-Expected: PASS
-
-- [ ] **Step 6: Commit**
+- [ ] **Step 3: Commit**
 
 ```bash
-git add features/automation/registry.ts features/automation/registry.test.ts app/api/cron/scheduler/route.ts
+git add features/automation/registry.ts app/api/cron/scheduler/route.ts
 git commit -m "feat: implement modular priority scheduler job registry and metrics logger"
 ```
 
 ---
 
-### Task 7: Local Chrono-Node Parsing Utility
+### Task 6: Local Chrono-Node Parsing Utility
 
 **Files:**
 - Modify: [package.json](file:///c:/Users/ADMIN/Desktop/shammas/website/volt/package.json)
 - Create: [lib/utils/parser.ts](file:///c:/Users/ADMIN/Desktop/shammas/website/volt/lib/utils/parser.ts)
-- Test: [lib/utils/parser.test.ts](file:///c:/Users/ADMIN/Desktop/shammas/website/volt/lib/utils/parser.test.ts)
 
-- [ ] **Step 1: Write date parser unit test**
-
-Create `lib/utils/parser.test.ts`:
-```typescript
-import { describe, it, expect } from 'vitest';
-import { parseReminderText } from './parser';
-
-describe('Natural Language Date Parsing', () => {
-  it('should parse simple statements like tomorrow', () => {
-    const result = parseReminderText('Submit invoice tomorrow');
-    expect(result.title).toBe('Submit invoice');
-    expect(result.triggerAt).toBeInstanceOf(Date);
-  });
-
-  it('should fail gracefully if no date is found', () => {
-    const result = parseReminderText('Just text without time');
-    expect(result.title).toBe('Just text without time');
-    expect(result.triggerAt).toBeUndefined();
-  });
-});
-```
-
-- [ ] **Step 2: Install chrono-node library**
+- [ ] **Step 1: Install chrono-node library**
 
 Run:
 ```bash
 npm install chrono-node
 ```
 
-- [ ] **Step 3: Implement Chrono-Node date parser utility**
+- [ ] **Step 2: Implement Chrono-Node date parser utility**
 
 Create `lib/utils/parser.ts`:
 ```typescript
@@ -875,14 +638,9 @@ export function parseReminderText(input: string): ParsedReminder {
 }
 ```
 
-- [ ] **Step 4: Run tests to verify passing**
-
-Run: `npm run test`
-Expected: PASS
-
-- [ ] **Step 5: Commit**
+- [ ] **Step 3: Commit**
 
 ```bash
-git add package.json lib/utils/parser.ts lib/utils/parser.test.ts
+git add package.json lib/utils/parser.ts
 git commit -m "feat: add chrono-node natural language date parsing utility"
 ```
