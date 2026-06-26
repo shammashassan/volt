@@ -454,7 +454,7 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
                                         })}
                                       </span>
                                       {r.attachments && r.attachments.length > 0 && (
-                                        <div className="flex flex-wrap gap-1.5 w-full min-w-0">
+                                        <span className="flex flex-wrap gap-1.5 w-full min-w-0">
                                           {r.attachments.map((a, i) => {
                                             const linkPath = a.type === 'note' ? `/notes?id=${a.id}` : a.type === 'project' ? `/projects/${a.id}` : a.type === 'person' ? `/people/${a.id}` : a.type === 'resource' ? '/resources' : '/media-watchlist';
                                             return (
@@ -468,7 +468,7 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
                                               </Link>
                                             );
                                           })}
-                                        </div>
+                                        </span>
                                       )}
                                     </ItemDescription>
                                   </ItemContent>
@@ -539,7 +539,7 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
                                         })}
                                       </span>
                                       {r.attachments && r.attachments.length > 0 && (
-                                        <div className="flex flex-wrap gap-1.5 mt-0.5 w-full min-w-0">
+                                        <span className="flex flex-wrap gap-1.5 mt-0.5 w-full min-w-0">
                                           {r.attachments.map((a, i) => {
                                             const linkPath = a.type === 'note' ? `/notes?id=${a.id}` : a.type === 'project' ? `/projects/${a.id}` : a.type === 'person' ? `/people/${a.id}` : a.type === 'resource' ? '/resources' : '/media-watchlist';
                                             return (
@@ -553,7 +553,7 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
                                               </Link>
                                             );
                                           })}
-                                        </div>
+                                        </span>
                                       )}
                                     </ItemDescription>
                                   </ItemContent>
