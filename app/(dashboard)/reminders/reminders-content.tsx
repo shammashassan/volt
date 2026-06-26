@@ -444,9 +444,9 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
                                     {getPriorityIcon(r.priority)}
                                   </ItemMedia>
                                   <ItemContent className="min-w-0">
-                                    <ItemTitle className={cn("font-semibold truncate transition-all duration-300", (checkingIds[r._id as string] || r.status === "completed") && "line-through text-muted-foreground/60")}>{r.title}</ItemTitle>
-                                    <ItemDescription className="flex flex-wrap items-center gap-x-2.5 gap-y-1 mt-0.5">
-                                      <span className="text-xs text-muted-foreground flex items-center gap-1">
+                                    <ItemTitle className={cn("font-semibold block w-full break-words whitespace-normal line-clamp-none transition-all duration-300", (checkingIds[r._id as string] || r.status === "completed") && "line-through text-muted-foreground/60")}>{r.title}</ItemTitle>
+                                    <ItemDescription className="flex flex-wrap items-center gap-x-2.5 gap-y-1 mt-0.5 w-full min-w-0">
+                                      <span className="text-xs text-muted-foreground flex items-center gap-1 shrink-0 whitespace-nowrap">
                                         <Calendar className="size-3" />
                                         {new Date(r.triggerAt).toLocaleString([], {
                                           dateStyle: "short",
@@ -454,25 +454,25 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
                                         })}
                                       </span>
                                       {r.attachments && r.attachments.length > 0 && (
-                                        <span className="flex flex-wrap gap-1.5">
+                                        <div className="flex flex-wrap gap-1.5 w-full min-w-0">
                                           {r.attachments.map((a, i) => {
                                             const linkPath = a.type === 'note' ? `/notes?id=${a.id}` : a.type === 'project' ? `/projects/${a.id}` : a.type === 'person' ? `/people/${a.id}` : a.type === 'resource' ? '/resources' : '/media-watchlist';
                                             return (
                                               <Link
                                                 key={i}
                                                 href={linkPath}
-                                                className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-muted text-[10px] font-semibold text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors border border-border/40 line-clamp-1"
+                                                className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-muted text-[10px] font-semibold text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors border border-border/40 max-w-full min-w-0"
                                               >
-                                                <span className="opacity-60 font-bold">{a.type}:</span>
-                                                <span className="truncate max-w-[120px]">{a.title}</span>
+                                                <span className="opacity-60 font-bold shrink-0">{a.type}:</span>
+                                                <span className="truncate max-w-[120px] sm:max-w-[150px]">{a.title}</span>
                                               </Link>
                                             );
                                           })}
-                                        </span>
+                                        </div>
                                       )}
                                     </ItemDescription>
                                   </ItemContent>
-                                  <ItemActions>
+                                  <ItemActions className="shrink-0">
                                     <Button
                                       onClick={() => handleDelete(r._id as string)}
                                       variant="ghost"
@@ -529,9 +529,9 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
                                     {getPriorityIcon(r.priority)}
                                   </ItemMedia>
                                   <ItemContent className="min-w-0">
-                                    <ItemTitle className={cn("truncate transition-all duration-300", (uncheckingIds[r._id as string] || r.status === "pending") ? "font-semibold text-foreground" : "line-through text-muted-foreground")}>{r.title}</ItemTitle>
-                                    <ItemDescription className="flex flex-wrap items-center gap-x-2.5 gap-y-1 mt-0.5">
-                                      <span className="text-xs text-muted-foreground/50 flex items-center gap-1 line-through">
+                                    <ItemTitle className={cn("block w-full break-words whitespace-normal line-clamp-none transition-all duration-300", (uncheckingIds[r._id as string] || r.status === "pending") ? "font-semibold text-foreground" : "line-through text-muted-foreground")}>{r.title}</ItemTitle>
+                                    <ItemDescription className="flex flex-wrap items-center gap-x-2.5 gap-y-1 mt-0.5 w-full min-w-0">
+                                      <span className="text-xs text-muted-foreground/50 flex items-center gap-1 line-through shrink-0 whitespace-nowrap">
                                         <Calendar className="size-3" />
                                         {new Date(r.triggerAt).toLocaleString([], {
                                           dateStyle: "short",
@@ -539,25 +539,25 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
                                         })}
                                       </span>
                                       {r.attachments && r.attachments.length > 0 && (
-                                        <span className="flex flex-wrap gap-1.5 mt-0.5">
+                                        <div className="flex flex-wrap gap-1.5 mt-0.5 w-full min-w-0">
                                           {r.attachments.map((a, i) => {
                                             const linkPath = a.type === 'note' ? `/notes?id=${a.id}` : a.type === 'project' ? `/projects/${a.id}` : a.type === 'person' ? `/people/${a.id}` : a.type === 'resource' ? '/resources' : '/media-watchlist';
                                             return (
                                               <Link
                                                 key={i}
                                                 href={linkPath}
-                                                className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-muted/40 text-[10px] font-semibold text-muted-foreground/60 hover:bg-primary/5 hover:text-primary transition-colors border border-border/20 line-through line-clamp-1"
+                                                className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-muted/40 text-[10px] font-semibold text-muted-foreground/60 hover:bg-primary/5 hover:text-primary transition-colors border border-border/20 line-through max-w-full min-w-0"
                                               >
-                                                <span className="opacity-40 font-bold">{a.type}:</span>
-                                                <span className="truncate max-w-[120px]">{a.title}</span>
+                                                <span className="opacity-40 font-bold shrink-0">{a.type}:</span>
+                                                <span className="truncate max-w-[120px] sm:max-w-[150px]">{a.title}</span>
                                               </Link>
                                             );
                                           })}
-                                        </span>
+                                        </div>
                                       )}
                                     </ItemDescription>
                                   </ItemContent>
-                                  <ItemActions>
+                                  <ItemActions className="shrink-0">
                                     <Button
                                       onClick={() => handleDelete(r._id as string)}
                                       variant="ghost"
