@@ -252,10 +252,10 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
   const timelineItems = getTimelineItems();
 
   return (
-    <div className="flex flex-1 flex-col gap-6 pb-12">
+    <div className="flex flex-1 flex-col gap-6 pb-12 w-full min-w-0">
       {/* Header */}
-      <section className="px-4 pt-8 lg:px-6">
-        <div className="flex flex-col gap-2 max-w-7xl">
+      <section className="w-full px-4 pt-8 lg:px-6">
+        <div className="flex flex-col gap-2 max-w-7xl w-full">
           <div className="flex items-center gap-4">
             <div className="flex size-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
               <Clock />
@@ -276,45 +276,47 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
       </section>
 
       {/* Main Content */}
-      <section className="px-4 lg:px-6">
-        <div className="max-w-7xl grid gap-6 md:grid-cols-3">
+      <section className="w-full px-4 lg:px-6">
+        <div className="max-w-7xl w-full grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* List Column */}
-          <div className="md:col-span-2 flex flex-col gap-4">
+          <div className="md:col-span-2 flex flex-col gap-4 min-w-0 w-full">
             {/* Quick Add */}
             <Collapsible open={isAdvancedOpen} onOpenChange={setIsAdvancedOpen} className="w-full">
               <form onSubmit={handleQuickAdd} className="flex flex-col gap-3 bg-muted/20 p-3.5 rounded-xl border border-border/40">
-                <div className="flex gap-2 items-center">
+                <div className="flex flex-col sm:flex-row gap-2">
                   <Input
                     value={inputText}
                     onChange={(e) => setInputText(e.target.value)}
                     placeholder='Add a reminder (e.g. "Meeting tomorrow at 3pm")'
                     className="flex-1"
                   />
-                  <Select value={priority} onValueChange={(v) => setPriority(v as ReminderPriority)}>
-                    <SelectTrigger className="w-[110px]">
-                      <SelectValue placeholder="Priority" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="high">High</SelectItem>
-                      <SelectItem value="medium">Medium</SelectItem>
-                      <SelectItem value="low">Low</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Button type="submit">
-                    <Plus data-icon="inline-start" />
-                    Add
-                  </Button>
-                  <CollapsibleTrigger asChild>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="shrink-0"
-                    >
-                      {isAdvancedOpen ? <ChevronUp /> : <ChevronDown />}
-                      <span className="sr-only">Toggle advanced options</span>
+                  <div className="flex gap-2 items-center sm:w-auto w-full">
+                    <Select value={priority} onValueChange={(v) => setPriority(v as ReminderPriority)}>
+                      <SelectTrigger className="w-[110px] flex-1 sm:flex-initial">
+                        <SelectValue placeholder="Priority" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="high">High</SelectItem>
+                        <SelectItem value="medium">Medium</SelectItem>
+                        <SelectItem value="low">Low</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Button type="submit" className="flex-1 sm:flex-initial">
+                      <Plus data-icon="inline-start" />
+                      Add
                     </Button>
-                  </CollapsibleTrigger>
+                    <CollapsibleTrigger asChild>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="shrink-0"
+                      >
+                        {isAdvancedOpen ? <ChevronUp /> : <ChevronDown />}
+                        <span className="sr-only">Toggle advanced options</span>
+                      </Button>
+                    </CollapsibleTrigger>
+                  </div>
                 </div>
 
                 <CollapsibleContent className="space-y-3 pt-3 border-t border-border/40 mt-1">
@@ -373,7 +375,7 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
               <Tabs defaultValue="pending">
                 <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3">
                   <CardTitle>Tasks</CardTitle>
-                  <div className="flex items-center gap-4">
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-4">
                     <Toggle
                       pressed={orderByPriority}
                       onPressedChange={setOrderByPriority}
@@ -578,7 +580,7 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
           </div>
 
           {/* Timeline Sidebar */}
-          <div>
+          <div className="min-w-0 w-full">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
