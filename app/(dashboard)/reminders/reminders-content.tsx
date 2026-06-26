@@ -411,7 +411,7 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
                         No tasks to do.
                       </p>
                     ) : (
-                      <ScrollArea className="max-h-[500px] w-full [&_[data-slot=scroll-area-viewport]]:max-h-[500px]">
+                      <ScrollArea className="max-h-[500px] w-full **:data-[slot=scroll-area-viewport]:max-h-[500px]">
                         <ItemGroup className="gap-2.5 pr-3.5 pb-4">
                           <AnimatePresence initial={false}>
                             {getSortedPending().map((r) => (
@@ -444,7 +444,7 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
                                     {getPriorityIcon(r.priority)}
                                   </ItemMedia>
                                   <ItemContent className="min-w-0">
-                                    <ItemTitle className={cn("font-semibold block w-full break-words whitespace-normal line-clamp-none transition-all duration-300", (checkingIds[r._id as string] || r.status === "completed") && "line-through text-muted-foreground/60")}>{r.title}</ItemTitle>
+                                    <ItemTitle className={cn("font-semibold block w-full wrap-break-word whitespace-normal line-clamp-none transition-all duration-300", (checkingIds[r._id as string] || r.status === "completed") && "line-through text-muted-foreground/60")}>{r.title}</ItemTitle>
                                     <ItemDescription className="flex flex-wrap items-center gap-x-2.5 gap-y-1 mt-0.5 w-full min-w-0">
                                       <span className="text-xs text-muted-foreground flex items-center gap-1 shrink-0 whitespace-nowrap">
                                         <Calendar className="size-3" />
@@ -496,7 +496,7 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
                         No completed tasks.
                       </p>
                     ) : (
-                      <ScrollArea className="max-h-[500px] w-full [&_[data-slot=scroll-area-viewport]]:max-h-[500px]">
+                      <ScrollArea className="max-h-[500px] w-full **:data-[slot=scroll-area-viewport]:max-h-[500px]">
                         <ItemGroup className="gap-2.5 opacity-80 pr-3.5 pb-4">
                           <AnimatePresence initial={false}>
                             {getSortedCompleted().map((r) => (
@@ -529,7 +529,7 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
                                     {getPriorityIcon(r.priority)}
                                   </ItemMedia>
                                   <ItemContent className="min-w-0">
-                                    <ItemTitle className={cn("block w-full break-words whitespace-normal line-clamp-none transition-all duration-300", (uncheckingIds[r._id as string] || r.status === "pending") ? "font-semibold text-foreground" : "line-through text-muted-foreground")}>{r.title}</ItemTitle>
+                                    <ItemTitle className={cn("block w-full wrap-break-word whitespace-normal line-clamp-none transition-all duration-300", (uncheckingIds[r._id as string] || r.status === "pending") ? "font-semibold text-foreground" : "line-through text-muted-foreground")}>{r.title}</ItemTitle>
                                     <ItemDescription className="flex flex-wrap items-center gap-x-2.5 gap-y-1 mt-0.5 w-full min-w-0">
                                       <span className="text-xs text-muted-foreground/50 flex items-center gap-1 line-through shrink-0 whitespace-nowrap">
                                         <Calendar className="size-3" />
