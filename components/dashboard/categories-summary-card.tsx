@@ -1,6 +1,6 @@
 "use client"
 
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+import { Card, CardHeader, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Folders, ArrowRight, FolderOpen } from "lucide-react"
 import Link from "next/link"
@@ -21,20 +21,33 @@ interface CategoriesSummaryCardProps {
 export function CategoriesSummaryCard({ categories = [] }: CategoriesSummaryCardProps) {
     if (categories.length === 0) {
         return (
-            <Card className="flex h-full flex-col justify-between border-border/50 bg-card/60 p-5 shadow-sm backdrop-blur-sm">
-                <CardHeader className="flex flex-row items-center gap-2 p-0 pb-3">
-                    <Folders className="size-4 text-amber-500" />
-                    <CardTitle className="text-sm font-semibold italic lowercase text-muted-foreground/90">
-                        categories
-                    </CardTitle>
+            <Card className="flex h-full flex-col border-border/50 bg-card/60 p-5 shadow-sm backdrop-blur-sm">
+                <CardHeader className="flex flex-row items-center gap-0 p-0 pb-4">
+                    <div className="flex items-center gap-2 flex-1">
+                        <div className="flex size-5 items-center justify-center rounded bg-amber-500/10">
+                            <Folders className="size-3 text-amber-500" />
+                        </div>
+                        <span className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground/60">
+                            categories
+                        </span>
+                    </div>
                 </CardHeader>
-                <CardContent className="flex flex-1 flex-col justify-center items-center py-6 p-0">
-                    <Link
-                        href="/categories"
-                        className="group flex items-center justify-between rounded-lg border border-border bg-muted/20 px-3 py-2.5 text-xs font-medium text-muted-foreground transition-all hover:border-primary/20 hover:bg-primary/5 hover:text-primary w-full"
-                    >
-                        <span>Create your first category &rarr;</span>
-                    </Link>
+                <CardContent className="flex flex-1 flex-col items-center justify-center gap-2 p-0">
+                    <div className="flex w-full flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-border/40 bg-muted/10 py-6">
+                        <div className="flex size-8 items-center justify-center rounded-full bg-amber-500/10">
+                            <Folders className="size-4 text-amber-500/60" />
+                        </div>
+                        <div className="flex flex-col items-center gap-0.5">
+                            <p className="text-xs font-medium text-foreground">No categories yet</p>
+                            <p className="text-[10px] text-muted-foreground/60 text-center">Organise your resources into categories.</p>
+                        </div>
+                        <Link
+                            href="/categories"
+                            className="text-[10px] text-primary hover:underline"
+                        >
+                            Create your first category →
+                        </Link>
+                    </div>
                 </CardContent>
             </Card>
         )
@@ -49,13 +62,17 @@ export function CategoriesSummaryCard({ categories = [] }: CategoriesSummaryCard
         .slice(0, 5)
 
     return (
-        <Card className="flex h-full flex-col justify-between border-border/50 bg-card/60 p-5 shadow-sm backdrop-blur-sm gap-5">
+        <Card className="flex h-full flex-col border-border/50 bg-card/60 p-5 shadow-sm backdrop-blur-sm gap-4">
             {/* Header */}
-            <CardHeader className="flex flex-row items-center gap-2 p-0">
-                <Folders className="size-4 text-amber-500" />
-                <CardTitle className="text-sm font-semibold italic lowercase text-muted-foreground/90">
-                    categories
-                </CardTitle>
+            <CardHeader className="flex flex-row items-center gap-0 p-0">
+                <div className="flex items-center gap-2 flex-1">
+                    <div className="flex size-5 items-center justify-center rounded bg-amber-500/10">
+                        <Folders className="size-3 text-amber-500" />
+                    </div>
+                    <span className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground/60">
+                        categories
+                    </span>
+                </div>
             </CardHeader>
 
             <CardContent className="flex flex-1 flex-col gap-4 p-0">
@@ -109,9 +126,9 @@ export function CategoriesSummaryCard({ categories = [] }: CategoriesSummaryCard
                                             </span>
                                         </div>
                                         {/* Density Bar */}
-                                        <Progress 
-                                            value={density} 
-                                            className="h-1 bg-muted/40 [&>[data-slot=progress-indicator]]:bg-amber-500/60 group-hover/item:[&>[data-slot=progress-indicator]]:bg-amber-500 transition-all duration-500" 
+                                        <Progress
+                                            value={density}
+                                            className="h-1 bg-muted/40 *:data-[slot=progress-indicator]:bg-amber-500/60 group-hover/item:*:data-[slot=progress-indicator]:bg-amber-500 transition-all duration-500"
                                         />
                                     </div>
                                 )

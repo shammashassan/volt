@@ -21,6 +21,7 @@ import {
 import { EmptyMuted } from "@/components/notification-menu";
 import { toast } from "sonner";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface NotificationsContentProps {
   initialNotifications: Notification[];
@@ -41,6 +42,7 @@ function NotificationIcon({ type }: { type: string }) {
 }
 
 export function NotificationsContent({ initialNotifications }: NotificationsContentProps) {
+  const router = useRouter();
   const [notifications, setNotifications] = useState<Notification[]>(initialNotifications);
 
   useEffect(() => {
@@ -61,6 +63,7 @@ export function NotificationsContent({ initialNotifications }: NotificationsCont
         prev.map((n) => (n._id === id ? { ...n, readAt: new Date() } : n))
       );
       toast.success("Marked as read");
+      router.refresh();
     } else {
       toast.error("Failed to mark as read");
     }
@@ -72,6 +75,7 @@ export function NotificationsContent({ initialNotifications }: NotificationsCont
     await Promise.all(unreadList.map((n) => markNotificationReadAction(n._id as string)));
     setNotifications((prev) => prev.map((n) => ({ ...n, readAt: n.readAt || new Date() })));
     toast.success("All notifications marked as read");
+    router.refresh();
   };
 
   const handleDelete = async (id: string) => {
@@ -79,6 +83,7 @@ export function NotificationsContent({ initialNotifications }: NotificationsCont
     if (res.success) {
       setNotifications((prev) => prev.filter((n) => n._id !== id));
       toast.success("Notification deleted");
+      router.refresh();
     } else {
       toast.error("Failed to delete notification");
     }

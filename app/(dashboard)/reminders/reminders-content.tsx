@@ -37,6 +37,7 @@ import { createReminderFromTextAction, updateReminderAction, deleteReminderActio
 import { Plus, Trash2, Calendar, Clock, ChevronDown, ChevronUp, ArrowUp, ArrowDown, Minus, ArrowUpDown } from "lucide-react";
 import { toast } from "sonner";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Timeline,
@@ -96,6 +97,7 @@ const getPriorityIcon = (priority: ReminderPriority) => {
 };
 
 export function RemindersContent({ initialReminders, notes, projects }: RemindersContentProps) {
+  const router = useRouter();
   const [reminders, setReminders] = useState<Reminder[]>(initialReminders);
   const [checkingIds, setCheckingIds] = useState<Record<string, boolean>>({});
   const [uncheckingIds, setUncheckingIds] = useState<Record<string, boolean>>({});
@@ -151,7 +153,8 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
       attachments.push({ type: "project", id: selectedProjectId });
     }
 
-    const res = await createReminderFromTextAction(inputText, priority, attachments);
+    const clientOffset = new Date().getTimezoneOffset();
+    const res = await createReminderFromTextAction(inputText, priority, attachments, clientOffset);
     if (res.success && res.data) {
       // Populate newly added attachments titles locally
       const populatedAttachments = attachments.map((a) => {
@@ -174,6 +177,7 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
       setSelectedNoteId("");
       setSelectedProjectId("");
       toast.success("Reminder added");
+      router.refresh();
     } else {
       toast.error("Failed to add reminder");
     }
@@ -189,6 +193,7 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
     const res = await updateReminderAction(id, { status: nextStatus });
     if (res.success && res.data) {
       toast.success(completedStatus ? "Reminder completed" : "Reminder pending");
+      router.refresh();
     } else {
       // Revert if request fails
       setReminders(originalReminders);
@@ -205,6 +210,7 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
     const res = await deleteReminderAction(id);
     if (res.success) {
       toast.success("Reminder deleted");
+      router.refresh();
     } else {
       // Revert if request fails
       setReminders(originalReminders);

@@ -3,9 +3,6 @@
 import React, { useRef } from "react"
 import { useGSAP } from "@gsap/react"
 import { gsap } from "gsap"
-import { Button } from "@/components/ui/button"
-import { ArrowRightIcon } from "lucide-react"
-import Link from "next/link"
 
 import { CommandCenterCard } from "./command-center-card"
 import { StatsCard } from "./stats-card"
@@ -14,13 +11,12 @@ import { FavoritesListCard } from "./favorites-list-card"
 import { CategoriesSummaryCard } from "./categories-summary-card"
 import { RecentlyValuable } from "./recently-valuable"
 import { QuickSaveCard } from "./quick-save-card"
-import { ResourceCard } from "@/components/resource-card"
+import { RecentlyAddedCarousel } from "./recently-added-carousel"
 import { InboxFocusCard } from "./inbox-focus-card"
 import { MyDayCard } from "./my-day-card"
 import { WatchlistUpcomingCard } from "./watchlist-upcoming-card"
 
 import { Resource, Category } from "@/lib/types"
-import { Resource as DataResource } from "@/lib/data"
 
 interface CategoryWithCount extends Category {
     resourceCount?: number
@@ -162,33 +158,9 @@ export function WorkspaceBento({
                     />
                 </div>
 
-                {/* Row 3: Recently Added grid & Categories Summary */}
-                <div className="workspace-card lg:col-span-2 order-7 lg:order-0 flex flex-col gap-3">
-                    <div className="flex items-center justify-between px-1">
-                        <h2 className="text-sm font-semibold italic lowercase text-muted-foreground/80">
-                            recently added
-                        </h2>
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-7 gap-1 text-xs font-semibold lowercase text-muted-foreground/70 hover:text-foreground"
-                            asChild
-                        >
-                            <Link href="/resources">
-                                Explore all
-                                <ArrowRightIcon data-icon="inline-end" />
-                            </Link>
-                        </Button>
-                    </div>
-                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                        {recentlyAdded.slice(0, 4).map((resource, index) => (
-                            <ResourceCard
-                                key={resource.id || resource._id?.toString()}
-                                resource={resource as unknown as DataResource}
-                                priority={index < 2}
-                            />
-                        ))}
-                    </div>
+                {/* Row 3: Recently Added carousel & Categories Summary */}
+                <div className="workspace-card lg:col-span-2 order-7 lg:order-0">
+                    <RecentlyAddedCarousel resources={recentlyAdded} />
                 </div>
                 <div className="workspace-card lg:col-span-1 order-9 lg:order-0">
                     <CategoriesSummaryCard categories={categories} />

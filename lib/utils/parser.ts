@@ -5,13 +5,23 @@ export interface ParsedReminder {
   triggerAt?: Date;
 }
 
-export async function parseReminderText(input: string): Promise<ParsedReminder> {
+export async function parseReminderText(input: string, clientOffset?: number): Promise<ParsedReminder> {
   const cleanInput = input.trim();
-  const results = chrono.parse(cleanInput);
+  const serverOffset = new Date().getTimezoneOffset();
+  const hasOffset = typeof clientOffset === 'number';
+  const shiftMs = hasOffset ? (serverOffset - clientOffset) * 60 * 1000 : 0;
+
+  const refDate = new Date(Date.now() + shiftMs);
+  const results = chrono.parse(cleanInput, refDate);
 
   if (results.length === 0) {
     if (process.env.GEMINI_API_KEY) {
       try {
+        const localNowStr = new Date(Date.now() + shiftMs).toISOString().replace('Z', '') + 
+          (hasOffset ? (clientOffset <= 0 ? '+' : '-') + 
+          Math.floor(Math.abs(clientOffset)/60).toString().padStart(2, '0') + ':' + 
+          (Math.abs(clientOffset)%60).toString().padStart(2, '0') : '');
+
         const response = await fetch(
           `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
           {
@@ -25,7 +35,7 @@ export async function parseReminderText(input: string): Promise<ParsedReminder> 
                   parts: [
                     {
                       text: `You are a helper that extracts a reminder title and its trigger date/time.
-The current date and time is: ${new Date().toISOString()} (local: ${new Date().toString()}).
+The current date and time in the user's local timezone is: ${localNowStr}.
 
 Analyze this input: "${cleanInput}"
 
@@ -82,7 +92,12 @@ Return a JSON object with:
 
   // Use the first recognized date result
   const match = results[0];
-  const triggerAt = match.date();
+  let triggerAt = match.date();
+
+  // Shift the parsed date back to get the correct UTC timestamp
+  if (hasOffset && triggerAt) {
+    triggerAt = new Date(triggerAt.getTime() - shiftMs);
+  }
 
   // Extract the text leaving out the parsed date segment
   const title = cleanInput.replace(match.text, '').replace(/\s+/g, ' ').trim();

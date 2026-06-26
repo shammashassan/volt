@@ -1,6 +1,6 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Target, AlertCircle, PlayCircle, FolderMinus, Bell } from 'lucide-react';
 import Link from 'next/link';
 
@@ -19,11 +19,15 @@ export function InboxFocusCard({
 }: InboxFocusProps) {
   return (
     <Card className="h-full flex flex-col border-border/50 bg-card/60 shadow-sm backdrop-blur-sm">
-      <CardHeader className="pb-2 pt-4 px-4">
-        <CardTitle className="text-sm font-semibold italic lowercase flex items-center gap-1.5 text-muted-foreground/90">
-          <Target className="size-4 text-primary" />
-          today's focus
-        </CardTitle>
+      <CardHeader className="flex flex-row items-center gap-0 p-4 pb-3">
+        <div className="flex items-center gap-2 flex-1">
+          <div className="flex size-5 items-center justify-center rounded bg-primary/10">
+            <Target className="size-3 text-primary" />
+          </div>
+          <span className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground/60">
+            today's focus
+          </span>
+        </div>
       </CardHeader>
       <CardContent className="grid grid-cols-2 gap-2.5 px-4 pb-4">
         <Link
