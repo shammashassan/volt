@@ -34,7 +34,7 @@ import {
   ItemSeparator,
 } from "@/components/ui/item";
 import { createReminderFromTextAction, updateReminderAction, deleteReminderAction } from "@/features/reminders/actions/reminders";
-import { Plus, Trash2, Calendar, Clock, ChevronDown, ChevronUp, ArrowUp, ArrowDown, Minus, ArrowUpDown } from "lucide-react";
+import { Plus, Trash2, Calendar, Clock, ChevronDown, ChevronUp, ArrowUp, ArrowDown, Equal, ArrowUpDown } from "lucide-react";
 import { toast } from "sonner";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -84,7 +84,7 @@ const getPriorityIcon = (priority: ReminderPriority) => {
     case "medium":
       return (
         <span className="flex size-7 shrink-0 items-center justify-center rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400">
-          <Minus className="size-4" />
+          <Equal className="size-4" />
         </span>
       );
     case "low":
@@ -409,7 +409,7 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
                         No tasks to do.
                       </p>
                     ) : (
-                      <ScrollArea className="max-h-[500px] w-full">
+                      <ScrollArea className="max-h-[500px] w-full [&_[data-slot=scroll-area-viewport]]:max-h-[500px]">
                         <ItemGroup className="gap-2.5 pr-3.5 pb-4">
                           <AnimatePresence initial={false}>
                             {getSortedPending().map((r) => (
@@ -494,7 +494,7 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
                         No completed tasks.
                       </p>
                     ) : (
-                      <ScrollArea className="max-h-[500px] w-full">
+                      <ScrollArea className="max-h-[500px] w-full [&_[data-slot=scroll-area-viewport]]:max-h-[500px]">
                         <ItemGroup className="gap-2.5 opacity-80 pr-3.5 pb-4">
                           <AnimatePresence initial={false}>
                             {getSortedCompleted().map((r) => (

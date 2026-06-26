@@ -45,7 +45,6 @@ export function serialize<T>(obj: T): any {
 
 const globalWithIndexes = global as typeof globalThis & {
   _mongoIndexesEnsured?: boolean;
-  _remindersInterval?: any;
 };
 
 export function mapResourceDoc(r: any): Resource {
@@ -137,18 +136,6 @@ export const getDb = cache(async () => {
     ]).catch(err => console.error("Error ensuring database indexes:", err));
 
     globalWithIndexes._mongoIndexesEnsured = true;
-
-    // Start background interval to check for reminders in development mode
-    if (process.env.NODE_ENV === "development" && !globalWithIndexes._remindersInterval) {
-      globalWithIndexes._remindersInterval = setInterval(async () => {
-        try {
-          const { ReminderService } = await import("@/features/reminders/services/reminder.service");
-          await ReminderService.processDueReminders();
-        } catch (err) {
-          console.error("Error in dev reminders background process:", err);
-        }
-      }, 30000); // Check every 30 seconds
-    }
   }
   return db;
 });
