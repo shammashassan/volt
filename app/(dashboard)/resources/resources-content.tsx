@@ -148,36 +148,42 @@ export function ResourcesContent({
     setResources(initialResources)
   }, [initialResources])
 
-  // Map filters
+  // Map filters and map properties for rendering
   const filteredResources = useMemo(() => {
-    return resources.filter((res) => {
-      const title = (res.title || res.name || "").toLowerCase()
-      const desc = (res.description || "").toLowerCase()
-      const tagsString = (res.tags || []).join(" ").toLowerCase()
-      const matchesSearch =
-        title.includes(searchQuery.toLowerCase()) ||
-        desc.includes(searchQuery.toLowerCase()) ||
-        tagsString.includes(searchQuery.toLowerCase())
+    return resources
+      .filter((res) => {
+        const title = (res.title || res.name || "").toLowerCase()
+        const desc = (res.description || "").toLowerCase()
+        const tagsString = (res.tags || []).join(" ").toLowerCase()
+        const matchesSearch =
+          title.includes(searchQuery.toLowerCase()) ||
+          desc.includes(searchQuery.toLowerCase()) ||
+          tagsString.includes(searchQuery.toLowerCase())
 
-      const resType = res.type || "website"
-      const resStatus = res.status || "saved"
-      const resFav = !!(res.favorite || res.featured)
+        const resType = res.type || "website"
+        const resStatus = res.status || "saved"
+        const resFav = !!(res.favorite || res.featured)
 
-      const matchesType = !filterType || resType === filterType
-      const matchesStatus = !filterStatus || resStatus === filterStatus
-      const matchesFav = !filterFavorite || resFav
+        const matchesType = !filterType || resType === filterType
+        const matchesStatus = !filterStatus || resStatus === filterStatus
+        const matchesFav = !filterFavorite || resFav
 
-      const rawCatId = res.categoryId || res.category || "none"
-      const matchedCat = categories.find(
-        (c) => (c._id?.toString() || c.id) === rawCatId || c.id === rawCatId || c._id?.toString() === rawCatId
-      )
-      const resolvedCatId = matchedCat ? (matchedCat.id || matchedCat._id?.toString() || "none") : "none"
+        const rawCatId = res.categoryId || res.category || "none"
+        const matchedCat = categories.find(
+          (c) => (c._id?.toString() || c.id) === rawCatId || c.id === rawCatId || c._id?.toString() === rawCatId
+        )
+        const resolvedCatId = matchedCat ? (matchedCat.id || matchedCat._id?.toString() || "none") : "none"
 
-      const filterCategory = filters.category
-      const matchesCategory = !filterCategory || resolvedCatId === filterCategory
+        const filterCategory = filters.category
+        const matchesCategory = !filterCategory || resolvedCatId === filterCategory
 
-      return matchesSearch && matchesType && matchesStatus && matchesFav && matchesCategory
-    })
+        return matchesSearch && matchesType && matchesStatus && matchesFav && matchesCategory
+      })
+      .map((res) => ({
+        ...res,
+        name: res.title || res.name || "",
+        link: res.url || res.link || "",
+      }))
   }, [resources, searchQuery, filterType, filterStatus, filterFavorite, filters.category, categories])
 
   const pageTitle = getResourcesPageTitle({
@@ -189,7 +195,7 @@ export function ResourcesContent({
   }, categories)
 
   // Open sheet for edit
-  const handleCardClick = async (resource: Resource) => {
+  const handleCardClick = React.useCallback(async (resource: Resource) => {
     setSelectedResource(resource)
     setIsCreating(false)
 
@@ -223,7 +229,7 @@ export function ResourcesContent({
     if (resId) {
       trackResourceViewAction(resId).catch((err) => console.error(err))
     }
-  }
+  }, [categories])
 
   // Open sheet for create
   const handleOpenCreate = () => {
@@ -338,10 +344,10 @@ export function ResourcesContent({
   }
 
   // Delete resource from card hover action — opens the AlertDialog
-  const handleCardDelete = (resource: Resource, e: React.MouseEvent) => {
+  const handleCardDelete = React.useCallback((resource: Resource, e: React.MouseEvent) => {
     e.stopPropagation()
     setDeleteTarget(resource)
-  }
+  }, [])
 
 
 
@@ -379,10 +385,8 @@ export function ResourcesContent({
         <div className="p-4 border border-border/40 bg-card/30 backdrop-blur-sm rounded-2xl flex flex-col gap-4 lg:flex-row lg:items-center max-w-7xl">
           {/* Search */}
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
             <Input
               placeholder="Search title, description, tags..."
-              className="pl-9 h-10 border-border/60 bg-background/50 focus-visible:ring-primary/20"
               value={searchValue}
               onChange={(e) => setSearchValue(e.target.value)}
             />
@@ -470,15 +474,10 @@ export function ResourcesContent({
             {filteredResources.map((res, index) => (
               <ResourceCard
                 key={res._id?.toString() || res.id}
-                resource={{
-                  ...res,
-                  // enforce mapped properties for ResourceCard rendering
-                  name: res.title || res.name || "",
-                  link: res.url || res.link || "",
-                }}
+                resource={res}
                 priority={index < 6}
-                onEdit={() => handleCardClick(res)}
-                onDelete={(e) => handleCardDelete(res, e)}
+                onEdit={handleCardClick}
+                onDelete={handleCardDelete}
               />
             ))}
           </div>

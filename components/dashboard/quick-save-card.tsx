@@ -3,14 +3,15 @@
 import { useState } from "react"
 import { Card, CardHeader, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group"
+import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupButton } from "@/components/ui/input-group"
 import { Separator } from "@/components/ui/separator"
 import {
     HoverCard,
     HoverCardContent,
     HoverCardTrigger,
 } from "@/components/ui/hover-card"
-import { PlusCircle, Loader2, Globe, Info } from "lucide-react"
+import { Popover, PopoverContent, PopoverAnchor } from "@/components/ui/popover"
+import { PlusCircle, Loader2, Globe, Info, ChevronRight } from "lucide-react"
 import { toast } from "sonner"
 import { addResourceAction } from "@/lib/actions"
 import { useRouter } from "next/navigation"
@@ -30,6 +31,7 @@ export function QuickSaveCard() {
     const [url, setUrl] = useState("")
     const [loading, setLoading] = useState(false)
     const [fetchingMetadata, setFetchingMetadata] = useState(false)
+    const [showPreview, setShowPreview] = useState(false)
     const [metadata, setMetadata] = useState<{
         title: string
         description: string
@@ -43,6 +45,7 @@ export function QuickSaveCard() {
         if (val.trim() && val.includes(".") && val.length > 4) {
             try {
                 setFetchingMetadata(true)
+                setShowPreview(true)
                 const res = await fetch(`/api/resources/metadata?url=${encodeURIComponent(val)}`)
                 if (res.ok) setMetadata(await res.json())
             } catch {
@@ -50,6 +53,8 @@ export function QuickSaveCard() {
             } finally {
                 setFetchingMetadata(false)
             }
+        } else {
+            setShowPreview(false)
         }
     }
 
@@ -70,6 +75,7 @@ export function QuickSaveCard() {
                 toast.success("Saved to Workspace!")
                 setUrl("")
                 setMetadata(null)
+                setShowPreview(false)
                 router.refresh()
             } else {
                 toast.error("Failed to save resource")
@@ -133,30 +139,73 @@ export function QuickSaveCard() {
             </CardHeader>
 
             {/* Body */}
-            <CardContent className="flex flex-col gap-2.5 p-0">
-                <InputGroup>
-                    <InputGroupAddon>
-                        <Globe />
-                    </InputGroupAddon>
-                    <InputGroupInput
-                        type="text"
-                        value={url}
-                        onChange={handleUrlChange}
-                        placeholder="Paste a URL to save…"
-                        disabled={loading}
-                    />
-                </InputGroup>
+            <CardContent className="flex flex-1 flex-col justify-center p-0">
+                <Popover open={showPreview} onOpenChange={setShowPreview}>
+                    <PopoverAnchor asChild>
+                        <form
+                            onSubmit={e => {
+                                e.preventDefault()
+                                handleSave()
+                            }}
+                            className="w-full"
+                        >
+                            <InputGroup>
+                                <InputGroupAddon align="inline-start">
+                                    <Globe />
+                                </InputGroupAddon>
+                                <InputGroupInput
+                                    type="text"
+                                    value={url}
+                                    onChange={handleUrlChange}
+                                    placeholder="Paste a URL to save…"
+                                    disabled={loading}
+                                />
+                                {url.trim() && (
+                                    <InputGroupAddon align="inline-end">
+                                        <InputGroupButton
+                                            onClick={() => setShowPreview(prev => !prev)}
+                                            variant="ghost"
+                                            size="icon-xs"
+                                            title="Toggle preview details"
+                                        >
+                                            {fetchingMetadata ? (
+                                                <Loader2 className="size-3.5 animate-spin text-primary" />
+                                            ) : (
+                                                <Info className={`size-3.5 transition-colors ${showPreview ? "text-primary" : ""}`} />
+                                            )}
+                                        </InputGroupButton>
+                                        <InputGroupButton
+                                            type="submit"
+                                            disabled={loading}
+                                            size="icon-xs"
+                                            title="Save to Workspace"
+                                        >
+                                            {loading ? (
+                                                <Loader2 className="size-3.5 animate-spin" />
+                                            ) : (
+                                                <ChevronRight className="size-3.5" />
+                                            )}
+                                        </InputGroupButton>
+                                    </InputGroupAddon>
+                                )}
+                            </InputGroup>
+                        </form>
+                    </PopoverAnchor>
 
-                {url.trim() && (
-                    <div className="animate-in fade-in-0 slide-in-from-top-1 flex flex-col gap-2.5 duration-150">
-                        {/* Inline metadata preview */}
+                    <PopoverContent
+                        align="start"
+                        side="top"
+                        sideOffset={6}
+                        onOpenAutoFocus={(e) => e.preventDefault()}
+                        className="w-(--radix-popover-trigger-width)"
+                    >
                         {fetchingMetadata ? (
-                            <div className="flex items-center gap-2 rounded-md border border-border/40 bg-muted/10 px-2.5 py-2.5">
+                            <div className="flex items-center gap-2 py-1">
                                 <Loader2 className="size-3.5 shrink-0 animate-spin text-muted-foreground" />
                                 <span className="text-xs text-muted-foreground">Fetching details…</span>
                             </div>
                         ) : (
-                            <div className="flex flex-col gap-1.5 rounded-md border border-border/40 bg-muted/10 p-2.5">
+                            <div className="flex flex-col gap-1.5">
                                 <div className="flex items-center gap-2 min-w-0">
                                     {metadata?.faviconUrl ? (
                                         <img
@@ -182,23 +231,18 @@ export function QuickSaveCard() {
                                     </div>
                                 </div>
                                 {metadata?.description && (
-                                    <p className="text-[10px] text-muted-foreground/70 leading-relaxed line-clamp-2 pl-6">
+                                    <p className="text-[10px] text-muted-foreground/70 leading-relaxed line-clamp-3 pl-6 border-l border-border/40 ml-2">
                                         {metadata.description}
                                     </p>
                                 )}
                             </div>
                         )}
+                    </PopoverContent>
+                </Popover>
 
-                        <Button
-                            onClick={handleSave}
-                            disabled={loading || !url.trim()}
-                            className="w-full text-xs font-semibold"
-                        >
-                            {loading && <Loader2 data-icon="inline-start" className="animate-spin" />}
-                            {loading ? "Saving to Workspace…" : "Save to Workspace"}
-                        </Button>
-                    </div>
-                )}
+                <p className="text-[10px] text-muted-foreground/35 text-center mt-3">
+                    press enter or click the chevron to save
+                </p>
             </CardContent>
         </Card>
     )

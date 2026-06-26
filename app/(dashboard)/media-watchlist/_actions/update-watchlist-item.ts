@@ -5,6 +5,7 @@ import { getSessionUser, getErrorMessage } from "@/lib/auth-utils";
 import { updateTag } from "next/cache";
 import { ObjectId } from "mongodb";
 import { updateWatchlistStatusSchema, updateWatchlistRatingSchema } from "../_schemas/watchlist.schema";
+import { WatchlistService } from "@/features/watchlist/services/watchlist.service";
 
 export async function updateWatchlistItemAction(id: string, payload: Record<string, unknown>): Promise<{ success: boolean; error?: string }> {
   try {
@@ -52,6 +53,15 @@ export async function updateWatchlistItemAction(id: string, payload: Record<stri
         { _id: new ObjectId(id) },
         updateOp
       );
+
+      // If status was changed, trigger an immediate metadata sync
+      if ("status" in payload) {
+        try {
+          await WatchlistService.syncItemById(id);
+        } catch (err) {
+          console.error("Failed to sync watchlist item metadata on update:", err);
+        }
+      }
     }
 
     updateTag("watchlist");

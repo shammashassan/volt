@@ -4,18 +4,28 @@ import * as React from "react"
 import { useState, useMemo } from "react"
 import { Resource, Note, Person, PersonType } from "@/lib/types"
 import { Button } from "@/components/ui/button"
-import { Tag, FileText, Link as LinkIcon, User, Layers, Search, Folder, X, Filter, ArrowUp, ArrowDown, Flame, CaseSensitive, Calendar } from "lucide-react"
-import { Empty, EmptyHeader, EmptyTitle, EmptyDescription, EmptyContent, EmptyMedia } from "@/components/ui/empty"
+import { Tag, FileText, Link as LinkIcon, User, Layers, X, Filter, ArrowUp, ArrowDown, Flame, CaseSensitive, Calendar } from "lucide-react"
+import { Empty, EmptyHeader, EmptyTitle, EmptyDescription, EmptyMedia } from "@/components/ui/empty"
 import { Badge } from "@/components/ui/badge"
 import { ResourceCard } from "@/components/resource-card"
-import { Card, CardContent, CardHeader, CardTitle, CardAction } from "@/components/ui/card"
-import { cn } from "@/lib/utils"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useRouter } from "next/navigation"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuGroup } from "@/components/ui/dropdown-menu"
-import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import {
+  Combobox,
+  ComboboxChip,
+  ComboboxChips,
+  ComboboxChipsInput,
+  ComboboxContent,
+  ComboboxEmpty,
+  ComboboxItem,
+  ComboboxList,
+  ComboboxValue,
+  useComboboxAnchor,
+} from "@/components/ui/combobox"
 
 interface TagsContentProps {
   resources: Resource[]
@@ -32,12 +42,12 @@ const TYPE_CONFIG: Record<PersonType, { label: string; variant: "secondary" | "o
 }
 
 export function TagsContent({ resources, notes, people }: TagsContentProps) {
-  const [selectedTag, setSelectedTag] = useState<string | null>(null)
-  const [searchQuery, setSearchQuery] = useState("")
+  const [selectedTags, setSelectedTags] = useState<string[]>([])
   const [sortBy, setSortBy] = useState<"popular" | "alpha" | "date">("popular")
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc")
+  const [sortOrder, setSortOrder] = useState<"desc" | "asc">("desc")
   const [activeTab, setActiveTab] = useState("resources")
   const router = useRouter()
+  const anchor = useComboboxAnchor()
 
   // Calculate tag counts and track the latest entity date for sorting
   const tagStats = useMemo(() => {
@@ -76,43 +86,100 @@ export function TagsContent({ resources, notes, people }: TagsContentProps) {
       })
     })
 
-    // Convert to array
     return Object.entries(counts).map(([name, stats]) => ({ name, ...stats }))
   }, [resources, notes, people])
 
-  // Filter and sort tags based on user selection
-  const processedTags = useMemo(() => {
-    let result = [...tagStats]
+  // Sort tags list in the combobox by total count descending (most popular tags first)
+  const tagNames = useMemo(() => {
+    return [...tagStats]
+      .sort((a, b) => b.total - a.total || a.name.localeCompare(b.name))
+      .map((t) => t.name)
+  }, [tagStats])
 
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase()
-      result = result.filter((t) => t.name.toLowerCase().includes(query))
-    }
+  // Filtered and sorted entities based on selected tags (OR match: matches any of selected tags)
+  const filteredEntities = useMemo(() => {
+    if (selectedTags.length === 0) return { resources: [], notes: [], people: [] }
 
-    result.sort((a, b) => {
+    const rawResources = resources.filter((r) => (r.tags || []).some((t) => selectedTags.includes(t)))
+    const rawNotes = notes.filter((n) => (n.tags || []).some((t) => selectedTags.includes(t)))
+    const rawPeople = people.filter((p) => (p.tags || []).some((t) => selectedTags.includes(t)))
+
+    // 1. Sort resources
+    const sortedResources = [...rawResources].sort((a, b) => {
       let comparison = 0
       if (sortBy === "alpha") {
-        comparison = a.name.localeCompare(b.name)
+        const titleA = a.title || a.name || ""
+        const titleB = b.title || b.name || ""
+        comparison = titleA.localeCompare(titleB)
       } else if (sortBy === "date") {
-        comparison = a.latestDate - b.latestDate
+        const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0
+        const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0
+        comparison = dateA - dateB
       } else {
-        comparison = a.total - b.total
+        // "popular" -> useCount
+        const countA = a.useCount || 0
+        const countB = b.useCount || 0
+        comparison = countA - countB
+        if (comparison === 0) {
+          const titleA = a.title || a.name || ""
+          const titleB = b.title || b.name || ""
+          comparison = titleB.localeCompare(titleA)
+        }
       }
       return sortOrder === "desc" ? -comparison : comparison
     })
 
-    return result
-  }, [tagStats, searchQuery, sortBy, sortOrder])
+    // 2. Sort notes
+    const sortedNotes = [...rawNotes].sort((a, b) => {
+      let comparison = 0
+      if (sortBy === "alpha") {
+        const titleA = a.title || ""
+        const titleB = b.title || ""
+        comparison = titleA.localeCompare(titleB)
+      } else if (sortBy === "date") {
+        const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0
+        const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0
+        comparison = dateA - dateB
+      } else {
+        // "popular" -> pinned first, then date
+        const pinA = a.pinned ? 1 : 0
+        const pinB = b.pinned ? 1 : 0
+        comparison = pinA - pinB
+        if (comparison === 0) {
+          const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0
+          const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0
+          comparison = dateA - dateB
+        }
+      }
+      return sortOrder === "desc" ? -comparison : comparison
+    })
 
-  // Filtered entities based on selected tag
-  const filteredEntities = useMemo(() => {
-    if (!selectedTag) return { resources: [], notes: [], people: [] }
+    // 3. Sort people
+    const sortedPeople = [...rawPeople].sort((a, b) => {
+      let comparison = 0
+      if (sortBy === "alpha") {
+        const nameA = a.name || ""
+        const nameB = b.name || ""
+        comparison = nameA.localeCompare(nameB)
+      } else if (sortBy === "date") {
+        const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0
+        const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0
+        comparison = dateA - dateB
+      } else {
+        // "popular" -> fallback to date
+        const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0
+        const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0
+        comparison = dateA - dateB
+      }
+      return sortOrder === "desc" ? -comparison : comparison
+    })
+
     return {
-      resources: resources.filter((r) => (r.tags || []).includes(selectedTag)),
-      notes: notes.filter((n) => (n.tags || []).includes(selectedTag)),
-      people: people.filter((p) => (p.tags || []).includes(selectedTag)),
+      resources: sortedResources,
+      notes: sortedNotes,
+      people: sortedPeople,
     }
-  }, [selectedTag, resources, notes, people])
+  }, [selectedTags, resources, notes, people, sortBy, sortOrder])
 
   return (
     <div className="flex flex-1 flex-col gap-6 pb-12">
@@ -140,27 +207,60 @@ export function TagsContent({ resources, notes, people }: TagsContentProps) {
         </div>
       </section>
 
-      {/* Controls: Search and Sort */}
+      {/* Controls & Dropdown Selection */}
       <section className="px-4 lg:px-6">
-        <div className="p-4 border border-border/40 bg-card/30 backdrop-blur-sm rounded-2xl flex flex-col gap-4 lg:flex-row lg:items-center max-w-7xl">
-          <InputGroup className="flex-1 max-w-none lg:max-w-xs bg-background/50">
-            <InputGroupAddon align="inline-start">
-              <Search className="text-muted-foreground" />
-            </InputGroupAddon>
-            <InputGroupInput
-              placeholder="Search tags..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </InputGroup>
+        <div className="p-4 border border-border/40 bg-card/30 backdrop-blur-sm rounded-2xl flex flex-col gap-4 md:flex-row md:items-center max-w-7xl">
+          {/* Combobox */}
+          <div className="flex-1 min-w-0">
+            <Combobox
+              multiple
+              autoHighlight
+              items={tagNames}
+              value={selectedTags}
+              onValueChange={setSelectedTags}
+            >
+              <ComboboxChips ref={anchor} className="w-full bg-background/50 border-border/60">
+                <ComboboxValue>
+                  {(values) => (
+                    <React.Fragment>
+                      {values.map((value: string) => (
+                        <ComboboxChip key={value}>{value}</ComboboxChip>
+                      ))}
+                      <ComboboxChipsInput placeholder="Filter by tags..." />
+                    </React.Fragment>
+                  )}
+                </ComboboxValue>
+              </ComboboxChips>
+              <ComboboxContent anchor={anchor} className="w-(--anchor-width)">
+                <ComboboxEmpty>No tags found.</ComboboxEmpty>
+                <ComboboxList>
+                  {(item) => {
+                    const stats = tagStats.find((t) => t.name === item)
+                    return (
+                      <ComboboxItem key={item} value={item}>
+                        <Tag className="text-muted-foreground" />
+                        <span>{item}</span>
+                        {stats && (
+                          <Badge variant="secondary" className="ml-auto">
+                            {stats.total}
+                          </Badge>
+                        )}
+                      </ComboboxItem>
+                    )
+                  }}
+                </ComboboxList>
+              </ComboboxContent>
+            </Combobox>
+          </div>
 
-          <div className="flex gap-2 justify-end w-full lg:w-auto items-center">
+          {/* Sort Dropdown & Toggle */}
+          <div className="flex gap-2 items-center shrink-0">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline">
-                  <Filter data-icon="inline-start" />
+                  <Filter />
                   <span>
-                    Sort: {sortBy === "popular" ? "Popularity" : sortBy === "alpha" ? "Alphabetical" : "Date Created"}
+                    Sort: {sortBy === "popular" ? "Popularity" : sortBy === "alpha" ? "Alphabetical" : "Date"}
                   </span>
                 </Button>
               </DropdownMenuTrigger>
@@ -210,88 +310,21 @@ export function TagsContent({ resources, notes, people }: TagsContentProps) {
       {/* Main Content section */}
       <section className="px-4 lg:px-6">
         <div className="max-w-7xl flex flex-col gap-6">
-          {/* Tag Cloud / Grid */}
-          {processedTags.length === 0 ? (
-            <Empty className="py-20 border border-dashed rounded-2xl bg-card/10">
-              <EmptyHeader>
-                <EmptyMedia variant="icon">
-                  <Tag />
-                </EmptyMedia>
-                <EmptyTitle>No tags found</EmptyTitle>
-                <EmptyDescription>
-                  {searchQuery ? "Try refining your search query." : "Add tags to resources, notes, or people."}
-                </EmptyDescription>
-              </EmptyHeader>
-            </Empty>
-          ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-              {processedTags.map((tag) => {
-                const isSelected = selectedTag === tag.name
-                return (
-                  <Card
-                    key={tag.name}
-                    size="sm"
-                    role="button"
-                    tabIndex={0}
-                    onClick={() => setSelectedTag(isSelected ? null : tag.name)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") {
-                        e.preventDefault()
-                        setSelectedTag(isSelected ? null : tag.name)
-                      }
-                    }}
-                    className={cn(
-                      "cursor-pointer select-none transition-all hover:bg-muted/50",
-                      isSelected && "border-primary bg-primary/5 ring-1 ring-primary/50"
-                    )}
-                  >
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1.5">
-                      <div className="flex items-center gap-1.5 min-w-0">
-                        <Tag className={cn("size-3.5 shrink-0", isSelected ? "text-primary" : "text-muted-foreground/60")} />
-                        <CardTitle className="font-bold text-xs truncate">{tag.name}</CardTitle>
-                      </div>
-                      <CardAction>
-                        <Badge
-                          variant={isSelected ? "primary" : "secondary"}
-                          className="text-[9px] px-1.5 h-4.5 rounded-full font-bold select-none shrink-0"
-                        >
-                          {tag.total}
-                        </Badge>
-                      </CardAction>
-                    </CardHeader>
-                    <CardContent className="pt-0 flex items-center gap-2 text-[10px] text-muted-foreground/60">
-                      {tag.resources > 0 && (
-                        <span className="flex items-center gap-0.5" title="Resources">
-                          <LinkIcon className="size-3 text-blue-500" />
-                          {tag.resources}
-                        </span>
-                      )}
-                      {tag.notes > 0 && (
-                        <span className="flex items-center gap-0.5" title="Notes">
-                          <FileText className="size-3 text-amber-500" />
-                          {tag.notes}
-                        </span>
-                      )}
-                      {tag.people > 0 && (
-                        <span className="flex items-center gap-0.5" title="People">
-                          <User className="size-3 text-emerald-500" />
-                          {tag.people}
-                        </span>
-                      )}
-                    </CardContent>
-                  </Card>
-                )
-              })}
-            </div>
-          )}
-
-          {/* Filtered Content View */}
-          {selectedTag && (
-            <div className="space-y-6 mt-4">
+          {/* Selected Tag Results View */}
+          {selectedTags.length > 0 ? (
+            <div className="space-y-6">
               <div className="flex items-center justify-between border-b border-border/20 pb-3">
-                <h2 className="text-xl font-bold tracking-tight text-foreground flex items-center gap-2">
-                  <Layers className="size-5 text-primary" />
-                  Results for tag: <span className="text-primary font-black">#{selectedTag}</span>
+                <h2 className="text-xl font-bold tracking-tight text-foreground flex flex-wrap items-center gap-2">
+                  <Layers />
+                  <span>Results for tags:</span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {selectedTags.map((tag) => (
+                      <Badge key={tag} variant="outline">
+                        <Tag />
+                        {tag}
+                      </Badge>
+                    ))}
+                  </div>
                 </h2>
                 <TooltipProvider>
                   <Tooltip>
@@ -299,8 +332,7 @@ export function TagsContent({ resources, notes, people }: TagsContentProps) {
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => setSelectedTag(null)}
-                        className="shrink-0"
+                        onClick={() => setSelectedTags([])}
                       >
                         <X />
                         <span className="sr-only">Clear Selection</span>
@@ -358,7 +390,7 @@ export function TagsContent({ resources, notes, people }: TagsContentProps) {
                         </EmptyMedia>
                         <EmptyTitle>No associated resources</EmptyTitle>
                         <EmptyDescription>
-                          Link resources from the resources library.
+                          No resources link to these tags.
                         </EmptyDescription>
                       </EmptyHeader>
                     </Empty>
@@ -380,7 +412,7 @@ export function TagsContent({ resources, notes, people }: TagsContentProps) {
                         </EmptyMedia>
                         <EmptyTitle>No associated notes</EmptyTitle>
                         <EmptyDescription>
-                          Link notes from the notes workspace.
+                          No notes link to these tags.
                         </EmptyDescription>
                       </EmptyHeader>
                     </Empty>
@@ -417,7 +449,7 @@ export function TagsContent({ resources, notes, people }: TagsContentProps) {
                         </EmptyMedia>
                         <EmptyTitle>No associated people</EmptyTitle>
                         <EmptyDescription>
-                          Link people from the developer network.
+                          No profiles link to these tags.
                         </EmptyDescription>
                       </EmptyHeader>
                     </Empty>
@@ -457,6 +489,18 @@ export function TagsContent({ resources, notes, people }: TagsContentProps) {
                 </TabsContent>
               </Tabs>
             </div>
+          ) : (
+            <Empty className="py-24">
+              <EmptyHeader>
+                <EmptyMedia variant="icon">
+                  <Tag />
+                </EmptyMedia>
+                <EmptyTitle>No tags selected</EmptyTitle>
+                <EmptyDescription>
+                  Select one or more tags from the dropdown list to explore linked resources, notes, and profiles.
+                </EmptyDescription>
+              </EmptyHeader>
+            </Empty>
           )}
         </div>
       </section>

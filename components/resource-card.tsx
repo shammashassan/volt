@@ -1,53 +1,229 @@
 "use client"
 
 import * as React from "react"
+import { useMemo, useState, useEffect, useCallback } from "react"
 import Image from "next/image"
 import { Card, CardHeader, CardTitle } from "@/components/ui/card"
+import { Skeleton } from "@/components/ui/skeleton"
 import { ExternalLinkIcon, PencilIcon, Trash2Icon } from "lucide-react"
-import { Resource } from "@/lib/data"
 import { cn } from "@/lib/utils"
 import { trackResourceViewAction, useResourceAction } from "@/lib/actions"
 
-export const ResourceCard = React.memo(function ResourceCard({
+// Minimum data structure a resource must have to be rendered by ResourceCard
+export interface ResourceCardData {
+  name: string
+  link: string
+  description: string
+  id?: string
+  _id?: unknown
+}
+
+interface ResourceCardProps<T> {
+  resource: T
+  priority?: boolean
+  onClick?: (e: React.MouseEvent) => void
+  onEdit?: (resource: T, e: React.MouseEvent) => void
+  onDelete?: (resource: T, e: React.MouseEvent) => void
+}
+
+interface ResourceCardOverlayProps<T> {
+  targetUrl: string
+  hasClick: boolean
+  resource: T
+  onEdit?: (resource: T, e: React.MouseEvent) => void
+  onDelete?: (resource: T, e: React.MouseEvent) => void
+}
+
+// Pure helper to normalize URLs defensively
+function normalizeUrl(url: string): string {
+  const rawUrl = url || ""
+  if (!rawUrl) return ""
+  return /^(https?:)?\/\//i.test(rawUrl) ? rawUrl : `https://${rawUrl}`
+}
+
+// Pure helper to resolve the preview URL
+function getPreviewUrl(link: string, fallbackName: string): string {
+  if (!link) {
+    return getFallbackImage(fallbackName)
+  }
+  return `https://api.microlink.io/?url=${encodeURIComponent(link)}&screenshot=true&meta=false&embed=screenshot.url`
+}
+
+// Pure helper to generate fallback initials images
+function getFallbackImage(name: string): string {
+  const safeName = name || "Resource"
+  return `https://avatar.vercel.sh/${safeName}?size=400&text=${safeName.slice(0, 2)}`
+}
+
+// Custom hook to handle screenshot loading, state synchronization, and fallbacks
+function useScreenshot<T extends ResourceCardData>(resource: T) {
+  const normalizedUrl = useMemo(() => normalizeUrl(resource.link || ""), [resource.link])
+
+  const previewUrl = useMemo(() => {
+    return getPreviewUrl(normalizedUrl, resource.name)
+  }, [normalizedUrl, resource.name])
+
+  const [imgSrc, setImgSrc] = useState(previewUrl)
+  const [isLoading, setIsLoading] = useState(true)
+  const [hasError, setHasError] = useState(false)
+
+  // React standard pattern to sync state when preview URL changes
+  useEffect(() => {
+    setImgSrc(previewUrl)
+    setIsLoading(true)
+    setHasError(false)
+  }, [previewUrl])
+
+  const handleLoad = useCallback(() => {
+    setIsLoading(false)
+  }, [])
+
+  const handleError = useCallback(() => {
+    if (!hasError && normalizedUrl) {
+      setHasError(true)
+      setImgSrc(`https://s0.wp.com/mshots/v1/${encodeURIComponent(normalizedUrl)}?w=600&h=400`)
+    } else {
+      setImgSrc(getFallbackImage(resource.name))
+      setIsLoading(false)
+    }
+  }, [hasError, normalizedUrl, resource.name])
+
+  // Check if image is already completed (cached) when source or ref changes
+  const [imgElement, setImgElement] = useState<HTMLImageElement | null>(null)
+
+  useEffect(() => {
+    if (imgElement && imgElement.complete) {
+      setIsLoading(false)
+    }
+  }, [imgElement, imgSrc])
+
+  return {
+    imgSrc,
+    isLoading,
+    handleLoad,
+    handleError,
+    setImgElement,
+  }
+}
+
+// Subcomponent: Hover and Actions overlay
+const ResourceCardOverlay = React.memo(function ResourceCardOverlay<
+  T extends ResourceCardData
+>({
+  targetUrl,
+  hasClick,
+  resource,
+  onEdit,
+  onDelete,
+}: ResourceCardOverlayProps<T>) {
+  const handleEditClick = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation()
+      e.preventDefault()
+      onEdit?.(resource, e)
+    },
+    [resource, onEdit]
+  )
+
+  const handleDeleteClick = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation()
+      e.preventDefault()
+      onDelete?.(resource, e)
+    },
+    [resource, onDelete]
+  )
+
+  return (
+    <>
+      {/* Hover Overlay */}
+      <div className="absolute inset-0 flex items-center justify-center bg-background/30 backdrop-blur-[1px] opacity-0 transition-opacity duration-300 group-hover:opacity-100 z-30">
+        {hasClick ? (
+          <a
+            href={targetUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => {
+              e.stopPropagation()
+            }}
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/95 text-primary-foreground shadow-lg transition-transform duration-300 scale-90 group-hover:scale-100 hover:scale-110 will-change-transform"
+          >
+            <ExternalLinkIcon className="size-5" />
+          </a>
+        ) : (
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/95 text-primary-foreground shadow-lg transition-transform duration-300 scale-90 group-hover:scale-100 hover:scale-110 will-change-transform">
+            <ExternalLinkIcon className="size-5" />
+          </div>
+        )}
+      </div>
+
+      {/* Edit/Delete Actions */}
+      {(onEdit || onDelete) && (
+        <div className="absolute top-2 right-2 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-50">
+          {onEdit && (
+            <button
+              onClick={handleEditClick}
+              className="flex h-7 w-7 items-center justify-center rounded-lg bg-background/80 hover:bg-background border border-border/40 backdrop-blur-xs text-muted-foreground hover:text-foreground transition-all shadow-xs cursor-pointer"
+              title="Edit Resource"
+              aria-label="Edit Resource"
+            >
+              <PencilIcon className="size-3.5" />
+            </button>
+          )}
+          {onDelete && (
+            <button
+              onClick={handleDeleteClick}
+              className="flex h-7 w-7 items-center justify-center rounded-lg bg-destructive/80 hover:bg-destructive border border-destructive/20 backdrop-blur-xs text-destructive-foreground transition-all shadow-xs cursor-pointer"
+              title="Delete Resource"
+              aria-label="Delete Resource"
+            >
+              <Trash2Icon className="size-3.5" />
+            </button>
+          )}
+        </div>
+      )}
+    </>
+  )
+}) as <T extends ResourceCardData>(props: ResourceCardOverlayProps<T>) => React.ReactNode
+
+// Main Component
+const ResourceCardComponent = function ResourceCardComponent<
+  T extends ResourceCardData
+>({
   resource,
   priority = false,
   onClick,
   onEdit,
   onDelete,
-}: {
-  resource: Resource
-  priority?: boolean
-  onClick?: (e: React.MouseEvent) => void
-  onEdit?: (e: React.MouseEvent) => void
-  onDelete?: (e: React.MouseEvent) => void
-}) {
-  const rawUrl = resource.link || ""
-  const targetUrl = /^(https?:)?\/\//i.test(rawUrl) ? rawUrl : `https://${rawUrl}`
+}: ResourceCardProps<T>) {
+  const targetUrl = useMemo(() => normalizeUrl(resource.link), [resource.link])
 
-  // Use Microlink API as primary screenshot provider
-  const previewUrl = `https://api.microlink.io/?url=${encodeURIComponent(resource.link)}&screenshot=true&meta=false&embed=screenshot.url`
+  const externalProps = useMemo(
+    () => ({
+      href: targetUrl,
+      target: "_blank",
+      rel: "noopener noreferrer",
+    }),
+    [targetUrl]
+  )
 
-  const [imgSrc, setImgSrc] = React.useState(previewUrl)
-  const [isLoading, setIsLoading] = React.useState(true)
-  const [hasError, setHasError] = React.useState(false)
+  const { imgSrc, isLoading, handleLoad, handleError, setImgElement } = useScreenshot(resource)
 
-  // Fire-and-forget: never block navigation
-  const handleTrack = React.useCallback(() => {
-    const id = (resource as any).id || (resource as any)._id?.toString()
-    if (!id) return
-    trackResourceViewAction(id)
-    useResourceAction(id)
-  }, [(resource as any).id])
+  const resourceId = resource.id || (resource._id as string | undefined)?.toString()
+  const handleTrack = useCallback(() => {
+    if (!resourceId) return
+    void trackResourceViewAction(resourceId)
+    void useResourceAction(resourceId)
+  }, [resourceId])
 
   const content = (
-    <Card className="relative h-full overflow-hidden p-0 border-border/40 bg-card/60 transition-[border-color,background-color,shadow,transform] duration-300 hover:border-primary/20 hover:bg-card hover:shadow-xl hover:shadow-primary/5 will-change-[transform,shadow]">
+    <Card className="relative h-full overflow-hidden p-0 border-border/40 bg-card/60 transition-[border-color,background-color,shadow,transform] duration-300 hover:border-primary/20 hover:bg-card hover:shadow-lg hover:shadow-primary/5 will-change-[transform,shadow]">
       <div className="relative aspect-video w-full overflow-hidden bg-muted/30 will-change-transform">
         {isLoading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-muted animate-pulse z-40">
-            <div className="size-8 rounded-full border-2 border-primary/20 border-t-primary animate-spin" />
-          </div>
+          <Skeleton className="absolute inset-0 rounded-none z-40" />
         )}
         <Image
+          ref={setImgElement}
           src={imgSrc}
           alt={resource.name}
           width={600}
@@ -56,77 +232,23 @@ export const ResourceCard = React.memo(function ResourceCard({
             "h-full w-full object-cover transition-all duration-500 group-hover:scale-105",
             isLoading ? "opacity-0" : "opacity-100"
           )}
-          onLoad={() => setIsLoading(false)}
-          onError={() => {
-            if (!hasError) {
-              // If Microlink fails, try WordPress mshots as a secondary fallback
-              setHasError(true)
-              setImgSrc(`https://s0.wp.com/mshots/v1/${encodeURIComponent(resource.link)}?w=600&h=400`)
-            } else {
-              // If both fail, use the branded placeholder
-              setImgSrc(`https://avatar.vercel.sh/${resource.name}?size=400&text=${resource.name.substring(0, 2)}`)
-              setIsLoading(false)
-            }
-          }}
+          onLoad={handleLoad}
+          onError={handleError}
           unoptimized={true}
           priority={priority}
           loading={priority ? undefined : "lazy"}
         />
-        {/* Hover Overlay */}
-        <div className="absolute inset-0 flex items-center justify-center bg-background/20 opacity-0 transition-opacity duration-300 group-hover:opacity-100 z-30">
-          {onClick ? (
-            <a
-              href={targetUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(e) => {
-                e.stopPropagation()
-              }}
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/95 text-primary-foreground shadow-lg transition-transform duration-300 scale-90 group-hover:scale-100 hover:scale-110 will-change-transform"
-            >
-              <ExternalLinkIcon className="size-5" />
-            </a>
-          ) : (
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/95 text-primary-foreground shadow-lg transition-transform duration-300 scale-90 group-hover:scale-100 hover:scale-110 will-change-transform">
-              <ExternalLinkIcon className="size-5" />
-            </div>
-          )}
-        </div>
 
-        {/* Edit/Delete Actions */}
-        {(onEdit || onDelete) && (
-          <div className="absolute top-2 right-2 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-50">
-            {onEdit && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation()
-                  e.preventDefault()
-                  onEdit(e)
-                }}
-                className="flex h-7 w-7 items-center justify-center rounded-lg bg-background/80 hover:bg-background border border-border/40 backdrop-blur-xs text-muted-foreground hover:text-foreground transition-all shadow-xs cursor-pointer"
-                title="Edit Resource"
-              >
-                <PencilIcon className="size-3.5" />
-              </button>
-            )}
-            {onDelete && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation()
-                  e.preventDefault()
-                  onDelete(e)
-                }}
-                className="flex h-7 w-7 items-center justify-center rounded-lg bg-destructive/80 hover:bg-destructive border border-destructive/20 backdrop-blur-xs text-destructive-foreground transition-all shadow-xs cursor-pointer"
-                title="Delete Resource"
-              >
-                <Trash2Icon className="size-3.5" />
-              </button>
-            )}
-          </div>
-        )}
+        <ResourceCardOverlay
+          targetUrl={targetUrl}
+          hasClick={!!onClick}
+          resource={resource}
+          onEdit={onEdit}
+          onDelete={onDelete}
+        />
       </div>
       <CardHeader className="flex flex-col gap-0.5 px-4 py-3">
-        <CardTitle className="line-clamp-1 text-base font-bold tracking-tight text-foreground/90 transition-colors group-hover:text-primary">
+        <CardTitle className="line-clamp-1 text-base font-semibold tracking-tight text-foreground/90 transition-colors group-hover:text-primary">
           {resource.name}
         </CardTitle>
         <p className="line-clamp-2 text-[11px] leading-tight text-muted-foreground/70">
@@ -139,7 +261,10 @@ export const ResourceCard = React.memo(function ResourceCard({
   if (onClick) {
     return (
       <div
-        onClick={(e) => { handleTrack(); onClick(e) }}
+        onClick={(e) => {
+          handleTrack()
+          onClick(e)
+        }}
         className="block group h-full focus-visible:outline-hidden cursor-pointer"
       >
         {content}
@@ -149,13 +274,17 @@ export const ResourceCard = React.memo(function ResourceCard({
 
   return (
     <a
-      href={targetUrl}
-      target="_blank"
-      rel="noopener noreferrer"
+      {...externalProps}
       onClick={handleTrack}
       className="block group h-full focus-visible:outline-hidden"
     >
       {content}
     </a>
   )
-})
+}
+
+export const ResourceCard = React.memo(ResourceCardComponent) as <
+  T extends ResourceCardData
+>(
+  props: ResourceCardProps<T>
+) => React.ReactNode

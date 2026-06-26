@@ -112,7 +112,7 @@ export function MediaWatchlistClient({ initialItems }: MediaWatchlistClientProps
     };
 
     setItems((prev) => [optimisticItem, ...prev]);
-    toast.success(`Staged "${result.title}"`);
+    const toastId = toast.loading(`Adding "${result.title}" to watchlist...`);
 
     // Server Request
     const res = await createWatchlistItemAction({
@@ -125,7 +125,7 @@ export function MediaWatchlistClient({ initialItems }: MediaWatchlistClientProps
 
     if (!res.success) {
       setItems((prev) => prev.filter((i) => i._id !== tempId));
-      toast.error(res.error || "Failed to add item.");
+      toast.error(res.error || "Failed to add item.", { id: toastId });
     } else if (res.exists) {
       // Remove temp and place existing in local list if not there
       setItems((prev) => {
@@ -133,11 +133,11 @@ export function MediaWatchlistClient({ initialItems }: MediaWatchlistClientProps
         if (filtered.some((i) => i._id === res.data?._id)) return filtered;
         return [res.data!, ...filtered];
       });
-      toast.info("Already in your watchlist.");
+      toast.info("Already in your watchlist.", { id: toastId });
     } else {
       // Swap temp with actual DB inserted item
       setItems((prev) => prev.map((i) => (i._id === tempId ? res.data! : i)));
-      toast.success(`Added "${result.title}" to watchlist`);
+      toast.success(`Added "${result.title}" to watchlist`, { id: toastId });
     }
   };
 
@@ -224,10 +224,8 @@ export function MediaWatchlistClient({ initialItems }: MediaWatchlistClientProps
         <div className="p-4 border border-border/40 bg-card/30 backdrop-blur-sm rounded-2xl flex flex-col gap-4 lg:flex-row lg:items-center max-w-7xl">
           {/* Search */}
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
             <Input
               placeholder="Search watchlist..."
-              className="pl-9 h-10 border-border/60 bg-background/50 focus-visible:ring-primary/20"
               value={searchValue}
               onChange={(e) => setSearchValue(e.target.value)}
             />

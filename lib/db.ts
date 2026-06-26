@@ -549,7 +549,7 @@ export const getRecentlyValuable = cache(
     const resources = await db
       .collection("resources")
       .find({ userId, useCount: { $gt: 0 } })
-      .sort({ recentlyUsedAt: -1, useCount: -1 })
+      .sort({ useCount: -1, recentlyUsedAt: -1 })
       .limit(limit)
       .toArray();
 

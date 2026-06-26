@@ -86,10 +86,10 @@ async function WorkspaceDashboardBody({
     getStats(userId),
     getFavorites(userId),
     getRecentlyViewed(userId, 3),
-    getRecentlyAdded(userId, 4),
+    getRecentlyAdded(userId, 10),
     getCategoriesWithCounts(userId),
     getInboxCount(userId),
-    getRecentlyValuable(userId, 5),
+    getRecentlyValuable(userId, 10),
     getRecommendedResources(userId, 3),
     getSpotlightResource(userId),
     getUnreadNotificationsCount(userId),
@@ -179,8 +179,8 @@ export default async function ExplorePage() {
     redirect("/login")
   }
 
-  return (
-    <div className="@container/main flex flex-1 flex-col gap-6 pb-12">
+    return (
+        <div className="@container/main flex flex-1 flex-col gap-6 pb-2">
       <Suspense fallback={<WorkspaceSkeleton />}>
         <WorkspaceDashboardBody
           userId={user.id}

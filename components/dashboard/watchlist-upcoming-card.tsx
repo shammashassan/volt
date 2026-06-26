@@ -47,8 +47,8 @@ export function WatchlistUpcomingCard() {
   }, []);
 
   return (
-    <Card className="h-full flex flex-col border-border/50 bg-card/60 shadow-sm backdrop-blur-sm">
-      <CardHeader className="flex flex-row items-center gap-0 p-4 pb-3 shrink-0">
+    <Card className="h-full flex flex-col border-border/50 bg-card/60 shadow-sm backdrop-blur-sm gap-2.5">
+      <CardHeader className="flex flex-row items-center gap-0 p-4 pb-2.5 shrink-0">
         <div className="flex items-center gap-2 flex-1">
           <div className="flex size-5 items-center justify-center rounded bg-amber-500/10">
             <Film className="size-3 text-amber-500" />
@@ -68,7 +68,7 @@ export function WatchlistUpcomingCard() {
       </CardHeader>
 
       {/* min-h-0 lets ScrollArea grow correctly inside a flex-col parent */}
-      <CardContent className="flex flex-1 flex-col min-h-0 p-4 pt-0">
+      <CardContent className="flex flex-1 flex-col min-h-0 px-4 pb-0 pt-0">
         {!loaded ? (
           <div className="flex flex-col gap-1.5">
             {[1, 2, 3].map(i => (
@@ -79,20 +79,20 @@ export function WatchlistUpcomingCard() {
             ))}
           </div>
         ) : items.length === 0 ? (
-          <div className="flex flex-1 flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-border/40 bg-muted/10">
-            <div className="flex size-8 items-center justify-center rounded-full bg-amber-500/10">
-              <Telescope className="size-4 text-amber-500/70" />
+          <div className="flex flex-1 items-center justify-center gap-3.5 rounded-lg border border-dashed border-border/40 bg-muted/10 p-4">
+            <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-amber-500/10">
+              <Telescope className="size-4 shrink-0 text-amber-500/70" />
             </div>
-            <div className="flex flex-col items-center gap-0.5">
+            <div className="flex flex-col min-w-0">
               <p className="text-xs font-medium text-foreground">Nothing on the horizon</p>
-              <p className="text-[10px] text-muted-foreground/60 text-center">No planned releases coming up.</p>
+              <p className="text-[10px] text-muted-foreground/60 leading-normal">No planned releases coming up.</p>
+              <Link href="/media-watchlist" className="text-[10px] text-primary hover:underline mt-1">
+                Add to watchlist →
+              </Link>
             </div>
-            <Link href="/media-watchlist" className="text-[10px] text-primary hover:underline">
-              Add to watchlist →
-            </Link>
           </div>
         ) : (
-          <ScrollArea className="flex-1">
+          <ScrollArea className="h-full">
             <div className="flex flex-col gap-1.5 pr-3">
               {items.map(item => (
                 <div

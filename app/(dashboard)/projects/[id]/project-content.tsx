@@ -35,25 +35,26 @@ export function ProjectContent({ project, resources, notes }: ProjectContentProp
       <section className="px-4 pt-8 lg:px-6">
         <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6 max-w-7xl">
           {/* Project details */}
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-3 w-full md:w-auto">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="-ml-2 h-8 text-muted-foreground hover:text-foreground hover:bg-muted/50 gap-1.5 text-xs font-medium transition-colors rounded-lg px-2 self-start"
+              onClick={() => router.push("/projects")}
+            >
+              <ArrowLeft className="size-3.5" />
+              Back to Projects
+            </Button>
+
             <div className="flex items-center gap-3">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-12 w-12 shrink-0 rounded-xl border border-border/40 bg-card/30 text-muted-foreground hover:text-foreground hover:bg-card/60 transition-colors"
-                onClick={() => router.push("/projects")}
-                title="Back to Projects"
-              >
-                <ArrowLeft className="size-5" />
-              </Button>
               <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
                 <Folder className="size-6" />
               </div>
-              <div className="flex items-center gap-2 min-w-0">
-                <h1 className="text-3xl font-black tracking-tight md:text-4xl bg-clip-text text-transparent bg-linear-to-r from-foreground to-foreground/60">
+              <div className="flex flex-wrap items-center gap-2 min-w-0">
+                <h1 className="text-3xl font-black tracking-tight md:text-4xl bg-clip-text text-transparent bg-linear-to-r from-foreground to-foreground/60 leading-tight">
                   {project.name}
                 </h1>
-                <Badge variant={status.variant} className="text-[10px] uppercase tracking-wider font-bold rounded-full select-none px-2.5 h-6">
+                <Badge variant={status.variant} className="text-[10px] uppercase tracking-wider font-bold rounded-full select-none px-2.5 h-6 shrink-0">
                   {status.label}
                 </Badge>
               </div>

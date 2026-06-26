@@ -8,7 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 
 function TagsSkeleton() {
   return (
-    <div className="flex flex-1 flex-col gap-6 pb-12">
+    <div className="flex flex-1 flex-col gap-6 pb-12 animate-pulse">
       {/* Header section */}
       <section className="px-4 pt-8 lg:px-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between max-w-7xl">
@@ -29,43 +29,27 @@ function TagsSkeleton() {
         </div>
       </section>
 
-      {/* Controls: Search and Sort */}
+      {/* Controls & Combobox Filter Row Skeleton */}
       <section className="px-4 lg:px-6">
-        <div className="p-4 border border-border/40 bg-card/30 backdrop-blur-sm rounded-2xl flex flex-col gap-4 lg:flex-row lg:items-center max-w-7xl">
-          <div className="relative flex-1 max-w-none lg:max-w-xs">
-            {/* Search input skeleton */}
-            <Skeleton className="h-10 w-full rounded-md" />
+        <div className="p-4 border border-border/40 bg-card/30 backdrop-blur-sm rounded-2xl flex flex-col gap-4 md:flex-row md:items-center max-w-7xl">
+          {/* Combobox Chips input skeleton */}
+          <div className="flex-1 min-w-0">
+            <Skeleton className="h-10 w-full rounded-lg" />
           </div>
-          <div className="flex gap-2 justify-end w-full lg:w-auto items-center">
-            {/* Sort button skeleton */}
-            <Skeleton className="h-10 w-[160px] rounded-md" />
-            {/* Sort order button skeleton */}
-            <Skeleton className="h-10 w-10 rounded-md" />
+          {/* Sort & Order button skeletons */}
+          <div className="flex gap-2 items-center shrink-0">
+            <Skeleton className="h-10 w-32 rounded-lg" />
+            <Skeleton className="h-10 w-10 rounded-lg" />
           </div>
         </div>
       </section>
 
-      {/* Grid Display */}
+      {/* Empty State placeholder skeleton */}
       <section className="px-4 lg:px-6">
-        <div className="max-w-7xl">
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-            {Array.from({ length: 15 }).map((_, i) => (
-              <div key={i} className="border border-border/40 bg-card/30 rounded-xl p-4 flex flex-col gap-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 flex-1">
-                    <Skeleton className="h-4 w-4 rounded-sm" />
-                    <Skeleton className="h-4 w-2/3" />
-                  </div>
-                  <Skeleton className="h-5 w-6 rounded-full shrink-0" />
-                </div>
-                <div className="flex items-center gap-3 mt-1">
-                  <Skeleton className="h-3.5 w-8 rounded-sm" />
-                  <Skeleton className="h-3.5 w-8 rounded-sm" />
-                  <Skeleton className="h-3.5 w-8 rounded-sm" />
-                </div>
-              </div>
-            ))}
-          </div>
+        <div className="max-w-7xl flex flex-col items-center justify-center py-20 gap-4">
+          <Skeleton className="h-12 w-12 rounded-lg" />
+          <Skeleton className="h-6 w-48 rounded" />
+          <Skeleton className="h-4 w-80 rounded" />
         </div>
       </section>
     </div>

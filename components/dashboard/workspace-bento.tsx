@@ -9,7 +9,7 @@ import { StatsCard } from "./stats-card"
 import { ActivityCard } from "./activity-card"
 import { FavoritesListCard } from "./favorites-list-card"
 import { CategoriesSummaryCard } from "./categories-summary-card"
-import { RecentlyValuable } from "./recently-valuable"
+import { MostUsedCard } from "./most-used-card"
 import { QuickSaveCard } from "./quick-save-card"
 import { RecentlyAddedCarousel } from "./recently-added-carousel"
 import { InboxFocusCard } from "./inbox-focus-card"
@@ -118,7 +118,7 @@ export function WorkspaceBento({
             {/* ── Grid Container ───────────────────────────────────── */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 {/* Row 0: Focus, My Day, Watchlist Upcoming */}
-                <div className="workspace-card lg:col-span-1 order-1 lg:order-0">
+                <div className="workspace-card lg:col-span-1 order-1 lg:order-0 h-[196px]">
                     <InboxFocusCard
                         remindersCount={remindersCount}
                         releasesCount={releasesCount}
@@ -126,18 +126,18 @@ export function WorkspaceBento({
                         inboxCount={inboxCount}
                     />
                 </div>
-                <div className="workspace-card lg:col-span-1 order-2 lg:order-0">
+                <div className="workspace-card lg:col-span-1 order-2 lg:order-0 h-[196px]">
                     <MyDayCard />
                 </div>
-                <div className="workspace-card lg:col-span-1 order-3 lg:order-0">
+                <div className="workspace-card lg:col-span-1 order-3 lg:order-0 h-[196px]">
                     <WatchlistUpcomingCard />
                 </div>
 
                 {/* Row 1: Command Center & Quick Save */}
-                <div className="workspace-card lg:col-span-2 order-4 lg:order-0 lg:self-start">
+                <div className="workspace-card lg:col-span-2 order-4 lg:order-0">
                     <CommandCenterCard />
                 </div>
-                <div className="workspace-card lg:col-span-1 order-5 lg:order-0 lg:self-start">
+                <div className="workspace-card lg:col-span-1 order-5 lg:order-0">
                     <QuickSaveCard />
                 </div>
 
@@ -159,16 +159,16 @@ export function WorkspaceBento({
                 </div>
 
                 {/* Row 3: Recently Added carousel & Categories Summary */}
-                <div className="workspace-card lg:col-span-2 order-7 lg:order-0 lg:self-start">
+                <div className="workspace-card lg:col-span-2 order-7 lg:order-0">
                     <RecentlyAddedCarousel resources={recentlyAdded} />
                 </div>
-                <div className="workspace-card lg:col-span-1 order-9 lg:order-0 lg:self-start">
+                <div className="workspace-card lg:col-span-1 order-9 lg:order-0">
                     <CategoriesSummaryCard categories={categories} />
                 </div>
 
                 {/* Row 4: Most Used Resources & Favorites */}
                 <div className="workspace-card lg:col-span-2 order-10 lg:order-0">
-                    <RecentlyValuable resources={recentlyValuable} />
+                    <MostUsedCard resources={recentlyValuable} />
                 </div>
                 <div className="workspace-card lg:col-span-1 order-11 lg:order-0">
                     <FavoritesListCard resources={favorites} />

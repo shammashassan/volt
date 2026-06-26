@@ -8,11 +8,11 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 
-interface RecentlyValuableProps {
+interface MostUsedCardProps {
     resources: Resource[]
 }
 
-export function RecentlyValuable({ resources }: RecentlyValuableProps) {
+export function MostUsedCard({ resources }: MostUsedCardProps) {
     return (
         <Card className="flex h-full flex-col border-border/50 bg-card/60 p-5 shadow-sm backdrop-blur-sm">
             <CardHeader className="flex flex-row items-center gap-0 p-0 pb-4">

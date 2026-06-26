@@ -5,6 +5,7 @@ import { getSessionUser, getErrorMessage } from "@/lib/auth-utils";
 import { updateTag } from "next/cache";
 import { createWatchlistItemSchema } from "../_schemas/watchlist.schema";
 import { WatchlistItem } from "../_types/watchlist.types";
+import { WatchlistService } from "@/features/watchlist/services/watchlist.service";
 
 export async function createWatchlistItemAction(payload: unknown): Promise<{ success: boolean; exists?: boolean; data?: WatchlistItem; error?: string }> {
   try {
@@ -36,15 +37,21 @@ export async function createWatchlistItemAction(payload: unknown): Promise<{ suc
     };
 
     const result = await db.collection("watchlist").insertOne(item);
-    const insertedItem: WatchlistItem = {
-      ...item,
-      _id: result.insertedId.toString(),
-    };
+    
+    // Sync metadata immediately
+    try {
+      await WatchlistService.syncItemById(result.insertedId);
+    } catch (err) {
+      console.error("Failed to sync watchlist item metadata on creation:", err);
+    }
+
+    const syncedItem = await db.collection("watchlist").findOne({ _id: result.insertedId });
+    const finalItem = syncedItem || { ...item, _id: result.insertedId.toString() };
 
     updateTag("watchlist");
     updateTag(`watchlist-${user.id}`);
 
-    return { success: true, exists: false, data: insertedItem };
+    return { success: true, exists: false, data: serialize(finalItem) as unknown as WatchlistItem };
   } catch (err) {
     return { success: false, error: getErrorMessage(err) };
   }

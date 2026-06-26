@@ -100,7 +100,7 @@ export function RecentlyAddedCarousel({ resources }: RecentlyAddedCarouselProps)
                 <Carousel
                     setApi={setApi}
                     opts={{ align: "start", loop: false }}
-                    className="w-full"
+                    className="w-full [&_[data-slot=carousel-content]]:py-3 [&_[data-slot=carousel-content]]:-my-3 [&_[data-slot=carousel-content]]:px-2 [&_[data-slot=carousel-content]]:-mx-2"
                 >
                     <CarouselContent className="-ml-3">
                         {resources.map((resource, index) => (
