@@ -81,7 +81,7 @@ export function StatsCard({ resourcesCount, categoriesCount, favoritesCount, inb
 
                 {inboxCount > 0 ? (
                     <Link
-                        href="/resources?filter=uncategorized"
+                        href="/resources?category=none"
                         className="group flex items-center justify-between rounded-lg border border-amber-500/20 bg-amber-500/5 px-3 py-2.5 text-xs font-medium text-amber-500/90 transition-all hover:bg-amber-500/10 hover:text-amber-500"
                     >
                         <div className="flex items-center gap-1.5">

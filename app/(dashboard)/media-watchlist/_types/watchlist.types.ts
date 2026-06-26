@@ -1,4 +1,4 @@
-export type WatchlistStatus = "planned" | "planning" | "upcoming" | "watching" | "completed" | "dropped";
+export type WatchlistStatus = "planned" | "upcoming" | "watching" | "completed" | "dropped";
 export type WatchlistSource = "tmdb" | "anilist";
 export type WatchlistMediaType = "movie" | "series" | "anime";
 

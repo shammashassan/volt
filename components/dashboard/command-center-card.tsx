@@ -36,7 +36,7 @@ export function CommandCenterCard() {
         </div>
       </button>
 
-      <Separator className="bg-border/45" />
+      {/* <Separator className="bg-border/45" /> */}
 
       {/* Quick actions */}
       <div className="flex flex-wrap items-center gap-2">

@@ -134,10 +134,10 @@ export function WorkspaceBento({
                 </div>
 
                 {/* Row 1: Command Center & Quick Save */}
-                <div className="workspace-card lg:col-span-2 order-4 lg:order-0">
+                <div className="workspace-card lg:col-span-2 order-4 lg:order-0 lg:self-start">
                     <CommandCenterCard />
                 </div>
-                <div className="workspace-card lg:col-span-1 order-5 lg:order-0">
+                <div className="workspace-card lg:col-span-1 order-5 lg:order-0 lg:self-start">
                     <QuickSaveCard />
                 </div>
 
@@ -159,10 +159,10 @@ export function WorkspaceBento({
                 </div>
 
                 {/* Row 3: Recently Added carousel & Categories Summary */}
-                <div className="workspace-card lg:col-span-2 order-7 lg:order-0">
+                <div className="workspace-card lg:col-span-2 order-7 lg:order-0 lg:self-start">
                     <RecentlyAddedCarousel resources={recentlyAdded} />
                 </div>
-                <div className="workspace-card lg:col-span-1 order-9 lg:order-0">
+                <div className="workspace-card lg:col-span-1 order-9 lg:order-0 lg:self-start">
                     <CategoriesSummaryCard categories={categories} />
                 </div>
 

@@ -3,19 +3,14 @@
 import { useState } from "react"
 import { Card, CardHeader, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group"
 import { Separator } from "@/components/ui/separator"
 import {
     HoverCard,
     HoverCardContent,
     HoverCardTrigger,
 } from "@/components/ui/hover-card"
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover"
-import { PlusCircle, Loader2, Globe, Info, ExternalLink } from "lucide-react"
+import { PlusCircle, Loader2, Globe, Info } from "lucide-react"
 import { toast } from "sonner"
 import { addResourceAction } from "@/lib/actions"
 import { useRouter } from "next/navigation"
@@ -89,7 +84,7 @@ export function QuickSaveCard() {
     const domain = getDomainFromUrl(url)
 
     return (
-        <Card className="flex h-full flex-col border-border/50 bg-card/60 p-5 shadow-sm backdrop-blur-sm">
+        <Card className="flex flex-col border-border/50 bg-card/60 p-5 shadow-sm backdrop-blur-sm">
             {/* Header */}
             <CardHeader className="flex flex-row items-center gap-0 p-0 pb-4">
                 <div className="flex items-center gap-2 flex-1">
@@ -138,82 +133,61 @@ export function QuickSaveCard() {
             </CardHeader>
 
             {/* Body */}
-            <CardContent className="flex flex-1 flex-col gap-3 p-0">
-                <Input
-                    type="text"
-                    value={url}
-                    onChange={handleUrlChange}
-                    placeholder="Paste a URL to save…"
-                    disabled={loading}
-                    className="h-9 w-full text-xs"
-                />
+            <CardContent className="flex flex-col gap-2.5 p-0">
+                <InputGroup>
+                    <InputGroupAddon>
+                        <Globe />
+                    </InputGroupAddon>
+                    <InputGroupInput
+                        type="text"
+                        value={url}
+                        onChange={handleUrlChange}
+                        placeholder="Paste a URL to save…"
+                        disabled={loading}
+                    />
+                </InputGroup>
 
-                {url.trim() ? (
+                {url.trim() && (
                     <div className="animate-in fade-in-0 slide-in-from-top-1 flex flex-col gap-2.5 duration-150">
-                        {/* Compact site preview — triggers popover for full details */}
-                        <Popover>
-                            <PopoverTrigger asChild>
-                                <button
-                                    type="button"
-                                    className="flex w-full items-center gap-2 rounded-md border border-border/60 bg-muted/20 px-2.5 py-2 text-left transition-colors hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                                >
-                                    {fetchingMetadata ? (
-                                        <Loader2 className="size-3.5 shrink-0 animate-spin text-muted-foreground" />
-                                    ) : metadata?.faviconUrl ? (
+                        {/* Inline metadata preview */}
+                        {fetchingMetadata ? (
+                            <div className="flex items-center gap-2 rounded-md border border-border/40 bg-muted/10 px-2.5 py-2.5">
+                                <Loader2 className="size-3.5 shrink-0 animate-spin text-muted-foreground" />
+                                <span className="text-xs text-muted-foreground">Fetching details…</span>
+                            </div>
+                        ) : (
+                            <div className="flex flex-col gap-1.5 rounded-md border border-border/40 bg-muted/10 p-2.5">
+                                <div className="flex items-center gap-2 min-w-0">
+                                    {metadata?.faviconUrl ? (
                                         <img
                                             src={metadata.faviconUrl}
                                             alt=""
-                                            className="size-3.5 shrink-0 rounded object-contain"
+                                            className="size-4 shrink-0 rounded object-contain"
                                             onError={e => {
                                                 (e.currentTarget as HTMLImageElement).style.display = "none"
                                             }}
                                         />
                                     ) : (
-                                        <Globe className="size-3.5 shrink-0 text-muted-foreground/50" />
+                                        <Globe className="size-4 shrink-0 text-muted-foreground/40" />
                                     )}
-                                    <span className="flex-1 truncate text-xs text-muted-foreground">
-                                        {fetchingMetadata ? "Fetching details…" : metadata?.title || domain || url}
-                                    </span>
-                                    <ExternalLink className="size-3 shrink-0 text-muted-foreground/30" />
-                                </button>
-                            </PopoverTrigger>
-                            <PopoverContent align="start" sideOffset={6} className="w-72 p-3">
-                                <div className="flex flex-col gap-2.5">
-                                    <div className="flex items-start gap-2.5">
-                                        {metadata?.faviconUrl ? (
-                                            <img
-                                                src={metadata.faviconUrl}
-                                                alt=""
-                                                className="mt-0.5 size-5 shrink-0 rounded object-contain"
-                                                onError={e => {
-                                                    (e.currentTarget as HTMLImageElement).style.display = "none"
-                                                }}
-                                            />
-                                        ) : (
-                                            <Globe className="mt-0.5 size-5 shrink-0 text-muted-foreground/40" />
+                                    <div className="flex flex-col min-w-0">
+                                        <span className="text-xs font-semibold text-foreground truncate leading-snug">
+                                            {metadata?.title || domain || url}
+                                        </span>
+                                        {domain && (
+                                            <span className="text-[10px] text-muted-foreground/60 truncate">
+                                                {domain}
+                                            </span>
                                         )}
-                                        <div className="flex flex-col min-w-0 gap-0.5">
-                                            <p className="text-xs font-semibold text-foreground leading-snug">
-                                                {metadata?.title || domain || "No title found"}
-                                            </p>
-                                            <p className="text-[10px] text-muted-foreground truncate">{domain}</p>
-                                        </div>
                                     </div>
-                                    {metadata?.description ? (
-                                        <>
-                                            <Separator />
-                                            <p className="text-[11px] text-muted-foreground leading-relaxed line-clamp-3">
-                                                {metadata.description}
-                                            </p>
-                                        </>
-                                    ) : !fetchingMetadata ? (
-                                        <p className="text-[11px] text-muted-foreground/50 italic">
-                                            No description found for this URL.
-                                        </p>
-                                    ) : null}
                                 </div>
-                            </PopoverContent>
-                        </Popover>
+                                {metadata?.description && (
+                                    <p className="text-[10px] text-muted-foreground/70 leading-relaxed line-clamp-2 pl-6">
+                                        {metadata.description}
+                                    </p>
+                                )}
+                            </div>
+                        )}
 
                         <Button
                             onClick={handleSave}
@@ -223,16 +197,6 @@ export function QuickSaveCard() {
                             {loading && <Loader2 data-icon="inline-start" className="animate-spin" />}
                             {loading ? "Saving to Workspace…" : "Save to Workspace"}
                         </Button>
-                    </div>
-                ) : (
-                    /* Empty state — fills the card when no URL is entered */
-                    <div className="flex flex-1 flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-border/40 bg-muted/10 py-5">
-                        <div className="flex size-8 items-center justify-center rounded-full bg-muted/30">
-                            <Globe className="size-4 text-muted-foreground/40" />
-                        </div>
-                        <p className="text-[11px] text-muted-foreground/60 text-center leading-relaxed px-3">
-                            Paste any URL above to instantly save it to your workspace.
-                        </p>
                     </div>
                 )}
             </CardContent>

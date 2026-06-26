@@ -17,7 +17,7 @@ export class WatchlistService {
     
     // Fetch 5 oldest check-ins needing update
     const staleItems = await col.find({
-      status: { $in: ['planning', 'upcoming', 'watching'] },
+      status: { $in: ['planned', 'upcoming', 'watching'] },
       deletedAt: { $exists: false }
     }).sort({ 'sync.lastChecked': 1 }).limit(5).toArray();
 
@@ -46,7 +46,7 @@ export class WatchlistService {
           upcomingReleased = !!(
             details.releaseDate && 
             new Date(details.releaseDate) <= now && 
-            item.status === 'planning' && 
+            item.status === 'planned' && 
             !releasedNotified
           );
         } else if (isEpisodic) {
@@ -94,7 +94,7 @@ export class WatchlistService {
           await NotificationService.createNotification(
             item.userId,
             `Released: ${item.metadata?.title || 'Watchlist Item'}`,
-            `Your planning item ${item.metadata?.title || ''} is officially released!`,
+            `Your planned item "${item.metadata?.title || ''}" is officially released!`,
             'watchlist.release',
             '/media-watchlist'
           );

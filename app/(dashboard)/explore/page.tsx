@@ -38,12 +38,23 @@ async function getPendingRemindersCount(userId: string) {
 
 async function getUpcomingReleasesCount(userId: string) {
   const db = await getDb()
-  const nowStr = new Date().toISOString().split("T")[0]
+  const now = new Date()
+  const nowStr = now.toISOString().split("T")[0]
   return db.collection("watchlist").countDocuments({
     userId,
-    status: { $in: ["planning", "planned"] },
-    "metadata.releaseDate": { $gt: nowStr },
     deletedAt: { $exists: false },
+    $or: [
+      {
+        type: 'movie',
+        status: 'planned',
+        'metadata.releaseDate': { $gt: nowStr }
+      },
+      {
+        type: { $in: ['series', 'anime'] },
+        status: 'watching',
+        'metadata.nextEpisodeDate': { $gt: nowStr }
+      }
+    ]
   })
 }
 

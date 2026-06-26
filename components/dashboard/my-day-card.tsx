@@ -40,7 +40,7 @@ export function MyDayCard() {
 
   return (
     <Card className="h-full flex flex-col border-border/50 bg-card/60 shadow-sm backdrop-blur-sm">
-      <CardHeader className="flex flex-row items-center gap-0 p-4 pb-3">
+      <CardHeader className="flex flex-row items-center gap-0 p-4 pb-3 shrink-0">
         <div className="flex items-center gap-2 flex-1">
           <div className="flex size-5 items-center justify-center rounded bg-violet-500/10">
             <CalendarDays className="size-3 text-violet-500" />
@@ -56,7 +56,8 @@ export function MyDayCard() {
         )}
       </CardHeader>
 
-      <CardContent className="flex flex-1 flex-col p-4 pt-0">
+      {/* min-h-0 lets flex-1 children shrink/grow correctly for ScrollArea */}
+      <CardContent className="flex flex-1 flex-col min-h-0 p-4 pt-0">
         {!loaded ? (
           <div className="flex flex-col gap-1.5">
             {[1, 2, 3].map(i => (
@@ -64,7 +65,7 @@ export function MyDayCard() {
             ))}
           </div>
         ) : reminders.length === 0 ? (
-          <div className="flex flex-1 flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-border/40 bg-muted/10 py-5">
+          <div className="flex flex-1 flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-border/40 bg-muted/10">
             <div className="flex size-8 items-center justify-center rounded-full bg-emerald-500/10">
               <CheckCircle2 className="size-4 text-emerald-500" />
             </div>
@@ -77,7 +78,7 @@ export function MyDayCard() {
             </Link>
           </div>
         ) : (
-          <ScrollArea className="flex-1 max-h-[170px]">
+          <ScrollArea className="flex-1">
             <div className="flex flex-col gap-1.5 pr-3">
               {reminders.map(r => (
                 <div
