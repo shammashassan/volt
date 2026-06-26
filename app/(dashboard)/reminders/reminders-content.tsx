@@ -427,7 +427,7 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
                                   height: { duration: 0.2 }
                                 }}
                               >
-                                <Item variant="outline">
+                                <Item variant="outline" className="flex-nowrap">
                                   <ItemMedia>
                                     <Checkbox
                                       checked={!!checkingIds[r._id as string] || r.status === "completed"}
@@ -441,8 +441,8 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
                                     />
                                     {getPriorityIcon(r.priority)}
                                   </ItemMedia>
-                                  <ItemContent>
-                                    <ItemTitle className={cn("font-semibold transition-all duration-300", (checkingIds[r._id as string] || r.status === "completed") && "line-through text-muted-foreground/60")}>{r.title}</ItemTitle>
+                                  <ItemContent className="min-w-0">
+                                    <ItemTitle className={cn("font-semibold truncate transition-all duration-300", (checkingIds[r._id as string] || r.status === "completed") && "line-through text-muted-foreground/60")}>{r.title}</ItemTitle>
                                     <ItemDescription className="flex flex-wrap items-center gap-x-2.5 gap-y-1 mt-0.5">
                                       <span className="text-xs text-muted-foreground flex items-center gap-1">
                                         <Calendar className="size-3" />
@@ -512,7 +512,7 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
                                   height: { duration: 0.2 }
                                 }}
                               >
-                                <Item variant="outline">
+                                <Item variant="outline" className="flex-nowrap">
                                   <ItemMedia>
                                     <Checkbox
                                       checked={!uncheckingIds[r._id as string] && r.status === "completed"}
@@ -526,8 +526,8 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
                                     />
                                     {getPriorityIcon(r.priority)}
                                   </ItemMedia>
-                                  <ItemContent>
-                                    <ItemTitle className={cn("transition-all duration-300", (uncheckingIds[r._id as string] || r.status === "pending") ? "font-semibold text-foreground" : "line-through text-muted-foreground")}>{r.title}</ItemTitle>
+                                  <ItemContent className="min-w-0">
+                                    <ItemTitle className={cn("truncate transition-all duration-300", (uncheckingIds[r._id as string] || r.status === "pending") ? "font-semibold text-foreground" : "line-through text-muted-foreground")}>{r.title}</ItemTitle>
                                     <ItemDescription className="flex flex-wrap items-center gap-x-2.5 gap-y-1 mt-0.5">
                                       <span className="text-xs text-muted-foreground/50 flex items-center gap-1 line-through">
                                         <Calendar className="size-3" />
