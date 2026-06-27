@@ -71,6 +71,17 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 # Media Watchlist API Keys (Optional - for TMDb integration)
 TMDB_API_KEY=your_tmdb_api_key
 TMDB_READ_TOKEN=your_tmdb_read_token
+
+# Upstash QStash (Required for background job scheduling & webhook verification)
+QSTASH_URL=https://qstash-us-east-1.upstash.io
+QSTASH_TOKEN=your_qstash_token
+QSTASH_CURRENT_SIGNING_KEY=your_qstash_current_signing_key
+QSTASH_NEXT_SIGNING_KEY=your_qstash_next_signing_key
+
+# Cloudinary (Required for saving resource screenshots)
+CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
+CLOUDINARY_API_KEY=your_cloudinary_api_key
+CLOUDINARY_API_SECRET=your_cloudinary_api_secret
 ```
 
 ### 3. Installation

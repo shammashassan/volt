@@ -55,7 +55,13 @@ function getFallbackImage(name: string): string {
   return `https://avatar.vercel.sh/${safeName}?size=400&text=${safeName.slice(0, 2)}`
 }
 
-// Custom hook to handle screenshot loading, state synchronization, and fallbacks
+// Custom hook to handle screenshot loading, state synchronization, and fallbacks.
+// Microlink & wp.com/mshots are on-demand screenshot services: the first request
+// triggers generation and may return an error/blank while still processing.
+// We auto-retry with exponential backoff so the user never has to reload manually.
+const MAX_MICROLINK_RETRIES = 4
+const RETRY_BASE_DELAY_MS = 3000
+
 function useScreenshot<T extends ResourceCardData>(resource: T) {
   const normalizedUrl = useMemo(() => normalizeUrl(resource.link || ""), [resource.link])
 
@@ -65,28 +71,83 @@ function useScreenshot<T extends ResourceCardData>(resource: T) {
 
   const [imgSrc, setImgSrc] = useState(previewUrl)
   const [isLoading, setIsLoading] = useState(true)
-  const [hasError, setHasError] = useState(false)
+
+  // Tracks which fallback stage we are on:
+  //   0 = microlink (retrying), 1 = wp.com/mshots, 2 = avatar (final)
+  const fallbackStage = React.useRef(0)
+  // How many times we've retried the current Microlink URL
+  const retryCount = React.useRef(0)
+  const retryTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // React standard pattern to sync state when preview URL changes
   useEffect(() => {
+    // Reset everything when the URL changes
+    if (retryTimer.current) clearTimeout(retryTimer.current)
+    fallbackStage.current = 0
+    retryCount.current = 0
     setImgSrc(previewUrl)
     setIsLoading(true)
-    setHasError(false)
   }, [previewUrl])
+
+  // Cleanup timer on unmount
+  useEffect(() => {
+    return () => {
+      if (retryTimer.current) clearTimeout(retryTimer.current)
+    }
+  }, [])
 
   const handleLoad = useCallback(() => {
     setIsLoading(false)
   }, [])
 
   const handleError = useCallback(() => {
-    if (!hasError && normalizedUrl) {
-      setHasError(true)
-      setImgSrc(`https://s0.wp.com/mshots/v1/${encodeURIComponent(normalizedUrl)}?w=600&h=400`)
+    if (retryTimer.current) clearTimeout(retryTimer.current)
+
+    if (fallbackStage.current === 0) {
+      // Stage 0: Microlink — retry with exponential backoff before giving up
+      if (retryCount.current < MAX_MICROLINK_RETRIES) {
+        const delay = RETRY_BASE_DELAY_MS * Math.pow(2, retryCount.current)
+        retryCount.current += 1
+        retryTimer.current = setTimeout(() => {
+          // Bust the cache by appending a timestamp so the browser re-fetches
+          setImgSrc(
+            `${previewUrl}&_retry=${retryCount.current}`
+          )
+        }, delay)
+      } else {
+        // Microlink exhausted → try wp.com/mshots
+        fallbackStage.current = 1
+        retryCount.current = 0
+        if (normalizedUrl) {
+          setImgSrc(
+            `https://s0.wp.com/mshots/v1/${encodeURIComponent(normalizedUrl)}?w=600&h=400`
+          )
+        } else {
+          fallbackStage.current = 2
+          setImgSrc(getFallbackImage(resource.name))
+          setIsLoading(false)
+        }
+      }
+    } else if (fallbackStage.current === 1) {
+      // Stage 1: wp.com/mshots failed — retry once after a delay, then avatar
+      if (retryCount.current === 0 && normalizedUrl) {
+        retryCount.current = 1
+        retryTimer.current = setTimeout(() => {
+          setImgSrc(
+            `https://s0.wp.com/mshots/v1/${encodeURIComponent(normalizedUrl)}?w=600&h=400&_retry=1`
+          )
+        }, RETRY_BASE_DELAY_MS)
+      } else {
+        fallbackStage.current = 2
+        setImgSrc(getFallbackImage(resource.name))
+        setIsLoading(false)
+      }
     } else {
+      // Stage 2: Final avatar fallback — nothing more to try
       setImgSrc(getFallbackImage(resource.name))
       setIsLoading(false)
     }
-  }, [hasError, normalizedUrl, resource.name])
+  }, [previewUrl, normalizedUrl, resource.name])
 
   // Check if image is already completed (cached) when source or ref changes
   const [imgElement, setImgElement] = useState<HTMLImageElement | null>(null)

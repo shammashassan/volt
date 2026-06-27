@@ -38,7 +38,13 @@ export function WatchlistUpcomingCard() {
             }
             return false;
           }
-        );
+        ).sort((a, b) => {
+          const dateA = a.type === 'movie' ? a.metadata?.releaseDate : a.metadata?.nextEpisodeDate;
+          const dateB = b.type === 'movie' ? b.metadata?.releaseDate : b.metadata?.nextEpisodeDate;
+          if (!dateA) return 1;
+          if (!dateB) return -1;
+          return new Date(dateA).getTime() - new Date(dateB).getTime();
+        });
         setItems(upcoming);
       }
       setLoaded(true);

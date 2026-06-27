@@ -1,8 +1,52 @@
 "use client"
 
 import * as React from "react"
-import { useState, useMemo, useEffect } from "react"
+import { useState, useMemo, useEffect, useRef, useCallback } from "react"
 import { ResourceCard } from "@/components/resource-card"
+
+// ---------------------------------------------------------------------------
+// Progressive rendering — only mount cards that are near / in the viewport.
+// With 100+ resources, mounting all cards at once hammers the network with
+// screenshot requests and creates a massive initial DOM. This hook renders
+// BATCH_SIZE cards immediately and appends the next batch as the user scrolls
+// to the sentinel element at the bottom of the list.
+// ---------------------------------------------------------------------------
+const BATCH_SIZE = 24
+
+function useVirtualizedItems<T>(items: T[]) {
+  const [visibleCount, setVisibleCount] = useState(BATCH_SIZE)
+  const sentinelRef = useRef<HTMLDivElement | null>(null)
+
+  // Reset to first page whenever the list changes (filter / search)
+  useEffect(() => {
+    setVisibleCount(BATCH_SIZE)
+  }, [items])
+
+  const loadMore = useCallback(() => {
+    setVisibleCount((prev) => Math.min(prev + BATCH_SIZE, items.length))
+  }, [items.length])
+
+  useEffect(() => {
+    const el = sentinelRef.current
+    if (!el) return
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) loadMore()
+      },
+      { rootMargin: "400px" } // start loading 400 px before sentinel enters view
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [loadMore])
+
+  return {
+    visibleItems: items.slice(0, visibleCount),
+    hasMore: visibleCount < items.length,
+    remaining: items.length - visibleCount,
+    sentinelRef,
+  }
+}
+
 import { Resource, Category, Project, Person, ResourceStatus, ResourceType } from "@/lib/types"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -49,6 +93,7 @@ import {
 } from "@/components/ui/select"
 import { Toggle } from "@/components/ui/toggle"
 import { Empty, EmptyHeader, EmptyTitle, EmptyDescription, EmptyMedia } from "@/components/ui/empty"
+import { Skeleton } from "@/components/ui/skeleton"
 import {
   addResourceAction,
   updateResourceAction,
@@ -74,6 +119,71 @@ import {
 import { RESOURCE_TYPES, STATUS_OPTIONS } from "@/lib/resource-types"
 import { useQueryStates } from "nuqs"
 import { resourceFilterParsers, getResourcesPageTitle } from "@/lib/resource-filters"
+
+// ---------------------------------------------------------------------------
+// ResourceGrid — renders filteredResources progressively using useVirtualizedItems
+// ---------------------------------------------------------------------------
+interface ResourceGridProps {
+  filteredResources: (Resource & { name: string; link: string })[]
+  handleCardClick: (resource: Resource) => void
+  handleCardDelete: (resource: Resource, e: React.MouseEvent) => void
+}
+
+function ResourceGrid({ filteredResources, handleCardClick, handleCardDelete }: ResourceGridProps) {
+  const { visibleItems, hasMore, remaining, sentinelRef } = useVirtualizedItems(filteredResources)
+
+  if (filteredResources.length === 0) {
+    return (
+      <section className="px-4 lg:px-6">
+        <Empty className="max-w-7xl py-24 border border-dashed rounded-3xl bg-card/10">
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <Filter />
+            </EmptyMedia>
+            <EmptyTitle>No resources found</EmptyTitle>
+            <EmptyDescription>Try resetting your filters.</EmptyDescription>
+          </EmptyHeader>
+        </Empty>
+      </section>
+    )
+  }
+
+  return (
+    <section className="px-4 lg:px-6">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 max-w-7xl">
+        {visibleItems.map((res, index) => (
+          <ResourceCard
+            key={res._id?.toString() || res.id}
+            resource={res}
+            priority={index < 6}
+            onEdit={handleCardClick}
+            onDelete={handleCardDelete}
+          />
+        ))}
+      </div>
+
+      {/* Sentinel + loading indicator — watched by IntersectionObserver */}
+      {hasMore && (
+        <div ref={sentinelRef} className="max-w-7xl mt-6">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: Math.min(3, remaining) }).map((_, i) => (
+              <div key={i} className="border border-border/40 bg-card/60 rounded-xl overflow-hidden">
+                <Skeleton className="aspect-video w-full rounded-none" />
+                <div className="px-4 py-3 flex flex-col gap-2">
+                  <Skeleton className="h-5 w-2/3" />
+                  <Skeleton className="h-3 w-full" />
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="text-center text-xs text-muted-foreground/50 mt-4">
+            {remaining} more resource{remaining !== 1 ? "s" : ""}…
+          </p>
+        </div>
+      )}
+    </section>
+  )
+}
 
 interface ResourcesContentProps {
   initialResources: Resource[]
@@ -455,34 +565,12 @@ export function ResourcesContent({
         </div>
       </section>
 
-      {/* Grid Display */}
-      <section className="px-4 lg:px-6">
-        {filteredResources.length === 0 ? (
-          <Empty className="max-w-7xl py-24 border border-dashed rounded-3xl bg-card/10">
-            <EmptyHeader>
-              <EmptyMedia variant="icon">
-                <Filter />
-              </EmptyMedia>
-              <EmptyTitle>No resources found</EmptyTitle>
-              <EmptyDescription>
-                Try resetting your filters.
-              </EmptyDescription>
-            </EmptyHeader>
-          </Empty>
-        ) : (
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 max-w-7xl">
-            {filteredResources.map((res, index) => (
-              <ResourceCard
-                key={res._id?.toString() || res.id}
-                resource={res}
-                priority={index < 6}
-                onEdit={handleCardClick}
-                onDelete={handleCardDelete}
-              />
-            ))}
-          </div>
-        )}
-      </section>
+      {/* Grid Display — progressively rendered in batches of BATCH_SIZE */}
+      <ResourceGrid
+        filteredResources={filteredResources}
+        handleCardClick={handleCardClick}
+        handleCardDelete={handleCardDelete}
+      />
 
       {/* Drawer / Edit Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>

@@ -200,7 +200,7 @@ export function SearchCommand() {
       <Button
         variant="outline"
         onClick={() => setOpen(true)}
-        className="size-9 p-0 bg-muted/40 text-muted-foreground hover:bg-muted sm:size-auto sm:h-9 sm:w-64 sm:justify-start sm:px-3"
+        className="size-9 p-0 bg-muted/40 text-muted-foreground hover:bg-muted has-data-[icon=inline-start]:pl-0 sm:size-auto sm:h-9 sm:w-64 sm:justify-start sm:px-3 sm:has-data-[icon=inline-start]:pl-2"
       >
         <SearchIcon data-icon="inline-start" aria-hidden="true" />
         <span className="hidden sm:inline-block flex-1 text-left font-medium">
