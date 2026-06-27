@@ -12,15 +12,20 @@ export class ReminderRepository {
   async findById(id: string, userId: UserId): Promise<Reminder | null> {
     const col = await this.getCollection();
     const query = ObjectId.isValid(id) ? { _id: new ObjectId(id), userId } : { id, userId };
-    return col.findOne({ ...query, deletedAt: { $exists: false } }) as Promise<Reminder | null>;
+    return col.findOne(query) as Promise<Reminder | null>;
+  }
+
+  async findByIdRaw(id: string): Promise<Reminder | null> {
+    const col = await this.getCollection();
+    const query = ObjectId.isValid(id) ? { _id: new ObjectId(id) } : { id };
+    return col.findOne(query) as Promise<Reminder | null>;
   }
 
   async findDue(now: Date): Promise<Reminder[]> {
     const col = await this.getCollection();
     return col.find({
       status: 'pending',
-      triggerAt: { $lte: now },
-      deletedAt: { $exists: false }
+      triggerAt: { $lte: now }
     }).toArray() as Promise<Reminder[]>;
   }
 
@@ -39,28 +44,27 @@ export class ReminderRepository {
     const col = await this.getCollection();
     const query = ObjectId.isValid(id) ? { _id: new ObjectId(id), userId } : { id, userId };
     const res = await col.findOneAndUpdate(
-      { ...query, deletedAt: { $exists: false } },
+      query,
       { $set: { ...updates, updatedAt: new Date() } },
       { returnDocument: 'after' }
     );
     return res as unknown as Reminder | null;
   }
 
-  async softDelete(id: string, userId: UserId): Promise<boolean> {
+  async hardDelete(id: string, userId: UserId): Promise<boolean> {
     const col = await this.getCollection();
     const query = ObjectId.isValid(id) ? { _id: new ObjectId(id), userId } : { id, userId };
-    const res = await col.updateOne(
-      query,
-      { $set: { deletedAt: new Date(), updatedAt: new Date() } }
-    );
-    return res.modifiedCount > 0;
+    const res = await col.deleteOne(query);
+    return res.deletedCount > 0;
   }
 
-  async hardDeleteExpired(olderThan: Date): Promise<number> {
+  async hardDeleteCompleted(olderThan: Date): Promise<number> {
     const col = await this.getCollection();
     const res = await col.deleteMany({
-      deletedAt: { $lte: olderThan }
+      status: 'completed',
+      updatedAt: { $lte: olderThan }
     });
     return res.deletedCount;
   }
 }
+

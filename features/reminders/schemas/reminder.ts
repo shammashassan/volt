@@ -1,4 +1,5 @@
 import { BaseDocument } from '@/features/shared/types';
+import { ScheduleMetadata } from '@/lib/scheduler/types';
 
 export type ReminderPriority = 'high' | 'medium' | 'low';
 export type ReminderStatus = 'pending' | 'completed' | 'cancelled' | 'expired';
@@ -27,4 +28,7 @@ export interface Reminder extends BaseDocument {
     frequency: 'daily' | 'weekly' | 'monthly' | 'yearly' | 'none';
     interval?: number;
   };
+
+  scheduler?: ScheduleMetadata;
 }
+

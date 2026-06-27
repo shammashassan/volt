@@ -5,6 +5,9 @@ import clientPromise from "../mongodb";
 import { ObjectId } from "mongodb";
 import { ProjectStatus } from "../types";
 import { getSessionUser, getErrorMessage } from "../auth-utils";
+import { SearchIndexRepository } from "@/features/search/repositories/search-index.repository";
+
+const searchIndexRepo = new SearchIndexRepository();
 
 export async function addProjectAction(data: {
   name: string;
@@ -25,6 +28,16 @@ export async function addProjectAction(data: {
     };
 
     const result = await db.collection("projects").insertOne(project);
+
+    // Upsert into Search Index
+    await searchIndexRepo.upsert({
+      userId: user.id,
+      title: project.name,
+      description: project.description || "",
+      entityType: 'project',
+      entityId: result.insertedId.toString()
+    });
+
     revalidatePath("/projects");
     updateTag(`explore-body-${user.id}`);
     updateTag(`dashboard-stats-${user.id}`);
@@ -46,6 +59,19 @@ export async function updateProjectAction(id: string, data: Record<string, unkno
     const query = ObjectId.isValid(id) ? { _id: new ObjectId(id), userId: user.id } : { id, userId: user.id };
 
     await db.collection("projects").updateOne(query, { $set: updateData });
+
+    // Fetch the updated project to update Search Index
+    const updated = await db.collection("projects").findOne(query);
+    if (updated) {
+      await searchIndexRepo.upsert({
+        userId: user.id,
+        title: updated.name,
+        description: updated.description || "",
+        entityType: 'project',
+        entityId: id
+      });
+    }
+
     revalidatePath("/projects");
     updateTag(`explore-body-${user.id}`);
     updateTag(`dashboard-stats-${user.id}`);
@@ -64,6 +90,10 @@ export async function deleteProjectAction(id: string) {
     const query = ObjectId.isValid(id) ? { _id: new ObjectId(id), userId: user.id } : { id, userId: user.id };
 
     await db.collection("projects").deleteOne(query);
+
+    // Remove from Search Index
+    await searchIndexRepo.remove(id);
+
     revalidatePath("/projects");
     updateTag(`explore-body-${user.id}`);
     updateTag(`dashboard-stats-${user.id}`);

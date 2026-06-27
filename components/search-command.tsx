@@ -30,6 +30,7 @@ import { useQuickCapture } from "./quick-capture-drawers"
 import { trackResourceViewAction } from "@/lib/actions"
 import { searchAction } from "@/lib/actions/search"
 import { Category, Resource, Note, Project, Person } from "@/lib/types"
+import { Button } from "@/components/ui/button"
 import { Kbd } from "@/components/ui/kbd"
 import { RESOURCE_TYPES } from "@/lib/resource-types"
 
@@ -196,14 +197,17 @@ export function SearchCommand() {
 
   return (
     <>
-      <button
+      <Button
+        variant="outline"
         onClick={() => setOpen(true)}
-        className="flex h-9 w-9 items-center justify-center rounded-md border border-input bg-muted/40 text-sm text-muted-foreground transition-all hover:bg-muted sm:w-64 sm:justify-start sm:px-3 sm:gap-2"
+        className="size-9 p-0 bg-muted/40 text-muted-foreground hover:bg-muted sm:size-auto sm:h-9 sm:w-64 sm:justify-start sm:px-3"
       >
-        <SearchIcon className="size-4 shrink-0" aria-hidden="true" />
-        <span className="hidden sm:inline-block flex-1 text-left font-medium">Search anything…</span>
+        <SearchIcon data-icon="inline-start" aria-hidden="true" />
+        <span className="hidden sm:inline-block flex-1 text-left font-medium">
+          Search anything…
+        </span>
         <Kbd className="hidden sm:inline-flex">⌘</Kbd>
-      </button>
+      </Button>
 
       <CommandDialog open={open} onOpenChange={setOpen} shouldFilter={false}>
         <CommandInput

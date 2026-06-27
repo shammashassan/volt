@@ -6,6 +6,9 @@ import { ObjectId } from "mongodb";
 import { ResourceStatus, ResourceType } from "../types";
 import { getSessionUser, getErrorMessage } from "../auth-utils";
 import { getResources } from "../db";
+import { SearchIndexRepository } from "@/features/search/repositories/search-index.repository";
+
+const searchIndexRepo = new SearchIndexRepository();
 
 export async function addResourceAction(
   dataOrForm: FormData | {
@@ -70,6 +73,16 @@ export async function addResourceAction(
     }
 
     const result = await db.collection("resources").insertOne(resource);
+
+    // Upsert into Search Index
+    await searchIndexRepo.upsert({
+      userId: user.id,
+      title: (resource.title || resource.name || "") as string,
+      description: (resource.description || resource.notes || "") as string,
+      entityType: 'resource',
+      entityId: result.insertedId.toString()
+    });
+
     revalidatePath("/explore");
     revalidatePath("/resources");
     updateTag(`explore-body-${user.id}`);
@@ -114,6 +127,19 @@ export async function updateResourceAction(idOrLink: string, data: Record<string
     }
 
     await db.collection("resources").updateOne(query, { $set: updateData });
+
+    // Fetch the updated resource to update Search Index
+    const updated = await db.collection("resources").findOne(query);
+    if (updated) {
+      await searchIndexRepo.upsert({
+        userId: user.id,
+        title: (updated.title || updated.name || "") as string,
+        description: (updated.description || updated.notes || "") as string,
+        entityType: 'resource',
+        entityId: updated._id.toString()
+      });
+    }
+
     revalidatePath("/explore");
     revalidatePath("/resources");
     updateTag(`explore-body-${user.id}`);
@@ -137,7 +163,20 @@ export async function deleteResourceAction(idOrLink: string) {
       query.url = idOrLink; // For old code using link
     }
 
+    let entityId = idOrLink;
+    if (!ObjectId.isValid(idOrLink)) {
+      const res = await db.collection("resources").findOne(query);
+      if (res) {
+        entityId = res._id.toString();
+      }
+    }
+
     await db.collection("resources").deleteOne(query);
+
+    if (entityId) {
+      await searchIndexRepo.remove(entityId);
+    }
+
     revalidatePath("/explore");
     revalidatePath("/resources");
     updateTag(`explore-body-${user.id}`);

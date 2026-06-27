@@ -15,6 +15,8 @@ export interface Notification extends BaseDocument {
   message: string;
   type: NotificationType;
   link?: string;
+  image?: string;
+  reminderId?: string;
   readAt?: Date;
   dismissedAt?: Date;
   archivedAt?: Date;

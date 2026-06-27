@@ -113,3 +113,21 @@ export async function deleteReminderAction(id: string) {
   }
 }
 
+export async function completeReminderAction(id: string) {
+  try {
+    const user = await getSessionUser();
+    const reminder = await ReminderService.updateReminder(id, user.id, {
+      status: 'completed',
+    });
+
+    updateTag('reminders');
+    updateTag(`reminders-${user.id}`);
+    updateTag(`explore-body-${user.id}`);
+    revalidatePath('/reminders');
+    revalidatePath('/notifications');
+    revalidatePath('/explore');
+    return { success: true, data: JSON.parse(JSON.stringify(reminder)) as Reminder };
+  } catch (err) {
+    return { success: false, error: getErrorMessage(err) };
+  }
+}

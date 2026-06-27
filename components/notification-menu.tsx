@@ -1,12 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { BellIcon, RefreshCcwIcon } from "lucide-react";
+import { BellIcon, RefreshCcwIcon, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -23,20 +26,54 @@ import {
   markNotificationReadAction,
 } from "@/features/notifications/actions/notifications";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { completeReminderAction } from "@/features/reminders/actions/reminders";
+import {
+  Item,
+  ItemContent,
+  ItemDescription,
+  ItemMedia,
+  ItemTitle,
+} from "@/components/ui/item";
+import { ScrollArea } from "@/components/ui/scroll-area";
+
+const TYPE_ICON: Record<string, React.ReactNode> = {
+  "reminder.due": <BellIcon className="size-3.5" />,
+  "watchlist.release": <BellIcon className="size-3.5" />,
+  "watchlist.episode": <BellIcon className="size-3.5" />,
+};
+
+function NotificationIcon({
+  type,
+  image,
+  title,
+}: {
+  type: string;
+  image?: string;
+  title: string;
+}) {
+  if (image && (type === "watchlist.release" || type === "watchlist.episode")) {
+    return (
+      <ItemMedia variant="image" className="mt-0.5">
+        <img src={image} alt={title} className="rounded-sm" />
+      </ItemMedia>
+    );
+  }
+  return (
+    <ItemMedia className="text-primary mt-0.5">
+      <div className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-primary/10">
+        {TYPE_ICON[type] ?? <AlertTriangle className="size-3.5" />}
+      </div>
+    </ItemMedia>
+  );
+}
 
 function Dot() {
   return (
-    <svg
+    <span
       aria-hidden="true"
-      className="text-primary"
-      fill="currentColor"
-      height="6"
-      viewBox="0 0 6 6"
-      width="6"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <circle cx="3" cy="3" r="3" />
-    </svg>
+      className="size-1.5 rounded-full bg-primary block"
+    />
   );
 }
 
@@ -100,14 +137,26 @@ export function NotificationMenu() {
     );
   };
 
-  const handleNotificationClick = async (id: string, link?: string) => {
-    await markNotificationReadAction(id);
+  const handleNotificationClick = async (id: string) => {
+    const notification = notifications.find((n) => n._id === id);
+    if (!notification || notification.readAt) return;
+
     setNotifications(
       notifications.map((n) =>
         n._id === id ? { ...n, readAt: new Date() } : n
       )
     );
-    if (link) router.push(link);
+    await markNotificationReadAction(id);
+    router.refresh();
+  };
+
+  const handleCompleteReminderClick = async (notificationId: string, reminderId: string) => {
+    await completeReminderAction(reminderId);
+    setNotifications((prev) =>
+      prev.map((n) => (n._id === notificationId ? { ...n, readAt: new Date() } : n))
+    );
+    await markNotificationReadAction(notificationId);
+    router.refresh();
   };
 
   const getRelativeTime = (date: Date) => {
@@ -142,7 +191,7 @@ export function NotificationMenu() {
         </Button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent className="w-80 p-0" align="end">
+      <DropdownMenuContent className="w-80" align="end">
         {/* Header */}
         <div className="flex items-center justify-between px-3 py-2.5">
           <span className="text-sm font-semibold">Notifications</span>
@@ -163,39 +212,126 @@ export function NotificationMenu() {
         {!hasNotifications ? (
           <EmptyMuted onRefresh={fetchNotifications} />
         ) : (
-          <div className="max-h-[300px] overflow-y-auto">
-            {notifications.slice(0, 5).map((notification) => (
-              <button
-                key={notification._id as string}
-                type="button"
-                className="w-full text-left px-3 py-2.5 text-sm transition-colors hover:bg-accent relative flex items-start gap-2"
-                onClick={() =>
-                  handleNotificationClick(
-                    notification._id as string,
-                    notification.link
-                  )
+          <ScrollArea className="h-[300px]">
+            <DropdownMenuGroup className="py-1 pr-3">
+              {notifications.slice(0, 5).map((notification) => {
+                const isReminder = notification.type === "reminder.due";
+                const hasLink = !!notification.link;
+
+                if (hasLink) {
+                  return (
+                    <DropdownMenuItem
+                      key={notification._id as string}
+                      asChild
+                    >
+                      <Link
+                        href={notification.link!}
+                        onClick={(e) => {
+                          if (!notification.readAt) {
+                            e.preventDefault();
+                            isReminder && notification.reminderId
+                              ? handleCompleteReminderClick(notification._id as string, notification.reminderId)
+                              : handleNotificationClick(notification._id as string);
+                          }
+                          // already read → navigate naturally
+                        }}
+                      >
+                        <Item size="xs" className="w-full p-2">
+                          <NotificationIcon
+                            type={notification.type}
+                            image={notification.image}
+                            title={notification.title}
+                          />
+
+                          <ItemContent className="gap-0.5">
+                            <ItemTitle className={cn(!notification.readAt ? "font-semibold text-foreground" : "font-medium text-muted-foreground/80 group-focus/dropdown-menu-item:text-muted-foreground/80!")}>
+                              {notification.title}
+                            </ItemTitle>
+                            <ItemDescription
+                              className={cn(
+                                "leading-normal",
+                                !notification.readAt
+                                  ? "text-muted-foreground group-focus/dropdown-menu-item:text-muted-foreground!"
+                                  : "text-muted-foreground/60 group-focus/dropdown-menu-item:text-muted-foreground/60!"
+                              )}
+                            >
+                              {notification.message}
+                            </ItemDescription>
+                            <span
+                              className={cn(
+                                "text-[10px] mt-1 block leading-none",
+                                !notification.readAt
+                                  ? "text-muted-foreground/60 group-focus/dropdown-menu-item:text-muted-foreground/60!"
+                                  : "text-muted-foreground/40 group-focus/dropdown-menu-item:text-muted-foreground/40!"
+                              )}
+                            >
+                              {getRelativeTime(notification.createdAt)}
+                            </span>
+                          </ItemContent>
+
+                          {!notification.readAt && (
+                            <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                              <span className="sr-only">Unread</span>
+                              <Dot />
+                            </div>
+                          )}
+                        </Item>
+                      </Link>
+                    </DropdownMenuItem>
+                  );
                 }
-              >
-                <div className="flex-1 flex flex-col gap-0.5 min-w-0 pe-3">
-                  <span className="font-medium text-foreground leading-snug">
-                    {notification.title}
-                  </span>
-                  <span className="text-muted-foreground text-xs leading-snug truncate">
-                    {notification.message}
-                  </span>
-                  <span className="text-muted-foreground/60 text-[10px] mt-0.5">
-                    {getRelativeTime(notification.createdAt)}
-                  </span>
-                </div>
-                {!notification.readAt && (
-                  <div className="absolute inset-e-3 top-1/2 -translate-y-1/2">
-                    <span className="sr-only">Unread</span>
-                    <Dot />
-                  </div>
-                )}
-              </button>
-            ))}
-          </div>
+
+                // No-link notification — click to mark read
+                return (
+                  <DropdownMenuItem
+                    key={notification._id as string}
+                    onClick={() => handleNotificationClick(notification._id as string)}
+                  >
+                    <Item size="xs" className="w-full p-2">
+                      <NotificationIcon
+                        type={notification.type}
+                        image={notification.image}
+                        title={notification.title}
+                      />
+
+                      <ItemContent className="gap-0.5">
+                        <ItemTitle className={cn(!notification.readAt ? "font-semibold text-foreground" : "font-medium text-muted-foreground/80 group-focus/dropdown-menu-item:text-muted-foreground/80!")}>
+                          {notification.title}
+                        </ItemTitle>
+                        <ItemDescription
+                          className={cn(
+                            "leading-normal",
+                            !notification.readAt
+                              ? "text-muted-foreground group-focus/dropdown-menu-item:text-muted-foreground!"
+                              : "text-muted-foreground/60 group-focus/dropdown-menu-item:text-muted-foreground/60!"
+                          )}
+                        >
+                          {notification.message}
+                        </ItemDescription>
+                        <span
+                          className={cn(
+                            "text-[10px] mt-1 block leading-none",
+                            !notification.readAt
+                              ? "text-muted-foreground/60 group-focus/dropdown-menu-item:text-muted-foreground/60!"
+                              : "text-muted-foreground/40 group-focus/dropdown-menu-item:text-muted-foreground/40!"
+                          )}
+                        >
+                          {getRelativeTime(notification.createdAt)}
+                        </span>
+                      </ItemContent>
+
+                      {!notification.readAt && (
+                        <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                          <span className="sr-only">Unread</span>
+                          <Dot />
+                        </div>
+                      )}
+                    </Item>
+                  </DropdownMenuItem>
+                );
+              })}
+            </DropdownMenuGroup>
+          </ScrollArea>
         )}
 
         <Separator />

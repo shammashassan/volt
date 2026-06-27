@@ -1,3 +1,5 @@
+import { ScheduleMetadata } from "@/lib/scheduler/types";
+
 export type WatchlistStatus = "planned" | "watching" | "completed" | "dropped";
 export type WatchlistSource = "tmdb" | "anilist";
 export type WatchlistMediaType = "movie" | "series" | "anime";
@@ -15,6 +17,8 @@ export interface WatchlistItem {
     posterUrl?: string;
     releaseYear?: number;
     releaseDate?: string;
+    theatricalReleaseDate?: string;
+    ottReleaseDate?: string;
     nextEpisodeDate?: string;
     nextEpisodeNumber?: number;
     runtime?: number;
@@ -22,7 +26,13 @@ export interface WatchlistItem {
   };
   createdAt: Date;
   updatedAt: Date;
+  scheduler?: {
+    theatrical?: ScheduleMetadata;
+    ott?: ScheduleMetadata;
+    episode?: ScheduleMetadata;
+  };
 }
+
 
 
 export interface SearchResult {

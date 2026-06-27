@@ -4,20 +4,23 @@ import { useState, useEffect } from "react";
 import { Notification } from "@/features/notifications/schemas/notification";
 import { Button } from "@/components/ui/button";
 import {
-  Card,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+  Item,
+  ItemGroup,
+  ItemMedia,
+  ItemContent,
+  ItemTitle,
+  ItemDescription,
+  ItemActions,
+} from "@/components/ui/item";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Check, Trash2, ExternalLink, Calendar, Bell, AlertTriangle } from "lucide-react";
+import { Bell, AlertTriangle, ChevronRight, CheckCheck } from "lucide-react";
 import {
   markNotificationReadAction,
   deleteNotificationAction,
   getNotificationsAction,
 } from "@/features/notifications/actions/notifications";
+import { completeReminderAction } from "@/features/reminders/actions/reminders";
 import { EmptyMuted } from "@/components/notification-menu";
 import { toast } from "sonner";
 import Link from "next/link";
@@ -28,16 +31,33 @@ interface NotificationsContentProps {
 }
 
 const TYPE_ICON: Record<string, React.ReactNode> = {
-  "reminder.due": <Calendar />,
-  "watchlist.release": <Bell />,
-  "watchlist.episode": <Bell />,
+  "reminder.due": <Bell className="size-4" />,
+  "watchlist.release": <Bell className="size-4" />,
+  "watchlist.episode": <Bell className="size-4" />,
 };
 
-function NotificationIcon({ type }: { type: string }) {
+function NotificationIcon({
+  type,
+  image,
+  title,
+}: {
+  type: string;
+  image?: string;
+  title: string;
+}) {
+  if (image && (type === "watchlist.release" || type === "watchlist.episode")) {
+    return (
+      <ItemMedia variant="image" className="mt-0.5">
+        <img src={image} alt={title} />
+      </ItemMedia>
+    );
+  }
   return (
-    <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-      {TYPE_ICON[type] ?? <AlertTriangle />}
-    </div>
+    <ItemMedia className="text-primary mt-0.5">
+      <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-primary/10">
+        {TYPE_ICON[type] ?? <AlertTriangle className="size-4" />}
+      </div>
+    </ItemMedia>
   );
 }
 
@@ -49,6 +69,11 @@ export function NotificationsContent({ initialNotifications }: NotificationsCont
     setNotifications(initialNotifications);
   }, [initialNotifications]);
 
+  useEffect(() => {
+    const interval = setInterval(fetchNotifications, 60000);
+    return () => clearInterval(interval);
+  }, []);
+
   const unread = notifications.filter((n) => !n.readAt);
 
   const fetchNotifications = async () => {
@@ -56,17 +81,15 @@ export function NotificationsContent({ initialNotifications }: NotificationsCont
     if (res.success && res.data) setNotifications(res.data);
   };
 
-  const handleMarkRead = async (id: string) => {
-    const res = await markNotificationReadAction(id);
-    if (res.success) {
-      setNotifications((prev) =>
-        prev.map((n) => (n._id === id ? { ...n, readAt: new Date() } : n))
-      );
-      toast.success("Marked as read");
-      router.refresh();
-    } else {
-      toast.error("Failed to mark as read");
-    }
+  const handleNotificationClick = async (id: string) => {
+    const notification = notifications.find((n) => n._id === id);
+    if (!notification || notification.readAt) return;
+
+    setNotifications((prev) =>
+      prev.map((n) => (n._id === id ? { ...n, readAt: new Date() } : n))
+    );
+    await markNotificationReadAction(id);
+    router.refresh();
   };
 
   const handleMarkAllAsRead = async () => {
@@ -86,6 +109,21 @@ export function NotificationsContent({ initialNotifications }: NotificationsCont
       router.refresh();
     } else {
       toast.error("Failed to delete notification");
+    }
+  };
+
+  const handleCompleteReminder = async (notificationId: string, reminderId: string) => {
+    const res = await completeReminderAction(reminderId);
+    if (res.success) {
+      // Also mark the notification as read
+      await markNotificationReadAction(notificationId);
+      setNotifications((prev) =>
+        prev.map((n) => (n._id === notificationId ? { ...n, readAt: new Date() } : n))
+      );
+      toast.success("Reminder marked as complete");
+      router.refresh();
+    } else {
+      toast.error("Failed to complete reminder");
     }
   };
 
@@ -115,61 +153,88 @@ export function NotificationsContent({ initialNotifications }: NotificationsCont
         <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground px-1">
           {title}
         </h3>
-        {list.map((n) => (
-          <Card
-            key={n._id as string}
-            className={!n.readAt ? "border-l-2 border-l-primary" : ""}
-          >
-            <CardHeader className="flex-row items-start gap-3">
-              <NotificationIcon type={n.type} />
-              <div className="flex flex-1 flex-col gap-1 min-w-0">
-                <div className="flex flex-wrap items-center gap-2">
-                  <CardTitle className="text-sm font-semibold leading-none">
-                    {n.title}
-                  </CardTitle>
-                  {!n.readAt && <Badge variant="secondary">New</Badge>}
-                </div>
-                <CardDescription className="text-xs leading-relaxed">
-                  {n.message}
-                </CardDescription>
-                <span className="text-[10px] text-muted-foreground/60 font-medium mt-0.5">
-                  {new Date(n.createdAt).toLocaleDateString()}{" "}
-                  {new Date(n.createdAt).toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </span>
-              </div>
-            </CardHeader>
-            <CardFooter className="flex justify-end gap-1.5">
-              {n.link && (
-                <Button asChild variant="outline" size="sm">
-                  <Link href={n.link}>
-                    <ExternalLink data-icon="inline-start" />
-                    Go to item
-                  </Link>
-                </Button>
-              )}
-              {!n.readAt && (
-                <Button
-                  onClick={() => handleMarkRead(n._id as string)}
-                  variant="outline"
-                  size="sm"
-                >
-                  <Check data-icon="inline-start" />
-                  Mark read
-                </Button>
-              )}
-              <Button
-                onClick={() => handleDelete(n._id as string)}
-                variant="ghost"
-                size="icon"
+        <ItemGroup>
+          {list.map((n) => {
+            const isReminder = n.type === "reminder.due";
+            const hasLink = !!n.link;
+
+            return (
+              <Item
+                key={n._id as string}
+                variant={!n.readAt ? "muted" : "outline"}
+                className="items-start md:items-center justify-between cursor-pointer"
+                asChild={hasLink}
+                onClick={!hasLink ? () => handleNotificationClick(n._id as string) : undefined}
               >
-                <Trash2 />
-              </Button>
-            </CardFooter>
-          </Card>
-        ))}
+                {hasLink ? (
+                  <Link
+                    href={n.link!}
+                    replace={true}
+                    onClick={(e) => {
+                      if (!n.readAt) {
+                        e.preventDefault();
+                        isReminder && n.reminderId
+                          ? handleCompleteReminder(n._id as string, n.reminderId)
+                          : handleNotificationClick(n._id as string);
+                      }
+                      // already read → navigate naturally
+                    }}
+                  >
+                    <NotificationIcon type={n.type} image={n.image} title={n.title} />
+
+                    <ItemContent className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <ItemTitle>{n.title}</ItemTitle>
+                        {!n.readAt && <Badge variant="secondary">New</Badge>}
+                      </div>
+                      <ItemDescription className="text-xs leading-relaxed mt-0.5">
+                        {n.message}
+                      </ItemDescription>
+                      <span className="text-[10px] text-muted-foreground/60 font-medium mt-1 block">
+                        {new Date(n.createdAt).toLocaleDateString()}{" "}
+                        {new Date(n.createdAt).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </span>
+                    </ItemContent>
+
+                    <ItemActions className="self-end md:self-center shrink-0 mt-3 md:mt-0 ml-auto">
+                      {n.readAt && <ChevronRight className="size-4" />}
+                    </ItemActions>
+                  </Link>
+                ) : (
+                  <div
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => e.key === "Enter" && handleNotificationClick(n._id as string)}
+                  >
+                    <NotificationIcon type={n.type} image={n.image} title={n.title} />
+
+                    <ItemContent className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <ItemTitle>{n.title}</ItemTitle>
+                        {!n.readAt && <Badge variant="secondary">New</Badge>}
+                      </div>
+                      <ItemDescription className="text-xs leading-relaxed mt-0.5">
+                        {n.message}
+                      </ItemDescription>
+                      <span className="text-[10px] text-muted-foreground/60 font-medium mt-1 block">
+                        {new Date(n.createdAt).toLocaleDateString()}{" "}
+                        {new Date(n.createdAt).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </span>
+                    </ItemContent>
+
+                    <ItemActions className="self-end md:self-center shrink-0 mt-3 md:mt-0 ml-auto" />
+                  </div>
+                )}
+              </Item>
+            );
+          })}
+        </ItemGroup>
       </div>
     );
   };

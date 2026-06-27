@@ -10,14 +10,18 @@ export class NotificationService {
     title: string,
     message: string,
     type: NotificationType,
-    link?: string
+    link?: string,
+    image?: string,
+    reminderId?: string
   ): Promise<Notification> {
     return this.repo.create({
       userId,
       title,
       message,
       type,
-      link
+      link,
+      image,
+      reminderId
     });
   }
 
@@ -38,8 +42,8 @@ export class NotificationService {
   }
 
   public static async purgeOldNotifications(): Promise<number> {
-    const ninetyDaysAgo = new Date();
-    ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
-    return this.repo.hardDeleteExpired(ninetyDaysAgo);
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    return this.repo.hardDeleteExpired(thirtyDaysAgo);
   }
 }

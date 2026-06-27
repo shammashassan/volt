@@ -1,5 +1,6 @@
 export interface WatchlistProviderDetails {
   releaseDate?: string;
+  ottReleaseDate?: string;
   nextEpisodeDate?: string;
   nextEpisodeNumber?: number;
   posterUrl?: string;

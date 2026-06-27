@@ -39,7 +39,7 @@ export class TmdbProvider implements WatchlistProvider {
       const usReleases = releaseResults.find((r: any) => r.iso_3166_1 === 'US')?.release_dates || [];
       const digital = usReleases.find((d: any) => d.type === 4); // Type 4 = Digital release
       if (digital) {
-        details.releaseDate = digital.release_date.split('T')[0];
+        details.ottReleaseDate = digital.release_date.split('T')[0];
       }
     } else {
       details.releaseDate = data.first_air_date;
