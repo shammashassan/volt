@@ -307,6 +307,8 @@ export class WatchlistService {
   public static async syncPendingMetadata(): Promise<number> {
     const db = await getDb();
     const col = db.collection('watchlist');
+    const now = new Date();
+    const nowIso = now.toISOString();
     
     // Fetch 25 oldest check-ins needing update
     const staleItems = await col.find({
@@ -322,14 +324,17 @@ export class WatchlistService {
             { 'scheduler.theatrical.status': 'failed' },
             { 'scheduler.ott.status': 'failed' },
             { 'scheduler.theatrical': { $exists: false } },
-            { 'scheduler.ott': { $exists: false } }
+            { 'scheduler.ott': { $exists: false } },
+            { 'scheduler.theatrical.status': 'scheduled', 'scheduler.theatrical.scheduledFor': { $lte: nowIso } },
+            { 'scheduler.ott.status': 'scheduled', 'scheduler.ott.scheduledFor': { $lte: nowIso } }
           ]
         },
         {
           type: { $in: ['series', 'anime'] },
           $or: [
             { 'scheduler.episode.status': 'failed' },
-            { 'scheduler.episode': { $exists: false } }
+            { 'scheduler.episode': { $exists: false } },
+            { 'scheduler.episode.status': 'scheduled', 'scheduler.episode.scheduledFor': { $lte: nowIso } }
           ]
         }
       ]

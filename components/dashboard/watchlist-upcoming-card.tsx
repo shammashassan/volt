@@ -23,17 +23,19 @@ export function WatchlistUpcomingCard() {
             const isEpisodic = item.type === 'series' || item.type === 'anime';
 
             if (isMovie) {
+              const releaseDate = item.metadata?.releaseDate;
               return (
                 item.status === 'planned' &&
-                item.metadata?.releaseDate &&
-                new Date(item.metadata.releaseDate) > now
+                releaseDate &&
+                new Date(new Date(releaseDate).setUTCHours(23, 59, 59, 999)) > now
               );
             }
             if (isEpisodic) {
+              const nextEpisodeDate = item.metadata?.nextEpisodeDate;
               return (
                 item.status === 'watching' &&
-                item.metadata?.nextEpisodeDate &&
-                new Date(item.metadata.nextEpisodeDate) > now
+                nextEpisodeDate &&
+                new Date(new Date(nextEpisodeDate).setUTCHours(23, 59, 59, 999)) > now
               );
             }
             return false;
