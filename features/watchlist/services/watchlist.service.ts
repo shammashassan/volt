@@ -341,7 +341,6 @@ export class WatchlistService {
     }).sort({ 'sync.lastChecked': 1 }).limit(25).toArray();
 
     let count = 0;
-    const now = new Date();
 
     for (const item of staleItems) {
       try {
