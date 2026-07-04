@@ -94,6 +94,42 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
+## 🔌 Quick Save Extension & Bookmarklet
+
+Volt provides tools to capture links directly from your web browser into your workspace.
+
+### 1. Browser Extension (Dropdown Popup)
+Volt comes with a native Chrome Extension that displays a clean dropdown form right under the browser toolbar.
+
+#### Installation:
+1. Open Google Chrome and navigate to `chrome://extensions/`.
+2. Enable **Developer mode** (toggle in the top-right corner).
+3. Click **Load unpacked** (top-left).
+4. Select the `chrome-extension` directory located in the root of your cloned Volt repository (`/chrome-extension`).
+
+#### Set a Keyboard Shortcut:
+1. Navigate to `chrome://extensions/shortcuts`.
+2. Locate **Volt Quick Save**.
+3. Under **Activate the extension**, assign your preferred shortcut (e.g., `Ctrl + Shift + S` or `Alt + V`).
+
+*Note: Since the extension runs over iframe contexts, make sure to log out and log back in at `http://localhost:3000` to refresh the session cookies with the updated SameSite policy.*
+
+---
+
+### 2. Browser Bookmarklet
+If you prefer not to load an unpacked extension, you can create a simple bookmarklet button on your bookmark bar.
+
+#### Installation:
+1. Right-click your browser's Bookmarks Bar and select **Add Page...** (or **Add Bookmark...**).
+2. Name it `⚡ Save to Volt`.
+3. Paste the following JavaScript code into the **URL / Location** field:
+   ```javascript
+   javascript:(function(){var url=encodeURIComponent(window.location.href);var title=encodeURIComponent(document.title);var voltUrl='http://localhost:3000/quick-save?url='+url+'&title='+title;window.open(voltUrl,'VoltQuickSave','width=450,height=680,scrollbars=yes,resizable=yes,status=no,location=no,toolbar=no,menubar=no');})();
+   ```
+4. Click **Save**. Now, clicking this bookmark on any page will open a quick-save popup window!
+
+---
+
 ## 🔑 Keyboard Shortcuts
 
 | Shortcut | Action |
