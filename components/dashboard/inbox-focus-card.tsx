@@ -60,13 +60,16 @@ export function InboxFocusCard({
             <span className="text-[10px] text-muted-foreground uppercase tracking-wider truncate">Unread</span>
           </div>
         </Link>
-        <div className="flex items-center gap-2.5 p-2 rounded-lg border border-border/60 bg-muted/20">
+        <Link
+          href="/resources?category=none"
+          className="flex items-center gap-2.5 p-2 rounded-lg border border-border/60 bg-muted/20 hover:bg-accent/50 transition-colors"
+        >
           <FolderMinus className="size-4 shrink-0 text-indigo-500" />
           <div className="flex flex-col min-w-0">
             <span className="text-lg font-bold leading-none">{inboxCount}</span>
-            <span className="text-[10px] text-muted-foreground uppercase tracking-wider truncate">Inbox</span>
+            <span className="text-[10px] text-muted-foreground uppercase tracking-wider truncate">Uncategorized</span>
           </div>
-        </div>
+        </Link>
       </CardContent>
     </Card>
   );
