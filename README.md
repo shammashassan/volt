@@ -106,13 +106,14 @@ Volt comes with a native Chrome Extension that displays a clean dropdown form ri
 2. Enable **Developer mode** (toggle in the top-right corner).
 3. Click **Load unpacked** (top-left).
 4. Select the `chrome-extension` directory located in the root of your cloned Volt repository (`/chrome-extension`).
+5. *Note: If your Volt app is deployed to production, open `chrome-extension/popup.js` and replace `http://localhost:3000` with your production URL.*
 
 #### Set a Keyboard Shortcut:
 1. Navigate to `chrome://extensions/shortcuts`.
 2. Locate **Volt Quick Save**.
 3. Under **Activate the extension**, assign your preferred shortcut (e.g., `Ctrl + Shift + S` or `Alt + V`).
 
-*Note: Since the extension runs over iframe contexts, make sure to log out and log back in at `http://localhost:3000` to refresh the session cookies with the updated SameSite policy.*
+*Note: Since the extension runs over iframe contexts, make sure to log out and log back in at `http://localhost:3000` (or your production URL) to refresh the session cookies with the updated SameSite policy.*
 
 ---
 
@@ -127,6 +128,7 @@ If you prefer not to load an unpacked extension, you can create a simple bookmar
    javascript:(function(){var url=encodeURIComponent(window.location.href);var title=encodeURIComponent(document.title);var voltUrl='http://localhost:3000/quick-save?url='+url+'&title='+title;window.open(voltUrl,'VoltQuickSave','width=450,height=680,scrollbars=yes,resizable=yes,status=no,location=no,toolbar=no,menubar=no');})();
    ```
 4. Click **Save**. Now, clicking this bookmark on any page will open a quick-save popup window!
+5. *Note: If your Volt app is deployed to production, make sure to replace `http://localhost:3000` in the script with your production URL.*
 
 ---
 
