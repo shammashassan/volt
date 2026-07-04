@@ -42,6 +42,12 @@ export const auth = betterAuth({
       },
     },
   },
+  advanced: {
+    defaultCookieAttributes: {
+      sameSite: "none",
+      secure: true,
+    }
+  },
   plugins: [
     admin({
       defaultRole: "user",

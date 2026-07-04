@@ -17,16 +17,29 @@ export default async function QuickSavePage({ searchParams }: PageProps) {
   const resolvedSearchParams = await searchParams
   const url = typeof resolvedSearchParams.url === "string" ? resolvedSearchParams.url : ""
   const title = typeof resolvedSearchParams.title === "string" ? resolvedSearchParams.title : ""
+  const embed = resolvedSearchParams.embed === "true"
 
   if (!session) {
     const callbackParams = new URLSearchParams()
-    const targetUrl = `/quick-save?url=${encodeURIComponent(url)}&title=${encodeURIComponent(title)}`
+    const targetUrl = `/quick-save?url=${encodeURIComponent(url)}&title=${encodeURIComponent(title)}${embed ? "&embed=true" : ""}`
     callbackParams.set("callbackURL", targetUrl)
     redirect(`/login?${callbackParams.toString()}`)
   }
 
   const userId = session.user.id
   const categories = await getCategories(userId)
+
+  if (embed) {
+    return (
+      <div className="w-full min-h-screen bg-background">
+        <QuickSaveContent
+          categories={categories}
+          initialUrl={url}
+          initialTitle={title}
+        />
+      </div>
+    )
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background/95 p-4 md:p-8">

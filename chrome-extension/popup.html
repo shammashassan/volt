@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    html, body {
+      width: 385px;
+      height: 480px;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background-color: #030712; /* Match Volt dark theme */
+    }
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    .loading-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+      font-family: system-ui, -apple-system, sans-serif;
+      color: #9ca3af;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div id="loading" class="loading-container">Connecting to Volt...</div>
+  <iframe id="volt-frame" style="display: none;"></iframe>
+  <script src="popup.js"></script>
+</body>
+</html>

@@ -16,7 +16,8 @@ import {
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { addResourceAction } from "@/lib/actions"
 import { toast } from "sonner"
-import { CheckCircle2, Loader2, Link as LinkIcon, Compass, Tags, HelpCircle, FileText } from "lucide-react"
+import { CheckCircle2, Loader2, Link as LinkIcon, Compass, Tags, HelpCircle, FileText, ChevronDown, ChevronUp } from "lucide-react"
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible"
 
 interface QuickSaveContentProps {
   categories: Category[]
@@ -52,6 +53,7 @@ export function QuickSaveContent({ categories, initialUrl = "", initialTitle = "
   const [notes, setNotes] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
+  const [showDetails, setShowDetails] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -158,7 +160,6 @@ export function QuickSaveContent({ categories, initialUrl = "", initialTitle = "
             placeholder="https://example.com"
             disabled={isLoading}
             required
-            className="h-10 bg-background/50 border-border/60 focus-visible:ring-1 focus-visible:ring-primary"
           />
         </Field>
 
@@ -175,7 +176,6 @@ export function QuickSaveContent({ categories, initialUrl = "", initialTitle = "
             placeholder="Page Title"
             disabled={isLoading}
             required
-            className="h-10 bg-background/50 border-border/60 focus-visible:ring-1 focus-visible:ring-primary"
           />
         </Field>
 
@@ -184,7 +184,7 @@ export function QuickSaveContent({ categories, initialUrl = "", initialTitle = "
           <Field>
             <FieldLabel htmlFor="category">Category</FieldLabel>
             <Select value={categoryId} onValueChange={setCategoryId} disabled={isLoading}>
-              <SelectTrigger id="category" className="bg-background/50 border-border/60">
+              <SelectTrigger id="category">
                 <SelectValue placeholder="Select Category" />
               </SelectTrigger>
               <SelectContent>
@@ -201,7 +201,7 @@ export function QuickSaveContent({ categories, initialUrl = "", initialTitle = "
           <Field>
             <FieldLabel htmlFor="type">Resource Type</FieldLabel>
             <Select value={resourceType} onValueChange={(val) => setResourceType(val as ResourceType)} disabled={isLoading}>
-              <SelectTrigger id="type" className="bg-background/50 border-border/60">
+              <SelectTrigger id="type">
                 <SelectValue placeholder="Select Type" />
               </SelectTrigger>
               <SelectContent>
@@ -219,57 +219,78 @@ export function QuickSaveContent({ categories, initialUrl = "", initialTitle = "
           </Field>
         </div>
 
-        {/* Tags Input */}
-        <Field>
-          <FieldLabel htmlFor="tags">
-            <Tags className="size-3.5" /> Tags <span className="text-[9px] text-muted-foreground/60 lowercase font-normal">(space or comma separated)</span>
-          </FieldLabel>
-          <Input
-            id="tags"
-            type="text"
-            value={tagsInput}
-            onChange={(e) => setTagsInput(e.target.value)}
-            placeholder="e.g. design system utility react"
-            disabled={isLoading}
-            className="h-10 bg-background/50 border-border/60 focus-visible:ring-1 focus-visible:ring-primary"
-          />
-        </Field>
+        {/* Collapsible details for tags, whySaved, notes */}
+        <Collapsible open={showDetails} onOpenChange={setShowDetails} className="w-full">
+          <CollapsibleTrigger asChild>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="w-full flex items-center justify-center gap-1 tracking-wider cursor-pointer"
+            >
+              {showDetails ? (
+                <>
+                  <ChevronUp />
+                  Hide Extra Details
+                </>
+              ) : (
+                <>
+                  <ChevronDown />
+                  Add Tags, Notes & Details
+                </>
+              )}
+            </Button>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="space-y-4 pt-4 animate-in fade-in-0 slide-in-from-top-1 duration-200">
+            {/* Tags Input */}
+            <Field>
+              <FieldLabel htmlFor="tags">
+                <Tags className="size-3.5" /> Tags <span className="text-[9px] text-muted-foreground/60 lowercase font-normal">(space or comma separated)</span>
+              </FieldLabel>
+              <Input
+                id="tags"
+                type="text"
+                value={tagsInput}
+                onChange={(e) => setTagsInput(e.target.value)}
+                placeholder="e.g. design system utility react"
+                disabled={isLoading}
+              />
+            </Field>
 
-        {/* Why Saved */}
-        <Field>
-          <FieldLabel htmlFor="whySaved">
-            <HelpCircle className="size-3.5" /> Why are you saving this?
-          </FieldLabel>
-          <Textarea
-            id="whySaved"
-            value={whySaved}
-            onChange={(e) => setWhySaved(e.target.value)}
-            placeholder="Quick summary of what caught your eye..."
-            disabled={isLoading}
-            className="min-h-[60px] bg-background/50 border-border/60 focus-visible:ring-1 focus-visible:ring-primary text-xs"
-          />
-        </Field>
+            {/* Why Saved */}
+            <Field>
+              <FieldLabel htmlFor="whySaved">
+                <HelpCircle className="size-3.5" /> Why are you saving this?
+              </FieldLabel>
+              <Textarea
+                id="whySaved"
+                value={whySaved}
+                onChange={(e) => setWhySaved(e.target.value)}
+                placeholder="Quick summary of what caught your eye..."
+                disabled={isLoading}
+              />
+            </Field>
 
-        {/* Notes */}
-        <Field>
-          <FieldLabel htmlFor="notes">
-            <FileText className="size-3.5" /> Personal Notes
-          </FieldLabel>
-          <Textarea
-            id="notes"
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            placeholder="Any additional thoughts or details..."
-            disabled={isLoading}
-            className="min-h-[60px] bg-background/50 border-border/60 focus-visible:ring-1 focus-visible:ring-primary text-xs"
-          />
-        </Field>
+            {/* Notes */}
+            <Field>
+              <FieldLabel htmlFor="notes">
+                <FileText className="size-3.5" /> Personal Notes
+              </FieldLabel>
+              <Textarea
+                id="notes"
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder="Any additional thoughts or details..."
+                disabled={isLoading}
+              />
+            </Field>
+          </CollapsibleContent>
+        </Collapsible>
       </FieldGroup>
 
       <Button
         type="submit"
         disabled={isLoading}
-        className="w-full h-11 text-sm font-bold uppercase tracking-widest mt-2 hover:scale-[1.01] active:scale-[0.99] transition-transform"
       >
         {isLoading ? (
           <>
