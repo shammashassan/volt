@@ -13,6 +13,7 @@ import {
   FolderOpen,
   Tag,
   Film,
+  Network,
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -99,6 +100,12 @@ export function AppSidebar({ initialCategories, ...props }: AppSidebarProps) {
       url: "/resources",
       icon: LibraryIcon,
       isActive: pathname === "/resources" && activeTypeParam === null,
+    },
+    {
+      title: "Knowledge Graph",
+      url: "/graph",
+      icon: Network,
+      isActive: pathname === "/graph",
     },
     {
       title: "CLI Commands",

@@ -23,7 +23,8 @@ import {
   SettingsIcon,
   FilmIcon,
   SquareTerminal,
-  CalendarIcon
+  CalendarIcon,
+  Network
 } from "lucide-react"
 import { ICON_MAP } from "@/lib/icons"
 import { useQuickCapture } from "./quick-capture-drawers"
@@ -168,6 +169,7 @@ export function SearchCommand() {
     { path: "/explore", label: "Go to Dashboard", icon: LayoutDashboardIcon },
     { path: "/resources", label: "Open Resources", icon: StarIcon },
     { path: "/categories", label: "Open Categories", icon: FolderIcon },
+    { path: "/graph", label: "Open Graph", icon: Network },
     { path: "/projects", label: "Open Projects", icon: BriefcaseIcon },
     { path: "/notes", label: "Open Notes", icon: FileTextIcon },
     { path: "/reminders", label: "Open Reminders", icon: CalendarIcon },
