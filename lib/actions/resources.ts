@@ -46,7 +46,7 @@ export async function addResourceAction(
         title: name,
         url: link,
         description,
-        categoryId: category,
+        categoryId: category === "none" || !category ? "" : category,
         tags: [],
         notes: "",
         whySaved: "",
@@ -65,6 +65,7 @@ export async function addResourceAction(
       // Support new structured data format
       resource = {
         ...dataOrForm,
+        categoryId: dataOrForm.categoryId === "none" || !dataOrForm.categoryId ? "" : dataOrForm.categoryId,
         userId: user.id,
         useCount: 0,
         createdAt: new Date(),
@@ -110,7 +111,10 @@ export async function updateResourceAction(idOrLink: string, data: Record<string
       updateData.url = updateData.link;
     }
     if (updateData.category) {
-      updateData.categoryId = updateData.category;
+      updateData.categoryId = updateData.category === "none" ? "" : updateData.category;
+    }
+    if (updateData.categoryId !== undefined) {
+      updateData.categoryId = updateData.categoryId === "none" ? "" : updateData.categoryId;
     }
     if (updateData.featured !== undefined) {
       updateData.favorite = updateData.featured;

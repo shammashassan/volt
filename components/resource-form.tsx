@@ -91,11 +91,12 @@ Format the response as a single sentence without quotes.`
       <div className="grid grid-cols-2 gap-4">
         <Field>
           <FieldLabel htmlFor="category">Category</FieldLabel>
-          <Select name="category" defaultValue={initialData?.category || ""}>
+          <Select name="category" defaultValue={initialData?.category || "none"}>
             <SelectTrigger id="category">
               <SelectValue placeholder="Select" />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="none">Uncategorized</SelectItem>
               {categories.map((cat) => (
                 <SelectItem key={cat.id || cat._id?.toString()} value={cat.id || cat._id?.toString() || ""}>
                   {cat.title || cat.name}

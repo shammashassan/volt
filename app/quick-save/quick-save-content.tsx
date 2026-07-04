@@ -45,7 +45,7 @@ function detectResourceType(urlStr: string): ResourceType {
 export function QuickSaveContent({ categories, initialUrl = "", initialTitle = "" }: QuickSaveContentProps) {
   const [url, setUrl] = useState(initialUrl)
   const [title, setTitle] = useState(initialTitle)
-  const [categoryId, setCategoryId] = useState(categories[0]?.id || categories[0]?._id?.toString() || "")
+  const [categoryId, setCategoryId] = useState("none")
   const [resourceType, setResourceType] = useState<ResourceType>(() => detectResourceType(initialUrl))
   const [tagsInput, setTagsInput] = useState("")
   const [whySaved, setWhySaved] = useState("")
@@ -76,7 +76,7 @@ export function QuickSaveContent({ categories, initialUrl = "", initialTitle = "
       title,
       url,
       description: whySaved, // Fallback as description or keep empty
-      categoryId: categoryId || undefined,
+      categoryId: categoryId === "none" || !categoryId ? undefined : categoryId,
       tags: tagsArray,
       whySaved,
       notes,
@@ -114,6 +114,7 @@ export function QuickSaveContent({ categories, initialUrl = "", initialTitle = "
             setIsSuccess(false)
             setUrl("")
             setTitle("")
+            setCategoryId("none")
             setTagsInput("")
             setWhySaved("")
             setNotes("")
@@ -187,14 +188,12 @@ export function QuickSaveContent({ categories, initialUrl = "", initialTitle = "
                 <SelectValue placeholder="Select Category" />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="none">Uncategorized</SelectItem>
                 {categories.map((cat) => (
                   <SelectItem key={cat.id || cat._id?.toString()} value={cat.id || cat._id?.toString() || ""}>
                     {cat.name}
                   </SelectItem>
                 ))}
-                {categories.length === 0 && (
-                  <SelectItem value="none" disabled>No Categories</SelectItem>
-                )}
               </SelectContent>
             </Select>
           </Field>

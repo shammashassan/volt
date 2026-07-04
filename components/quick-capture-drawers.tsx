@@ -147,7 +147,7 @@ function QuickCaptureDrawers({
   const [resTitle, setResTitle] = useState("");
   const [resUrl, setResUrl] = useState("");
   const [resType, setResType] = useState("website");
-  const [resCategoryId, setResCategoryId] = useState("");
+  const [resCategoryId, setResCategoryId] = useState("none");
   const [resTags, setResTags] = useState("");
   const [resWhySaved, setResWhySaved] = useState("");
   const [resNotes, setResNotes] = useState("");
@@ -187,7 +187,7 @@ function QuickCaptureDrawers({
     setResTitle("");
     setResUrl("");
     setResType("website");
-    setResCategoryId("");
+    setResCategoryId("none");
     setResTags("");
     setResWhySaved("");
     setResNotes("");
@@ -232,7 +232,7 @@ function QuickCaptureDrawers({
       url: resUrl,
       description: resDescription || undefined,
       type: resType as ResourceType,
-      categoryId: resCategoryId || undefined,
+      categoryId: resCategoryId === "none" || !resCategoryId ? undefined : resCategoryId,
       tags: resTags.split(",").map(t => t.trim()).filter(Boolean),
       whySaved: resWhySaved || undefined,
       notes: resNotes || undefined,
@@ -411,6 +411,7 @@ function QuickCaptureDrawers({
                         <SelectValue placeholder="Select a Category" />
                       </SelectTrigger>
                       <SelectContent>
+                        <SelectItem value="none">Uncategorized</SelectItem>
                         {categories.map((c) => (
                           <SelectItem key={c.id || c._id?.toString()} value={c.id || c._id?.toString() || ""}>
                             {c.name || c.title}
