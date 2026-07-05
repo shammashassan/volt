@@ -3,7 +3,6 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { getCategoriesAction } from "@/lib/actions/categories";
-import { getProjectsAction } from "@/lib/actions/projects";
 import { ShareClient } from "@/components/share-client";
 
 function ShareSkeleton() {
@@ -27,18 +26,14 @@ async function ShareContentWrapper() {
     redirect("/login");
   }
 
-  // Fetch categories and projects to pass to the client Quick-Save interface
-  const [categoriesResult, projectsResult] = await Promise.all([
-    getCategoriesAction(),
-    getProjectsAction()
-  ]);
+  // Fetch categories to pass to the client Quick-Save interface
+  const categoriesResult = await getCategoriesAction();
 
   const categories = categoriesResult.success && categoriesResult.data ? categoriesResult.data : [];
-  const projects = projectsResult.success && projectsResult.data ? projectsResult.data : [];
 
   return (
     <div className="flex flex-1 items-center justify-center p-4 lg:p-6 min-h-[calc(100vh-var(--header-height)-4rem)]">
-      <ShareClient categories={categories} projects={projects} />
+      <ShareClient categories={categories} />
     </div>
   );
 }
