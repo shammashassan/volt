@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import { Card, CardHeader, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
 import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupButton } from "@/components/ui/input-group"
 import { Separator } from "@/components/ui/separator"
 import {
@@ -78,7 +77,7 @@ export function QuickSaveCard() {
                 setShowPreview(false)
                 router.refresh()
             } else {
-                toast.error("Failed to save resource")
+                toast.error(result.error || "Failed to save resource")
             }
         } catch {
             toast.error("An error occurred")

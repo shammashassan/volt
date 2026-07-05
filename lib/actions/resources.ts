@@ -73,6 +73,23 @@ export async function addResourceAction(
       };
     }
 
+    // Check if duplicate resource (same URL and userId) already exists
+    const cleanUrl = (resource.url as string || "").trim();
+    if (cleanUrl) {
+      const existing = await db.collection("resources").findOne({
+        userId: user.id,
+        url: cleanUrl
+      });
+      if (existing) {
+        return {
+          success: false,
+          error: "A resource with this URL already exists in your library.",
+          isDuplicate: true,
+          id: existing._id.toString()
+        };
+      }
+    }
+
     const result = await db.collection("resources").insertOne(resource);
 
     // Upsert into Search Index
@@ -254,6 +271,33 @@ export async function getResourcesAction() {
     const user = await getSessionUser();
     const resources = await getResources(user.id);
     return { success: true, data: resources };
+  } catch (error) {
+    return { success: false, error: getErrorMessage(error) };
+  }
+}
+
+export async function getResourceAction(id: string) {
+  try {
+    const user = await getSessionUser();
+    const client = await clientPromise;
+    const db = client.db();
+
+    const query = ObjectId.isValid(id) ? { _id: new ObjectId(id), userId: user.id } : { url: id, userId: user.id };
+    const resource = await db.collection("resources").findOne(query);
+
+    if (!resource) {
+      return { success: false, error: "Resource not found" };
+    }
+
+    // Convert ObjectId and Dates to string for safe serialization
+    const serialized = {
+      ...resource,
+      _id: resource._id.toString(),
+      createdAt: resource.createdAt?.toISOString(),
+      updatedAt: resource.updatedAt?.toISOString()
+    };
+
+    return { success: true, data: serialized };
   } catch (error) {
     return { success: false, error: getErrorMessage(error) };
   }

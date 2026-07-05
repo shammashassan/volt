@@ -20,8 +20,8 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { FieldGroup, Field, FieldLabel } from "@/components/ui/field";
-import { addResourceAction, updateResourceAction } from "@/lib/actions/resources";
-import { Category, ResourceType, ResourceStatus } from "@/lib/types";
+import { addResourceAction, updateResourceAction, getResourceAction } from "@/lib/actions/resources";
+import { Category, ResourceType, ResourceStatus, Resource } from "@/lib/types";
 
 interface ShareClientProps {
   categories: Category[];
@@ -36,6 +36,7 @@ export function ShareClient({ categories }: ShareClientProps) {
   const [status, setStatus] = useState<"parsing" | "saving" | "success" | "error">("parsing");
   const [errorMsg, setErrorMsg] = useState("");
   const [resourceId, setResourceId] = useState<string | null>(null);
+  const [isDuplicateLink, setIsDuplicateLink] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
 
   // Form Fields
@@ -96,6 +97,29 @@ export function ShareClient({ categories }: ShareClientProps) {
           setResourceId(res.id);
           setStatus("success");
           toast.success("Link saved to Inbox!");
+        } else if ((res as { isDuplicate?: boolean }).isDuplicate && res.id) {
+          const dupId = res.id;
+          setResourceId(dupId);
+          setIsDuplicateLink(true);
+          
+          // Fetch existing resource to pre-populate current database configuration
+          getResourceAction(dupId)
+            .then((getResult) => {
+              if (getResult.success && getResult.data) {
+                const item = getResult.data as Resource;
+                setTitle(item.title || "");
+                setUrl(item.url || "");
+                setDescription(item.description || "");
+                setCategoryId(item.categoryId || "none");
+                setResourceType((item.type as ResourceType) || "website");
+                setResourceStatus((item.status as ResourceStatus) || "saved");
+                setFavorite(!!item.favorite);
+              }
+            })
+            .finally(() => {
+              setStatus("success");
+              toast.warning("This URL is already in your library!");
+            });
         } else {
           setStatus("error");
           setErrorMsg(res.error || "Failed to auto-save the link.");
@@ -241,14 +265,26 @@ export function ShareClient({ categories }: ShareClientProps) {
                     />
                   </motion.svg>
                 </motion.div>
-                <h3 className="font-bold text-base text-foreground">Link Saved successfully!</h3>
+                <h3 className="font-bold text-base text-foreground">
+                  {isDuplicateLink ? "Resource Already Saved" : "Link Saved successfully!"}
+                </h3>
                 <p className="text-[11px] text-muted-foreground">
-                  Saved to your Inbox. Categorize it below or close this window.
+                  {isDuplicateLink 
+                    ? "This link is already in your second brain." 
+                    : "Saved to your Inbox. Categorize it below or close this window."}
                 </p>
               </div>
 
               {/* Edit Form */}
               <form onSubmit={handleUpdate} className="pt-2 border-t">
+                {isDuplicateLink && (
+                  <div className="flex items-start gap-2.5 p-3 rounded-lg border border-amber-500/20 bg-amber-500/10 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 text-left text-xs mb-4">
+                    <AlertCircle className="size-4 shrink-0 mt-0.5 animate-pulse" />
+                    <div>
+                      <span className="font-bold">Duplicate Detected:</span> This URL already exists in your library. You can update its details or category below.
+                    </div>
+                  </div>
+                )}
                 <FieldGroup>
                   {/* Title */}
                   <Field>
