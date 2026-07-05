@@ -7,6 +7,7 @@ import { ResourceStatus, ResourceType } from "../types";
 import { getSessionUser, getErrorMessage } from "../auth-utils";
 import { getResources } from "../db";
 import { SearchIndexRepository } from "@/features/search/repositories/search-index.repository";
+import { cleanHtmlArticle } from "@/lib/utils/reader";
 
 const searchIndexRepo = new SearchIndexRepository();
 
@@ -298,6 +299,111 @@ export async function getResourceAction(id: string) {
     };
 
     return { success: true, data: serialized };
+  } catch (error) {
+    return { success: false, error: getErrorMessage(error) };
+  }
+}
+
+export async function getReaderContentAction(resourceId: string) {
+  try {
+    const user = await getSessionUser();
+    const client = await clientPromise;
+    const db = client.db();
+
+    // Find the resource
+    const resource = await db.collection("resources").findOne({
+      _id: new ObjectId(resourceId),
+      userId: user.id
+    });
+
+    if (!resource) {
+      return { success: false, error: "Resource not found" };
+    }
+
+    // 1. If already parsed and cached, return cached html
+    if (resource.readerHtml) {
+      return {
+        success: true,
+        data: {
+          title: resource.title || resource.name || "Untitled Article",
+          url: resource.url || resource.link || "",
+          content: resource.readerHtml,
+          wordCount: resource.readerWordCount || 0,
+          readingTime: resource.readerReadingTime || 0,
+          scrollProgress: resource.readerScrollProgress || 0
+        }
+      };
+    }
+
+    // 2. Fetch the remote HTML on the server
+    const targetUrl = resource.url || resource.link;
+    if (!targetUrl) {
+      return { success: false, error: "This resource has no valid URL link." };
+    }
+
+    // Ensure url has a protocol
+    let finalUrl = targetUrl.trim();
+    if (!/^https?:\/\//i.test(finalUrl)) {
+      finalUrl = `https://${finalUrl}`;
+    }
+
+    const response = await fetch(finalUrl, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+      },
+      next: { revalidate: 86400 } // Cache remote fetch for 24h
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch page: HTTP ${response.status}`);
+    }
+
+    const html = await response.text();
+    
+    // 3. Clean HTML
+    const cleaned = cleanHtmlArticle(html, resource.title || resource.name, finalUrl);
+
+    // 4. Update the MongoDB document with cached contents
+    await db.collection("resources").updateOne(
+      { _id: new ObjectId(resourceId), userId: user.id },
+      {
+        $set: {
+          readerHtml: cleaned.content,
+          readerWordCount: cleaned.wordCount,
+          readerReadingTime: cleaned.readingTime,
+          updatedAt: new Date()
+        }
+      }
+    );
+
+    return {
+      success: true,
+      data: {
+        title: cleaned.title,
+        url: finalUrl,
+        content: cleaned.content,
+        wordCount: cleaned.wordCount,
+        readingTime: cleaned.readingTime,
+        scrollProgress: 0
+      }
+    };
+  } catch (error) {
+    return { success: false, error: getErrorMessage(error) };
+  }
+}
+
+export async function updateReadingProgressAction(resourceId: string, progress: number) {
+  try {
+    const user = await getSessionUser();
+    const client = await clientPromise;
+    const db = client.db();
+
+    await db.collection("resources").updateOne(
+      { _id: new ObjectId(resourceId), userId: user.id },
+      { $set: { readerScrollProgress: progress } }
+    );
+
+    return { success: true };
   } catch (error) {
     return { success: false, error: getErrorMessage(error) };
   }

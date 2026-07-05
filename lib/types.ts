@@ -56,6 +56,10 @@ export interface Resource {
   updatedAt: Date;
   recentlyViewedAt?: Date;
   recentlyUsedAt?: Date;
+  readerHtml?: string;
+  readerWordCount?: number;
+  readerReadingTime?: number;
+  readerScrollProgress?: number;
 }
 
 export interface Note {
