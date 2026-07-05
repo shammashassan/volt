@@ -28,7 +28,6 @@ async function ShareContentWrapper() {
 
   // Fetch categories to pass to the client Quick-Save interface
   const categoriesResult = await getCategoriesAction();
-
   const categories = categoriesResult.success && categoriesResult.data ? categoriesResult.data : [];
 
   return (
