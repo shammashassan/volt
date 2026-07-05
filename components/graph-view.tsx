@@ -687,6 +687,10 @@ export function GraphView({ data }: { data: GraphData }) {
       state.dragStartPos = { x: touch.clientX, y: touch.clientY }
       state.hasDragged = false
       setSelectedNode(nodeUnderTouch)
+      
+      // Open hovercard immediately on touch start / grab
+      state.hoveredNode = nodeUnderTouch
+      setHoveredNode(nodeUnderTouch)
     } else {
       state.isPanning = true
       state.panStart = {
