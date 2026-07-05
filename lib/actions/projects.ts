@@ -5,6 +5,7 @@ import clientPromise from "../mongodb";
 import { ObjectId } from "mongodb";
 import { ProjectStatus } from "../types";
 import { getSessionUser, getErrorMessage } from "../auth-utils";
+import { getProjects } from "../db";
 import { SearchIndexRepository } from "@/features/search/repositories/search-index.repository";
 
 const searchIndexRepo = new SearchIndexRepository();
@@ -98,6 +99,16 @@ export async function deleteProjectAction(id: string) {
     updateTag(`explore-body-${user.id}`);
     updateTag(`dashboard-stats-${user.id}`);
     return { success: true };
+  } catch (error) {
+    return { success: false, error: getErrorMessage(error) };
+  }
+}
+
+export async function getProjectsAction() {
+  try {
+    const user = await getSessionUser();
+    const projects = await getProjects(user.id);
+    return { success: true, data: projects };
   } catch (error) {
     return { success: false, error: getErrorMessage(error) };
   }

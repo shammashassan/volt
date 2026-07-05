@@ -10,6 +10,7 @@ Disallow: /account
 Disallow: /categories
 Disallow: /commands
 Disallow: /explore
+Disallow: /graph
 Disallow: /media-watchlist
 Disallow: /resources
 Disallow: /projects

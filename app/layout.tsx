@@ -4,6 +4,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Suspense } from "react";
+import { PWARegister } from "@/components/pwa-register";
 
 const inter = Inter({
   variable: "--font-sans",
@@ -41,6 +42,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <TooltipProvider>
+            <PWARegister />
             {/* <LenisProvider> */}
             <Suspense fallback={<div className="flex-1 min-h-screen bg-background" />}>
               {children}
