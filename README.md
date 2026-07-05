@@ -107,6 +107,7 @@ Volt comes with a native Chrome Extension that displays a clean dropdown form ri
 3. Click **Load unpacked** (top-left).
 4. Select the `chrome-extension` directory located in the root of your cloned Volt repository (`/chrome-extension`).
 5. *Note: If your Volt app is deployed to production, open `chrome-extension/popup.js` and replace `http://localhost:3000` with your production URL.*
+   *Tip: To keep your local Git workspace clean, you can copy the `/chrome-extension` directory to a folder outside the project (e.g. to your Desktop) and load that copy into Chrome. This lets you point it to your production URL without triggering local Git modifications.*
 
 #### Set a Keyboard Shortcut:
 1. Navigate to `chrome://extensions/shortcuts`.
