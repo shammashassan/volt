@@ -38,15 +38,17 @@ self.addEventListener('activate', (event) => {
 
 // Fetch Event
 self.addEventListener('fetch', (event) => {
-  // Only cache GET requests, avoid API and chrome-extension/dev requests
+  // Only cache GET requests, avoid API, authentication, and dev-mode HMR
   if (event.request.method !== 'GET') return;
   
   const url = new URL(event.request.url);
   
-  // Skip API routes, chrome extensions, dev-server HMR, and other domains
+  // Skip API routes, auth routes, dev-server HMR, and other domains
   if (
     url.pathname.startsWith('/api') ||
     url.pathname.startsWith('/_next/webpack-hmr') ||
+    url.pathname.startsWith('/login') ||
+    url.pathname.startsWith('/register') ||
     url.hostname !== self.location.hostname
   ) {
     return;
@@ -54,9 +56,13 @@ self.addEventListener('fetch', (event) => {
 
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
+      // If we have a cached response, return it (and fetch in background to refresh)
       if (cachedResponse) {
-        // Return cached asset, and fetch in background for fresh assets (Stale-While-Revalidate)
-        if (!url.pathname.startsWith('/_next/data') && !url.pathname.startsWith('/share')) {
+        // Refresh in background if it's not a static immutable file
+        if (
+          !url.pathname.startsWith('/_next/static') && 
+          !url.pathname.startsWith('/share')
+        ) {
           fetch(event.request)
             .then((networkResponse) => {
               if (networkResponse && networkResponse.status === 200) {
@@ -70,26 +76,42 @@ self.addEventListener('fetch', (event) => {
         return cachedResponse;
       }
 
-      // Network first, fallback to cache
+      // Network first, fall back to cache
       return fetch(event.request)
         .then((networkResponse) => {
-          // If valid response, cache it
-          if (
-            networkResponse &&
-            networkResponse.status === 200 &&
-            (url.pathname.startsWith('/_next/static') || url.pathname.match(/\.(png|jpg|jpeg|svg|gif|ico|woff2)$/))
-          ) {
+          if (!networkResponse || networkResponse.status !== 200) {
+            return networkResponse;
+          }
+
+          // Cache logic: we want to dynamically cache:
+          // 1. Static assets (JS, CSS, fonts, images)
+          // 2. Main pages (HTML navigations)
+          // 3. Next.js router payloads (RSC data containing _rsc query parameter)
+          const isStaticAsset = url.pathname.startsWith('/_next/static') || url.pathname.match(/\.(png|jpg|jpeg|svg|gif|ico|woff2)$/);
+          const isPageNavigation = event.request.mode === 'navigate';
+          const isNextRouterPayload = url.searchParams.has('_rsc');
+
+          if (isStaticAsset || isPageNavigation || isNextRouterPayload) {
             const responseClone = networkResponse.clone();
             caches.open(CACHE_NAME).then((cache) => {
               cache.put(event.request, responseClone);
             });
           }
+
           return networkResponse;
         })
         .catch(() => {
-          // Offline fallback for page navigation
+          // Offline fallback
           if (event.request.mode === 'navigate') {
             return caches.match('/');
+          }
+          // If a Next.js RSC data request fails, try to return a cached base page or generic empty response
+          if (url.searchParams.has('_rsc')) {
+            return caches.match(event.request).then((res) => {
+              return res || new Response(JSON.stringify({ offline: true }), {
+                headers: { 'Content-Type': 'application/json' }
+              });
+            });
           }
         });
     })
