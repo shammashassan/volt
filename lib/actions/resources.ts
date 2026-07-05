@@ -105,10 +105,6 @@ export async function addResourceAction(
     revalidatePath("/resources");
     updateTag(`explore-body-${user.id}`);
     updateTag(`dashboard-stats-${user.id}`);
-
-    // Trigger background AI enrichment asynchronously (crawls, summarizes, tags & updates search indexes)
-    void enrichResourceWithAi(result.insertedId.toString(), resource.url as string);
-
     return { success: true, id: result.insertedId.toString() };
   } catch (error) {
     return { success: false, error: getErrorMessage(error) };
@@ -156,11 +152,10 @@ export async function updateResourceAction(idOrLink: string, data: Record<string
     // Fetch the updated resource to update Search Index
     const updated = await db.collection("resources").findOne(query);
     if (updated) {
-      const combinedDesc = `${updated.description || updated.notes || ""}${updated.summary ? `\n\nAI Takeaways:\n${updated.summary}` : ""}`;
       await searchIndexRepo.upsert({
         userId: user.id,
         title: (updated.title || updated.name || "") as string,
-        description: combinedDesc,
+        description: (updated.description || updated.notes || "") as string,
         entityType: 'resource',
         entityId: updated._id.toString()
       });
@@ -304,153 +299,6 @@ export async function getResourceAction(id: string) {
 
     return { success: true, data: serialized };
   } catch (error) {
-    return { success: false, error: getErrorMessage(error) };
-  }
-}
-
-function cleanHtml(html: string): string {
-  // Remove scripts
-  let text = html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
-  // Remove styles
-  text = text.replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '');
-  // Remove HTML comments
-  text = text.replace(/<!--[\s\S]*?-->/g, '');
-  // Extract body content if present
-  const bodyMatch = text.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
-  if (bodyMatch) {
-    text = bodyMatch[1];
-  }
-  // Strip all HTML tags
-  text = text.replace(/<[^>]+>/g, ' ');
-  // Normalize whitespace
-  text = text.replace(/\s+/g, ' ').trim();
-  // Truncate to first 30,000 characters
-  return text.slice(0, 30000);
-}
-
-export async function enrichResourceWithAi(resourceId: string, url: string) {
-  try {
-    if (!process.env.GEMINI_API_KEY) {
-      console.warn("GEMINI_API_KEY is not defined. Skipping AI enrichment.");
-      return { success: false, error: "GEMINI_API_KEY is not defined" };
-    }
-
-    // 1. Crawl URL
-    let targetUrl = url.trim();
-    if (!/^https?:\/\//i.test(targetUrl)) {
-      targetUrl = `https://${targetUrl}`;
-    }
-
-    let crawledText = "";
-    try {
-      const response = await fetch(targetUrl, {
-        headers: {
-          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-        },
-        next: { revalidate: 3600 },
-      });
-      if (response.ok) {
-        const html = await response.text();
-        crawledText = cleanHtml(html);
-      }
-    } catch (crawlErr) {
-      console.error(`Failed to crawl URL ${targetUrl}:`, crawlErr);
-    }
-
-    const promptText = crawledText 
-      ? `Summarize this webpage content. URL: ${targetUrl}\nContent:\n${crawledText}`
-      : `Provide a best-guess summary and tags for this webpage URL: ${targetUrl}`;
-
-    // 2. Call Gemini API
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [
-                {
-                  text: `${promptText}\n\nYou are a professional research assistant. Analyze the webpage and extract:
-1. A summary of exactly 3 bullet points, each on a new line starting with '•'. Be concise, informative, and readable.
-2. A list of 3 to 6 lowercase tags relevant to the topic.
-Format your output as a JSON object matching this schema.`,
-                },
-              ],
-            },
-          ],
-          generationConfig: {
-            responseMimeType: "application/json",
-            responseSchema: {
-              type: "OBJECT",
-              properties: {
-                summary: { 
-                  type: "STRING", 
-                  description: "Exactly 3 key takeaways, each starting with '•' on a new line." 
-                },
-                tags: { 
-                  type: "ARRAY", 
-                  items: { type: "STRING" },
-                  description: "List of 3 to 6 lowercase tags." 
-                },
-              },
-              required: ["summary", "tags"],
-            },
-          },
-        }),
-      }
-    );
-
-    if (!response.ok) {
-      const errText = await response.text();
-      throw new Error(`Gemini API error: ${response.statusText} - ${errText}`);
-    }
-
-    const resData = await response.json();
-    const resultText = resData.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!resultText) {
-      throw new Error("No summary content returned from Gemini API");
-    }
-
-    const parsed = JSON.parse(resultText);
-    const summary = parsed.summary?.trim() || "";
-    const aiTags = Array.isArray(parsed.tags) ? parsed.tags.map((t: string) => t.trim().toLowerCase()).filter(Boolean) : [];
-
-    // 3. Update MongoDB resource document
-    const client = await clientPromise;
-    const db = client.db();
-    const resource = await db.collection("resources").findOne({ _id: new ObjectId(resourceId) });
-    if (!resource) {
-      throw new Error("Resource not found in database for AI update");
-    }
-
-    await db.collection("resources").updateOne(
-      { _id: new ObjectId(resourceId) },
-      { $set: { summary, aiTags, updatedAt: new Date() } }
-    );
-
-    // 4. Update Search Index
-    const combinedDesc = `${resource.description || resource.notes || ""}\n\nAI Takeaways:\n${summary}`;
-    await searchIndexRepo.upsert({
-      userId: resource.userId.toString(),
-      title: (resource.title || resource.name || "") as string,
-      description: combinedDesc,
-      entityType: "resource",
-      entityId: resourceId,
-    });
-
-    // Revalidate paths
-    revalidatePath("/explore");
-    revalidatePath("/resources");
-    updateTag(`explore-body-${resource.userId}`);
-    updateTag(`dashboard-stats-${resource.userId}`);
-
-    return { success: true, summary, aiTags };
-  } catch (error) {
-    console.error("Error in enrichResourceWithAi background worker:", error);
     return { success: false, error: getErrorMessage(error) };
   }
 }

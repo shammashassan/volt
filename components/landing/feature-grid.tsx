@@ -4,13 +4,13 @@ import React, { useRef } from 'react'
 import { BentoGrid, BentoCard } from '@/components/bento-grid'
 import {
   Command,
-  GitFork,
   HelpCircle,
   Layers,
   History,
   Sparkles,
   ListTodo,
-  Bell
+  Network,
+  Smartphone
 } from 'lucide-react'
 import { gsap } from 'gsap'
 import { useGSAP } from '@gsap/react'
@@ -29,10 +29,10 @@ const features = [
     className: "md:col-span-2"
   },
   {
-    id: "connections",
-    title: "Bidirectional Connections",
-    description: "Link resources to notes, notes to projects, and projects to people. Volt ensures your knowledge is mapped in a web of relationships rather than isolated files.",
-    icon: GitFork,
+    id: "graph",
+    title: "Interactive Knowledge Graph",
+    description: "Visualize and explore your second brain in real-time. Navigate categories and resource nodes organically using physics-based force graphs, fixed hover card tooltips, and instant toggle filters.",
+    icon: Network,
     image: "/images/categories/enhance.png",
     className: "md:col-span-1"
   },
@@ -77,10 +77,10 @@ const features = [
     className: "md:col-span-2"
   },
   {
-    id: "notifications",
-    title: "Notification Center",
-    description: "Stay updated on automated background actions, cron execution status, and workspace events with real-time in-app alerts.",
-    icon: Bell,
+    id: "pwa",
+    title: "Offline PWA & Mobile Share Target",
+    description: "Install Volt as a standalone app on iOS or Android. Save webpage links instantly from other mobile apps using the native OS Share Sheet, with full offline caching and dynamic duplicate pre-loading support.",
+    icon: Smartphone,
     image: "/images/categories/customize.png",
     className: "md:col-span-1"
   }

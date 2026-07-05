@@ -56,8 +56,6 @@ export interface Resource {
   updatedAt: Date;
   recentlyViewedAt?: Date;
   recentlyUsedAt?: Date;
-  summary?: string;
-  aiTags?: string[];
 }
 
 export interface Note {

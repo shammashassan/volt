@@ -24,6 +24,8 @@ Open your workspace, summon the Command Center with `Ctrl + K`, and instantly re
 ## ✨ Features
 
 - 🖥️ **Command Center Navigation**: Seamlessly navigate and search your entire digital workspace in milliseconds (`Ctrl + K`).
+- 🕸️ **Interactive Knowledge Graph**: Visualize your second brain nodes using a dynamic, interactive Force Graph. Features viewport-fixed hover card tooltips, instant filter controls, and click-to-navigate client routing.
+- 📶 **PWA Offline Mode & Share Target**: Install Volt as a standalone app on iOS or Android. Intercept shared links directly from other apps via the OS Share Sheet, auto-save links to your Inbox, and edit tags instantly while offline with automatic caching.
 - 📁 **Structured Curation**: Save, organize, and group bookmarks and articles into custom **Categories & Collections**.
 - 📝 **Bidirectional Linking**: Link **Resources** to custom **Projects**, **Notes**, and **People** to map relationships and map your second brain.
 - 🎬 **Media Watchlist**: Track movies, series, and anime with real-time **TMDb** & **AniList** search integration and visual popover slider ratings.

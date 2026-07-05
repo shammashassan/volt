@@ -198,7 +198,7 @@ const ResourceCardOverlay = React.memo(function ResourceCardOverlay<
   return (
     <>
       {/* Hover Overlay */}
-      <div className="absolute inset-0 flex items-center justify-center bg-background/30 backdrop-blur-[1px] opacity-0 transition-opacity duration-300 group-hover:opacity-100 z-30">
+      <div className="absolute inset-0 flex items-center justify-center bg-background/30 backdrop-blur-[1px] opacity-0 has-hover:group-hover:opacity-100 transition-opacity duration-300 z-30 pointer-events-none has-hover:pointer-events-auto">
         {hasClick ? (
           <a
             href={targetUrl}
@@ -207,12 +207,12 @@ const ResourceCardOverlay = React.memo(function ResourceCardOverlay<
             onClick={(e) => {
               e.stopPropagation()
             }}
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/95 text-primary-foreground shadow-lg transition-transform duration-300 scale-90 group-hover:scale-100 hover:scale-110 will-change-transform"
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/95 text-primary-foreground shadow-lg transition-transform duration-300 scale-90 has-hover:group-hover:scale-100 hover:scale-110 will-change-transform"
           >
             <ExternalLinkIcon className="size-5" />
           </a>
         ) : (
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/95 text-primary-foreground shadow-lg transition-transform duration-300 scale-90 group-hover:scale-100 hover:scale-110 will-change-transform">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/95 text-primary-foreground shadow-lg transition-transform duration-300 scale-90 has-hover:group-hover:scale-100 hover:scale-110 will-change-transform">
             <ExternalLinkIcon className="size-5" />
           </div>
         )}
@@ -220,25 +220,25 @@ const ResourceCardOverlay = React.memo(function ResourceCardOverlay<
 
       {/* Edit/Delete Actions */}
       {(onEdit || onDelete) && (
-        <div className="absolute top-2 right-2 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-50">
+        <div className="absolute top-2 right-2 flex items-center gap-1.5 opacity-100 has-hover:opacity-0 has-hover:group-hover:opacity-100 transition-opacity duration-300 z-50">
           {onEdit && (
             <button
               onClick={handleEditClick}
-              className="flex h-7 w-7 items-center justify-center rounded-lg bg-background/80 hover:bg-background border border-border/40 backdrop-blur-xs text-muted-foreground hover:text-foreground transition-all shadow-xs cursor-pointer"
+              className="flex h-8 w-8 has-hover:h-7 has-hover:w-7 items-center justify-center rounded-lg bg-background/80 hover:bg-background border border-border/40 backdrop-blur-xs text-muted-foreground hover:text-foreground transition-all shadow-xs cursor-pointer"
               title="Edit Resource"
               aria-label="Edit Resource"
             >
-              <PencilIcon className="size-3.5" />
+              <PencilIcon className="size-4 has-hover:size-3.5" />
             </button>
           )}
           {onDelete && (
             <button
               onClick={handleDeleteClick}
-              className="flex h-7 w-7 items-center justify-center rounded-lg bg-destructive/80 hover:bg-destructive border border-destructive/20 backdrop-blur-xs text-destructive-foreground transition-all shadow-xs cursor-pointer"
+              className="flex h-8 w-8 has-hover:h-7 has-hover:w-7 items-center justify-center rounded-lg bg-destructive/80 hover:bg-destructive border border-destructive/20 backdrop-blur-xs text-destructive-foreground transition-all shadow-xs cursor-pointer"
               title="Delete Resource"
               aria-label="Delete Resource"
             >
-              <Trash2Icon className="size-3.5" />
+              <Trash2Icon className="size-4 has-hover:size-3.5" />
             </button>
           )}
         </div>
