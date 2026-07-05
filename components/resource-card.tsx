@@ -86,6 +86,7 @@ function useScreenshot<T extends ResourceCardData>(resource: T) {
     if (retryTimer.current) clearTimeout(retryTimer.current)
     fallbackStage.current = 0
     retryCount.current = 0
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setImgSrc(previewUrl)
     setIsLoading(true)
   }, [previewUrl])
