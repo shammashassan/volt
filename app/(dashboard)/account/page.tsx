@@ -31,7 +31,8 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useGSAP } from "@gsap/react"
 import gsap from "gsap"
-import { Loader2, User, Lock, Trash2, ShieldAlert, UserCircle } from "lucide-react"
+import { Loader2, User, Lock, Trash2, ShieldAlert, UserCircle, Compass, Download } from "lucide-react"
+import { Separator } from "@/components/ui/separator"
 
 
 // Register the useGSAP plugin
@@ -52,6 +53,99 @@ export default function AccountPage() {
   const [passwordData, setPasswordData] = useState({ currentPassword: "", newPassword: "", confirmPassword: "" })
 
   const router = useRouter()
+  const [origin, setOrigin] = useState("http://localhost:3000")
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setOrigin(window.location.origin)
+    }
+  }, [])
+
+  const downloadFile = (filename: string, content: string, mimeType: string) => {
+    const blob = new Blob([content], { type: mimeType })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = filename
+    a.click()
+    URL.revokeObjectURL(url)
+    toast.success(`Downloaded ${filename}`)
+  }
+
+  const downloadExtensionFiles = () => {
+    const manifestContent = JSON.stringify({
+      manifest_version: 3,
+      name: "Volt Quick Save",
+      version: "1.0.0",
+      description: "Quickly save tabs to your Volt workspace.",
+      permissions: ["activeTab"],
+      action: {
+        default_popup: "popup.html",
+        default_title: "Save to Volt"
+      }
+    }, null, 2)
+
+    const popupHtmlContent = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    html, body {
+      width: 385px;
+      height: 480px;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background-color: #030712;
+    }
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    .loading-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+      font-family: system-ui, -apple-system, sans-serif;
+      color: #9ca3af;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div id="loading" class="loading-container">Connecting to Volt...</div>
+  <iframe id="volt-frame" style="display: none;"></iframe>
+  <script src="popup.js"></script>
+</body>
+</html>`
+
+    const popupJsContent = `chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+  const tab = tabs[0];
+  if (tab && tab.url) {
+    const url = encodeURIComponent(tab.url);
+    const title = encodeURIComponent(tab.title || "");
+    const voltUrl = \`${origin}/quick-save?url=\${url}&title=\${title}&embed=true\`;
+    
+    const iframe = document.getElementById("volt-frame");
+    const loading = document.getElementById("loading");
+
+    iframe.src = voltUrl;
+    
+    iframe.onload = function() {
+      loading.style.display = "none";
+      iframe.style.display = "block";
+    };
+  } else {
+    document.getElementById("loading").textContent = "Cannot save this page.";
+  }
+});`
+
+    downloadFile("manifest.json", manifestContent, "application/json")
+    downloadFile("popup.html", popupHtmlContent, "text/html")
+    downloadFile("popup.js", popupJsContent, "application/javascript")
+  }
+
   const contentRef = useRef<HTMLDivElement>(null)
   // GSAP animation on tab change
   useGSAP(
@@ -205,6 +299,13 @@ export default function AccountPage() {
                 Security
               </TabsTrigger>
               <TabsTrigger
+                value="clipper"
+                className="flex items-center gap-2 justify-center lg:justify-start w-auto lg:w-full whitespace-nowrap px-4 py-2.5 text-xs lg:text-sm font-semibold cursor-pointer"
+              >
+                <Compass className="size-4" />
+                Browser Clipper
+              </TabsTrigger>
+              <TabsTrigger
                 value="danger"
                 className="flex items-center gap-2 justify-center lg:justify-start w-auto lg:w-full whitespace-nowrap px-4 py-2.5 text-xs lg:text-sm font-semibold text-rose-500 hover:text-rose-600 dark:hover:text-rose-400 cursor-pointer"
               >
@@ -355,6 +456,64 @@ export default function AccountPage() {
                   </CardFooter>
                 </Card>
               </TabsContent>
+
+              {/* BROWSER CLIPPER */}
+              <TabsContent value="clipper" className="outline-none">
+                <Card className="border-none shadow-2xl bg-background/40 backdrop-blur-xl overflow-hidden">
+                  <CardHeader className="pb-4">
+                    <CardTitle>Browser Clipper & Bookmarklet</CardTitle>
+                    <CardDescription>Capture articles, links, and design inspirations instantly from your browser.</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-8 pt-2 pb-6">
+                    {/* Bookmarklet */}
+                    <div className="space-y-3">
+                      <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground/60">1. Browser Bookmarklet</h3>
+                      <p className="text-xs text-muted-foreground/80 leading-relaxed">
+                        The simplest way to save links without installing an extension. Drag the button below directly to your browser's bookmarks bar.
+                      </p>
+                      <div className="pt-2">
+                        <a
+                          href={`javascript:(function(){var url=encodeURIComponent(window.location.href);var title=encodeURIComponent(document.title);var voltUrl='${origin}/quick-save?url='+url+'&title='+title;window.open(voltUrl,'VoltQuickSave','width=450,height=680,scrollbars=yes,resizable=yes,status=no,location=no,toolbar=no,menubar=no');})();`}
+                          className="inline-flex h-11 items-center justify-center rounded-lg bg-primary px-6 text-sm font-semibold text-primary-foreground shadow-md transition-all hover:bg-primary/90 active:scale-95 cursor-grab active:cursor-grabbing select-none"
+                          onClick={(e) => e.preventDefault()}
+                        >
+                          ⚡ Save to Volt
+                        </a>
+                        <span className="text-[10px] text-muted-foreground/50 block mt-2 italic">
+                          ← Drag this button to your bookmarks bar
+                        </span>
+                      </div>
+                    </div>
+
+                    <Separator className="bg-border/40" />
+
+                    {/* Chrome Extension */}
+                    <div className="space-y-4">
+                      <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground/60">2. Chrome Extension</h3>
+                      <p className="text-xs text-muted-foreground/80 leading-relaxed">
+                        For a native feel. Installs as a clean toolbar dropdown that opens with a hotkey.
+                      </p>
+                      
+                      <div className="space-y-2 text-xs text-muted-foreground/80 list-decimal pl-4">
+                        <div>1. Click the button below to download your pre-configured extension files.</div>
+                        <div>2. Create a folder named <code className="text-primary font-mono bg-primary/10 px-1 py-0.5 rounded">volt-extension</code> on your computer and place the 3 downloaded files inside it.</div>
+                        <div>3. Open <code className="text-foreground font-semibold">chrome://extensions/</code> in Chrome and enable <code className="text-foreground font-semibold">Developer mode</code> (top-right).</div>
+                        <div>4. Click <code className="text-foreground font-semibold">Load unpacked</code> (top-left) and select your <code className="text-primary font-mono">volt-extension</code> folder.</div>
+                      </div>
+
+                      <div className="pt-2">
+                        <Button 
+                          onClick={downloadExtensionFiles}
+                          className="h-11 px-6 shadow-md transition-all active:scale-95 cursor-pointer gap-2"
+                        >
+                          <Download className="size-4" />
+                          Download Extension Config
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
             </div>
           </Tabs>
         </div>
@@ -362,4 +521,3 @@ export default function AccountPage() {
     </div>
   )
 }
-

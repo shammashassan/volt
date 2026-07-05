@@ -3,7 +3,7 @@ chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
   if (tab && tab.url) {
     const url = encodeURIComponent(tab.url);
     const title = encodeURIComponent(tab.title || "");
-    const voltUrl = `http://localhost:3000/quick-save?url=${url}&title=${title}&embed=true`;
+    const voltUrl = `https://ui-volt.vercel.app/quick-save?url=${url}&title=${title}&embed=true`;
 
     const iframe = document.getElementById("volt-frame");
     const loading = document.getElementById("loading");
