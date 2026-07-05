@@ -3,7 +3,7 @@
 import { Card, CardHeader, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Star, ExternalLink, BookmarkPlus } from "lucide-react"
-import { Resource } from "@/lib/types"
+import { Resource } from "@/types"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import Link from "next/link"
 

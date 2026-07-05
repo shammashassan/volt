@@ -1,4 +1,5 @@
-import { getResourcesByCategoryId, getCategoryById, getCategories } from "@/lib/db"
+import { getResourcesByCategoryId } from "@/lib/queries/resources";
+import { getCategoryById, getCategories } from "@/lib/queries/categories";
 import { Badge } from "@/components/ui/badge"
 import { FileText } from "lucide-react"
 import { ICON_MAP } from "@/lib/icons"

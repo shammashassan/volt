@@ -1,9 +1,9 @@
-import { getCategories } from "@/lib/db"
+import { getCategories } from "@/lib/queries/categories";
 import { CategoriesContent } from "./categories-content"
 import { auth } from "@/lib/auth"
 import { headers } from "next/headers"
 import { redirect } from "next/navigation"
-import { Category } from "@/lib/types"
+import { Category } from "@/types"
 import { Suspense } from "react"
 import { Skeleton } from "@/components/ui/skeleton"
 

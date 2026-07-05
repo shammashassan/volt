@@ -21,7 +21,7 @@ import {
 import { CSS } from "@dnd-kit/utilities"
 import { restrictToParentElement } from "@dnd-kit/modifiers"
 import { Resource } from "@/lib/data"
-import { ResourceCard } from "@/components/resource-card"
+import { ResourceCard } from "@/components/resources/resource-card"
 import { GripVertical, Trash2, Loader2 } from "lucide-react"
 import {
   AlertDialog,

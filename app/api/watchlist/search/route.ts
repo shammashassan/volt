@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/auth-utils";
-import { SearchResult, WatchlistMediaType } from "@/app/(dashboard)/media-watchlist/_types/watchlist.types";
+import { SearchResult, WatchlistMediaType } from "@/types/watchlist";
 
 interface TmdbItem {
   id: number;

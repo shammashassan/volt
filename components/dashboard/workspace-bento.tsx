@@ -16,7 +16,7 @@ import { InboxFocusCard } from "./inbox-focus-card"
 import { MyDayCard } from "./my-day-card"
 import { WatchlistUpcomingCard } from "./watchlist-upcoming-card"
 
-import { Resource, Category } from "@/lib/types"
+import { Resource, Category } from "@/types"
 
 interface CategoryWithCount extends Category {
     resourceCount?: number

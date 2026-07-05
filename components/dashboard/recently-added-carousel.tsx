@@ -5,8 +5,8 @@ import { type CarouselApi, Carousel, CarouselContent, CarouselItem } from "@/com
 import { Button } from "@/components/ui/button"
 import { Clock, ArrowRight, PackagePlus, ChevronLeft, ChevronRight } from "lucide-react"
 import Link from "next/link"
-import { ResourceCard } from "@/components/resource-card"
-import { Resource } from "@/lib/types"
+import { ResourceCard } from "@/components/resources/resource-card"
+import { Resource } from "@/types"
 import { Resource as DataResource } from "@/lib/data"
 
 interface RecentlyAddedCarouselProps {

@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useState, useMemo } from "react"
-import { Project, ProjectStatus } from "@/lib/types"
+import { Project, ProjectStatus } from "@/types"
 import { Button } from "@/components/ui/button"
 import { Folder, Plus, Edit3, Trash2, ArrowRight, Link as LinkIcon } from "lucide-react"
 import { Separator } from "@/components/ui/separator"

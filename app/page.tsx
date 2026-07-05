@@ -2,7 +2,7 @@
 
 import React, { useRef, useState, useEffect } from 'react'
 import { Preloader } from '@/components/landing/preloader'
-import { HeroHeader } from '@/components/header'
+import { HeroHeader } from '@/components/layout/header'
 import { HeroSection } from '@/components/landing/hero-section'
 import { FeatureGrid } from '@/components/landing/feature-grid'
 import { HowItWorks } from '@/components/landing/how-it-works'
@@ -18,7 +18,7 @@ import {
   AlarmClock
 } from 'lucide-react'
 import Link from 'next/link'
-import { LenisProvider } from '@/components/lenis-provider'
+import { LenisProvider } from '@/components/layout/lenis-provider'
 import { gsap } from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'

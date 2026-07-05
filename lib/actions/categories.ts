@@ -4,7 +4,8 @@ import { revalidatePath, updateTag } from "next/cache";
 import clientPromise from "../mongodb";
 import { ObjectId } from "mongodb";
 import { getSessionUser, getErrorMessage } from "../auth-utils";
-import { getCategories, getDb } from "../db";
+import { getDb } from "../db";
+import { getCategories } from "@/lib/queries/categories";
 
 export async function addCategoryAction(
   dataOrForm: FormData | {

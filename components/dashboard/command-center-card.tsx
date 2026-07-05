@@ -3,7 +3,7 @@
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
-import { useQuickCapture } from "@/components/quick-capture-drawers"
+import { useQuickCapture } from "@/components/layout/quick-capture-drawers"
 import { Search, Plus, FolderPlus, Star, LayoutGrid } from "lucide-react"
 import Link from "next/link"
 

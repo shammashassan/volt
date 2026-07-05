@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { CalendarService } from '@/features/calendar/services/calendar.service';
+import { CalendarService } from '@/lib/services/calendar.service';
 import { getDb } from '@/lib/db';
 
 export async function GET(req: NextRequest) {

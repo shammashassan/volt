@@ -1,7 +1,7 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import { Category } from "@/lib/types"
+import { Category } from "@/types"
 import { Button } from "@/components/ui/button"
 import { MoreHorizontal, Edit, Trash, ExternalLink } from "lucide-react"
 import {

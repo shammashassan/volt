@@ -11,7 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { ResourceForm } from "@/components/resource-form"
+import { ResourceForm } from "@/components/resources/resource-form"
 import { addResourceAction } from "@/lib/actions"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"

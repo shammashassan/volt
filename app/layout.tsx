@@ -2,9 +2,9 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { ThemeProvider } from "@/components/theme-provider";
+import { ThemeProvider } from "@/components/layout/theme-provider";
 import { Suspense } from "react";
-import { PWARegister } from "@/components/pwa-register";
+import { PWARegister } from "@/components/layout/pwa-register";
 
 const inter = Inter({
   variable: "--font-sans",

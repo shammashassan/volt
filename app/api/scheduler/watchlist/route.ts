@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { WatchlistService } from "@/features/watchlist/services/watchlist.service";
+import { WatchlistService } from "@/lib/services/watchlist.service";
 import { verifySchedulerRequest } from "@/lib/scheduler/verify";
 
 async function handleRequest(req: Request) {

@@ -1,5 +1,5 @@
 import { Suspense } from "react"
-import { getPeople } from "@/lib/db"
+import { getPeople } from "@/lib/queries/people";
 import { PeopleContent } from "./people-content"
 import { auth } from "@/lib/auth"
 import { headers } from "next/headers"

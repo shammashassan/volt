@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useState, useMemo } from "react"
-import { Person, PersonType } from "@/lib/types"
+import { Person, PersonType } from "@/types"
 import { Button } from "@/components/ui/button"
 import { User, Plus, Edit3, Trash2, ExternalLink } from "lucide-react"
 import { Separator } from "@/components/ui/separator"

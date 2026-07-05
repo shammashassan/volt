@@ -1,5 +1,5 @@
 import { getGraphDataAction } from "@/lib/actions/graph"
-import { GraphView } from "@/components/graph-view"
+import { GraphView } from "@/components/dashboard/graph-view"
 import { auth } from "@/lib/auth"
 import { headers } from "next/headers"
 import { redirect } from "next/navigation"

@@ -1,5 +1,5 @@
-import { getCachedReminders } from "@/features/reminders/queries/reminders";
-import { RemindersContent } from "./reminders-content";
+import { getCachedReminders } from "@/lib/queries/reminders";
+import { RemindersContent } from "@/components/reminders/reminders-view";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Metadata } from "next";

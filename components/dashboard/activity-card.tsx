@@ -6,7 +6,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Clock, Sparkles, Award, ExternalLink, ArrowUpRight, MousePointerClick, BookOpen } from "lucide-react"
-import { Resource } from "@/lib/types"
+import { Resource } from "@/types"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import Link from "next/link"
 

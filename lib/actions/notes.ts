@@ -4,7 +4,7 @@ import { revalidatePath, updateTag } from "next/cache";
 import clientPromise from "../mongodb";
 import { ObjectId } from "mongodb";
 import { getSessionUser, getErrorMessage } from "../auth-utils";
-import { SearchIndexRepository } from "@/features/search/repositories/search-index.repository";
+import { SearchIndexRepository } from "@/lib/repositories/search-index.repository";
 
 const searchIndexRepo = new SearchIndexRepository();
 

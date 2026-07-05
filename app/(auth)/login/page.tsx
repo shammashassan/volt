@@ -1,4 +1,4 @@
-import { LoginForm } from "@/components/login-form"
+import { LoginForm } from "@/components/auth/login-form"
 import { FlickeringGrid } from "@/components/ui/flickering-grid"
 import { Suspense } from "react"
 

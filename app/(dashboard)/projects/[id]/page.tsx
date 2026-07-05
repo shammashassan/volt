@@ -1,4 +1,6 @@
-import { getProjectById, getResourcesByProjectId, getNotesByProjectId } from "@/lib/db"
+import { getProjectById } from "@/lib/queries/projects";
+import { getResourcesByProjectId } from "@/lib/queries/resources";
+import { getNotesByProjectId } from "@/lib/queries/notes";
 import { ProjectContent } from "./project-content"
 import { auth } from "@/lib/auth"
 import { headers } from "next/headers"

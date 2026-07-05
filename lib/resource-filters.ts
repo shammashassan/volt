@@ -1,6 +1,6 @@
 import { createParser, parseAsString, parseAsBoolean } from 'nuqs'
-import { ResourceType, ResourceStatus, Category } from '@/lib/types'
-import { RESOURCE_TYPES, STATUS_OPTIONS, getResourceTypeInfo } from './resource-types'
+import { ResourceType, ResourceStatus, Category } from '@/types'
+import { RESOURCE_TYPES, STATUS_OPTIONS, getResourceTypeInfo } from '@/components/resources/resource-types'
 
 const validTypes = RESOURCE_TYPES.map(t => t.value)
 export const parseResourceType = createParser({

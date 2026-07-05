@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { ReminderService } from "@/features/reminders/services/reminder.service";
+import { ReminderService } from "@/lib/services/reminder.service";
 import { verifySchedulerRequest } from "@/lib/scheduler/verify";
 
 async function handleRequest(req: Request) {

@@ -1,4 +1,6 @@
-import { getPersonById, getResourcesByPersonId, getNotesByPersonId } from "@/lib/db"
+import { getPersonById } from "@/lib/queries/people";
+import { getResourcesByPersonId } from "@/lib/queries/resources";
+import { getNotesByPersonId } from "@/lib/queries/notes";
 import { PersonContent } from "./person-content"
 import { auth } from "@/lib/auth"
 import { headers } from "next/headers"

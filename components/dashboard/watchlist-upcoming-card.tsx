@@ -5,8 +5,8 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Film, Calendar, Telescope } from 'lucide-react';
 import Link from 'next/link';
-import { getWatchlistAction } from '@/app/(dashboard)/media-watchlist/_actions/get-watchlist';
-import { WatchlistItem } from '@/app/(dashboard)/media-watchlist/_types/watchlist.types';
+import { getWatchlistAction } from '@/lib/queries/watchlist';
+import { WatchlistItem } from '@/types/watchlist';
 
 export function WatchlistUpcomingCard() {
   const [items, setItems] = useState<WatchlistItem[]>([]);

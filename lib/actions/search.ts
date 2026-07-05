@@ -2,7 +2,7 @@
 
 import { getDb, serialize } from "../db";
 import { getSessionUser, getErrorMessage } from "../auth-utils";
-import type { Resource, Note, Project, Person, Category } from "../types";
+import type { Resource, Note, Project, Person, Category } from "@/types";
 import { ObjectId } from "mongodb";
 
 export async function searchAction(query: string) {

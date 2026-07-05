@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useState, useMemo, useEffect } from "react"
-import { Note, Resource, Project, Person } from "@/lib/types"
+import { Note, Resource, Project, Person } from "@/types"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"

@@ -5,8 +5,8 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { CalendarDays, CheckCircle2 } from 'lucide-react';
-import { Reminder } from '@/features/reminders/schemas/reminder';
-import { getRemindersAction, updateReminderAction } from '@/features/reminders/actions/reminders';
+import { Reminder } from '@/types/reminder';
+import { getRemindersAction, updateReminderAction } from '@/lib/actions/reminders';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 

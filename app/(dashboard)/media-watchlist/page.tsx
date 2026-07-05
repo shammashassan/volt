@@ -1,6 +1,6 @@
 import React from "react";
-import { getWatchlistAction } from "./_actions/get-watchlist";
-import { MediaWatchlistClient } from "./_components/media-watchlist-client";
+import { getWatchlistAction } from "@/lib/queries/watchlist";
+import { MediaWatchlistClient } from "@/components/watchlist/media-watchlist-client";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {

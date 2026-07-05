@@ -1,5 +1,5 @@
-import { getCachedNotifications } from "@/features/notifications/queries/notifications";
-import { NotificationsContent } from "./notifications-content";
+import { getCachedNotifications } from "@/lib/queries/notifications";
+import { NotificationsContent } from "@/components/notifications/notifications-view";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Metadata } from "next";

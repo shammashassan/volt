@@ -3,7 +3,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { getCategoriesAction } from "@/lib/actions/categories";
-import { ShareClient } from "@/components/share-client";
+import { ShareClient } from "@/components/share/share-client";
 
 function ShareSkeleton() {
   return (

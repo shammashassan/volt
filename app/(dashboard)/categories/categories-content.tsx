@@ -4,7 +4,7 @@ import * as React from "react"
 import { useState } from "react"
 import { columns } from "./columns"
 import { DataTable } from "./data-table"
-import { Category } from "@/lib/types"
+import { Category } from "@/types"
 import { Button } from "@/components/ui/button"
 import { Layers, Plus } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
@@ -18,7 +18,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog"
-import { CategoryFormFields } from "@/components/category-form"
+import { CategoryFormFields } from "@/components/categories/category-form"
 import { addCategoryAction, deleteCategoryAction, updateCategoryAction } from "@/lib/actions"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"

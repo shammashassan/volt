@@ -2,7 +2,7 @@ import * as React from "react"
 import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 import { auth } from "@/lib/auth"
-import { getCategories } from "@/lib/db"
+import { getCategories } from "@/lib/queries/categories";
 import { QuickSaveContent } from "./quick-save-content"
 
 interface PageProps {

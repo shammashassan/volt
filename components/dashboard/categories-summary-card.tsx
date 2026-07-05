@@ -7,7 +7,7 @@ import Link from "next/link"
 import { ICON_MAP } from "@/lib/icons"
 import { Progress } from "@/components/ui/progress"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Category } from "@/lib/types"
+import { Category } from "@/types"
 
 interface CategoryWithCount extends Category {
     resourceCount?: number

@@ -1,4 +1,4 @@
-import { getProjects } from "@/lib/db"
+import { getProjects } from "@/lib/queries/projects";
 import { ProjectsContent } from "./projects-content"
 import { auth } from "@/lib/auth"
 import { headers } from "next/headers"

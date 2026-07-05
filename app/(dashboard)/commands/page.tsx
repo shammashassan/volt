@@ -78,7 +78,7 @@ const commandGroups = [
       {
         name: "Motion (Framer)",
         description: "Install Framer Motion for React animations.",
-        code: "npm install framer-motion",
+        code: "npm install motion",
         language: "bash"
       },
       {

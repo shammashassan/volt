@@ -1,7 +1,11 @@
 "use server";
 
 import { getSessionUser, getErrorMessage } from "../auth-utils";
-import { getCategories, getResources, getNotes, getProjects, getPeople } from "../db";
+import { getCategories } from "@/lib/queries/categories";
+import { getResources } from "@/lib/queries/resources";
+import { getNotes } from "@/lib/queries/notes";
+import { getProjects } from "@/lib/queries/projects";
+import { getPeople } from "@/lib/queries/people";
 
 export interface GraphNode {
   id: string;

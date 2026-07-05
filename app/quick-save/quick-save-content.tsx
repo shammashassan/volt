@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useState } from "react"
-import { Category, ResourceType, ResourceStatus } from "@/lib/types"
+import { Category, ResourceType, ResourceStatus } from "@/types"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"

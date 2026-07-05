@@ -1,4 +1,6 @@
-import { getResources, getNotes, getPeople } from "@/lib/db"
+import { getResources } from "@/lib/queries/resources";
+import { getNotes } from "@/lib/queries/notes";
+import { getPeople } from "@/lib/queries/people";
 import { TagsContent } from "./tags-content"
 import { auth } from "@/lib/auth"
 import { headers } from "next/headers"

@@ -1,6 +1,6 @@
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
-import { UserManagement, UserData } from "@/components/UserManagement";
+import { UserManagement, UserData } from "@/components/user/UserManagement";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 

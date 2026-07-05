@@ -2,18 +2,17 @@ import { Suspense } from "react"
 import { redirect } from "next/navigation"
 import { cacheLife, cacheTag } from "next/cache"
 import { getSessionUser } from "@/lib/auth-utils"
+import { getDb } from "@/lib/db"
+import { getStats, getFavorites } from "@/lib/queries/dashboard"
+import { getCategoriesWithCounts } from "@/lib/queries/categories"
 import {
-  getStats,
-  getFavorites,
   getRecentlyViewed,
   getRecentlyAdded,
-  getCategoriesWithCounts,
   getInboxCount,
   getRecentlyValuable,
   getRecommendedResources,
-  getSpotlightResource,
-  getDb,
-} from "@/lib/db"
+  getSpotlightResource
+} from "@/lib/queries/resources"
 import { WorkspaceBento } from "@/components/dashboard/workspace-bento"
 import { Skeleton } from "@/components/ui/skeleton"
 

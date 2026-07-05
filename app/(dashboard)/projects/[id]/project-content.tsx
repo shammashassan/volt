@@ -1,11 +1,11 @@
 "use client"
 
 import * as React from "react"
-import { Project, Resource, Note, ProjectStatus } from "@/lib/types"
+import { Project, Resource, Note, ProjectStatus } from "@/types"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, Folder, FileText, Link as LinkIcon, Calendar, ExternalLink } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
-import { ResourceCard } from "@/components/resource-card"
+import { ResourceCard } from "@/components/resources/resource-card"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useRouter } from "next/navigation"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"

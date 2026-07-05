@@ -3,10 +3,10 @@
 import { revalidatePath, updateTag } from "next/cache";
 import clientPromise from "../mongodb";
 import { ObjectId } from "mongodb";
-import { ResourceStatus, ResourceType } from "../types";
+import { ResourceStatus, ResourceType } from "@/types";
 import { getSessionUser, getErrorMessage } from "../auth-utils";
-import { getResources } from "../db";
-import { SearchIndexRepository } from "@/features/search/repositories/search-index.repository";
+import { getResources } from "@/lib/queries/resources";
+import { SearchIndexRepository } from "@/lib/repositories/search-index.repository";
 
 const searchIndexRepo = new SearchIndexRepository();
 

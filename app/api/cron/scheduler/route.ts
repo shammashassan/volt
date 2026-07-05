@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { JobRegistry, Job } from '@/features/automation/registry';
-import { ReminderService } from '@/features/reminders/services/reminder.service';
-import { NotificationService } from '@/features/notifications/services/notification.service';
-import { WatchlistService } from '@/features/watchlist/services/watchlist.service';
+import { JobRegistry, Job } from '@/lib/services/automation-registry';
+import { ReminderService } from '@/lib/services/reminder.service';
+import { NotificationService } from '@/lib/services/notification.service';
+import { WatchlistService } from '@/lib/services/watchlist.service';
 import { SchedulerService } from '@/lib/scheduler/scheduler.service';
 import { getDb } from '@/lib/db';
 

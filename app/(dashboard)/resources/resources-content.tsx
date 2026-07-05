@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useState, useMemo, useEffect, useRef, useCallback } from "react"
-import { ResourceCard } from "@/components/resource-card"
+import { ResourceCard } from "@/components/resources/resource-card"
 
 // ---------------------------------------------------------------------------
 // Progressive rendering — only mount cards that are near / in the viewport.
@@ -47,7 +47,7 @@ function useVirtualizedItems<T>(items: T[]) {
   }
 }
 
-import { Resource, Category, Project, Person, ResourceStatus, ResourceType } from "@/lib/types"
+import { Resource, Category, Project, Person, ResourceStatus, ResourceType } from "@/types"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -116,7 +116,7 @@ import {
   Layers,
 } from "lucide-react"
 
-import { RESOURCE_TYPES, STATUS_OPTIONS } from "@/lib/resource-types"
+import { RESOURCE_TYPES, STATUS_OPTIONS } from "@/components/resources/resource-types"
 import { useQueryStates } from "nuqs"
 import { resourceFilterParsers, getResourcesPageTitle } from "@/lib/resource-filters"
 
