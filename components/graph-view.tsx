@@ -96,6 +96,7 @@ export function GraphView({ data }: { data: GraphData }) {
   const [hoveredNode, setHoveredNode] = useState<SimulationNode | null>(null)
   const [selectedNode, setSelectedNode] = useState<SimulationNode | null>(null)
   const [mounted, setMounted] = useState(false)
+  const [isTouchDevice, setIsTouchDevice] = useState(false)
   const [isFullscreen, setIsFullscreen] = useState(false)
 
   const toggleFullscreen = () => {
@@ -113,6 +114,7 @@ export function GraphView({ data }: { data: GraphData }) {
   useEffect(() => {
     const timer = setTimeout(() => {
       setMounted(true)
+      setIsTouchDevice("ontouchstart" in window || navigator.maxTouchPoints > 0)
     }, 0)
     return () => clearTimeout(timer)
   }, [])
@@ -664,6 +666,109 @@ export function GraphView({ data }: { data: GraphData }) {
     setHoveredNode(null)
   }
 
+  // Touch Event Handlers for Mobile Interaction
+  const handleTouchStart = (e: React.TouchEvent) => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+
+    const touch = e.touches[0]
+    const rect = canvas.getBoundingClientRect()
+    const screenX = touch.clientX - rect.left
+    const screenY = touch.clientY - rect.top
+
+    const state = stateRef.current
+    state.mousePos = { x: screenX, y: screenY }
+
+    const nodeUnderTouch = getNodeAt(touch.clientX, touch.clientY)
+
+    if (nodeUnderTouch) {
+      const idx = state.nodes.findIndex((n) => n.id === nodeUnderTouch.id)
+      state.draggedNodeIndex = idx
+      state.dragStartPos = { x: touch.clientX, y: touch.clientY }
+      state.hasDragged = false
+      setSelectedNode(nodeUnderTouch)
+    } else {
+      state.isPanning = true
+      state.panStart = {
+        x: screenX - state.transform.x,
+        y: screenY - state.transform.y,
+      }
+    }
+  }
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+
+    const touch = e.touches[0]
+    const rect = canvas.getBoundingClientRect()
+    const screenX = touch.clientX - rect.left
+    const screenY = touch.clientY - rect.top
+
+    const state = stateRef.current
+    state.mousePos = { x: screenX, y: screenY }
+
+    if (state.draggedNodeIndex !== null) {
+      const dx = touch.clientX - state.dragStartPos.x
+      const dy = touch.clientY - state.dragStartPos.y
+      if (Math.sqrt(dx * dx + dy * dy) > 4) {
+        state.hasDragged = true
+      }
+      state.alpha = 0.2
+    } else if (state.isPanning) {
+      state.transform = {
+        ...state.transform,
+        x: screenX - state.panStart.x,
+        y: screenY - state.panStart.y,
+      }
+    }
+  }
+
+  const handleTouchEnd = () => {
+    const state = stateRef.current
+
+    if (state.draggedNodeIndex !== null && !state.hasDragged) {
+      const clickedNode = state.nodes[state.draggedNodeIndex]
+      if (clickedNode) {
+        // If it's a touch device and this node is not already the "hoveredNode"
+        // (meaning we haven't shown its details yet), show details first!
+        if (hoveredNode?.id !== clickedNode.id) {
+          state.hoveredNode = clickedNode
+          setHoveredNode(clickedNode)
+        } else {
+          // Second tap acts as redirect!
+          if (clickedNode.link) {
+            if (clickedNode.type === "resource") {
+              const rawUrl = clickedNode.link
+              const targetUrl = /^(https?:)?\/\//i.test(rawUrl) ? rawUrl : `https://${rawUrl}`
+              window.open(targetUrl, "_blank")
+            } else {
+              if (document.fullscreenElement) {
+                document.exitFullscreen().catch((err) => {
+                  console.error("Error exiting fullscreen on navigate:", err)
+                })
+              }
+              router.push(clickedNode.link)
+            }
+          }
+        }
+      }
+    } else if (!state.hasDragged && state.draggedNodeIndex === null) {
+      // Tap empty background to hide the details popup
+      state.hoveredNode = null
+      setHoveredNode(null)
+    }
+
+    state.draggedNodeIndex = null
+    state.isPanning = false
+  }
+
+  const handleTouchCancel = () => {
+    const state = stateRef.current
+    state.draggedNodeIndex = null
+    state.isPanning = false
+  }
+
   // Zoom Button Controls
   const zoom = (direction: "in" | "out") => {
     const state = stateRef.current
@@ -869,6 +974,10 @@ export function GraphView({ data }: { data: GraphData }) {
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
           onMouseLeave={handleMouseLeave}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+          onTouchCancel={handleTouchCancel}
           className="absolute inset-0 block select-none touch-none"
         />
 
@@ -1008,8 +1117,8 @@ export function GraphView({ data }: { data: GraphData }) {
             )}
             {hoveredNode.link && (
               <span className="text-[9px] text-muted-foreground/80 italic mt-1 border-t pt-1 flex items-center justify-between">
-                <span>Click to navigate</span>
-                <span className="font-mono text-[8px] bg-muted px-1 rounded opacity-75">Click</span>
+                <span>{isTouchDevice ? "Tap again to navigate" : "Click to navigate"}</span>
+                <span className="font-mono text-[8px] bg-muted px-1 rounded opacity-75">{isTouchDevice ? "Double Tap" : "Click"}</span>
               </span>
             )}
           </>
