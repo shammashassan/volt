@@ -3,10 +3,9 @@
 import * as React from "react"
 import { useMemo, useState, useEffect, useCallback } from "react"
 import Image from "next/image"
-import Link from "next/link"
 import { Card, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
-import { ExternalLinkIcon, PencilIcon, Trash2Icon, BookOpenIcon } from "lucide-react"
+import { ExternalLinkIcon, PencilIcon, Trash2Icon } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { trackResourceViewAction, useResourceAction } from "@/lib/actions"
 
@@ -86,7 +85,6 @@ function useScreenshot<T extends ResourceCardData>(resource: T) {
     if (retryTimer.current) clearTimeout(retryTimer.current)
     fallbackStage.current = 0
     retryCount.current = 0
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setImgSrc(previewUrl)
     setIsLoading(true)
   }, [previewUrl])
@@ -156,7 +154,6 @@ function useScreenshot<T extends ResourceCardData>(resource: T) {
 
   useEffect(() => {
     if (imgElement && imgElement.complete) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsLoading(false)
     }
   }, [imgElement, imgSrc])
@@ -180,7 +177,6 @@ const ResourceCardOverlay = React.memo(function ResourceCardOverlay<
   onEdit,
   onDelete,
 }: ResourceCardOverlayProps<T>) {
-  const resourceId = resource.id || (resource._id as string | undefined)?.toString()
   const handleEditClick = useCallback(
     (e: React.MouseEvent) => {
       e.stopPropagation()
@@ -222,42 +218,31 @@ const ResourceCardOverlay = React.memo(function ResourceCardOverlay<
         )}
       </div>
 
-      {/* Edit/Delete/Read Actions */}
-      <div className="absolute top-2 right-2 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-50">
-        {resourceId && targetUrl && (
-          <Link
-            href={`/read/${resourceId}`}
-            onClick={(e) => {
-              e.stopPropagation()
-            }}
-            className="flex h-7 w-7 items-center justify-center rounded-lg bg-background/80 hover:bg-background border border-border/40 backdrop-blur-xs text-muted-foreground hover:text-primary transition-all shadow-xs cursor-pointer animate-in zoom-in-75 duration-200"
-            title="Open Reader Mode"
-            aria-label="Open Reader Mode"
-          >
-            <BookOpenIcon className="size-3.5" />
-          </Link>
-        )}
-        {onEdit && (
-          <button
-            onClick={handleEditClick}
-            className="flex h-7 w-7 items-center justify-center rounded-lg bg-background/80 hover:bg-background border border-border/40 backdrop-blur-xs text-muted-foreground hover:text-foreground transition-all shadow-xs cursor-pointer"
-            title="Edit Resource"
-            aria-label="Edit Resource"
-          >
-            <PencilIcon className="size-3.5" />
-          </button>
-        )}
-        {onDelete && (
-          <button
-            onClick={handleDeleteClick}
-            className="flex h-7 w-7 items-center justify-center rounded-lg bg-destructive/80 hover:bg-destructive border border-destructive/20 backdrop-blur-xs text-destructive-foreground transition-all shadow-xs cursor-pointer"
-            title="Delete Resource"
-            aria-label="Delete Resource"
-          >
-            <Trash2Icon className="size-3.5" />
-          </button>
-        )}
-      </div>
+      {/* Edit/Delete Actions */}
+      {(onEdit || onDelete) && (
+        <div className="absolute top-2 right-2 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-50">
+          {onEdit && (
+            <button
+              onClick={handleEditClick}
+              className="flex h-7 w-7 items-center justify-center rounded-lg bg-background/80 hover:bg-background border border-border/40 backdrop-blur-xs text-muted-foreground hover:text-foreground transition-all shadow-xs cursor-pointer"
+              title="Edit Resource"
+              aria-label="Edit Resource"
+            >
+              <PencilIcon className="size-3.5" />
+            </button>
+          )}
+          {onDelete && (
+            <button
+              onClick={handleDeleteClick}
+              className="flex h-7 w-7 items-center justify-center rounded-lg bg-destructive/80 hover:bg-destructive border border-destructive/20 backdrop-blur-xs text-destructive-foreground transition-all shadow-xs cursor-pointer"
+              title="Delete Resource"
+              aria-label="Delete Resource"
+            >
+              <Trash2Icon className="size-3.5" />
+            </button>
+          )}
+        </div>
+      )}
     </>
   )
 }) as <T extends ResourceCardData>(props: ResourceCardOverlayProps<T>) => React.ReactNode
@@ -289,7 +274,6 @@ const ResourceCardComponent = function ResourceCardComponent<
   const handleTrack = useCallback(() => {
     if (!resourceId) return
     void trackResourceViewAction(resourceId)
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     void useResourceAction(resourceId)
   }, [resourceId])
 

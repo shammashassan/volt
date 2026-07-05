@@ -19,6 +19,7 @@ function useVirtualizedItems<T>(items: T[]) {
 
   // Reset to first page whenever the list changes (filter / search)
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setVisibleCount(BATCH_SIZE)
   }, [items])
 
@@ -103,7 +104,6 @@ import {
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import {
-  Search,
   Filter,
   Plus,
   Star,
@@ -114,6 +114,7 @@ import {
   Folder,
   User,
   Layers,
+  Sparkles,
 } from "lucide-react"
 
 import { RESOURCE_TYPES, STATUS_OPTIONS } from "@/lib/resource-types"
@@ -600,6 +601,59 @@ export function ResourcesContent({
             </DialogHeader>
 
             <FieldGroup className="flex-1 flex flex-col gap-5 py-2">
+              {!isCreating && (() => {
+                const hasSummary = !!selectedResource?.summary;
+                const isNew = selectedResource?.createdAt
+                  ? (new Date().getTime() - new Date(selectedResource.createdAt).getTime()) < 45000
+                  : false;
+
+                if (!hasSummary && !isNew) return null;
+
+                return (
+                  <div className="rounded-xl border border-primary/20 bg-primary/5 p-3.5 text-left shadow-sm relative overflow-hidden backdrop-blur-xs">
+                    {/* Glowing glass accent */}
+                    <div className="absolute -right-4 -top-4 size-16 rounded-full bg-primary/10 blur-xl" />
+                    
+                    {/* Badge */}
+                    <div className="flex items-center gap-1.5 mb-2">
+                      <div className="flex size-4 items-center justify-center rounded-full bg-primary/10 text-primary">
+                        <Sparkles className="size-2.5 animate-pulse" />
+                      </div>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-primary">
+                        AI Takeaways
+                      </span>
+                    </div>
+
+                    {hasSummary ? (
+                      <div className="space-y-1.5 text-xs text-foreground/80 leading-relaxed font-normal">
+                        {selectedResource?.summary?.split('\n').map((line, idx) => {
+                          const cleanLine = line.replace(/^[•\s*-]+/, '').trim();
+                          if (!cleanLine) return null;
+                          return (
+                            <div key={idx} className="flex gap-2">
+                              <span className="text-primary font-bold select-none">•</span>
+                              <span>{cleanLine}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      <div className="space-y-2 py-1">
+                        <div className="flex items-center gap-2 text-[11px] text-muted-foreground/80">
+                          <Loader2 className="size-3 animate-spin text-primary" />
+                          <span>AI is reading and extracting key takeaways...</span>
+                        </div>
+                        <div className="space-y-1.5">
+                          <div className="h-2.5 w-[90%] bg-primary/5 animate-pulse rounded" />
+                          <div className="h-2.5 w-[95%] bg-primary/5 animate-pulse rounded" />
+                          <div className="h-2.5 w-[75%] bg-primary/5 animate-pulse rounded" />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
+
               {/* Title */}
               <Field>
                 <FieldLabel>Title</FieldLabel>
@@ -748,6 +802,31 @@ export function ResourcesContent({
                   onChange={(e) => setFormTags(e.target.value)}
                   className="bg-background/40"
                 />
+                {!isCreating && selectedResource?.aiTags && selectedResource.aiTags.length > 0 && (() => {
+                  const currentTags = formTags.split(',').map(t => t.trim().toLowerCase()).filter(Boolean);
+                  const suggested = selectedResource.aiTags.filter(t => !currentTags.includes(t.toLowerCase()));
+                  if (suggested.length === 0) return null;
+
+                  return (
+                    <div className="mt-2 flex flex-wrap items-center gap-1.5 text-[10px]">
+                      <span className="text-muted-foreground/80 font-bold">AI Suggestions:</span>
+                      {suggested.map((tag) => (
+                        <button
+                          key={tag}
+                          type="button"
+                          onClick={() => {
+                            const newTags = currentTags.concat(tag.toLowerCase());
+                            setFormTags(newTags.join(', '));
+                          }}
+                          className="px-2 py-0.5 rounded bg-primary/10 border border-primary/20 text-primary hover:bg-primary/20 transition-all font-bold flex items-center gap-1 cursor-pointer"
+                        >
+                          <Sparkles className="size-2.5" />
+                          <span>{tag}</span>
+                        </button>
+                      ))}
+                    </div>
+                  );
+                })()}
               </Field>
 
               {/* Bidirectional Relationships Box */}
