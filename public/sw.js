@@ -1,4 +1,4 @@
-const CACHE_NAME = 'volt-pwa-cache-v1';
+const CACHE_NAME = 'volt-pwa-cache-v2';
 const ASSETS_TO_CACHE = [
   '/',
   '/site.webmanifest',
@@ -54,15 +54,45 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  const isPageNavigation = event.request.mode === 'navigate';
+  const isNextRouterPayload = url.searchParams.has('_rsc');
+
+  // Network First strategy for page navigations (HTML documents) and Next.js RSC data
+  if (isPageNavigation || isNextRouterPayload) {
+    event.respondWith(
+      fetch(event.request)
+        .then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200) {
+            const responseClone = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(event.request, responseClone);
+            });
+          }
+          return networkResponse;
+        })
+        .catch(() => {
+          // Offline fallback
+          if (isPageNavigation) {
+            return caches.match('/');
+          }
+          // If Next.js RSC request fails, try cache first, then dynamic empty offline response
+          return caches.match(event.request).then((cachedResponse) => {
+            return cachedResponse || new Response(JSON.stringify({ offline: true }), {
+              headers: { 'Content-Type': 'application/json' }
+            });
+          });
+        })
+    );
+    return;
+  }
+
+  // Cache First (with SWR/network updates) for static assets
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
-      // If we have a cached response, return it (and fetch in background to refresh)
       if (cachedResponse) {
-        // Refresh in background if it's not a static immutable file
-        if (
-          !url.pathname.startsWith('/_next/static') && 
-          !url.pathname.startsWith('/share')
-        ) {
+        // Refresh in background if it's not a static hashed asset
+        const isImmutable = url.pathname.startsWith('/_next/static') || url.pathname.match(/\.(woff2)$/);
+        if (!isImmutable) {
           fetch(event.request)
             .then((networkResponse) => {
               if (networkResponse && networkResponse.status === 200) {
@@ -76,22 +106,15 @@ self.addEventListener('fetch', (event) => {
         return cachedResponse;
       }
 
-      // Network first, fall back to cache
+      // If not in cache, fetch from network and cache
       return fetch(event.request)
         .then((networkResponse) => {
           if (!networkResponse || networkResponse.status !== 200) {
             return networkResponse;
           }
 
-          // Cache logic: we want to dynamically cache:
-          // 1. Static assets (JS, CSS, fonts, images)
-          // 2. Main pages (HTML navigations)
-          // 3. Next.js router payloads (RSC data containing _rsc query parameter)
           const isStaticAsset = url.pathname.startsWith('/_next/static') || url.pathname.match(/\.(png|jpg|jpeg|svg|gif|ico|woff2)$/);
-          const isPageNavigation = event.request.mode === 'navigate';
-          const isNextRouterPayload = url.searchParams.has('_rsc');
-
-          if (isStaticAsset || isPageNavigation || isNextRouterPayload) {
+          if (isStaticAsset) {
             const responseClone = networkResponse.clone();
             caches.open(CACHE_NAME).then((cache) => {
               cache.put(event.request, responseClone);
@@ -99,20 +122,6 @@ self.addEventListener('fetch', (event) => {
           }
 
           return networkResponse;
-        })
-        .catch(() => {
-          // Offline fallback
-          if (event.request.mode === 'navigate') {
-            return caches.match('/');
-          }
-          // If a Next.js RSC data request fails, try to return a cached base page or generic empty response
-          if (url.searchParams.has('_rsc')) {
-            return caches.match(event.request).then((res) => {
-              return res || new Response(JSON.stringify({ offline: true }), {
-                headers: { 'Content-Type': 'application/json' }
-              });
-            });
-          }
         });
     })
   );

@@ -4,10 +4,7 @@ import React, { useRef } from 'react'
 import { BentoGrid, BentoCard } from '@/components/bento-grid'
 import {
   Command,
-  HelpCircle,
   Layers,
-  History,
-  Sparkles,
   ListTodo,
   Network,
   Smartphone
@@ -31,17 +28,9 @@ const features = [
   {
     id: "graph",
     title: "Interactive Knowledge Graph",
-    description: "Visualize and explore your second brain in real-time. Navigate categories and resource nodes organically using physics-based force graphs, fixed hover card tooltips, and instant toggle filters.",
+    description: "Visualize and explore your second brain in real-time. Navigate categories and resource nodes organically using physics-based force graphs, and discover smart bidirectional relationships.",
     icon: Network,
     image: "/images/categories/enhance.png",
-    className: "md:col-span-1"
-  },
-  {
-    id: "context",
-    title: "Context-First Curation",
-    description: "Every saved link goes beyond the URL, capturing the creator/author, associated projects, custom tags, and a description of why it matters.",
-    icon: HelpCircle,
-    image: "/images/categories/agents.png",
     className: "md:col-span-1"
   },
   {
@@ -50,36 +39,20 @@ const features = [
     description: "A completely custom structure tailored to you. Start with a clean slate and build your own nested categories, custom collections, and tag namespaces that match your exact mental model.",
     icon: Layers,
     image: "/images/categories/build.png",
-    className: "md:col-span-2"
-  },
-  {
-    id: "associations",
-    title: "Smart Relationships",
-    description: "Uncover hidden links. Volt automatically suggests related notes, overlapping resources, and connected categories based on tags, projects, and bidirectional linkages.",
-    icon: Sparkles,
-    image: "/images/categories/polish.png",
-    className: "md:col-span-2"
-  },
-  {
-    id: "timeline",
-    title: "Activity Footprint",
-    description: "A chronological timeline tracking your learning speed and input history, acting as a supporting registry of what you captured and when.",
-    icon: History,
-    image: "/images/categories/start.png",
     className: "md:col-span-1"
   },
   {
     id: "reminders",
-    title: "Checklist & Day Timeline",
+    title: "Checklist & Day Agenda",
     description: "Manage actionable tasks with smart priority filters, seamless transition animations, and a visual daily timeline mapping out your agenda.",
     icon: ListTodo,
     image: "/images/categories/maps.png",
-    className: "md:col-span-2"
+    className: "md:col-span-1"
   },
   {
     id: "pwa",
     title: "Offline PWA & Mobile Share Target",
-    description: "Install Volt as a standalone app on iOS or Android. Save webpage links instantly from other mobile apps using the native OS Share Sheet, with full offline caching and dynamic duplicate pre-loading support.",
+    description: "Install Volt as a standalone app on iOS or Android. Save webpage links instantly from other mobile apps using the native OS Share Sheet, with full offline caching and dynamic preloading.",
     icon: Smartphone,
     image: "/images/categories/customize.png",
     className: "md:col-span-1"
