@@ -1,9 +1,10 @@
 import { getCategories } from "@/lib/queries/categories";
+import { getCollections } from "@/lib/queries/collections";
 import { CategoriesContent } from "./categories-content"
 import { auth } from "@/lib/auth"
 import { headers } from "next/headers"
 import { redirect } from "next/navigation"
-import { Category } from "@/types"
+import { Category, Collection } from "@/types"
 import { Suspense } from "react"
 import { Skeleton } from "@/components/ui/skeleton"
 
@@ -68,9 +69,17 @@ async function CategoriesContentWrapper() {
     redirect("/login")
   }
   const userId = session.user.id
-  const categories = await getCategories(userId)
+  const [categories, collections] = await Promise.all([
+    getCategories(userId),
+    getCollections(userId)
+  ])
   
-  return <CategoriesContent initialCategories={categories as unknown as Category[]} />
+  return (
+    <CategoriesContent
+      initialCategories={categories as unknown as Category[]}
+      initialCollections={collections as unknown as Collection[]}
+    />
+  )
 }
 
 export default function CategoriesPage() {

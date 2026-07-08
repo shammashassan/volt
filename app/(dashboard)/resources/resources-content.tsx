@@ -5,20 +5,33 @@ import { useState, useMemo, useEffect, useRef, useCallback } from "react"
 import { ResourceCard } from "@/components/resources/resource-card"
 import { ResourceForm } from "@/components/resources/resource-form"
 
-// ---------------------------------------------------------------------------
-// Progressive rendering — only mount cards that are near / in the viewport.
-// With 100+ resources, mounting all cards at once hammers the network with
-// screenshot requests and creates a massive initial DOM. This hook renders
-// BATCH_SIZE cards immediately and appends the next batch as the user scrolls
-// to the sentinel element at the bottom of the list.
-// ---------------------------------------------------------------------------
+// DnD Kit imports
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  MouseSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core"
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  rectSortingStrategy,
+} from "@dnd-kit/sortable"
+import { CSS } from "@dnd-kit/utilities"
+
+// Progressive rendering hook
 const BATCH_SIZE = 24
 
 function useVirtualizedItems<T>(items: T[]) {
   const [visibleCount, setVisibleCount] = useState(BATCH_SIZE)
   const sentinelRef = useRef<HTMLDivElement | null>(null)
 
-  // Reset to first page whenever the list changes (filter / search)
   useEffect(() => {
     setVisibleCount(BATCH_SIZE)
   }, [items])
@@ -34,7 +47,7 @@ function useVirtualizedItems<T>(items: T[]) {
       (entries) => {
         if (entries[0]?.isIntersecting) loadMore()
       },
-      { rootMargin: "400px" } // start loading 400 px before sentinel enters view
+      { rootMargin: "400px" }
     )
     observer.observe(el)
     return () => observer.disconnect()
@@ -48,10 +61,9 @@ function useVirtualizedItems<T>(items: T[]) {
   }
 }
 
-import { Resource, Category, Project, Person, ResourceStatus, ResourceType } from "@/types"
+import { Resource, Category, Project, Person, ResourceType } from "@/types"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
 import {
   Dialog,
@@ -59,7 +71,6 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from "@/components/ui/dialog"
 import {
   AlertDialog,
@@ -72,19 +83,6 @@ import {
   AlertDialogMedia,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import { Field, FieldGroup, FieldLabel } from "@/components/ui/field"
-import {
-  Combobox,
-  ComboboxChip,
-  ComboboxChips,
-  ComboboxChipsInput,
-  ComboboxContent,
-  ComboboxEmpty,
-  ComboboxItem,
-  ComboboxList,
-  ComboboxValue,
-  useComboboxAnchor,
-} from "@/components/ui/combobox"
 import {
   Select,
   SelectTrigger,
@@ -99,7 +97,8 @@ import {
   addResourceAction,
   updateResourceAction,
   deleteResourceAction,
-  trackResourceViewAction
+  trackResourceViewAction,
+  updateResourceOrdersAction
 } from "@/lib/actions"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
@@ -108,30 +107,105 @@ import {
   Filter,
   Plus,
   Star,
-  ExternalLink,
   Trash2,
-  Save,
-  Loader2,
-  Folder,
-  User,
   Layers,
+  ArrowUpDown,
+  Check,
 } from "lucide-react"
 
-import { RESOURCE_TYPES, STATUS_OPTIONS } from "@/components/resources/resource-types"
+import { RESOURCE_TYPES } from "@/components/resources/resource-types"
 import { useQueryStates } from "nuqs"
 import { resourceFilterParsers, getResourcesPageTitle } from "@/lib/resource-filters"
 
-// ---------------------------------------------------------------------------
-// ResourceGrid — renders filteredResources progressively using useVirtualizedItems
-// ---------------------------------------------------------------------------
-interface ResourceGridProps {
-  filteredResources: (Resource & { name: string; link: string })[]
-  handleCardClick: (resource: Resource) => void
-  handleCardDelete: (resource: Resource, e: React.MouseEvent) => void
+// Sortable Card Wrapper Component
+interface SortableCardProps {
+  resource: Resource
+  priority: boolean
+  onEdit: (resource: Resource) => void
+  onDelete: (resource: Resource, e: React.MouseEvent) => void
+  isDraggingEnabled: boolean
 }
 
-function ResourceGrid({ filteredResources, handleCardClick, handleCardDelete }: ResourceGridProps) {
+function SortableCard({ resource, priority, onEdit, onDelete, isDraggingEnabled }: SortableCardProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
+    id: resource._id?.toString() || resource.id || "",
+    disabled: !isDraggingEnabled,
+  })
+
+  const style: React.CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 10 : 1,
+    cursor: isDraggingEnabled ? "grab" : "default",
+    touchAction: isDraggingEnabled ? "none" : "auto",
+  }
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...(isDraggingEnabled ? { ...attributes, ...listeners } : {})}
+      className="relative group transition-shadow"
+    >
+      <ResourceCard
+        resource={resource}
+        priority={priority}
+        onEdit={onEdit}
+        onDelete={onDelete}
+        disableRedirect={isDraggingEnabled}
+      />
+      {isDraggingEnabled && (
+        <div className="absolute inset-0 border-2 border-dashed border-primary/40 rounded-2xl pointer-events-none bg-primary/2 flex items-center justify-center">
+          <div className="opacity-0 group-hover:opacity-100 bg-background/90 text-primary border border-border px-2.5 py-1.5 rounded-lg text-xs font-semibold shadow-xs transition-opacity flex items-center gap-1.5">
+            <ArrowUpDown className="size-3.5" />
+            Drag to Reorder
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+interface ResourceGridProps {
+  filteredResources: Resource[]
+  handleCardClick: (resource: Resource) => void
+  handleCardDelete: (resource: Resource, e: React.MouseEvent) => void
+  isReorderActive: boolean
+  onDragEnd: (event: DragEndEvent) => void
+}
+
+function ResourceGrid({
+  filteredResources,
+  handleCardClick,
+  handleCardDelete,
+  isReorderActive,
+  onDragEnd,
+}: ResourceGridProps) {
   const { visibleItems, hasMore, remaining, sentinelRef } = useVirtualizedItems(filteredResources)
+
+  const sensors = useSensors(
+    useSensor(MouseSensor, {
+      activationConstraint: {
+        distance: 8, // Require dragging at least 8px to differentiate from click
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        distance: 8, // Differentiate dragging from tap on mobile
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  )
 
   if (filteredResources.length === 0) {
     return (
@@ -151,20 +225,32 @@ function ResourceGrid({ filteredResources, handleCardClick, handleCardDelete }: 
 
   return (
     <section className="px-4 lg:px-6">
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 max-w-7xl">
-        {visibleItems.map((res, index) => (
-          <ResourceCard
-            key={res._id?.toString() || res.id}
-            resource={res}
-            priority={index < 6}
-            onEdit={handleCardClick}
-            onDelete={handleCardDelete}
-          />
-        ))}
-      </div>
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={onDragEnd}
+      >
+        <SortableContext
+          items={visibleItems.map((r) => r._id?.toString() || r.id || "")}
+          strategy={rectSortingStrategy}
+        >
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 max-w-7xl">
+            {visibleItems.map((res, index) => (
+              <SortableCard
+                key={res._id?.toString() || res.id}
+                resource={res}
+                priority={index < 6}
+                onEdit={handleCardClick}
+                onDelete={handleCardDelete}
+                isDraggingEnabled={isReorderActive}
+              />
+            ))}
+          </div>
+        </SortableContext>
+      </DndContext>
 
-      {/* Sentinel + loading indicator — watched by IntersectionObserver */}
-      {hasMore && (
+      {/* Sentinel + loading indicator */}
+      {hasMore && !isReorderActive && (
         <div ref={sentinelRef} className="max-w-7xl mt-6">
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {Array.from({ length: Math.min(3, remaining) }).map((_, i) => (
@@ -200,18 +286,16 @@ export function ResourcesContent({
   people,
 }: ResourcesContentProps) {
   const router = useRouter()
-  const projectsAnchor = useComboboxAnchor()
-  const peopleAnchor = useComboboxAnchor()
 
   // Scopes and states
   const [resources, setResources] = useState<Resource[]>(initialResources)
+  const [isReorderActive, setIsReorderActive] = useState(false)
   const [filters, setFilters] = useQueryStates(
     resourceFilterParsers,
     { history: 'replace', shallow: true }
   )
 
   const filterType = filters.type
-  const filterStatus = filters.status
   const filterFavorite = filters.favorite
   const searchQuery = filters.q || ""
 
@@ -231,13 +315,19 @@ export function ResourcesContent({
     setSearchValue(filters.q || '')
   }, [filters.q])
 
+  // Reset reorder mode if category filter is cleared
+  useEffect(() => {
+    if (!filters.category) {
+      setIsReorderActive(false)
+    }
+  }, [filters.category])
+
   // Sheet states
   const [selectedResource, setSelectedResource] = useState<Resource | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
-  const [isCreating, setIsCreating] = useState(false) // toggle for adding new
-  // Delete confirmation state: stores the resource to be deleted
+  const [isCreating, setIsCreating] = useState(false)
   const [deleteTarget, setDeleteTarget] = useState<Resource | null>(null)
 
   // Refresh local resources when props change
@@ -247,45 +337,46 @@ export function ResourcesContent({
 
   // Map filters and map properties for rendering
   const filteredResources = useMemo(() => {
-    return resources
-      .filter((res) => {
-        const title = (res.title || res.name || "").toLowerCase()
-        const desc = (res.description || "").toLowerCase()
-        const tagsString = (res.tags || []).join(" ").toLowerCase()
-        const matchesSearch =
-          title.includes(searchQuery.toLowerCase()) ||
-          desc.includes(searchQuery.toLowerCase()) ||
-          tagsString.includes(searchQuery.toLowerCase())
+    const filtered = resources.filter((res) => {
+      const title = (res.title || "").toLowerCase()
+      const desc = (res.description || "").toLowerCase()
+      const tagsString = (res.tags || []).join(" ").toLowerCase()
+      const matchesSearch =
+        title.includes(searchQuery.toLowerCase()) ||
+        desc.includes(searchQuery.toLowerCase()) ||
+        tagsString.includes(searchQuery.toLowerCase())
 
-        const resType = res.type || "website"
-        const resStatus = res.status || "saved"
-        const resFav = !!(res.favorite || res.featured)
+      const resType = res.type || "website"
+      const resFav = !!res.favorite
 
-        const matchesType = !filterType || resType === filterType
-        const matchesStatus = !filterStatus || resStatus === filterStatus
-        const matchesFav = !filterFavorite || resFav
+      const matchesType = !filterType || resType === filterType
+      const matchesFav = !filterFavorite || resFav
 
-        const rawCatId = res.categoryId || res.category || "none"
-        const matchedCat = categories.find(
-          (c) => (c._id?.toString() || c.id) === rawCatId || c.id === rawCatId || c._id?.toString() === rawCatId
-        )
-        const resolvedCatId = matchedCat ? (matchedCat.id || matchedCat._id?.toString() || "none") : "none"
+      const resolvedCatId = res.categoryId || "none"
+      const filterCategory = filters.category
+      const matchesCategory = !filterCategory || resolvedCatId === filterCategory
 
-        const filterCategory = filters.category
-        const matchesCategory = !filterCategory || resolvedCatId === filterCategory
+      return matchesSearch && matchesType && matchesFav && matchesCategory
+    })
 
-        return matchesSearch && matchesType && matchesStatus && matchesFav && matchesCategory
+    // Sort order:
+    // If inside a specific category filter, sort by manual 'order' ASC, then by 'createdAt' DESC
+    if (filters.category) {
+      filtered.sort((a, b) => {
+        const orderDiff = (a.order ?? 0) - (b.order ?? 0)
+        if (orderDiff !== 0) return orderDiff
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       })
-      .map((res) => ({
-        ...res,
-        name: res.title || res.name || "",
-        link: res.url || res.link || "",
-      }))
-  }, [resources, searchQuery, filterType, filterStatus, filterFavorite, filters.category, categories])
+    } else {
+      // If in library overview, sort by 'createdAt' DESC
+      filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    }
+
+    return filtered
+  }, [resources, searchQuery, filterType, filterFavorite, filters.category])
 
   const pageTitle = getResourcesPageTitle({
     type: filterType,
-    status: filterStatus,
     favorite: filterFavorite ?? undefined,
     category: filters.category,
     q: searchQuery
@@ -367,13 +458,50 @@ export function ResourcesContent({
     setIsDeleting(false)
   }
 
-  // Delete resource from card hover action — opens the AlertDialog
+  // Delete resource from card hover action
   const handleCardDelete = React.useCallback((resource: Resource, e: React.MouseEvent) => {
     e.stopPropagation()
     setDeleteTarget(resource)
   }, [])
 
+  // Drag to reorder handler
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event
+    if (!over || active.id === over.id) return
 
+    const oldIndex = filteredResources.findIndex((r) => (r._id?.toString() || r.id) === active.id)
+    const newIndex = filteredResources.findIndex((r) => (r._id?.toString() || r.id) === over.id)
+
+    if (oldIndex === -1 || newIndex === -1) return
+
+    const reorderedFiltered = arrayMove(filteredResources, oldIndex, newIndex)
+
+    // Calculate sequential order indices
+    const updates = reorderedFiltered.map((r, index) => ({
+      id: r._id?.toString() || r.id || "",
+      order: index,
+    }))
+
+    // Optimistic UI Update
+    setResources((prev) => {
+      const updated = [...prev]
+      updates.forEach((u) => {
+        const idx = updated.findIndex((r) => (r._id?.toString() || r.id) === u.id)
+        if (idx !== -1) {
+          updated[idx] = { ...updated[idx], order: u.order }
+        }
+      })
+      return updated
+    })
+
+    const result = await updateResourceOrdersAction(updates)
+    if (result.success) {
+      toast.success("Resource order updated")
+    } else {
+      toast.error(result.error || "Failed to update resource order")
+      router.refresh()
+    }
+  }
 
   return (
     <div className="flex flex-1 flex-col gap-6 pb-12">
@@ -397,10 +525,22 @@ export function ResourcesContent({
               Curate, search, filter, and link resources to your active projects and developer network.
             </p>
           </div>
-          <Button onClick={handleOpenCreate} className="w-full sm:w-auto shrink-0 gap-2 font-bold">
-            <Plus className="size-4" />
-            Add Resource
-          </Button>
+          <div className="flex gap-3 w-full sm:w-auto">
+            {filters.category && (
+              <Toggle
+                pressed={isReorderActive}
+                onPressedChange={setIsReorderActive}
+                variant="outline"
+              >
+                {isReorderActive ? <Check /> : <ArrowUpDown />}
+                <span>{isReorderActive ? "Done Ordering" : "Reorder Mode"}</span>
+              </Toggle>
+            )}
+            <Button onClick={handleOpenCreate}>
+              <Plus />
+              Add Resource
+            </Button>
+          </div>
         </div>
       </section>
 
@@ -413,12 +553,17 @@ export function ResourcesContent({
               placeholder="Search title, description, tags..."
               value={searchValue}
               onChange={(e) => setSearchValue(e.target.value)}
+              disabled={isReorderActive}
             />
           </div>
 
           <div className="flex flex-wrap gap-3 items-center">
             {/* Type Filter */}
-            <Select value={filterType || "all"} onValueChange={(val) => setFilters({ type: val === "all" ? null : (val as ResourceType) })}>
+            <Select
+              value={filterType || "all"}
+              onValueChange={(val) => setFilters({ type: val === "all" ? null : (val as ResourceType) })}
+              disabled={isReorderActive}
+            >
               <SelectTrigger className="w-[140px] h-10 bg-background/50 border-border/60">
                 <SelectValue placeholder="All Types" />
               </SelectTrigger>
@@ -432,23 +577,12 @@ export function ResourcesContent({
               </SelectContent>
             </Select>
 
-            {/* Status Filter */}
-            <Select value={filterStatus || "all"} onValueChange={(val) => setFilters({ status: val === "all" ? null : (val as ResourceStatus) })}>
-              <SelectTrigger className="w-[140px] h-10 bg-background/50 border-border/60">
-                <SelectValue placeholder="All Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                {STATUS_OPTIONS.map((s) => (
-                  <SelectItem key={s.value} value={s.value}>
-                    {s.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
             {/* Category Filter */}
-            <Select value={filters.category || "all"} onValueChange={(val) => setFilters({ category: val === "all" ? null : val })}>
+            <Select
+              value={filters.category || "all"}
+              onValueChange={(val) => setFilters({ category: val === "all" ? null : val })}
+              disabled={isReorderActive}
+            >
               <SelectTrigger className="w-[160px] h-10 bg-background/50 border-border/60">
                 <SelectValue placeholder="All Categories" />
               </SelectTrigger>
@@ -456,7 +590,7 @@ export function ResourcesContent({
                 <SelectItem value="all">All Categories</SelectItem>
                 <SelectItem value="none">Uncategorized</SelectItem>
                 {categories.map((cat) => {
-                  const catId = cat.id || cat._id?.toString() || ""
+                  const catId = cat.slug
                   return (
                     <SelectItem key={catId} value={catId}>
                       {cat.name}
@@ -471,6 +605,7 @@ export function ResourcesContent({
               pressed={filterFavorite || false}
               onPressedChange={(pressed) => setFilters({ favorite: pressed || null })}
               variant="outline"
+              disabled={isReorderActive}
             >
               <Star className={`size-3.5 ${filterFavorite ? "fill-current" : ""}`} />
               <span>Starred</span>
@@ -479,11 +614,13 @@ export function ResourcesContent({
         </div>
       </section>
 
-      {/* Grid Display — progressively rendered in batches of BATCH_SIZE */}
+      {/* Grid Display */}
       <ResourceGrid
         filteredResources={filteredResources}
         handleCardClick={handleCardClick}
         handleCardDelete={handleCardDelete}
+        isReorderActive={isReorderActive}
+        onDragEnd={handleDragEnd}
       />
 
       {/* Drawer / Edit Dialog */}
@@ -505,7 +642,7 @@ export function ResourcesContent({
         >
           <DialogHeader>
             <DialogTitle>
-              {isCreating ? "Add new resource" : selectedResource?.title || selectedResource?.name || "Resource details"}
+              {isCreating ? "Add new resource" : selectedResource?.title || "Resource details"}
             </DialogTitle>
             <DialogDescription>
               {isCreating ? "Create a new entry in your knowledge graph." : "Edit parameters and link connections below."}
@@ -538,7 +675,7 @@ export function ResourcesContent({
             <AlertDialogDescription>
               This action cannot be undone. This will permanently delete{" "}
               <span className="font-semibold text-foreground">
-                &ldquo;{deleteTarget?.title || deleteTarget?.name}&rdquo;
+                &ldquo;{deleteTarget?.title}&rdquo;
               </span>{" "}
               from your library.
             </AlertDialogDescription>

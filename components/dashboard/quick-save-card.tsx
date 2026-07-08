@@ -67,7 +67,7 @@ export function QuickSaveCard() {
                 title, url, description,
                 categoryId: "", tags: [],
                 whySaved: "quick save", notes: "",
-                status: "saved", type: "website",
+                type: "website",
                 favorite: false, projectIds: [], personIds: [],
             })
             if (result.success) {

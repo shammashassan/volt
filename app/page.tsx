@@ -22,6 +22,7 @@ import { LenisProvider } from '@/components/layout/lenis-provider'
 import { gsap } from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { LogoMark } from '@/components/brand/logo-mark'
 
 // Register plugins
 gsap.registerPlugin(useGSAP, ScrollTrigger)
@@ -236,7 +237,7 @@ export default function LandingPage() {
               <div className="flex flex-col md:flex-row items-center justify-between gap-6 border-b border-border/40 pb-10">
                 <div className="flex items-center gap-3">
                   <div className="flex size-10 items-center justify-center rounded-xl bg-primary text-primary-foreground">
-                    <Command className="size-6" aria-hidden="true" />
+                    <LogoMark className="size-6" aria-hidden="true" />
                   </div>
                   <span className="text-2xl font-bold tracking-tighter">Volt</span>
                 </div>

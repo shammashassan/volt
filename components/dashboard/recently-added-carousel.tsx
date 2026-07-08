@@ -7,7 +7,6 @@ import { Clock, ArrowRight, PackagePlus, ChevronLeft, ChevronRight } from "lucid
 import Link from "next/link"
 import { ResourceCard } from "@/components/resources/resource-card"
 import { Resource } from "@/types"
-import { Resource as DataResource } from "@/lib/data"
 
 interface RecentlyAddedCarouselProps {
     resources: Resource[]
@@ -109,7 +108,7 @@ export function RecentlyAddedCarousel({ resources }: RecentlyAddedCarouselProps)
                                 className="pl-3 basis-full sm:basis-1/2"
                             >
                                 <ResourceCard
-                                    resource={resource as unknown as DataResource}
+                                    resource={resource}
                                     priority={index < 2}
                                 />
                             </CarouselItem>

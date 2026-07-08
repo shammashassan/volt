@@ -11,8 +11,8 @@ import { trackResourceViewAction, useResourceAction } from "@/lib/actions"
 
 // Minimum data structure a resource must have to be rendered by ResourceCard
 export interface ResourceCardData {
-  name: string
-  link: string
+  title: string
+  url: string
   description: string
   id?: string
   _id?: unknown
@@ -24,6 +24,7 @@ interface ResourceCardProps<T> {
   onClick?: (e: React.MouseEvent) => void
   onEdit?: (resource: T, e: React.MouseEvent) => void
   onDelete?: (resource: T, e: React.MouseEvent) => void
+  disableRedirect?: boolean
 }
 
 interface ResourceCardOverlayProps<T> {
@@ -32,6 +33,7 @@ interface ResourceCardOverlayProps<T> {
   resource: T
   onEdit?: (resource: T, e: React.MouseEvent) => void
   onDelete?: (resource: T, e: React.MouseEvent) => void
+  disableRedirect?: boolean
 }
 
 // Pure helper to normalize URLs defensively
@@ -63,11 +65,11 @@ const MAX_MICROLINK_RETRIES = 4
 const RETRY_BASE_DELAY_MS = 3000
 
 function useScreenshot<T extends ResourceCardData>(resource: T) {
-  const normalizedUrl = useMemo(() => normalizeUrl(resource.link || ""), [resource.link])
+  const normalizedUrl = useMemo(() => normalizeUrl(resource.url || ""), [resource.url])
 
   const previewUrl = useMemo(() => {
-    return getPreviewUrl(normalizedUrl, resource.name)
-  }, [normalizedUrl, resource.name])
+    return getPreviewUrl(normalizedUrl, resource.title)
+  }, [normalizedUrl, resource.title])
 
   const [imgSrc, setImgSrc] = useState(previewUrl)
   const [isLoading, setIsLoading] = useState(true)
@@ -124,7 +126,7 @@ function useScreenshot<T extends ResourceCardData>(resource: T) {
           )
         } else {
           fallbackStage.current = 2
-          setImgSrc(getFallbackImage(resource.name))
+          setImgSrc(getFallbackImage(resource.title))
           setIsLoading(false)
         }
       }
@@ -139,15 +141,15 @@ function useScreenshot<T extends ResourceCardData>(resource: T) {
         }, RETRY_BASE_DELAY_MS)
       } else {
         fallbackStage.current = 2
-        setImgSrc(getFallbackImage(resource.name))
+        setImgSrc(getFallbackImage(resource.title))
         setIsLoading(false)
       }
     } else {
       // Stage 2: Final avatar fallback — nothing more to try
-      setImgSrc(getFallbackImage(resource.name))
+      setImgSrc(getFallbackImage(resource.title))
       setIsLoading(false)
     }
-  }, [previewUrl, normalizedUrl, resource.name])
+  }, [previewUrl, normalizedUrl, resource.title])
 
   // Check if image is already completed (cached) when source or ref changes
   const [imgElement, setImgElement] = useState<HTMLImageElement | null>(null)
@@ -176,6 +178,7 @@ const ResourceCardOverlay = React.memo(function ResourceCardOverlay<
   resource,
   onEdit,
   onDelete,
+  disableRedirect = false,
 }: ResourceCardOverlayProps<T>) {
   const handleEditClick = useCallback(
     (e: React.MouseEvent) => {
@@ -198,25 +201,27 @@ const ResourceCardOverlay = React.memo(function ResourceCardOverlay<
   return (
     <>
       {/* Hover Overlay */}
-      <div className="absolute inset-0 flex items-center justify-center bg-background/30 backdrop-blur-[1px] opacity-0 has-hover:group-hover:opacity-100 transition-opacity duration-300 z-30 pointer-events-none has-hover:pointer-events-auto">
-        {hasClick ? (
-          <a
-            href={targetUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={(e) => {
-              e.stopPropagation()
-            }}
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/95 text-primary-foreground shadow-lg transition-transform duration-300 scale-90 has-hover:group-hover:scale-100 hover:scale-110 will-change-transform"
-          >
-            <ExternalLinkIcon className="size-5" />
-          </a>
-        ) : (
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/95 text-primary-foreground shadow-lg transition-transform duration-300 scale-90 has-hover:group-hover:scale-100 hover:scale-110 will-change-transform">
-            <ExternalLinkIcon className="size-5" />
-          </div>
-        )}
-      </div>
+      {!disableRedirect && (
+        <div className="absolute inset-0 flex items-center justify-center bg-background/30 backdrop-blur-[1px] opacity-0 has-hover:group-hover:opacity-100 transition-opacity duration-300 z-30 pointer-events-none has-hover:pointer-events-auto">
+          {hasClick ? (
+            <a
+              href={targetUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => {
+                e.stopPropagation()
+              }}
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/95 text-primary-foreground shadow-lg transition-transform duration-300 scale-90 has-hover:group-hover:scale-100 hover:scale-110 will-change-transform"
+            >
+              <ExternalLinkIcon className="size-5" />
+            </a>
+          ) : (
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/95 text-primary-foreground shadow-lg transition-transform duration-300 scale-90 has-hover:group-hover:scale-100 hover:scale-110 will-change-transform">
+              <ExternalLinkIcon className="size-5" />
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Edit/Delete Actions */}
       {(onEdit || onDelete) && (
@@ -256,8 +261,9 @@ const ResourceCardComponent = function ResourceCardComponent<
   onClick,
   onEdit,
   onDelete,
+  disableRedirect = false,
 }: ResourceCardProps<T>) {
-  const targetUrl = useMemo(() => normalizeUrl(resource.link), [resource.link])
+  const targetUrl = useMemo(() => normalizeUrl(resource.url), [resource.url])
 
   const externalProps = useMemo(
     () => ({
@@ -274,6 +280,7 @@ const ResourceCardComponent = function ResourceCardComponent<
   const handleTrack = useCallback(() => {
     if (!resourceId) return
     void trackResourceViewAction(resourceId)
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     void useResourceAction(resourceId)
   }, [resourceId])
 
@@ -286,7 +293,7 @@ const ResourceCardComponent = function ResourceCardComponent<
         <Image
           ref={setImgElement}
           src={imgSrc}
-          alt={resource.name}
+          alt={resource.title}
           width={600}
           height={400}
           className={cn(
@@ -306,11 +313,12 @@ const ResourceCardComponent = function ResourceCardComponent<
           resource={resource}
           onEdit={onEdit}
           onDelete={onDelete}
+          disableRedirect={disableRedirect}
         />
       </div>
       <CardHeader className="flex flex-col gap-0.5 px-4 py-3">
         <CardTitle className="line-clamp-1 text-base font-semibold tracking-tight text-foreground/90 transition-colors group-hover:text-primary">
-          {resource.name}
+          {resource.title}
         </CardTitle>
         <p className="line-clamp-2 text-[11px] leading-tight text-muted-foreground/70">
           {resource.description}
@@ -328,6 +336,14 @@ const ResourceCardComponent = function ResourceCardComponent<
         }}
         className="block group h-full focus-visible:outline-hidden cursor-pointer"
       >
+        {content}
+      </div>
+    )
+  }
+
+  if (disableRedirect) {
+    return (
+      <div className="block group h-full focus-visible:outline-hidden">
         {content}
       </div>
     )

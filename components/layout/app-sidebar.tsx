@@ -5,7 +5,6 @@ import { useState, useEffect } from "react"
 import {
   BookOpen,
   Command,
-  SquareTerminal,
   UsersIcon,
   LibraryIcon,
   LayoutGrid,
@@ -14,6 +13,7 @@ import {
   Tag,
   Film,
   Network,
+  SquareTerminal,
 } from "lucide-react"
 
 import { NavMain } from "@/components/layout/nav-main"
@@ -32,17 +32,22 @@ import Link from "next/link"
 import { usePathname, useSearchParams } from "next/navigation"
 import { authClient } from "@/lib/auth-client"
 import { getCategoriesAction } from "@/lib/actions/categories"
-import { Category } from "@/types"
+import { getCollectionsAction } from "@/lib/actions/collections"
+import { Category, Collection } from "@/types"
 import { RESOURCE_TYPES } from "@/components/resources/resource-types"
+import { ICON_MAP } from "@/lib/icons"
+import { LogoMark } from "../brand/logo-mark"
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   initialCategories?: Category[]
+  initialCollections?: Collection[]
 }
 
-export function AppSidebar({ initialCategories, ...props }: AppSidebarProps) {
+export function AppSidebar({ initialCategories, initialCollections, ...props }: AppSidebarProps) {
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const activeTypeParam = searchParams?.get("type") || null
+  const activeCategoryParam = searchParams?.get("category") || null
 
   const typeSubItems = RESOURCE_TYPES.map(type => ({
     title: type.label,
@@ -52,6 +57,7 @@ export function AppSidebar({ initialCategories, ...props }: AppSidebarProps) {
 
   const { data: session } = authClient.useSession()
   const [categories, setCategories] = useState<Category[]>(initialCategories || [])
+  const [collections, setCollections] = useState<Collection[]>(initialCollections || [])
   const [isMounted, setIsMounted] = useState(false)
 
   useEffect(() => {
@@ -70,7 +76,7 @@ export function AppSidebar({ initialCategories, ...props }: AppSidebarProps) {
       try {
         const result = await getCategoriesAction()
         if (result.success && Array.isArray(result.data)) {
-          setCategories(result.data)
+          setCategories(result.data as unknown as Category[])
         } else {
           setCategories([])
         }
@@ -82,13 +88,52 @@ export function AppSidebar({ initialCategories, ...props }: AppSidebarProps) {
     fetchCategories()
   }, [initialCategories])
 
-  const categorySubItems = (Array.isArray(categories) ? categories : []).map(category => ({
-    title: category.name || category.title || "Untitled Category",
-    url: `/categories/${category.id}`,
-    isActive: pathname === `/categories/${category.id}`,
-  }))
+  useEffect(() => {
+    if (initialCollections) {
+      setCollections(initialCollections)
+      return
+    }
+    async function fetchCollections() {
+      try {
+        const result = await getCollectionsAction()
+        if (result.success && Array.isArray(result.data)) {
+          setCollections(result.data as unknown as Collection[])
+        } else {
+          setCollections([])
+        }
+      } catch (error) {
+        console.error("Failed to fetch collections:", error)
+        setCollections([])
+      }
+    }
+    fetchCollections()
+  }, [initialCollections])
 
-  const platformItems = [
+  // Map dynamic collections & categories into sidebar items
+  const sortedCollections = [...collections].sort((a, b) => a.order - b.order)
+  const collectionItems = sortedCollections.map(coll => {
+    const collCategories = categories
+      .filter(cat => cat.collectionId === coll.slug)
+      .sort((a, b) => a.order - b.order)
+
+    const Icon = ICON_MAP[coll.icon || ""] || BookOpen
+
+    const items = collCategories.map(cat => ({
+      title: cat.name,
+      url: `/resources?category=${cat.slug}`,
+      isActive: pathname === "/resources" && activeCategoryParam === cat.slug,
+    }))
+
+    return {
+      title: coll.name,
+      url: `/resources?collection=${coll.slug}`,
+      icon: Icon,
+      isActive: items.some(item => item.isActive),
+      items: items.length > 0 ? items : undefined,
+    }
+  }).filter(item => item.items !== undefined)
+
+  const exploreItems = [
     {
       title: "Dashboard",
       url: "/explore",
@@ -99,7 +144,7 @@ export function AppSidebar({ initialCategories, ...props }: AppSidebarProps) {
       title: "Resources",
       url: "/resources",
       icon: LibraryIcon,
-      isActive: pathname === "/resources" && activeTypeParam === null,
+      isActive: pathname === "/resources" && activeTypeParam === null && activeCategoryParam === null && !searchParams?.has("collection"),
     },
     {
       title: "Knowledge Graph",
@@ -111,13 +156,17 @@ export function AppSidebar({ initialCategories, ...props }: AppSidebarProps) {
       title: "CLI Commands",
       url: "/commands",
       icon: SquareTerminal,
-      isActive: pathname === "/commands",
+      isActive: pathname === "/commands"
     },
+
+  ]
+
+  const workspaceItems = [
     {
       title: "Workspace",
       url: "/projects",
       icon: FolderOpen,
-      isActive: ["/projects", "/notes", "/reminders"].includes(pathname),
+      isActive: ["/projects", "/notes", "/reminders", "/commands"].includes(pathname),
       items: [
         { title: "Projects", url: "/projects", isActive: pathname === "/projects" },
         { title: "Notes", url: "/notes", isActive: pathname === "/notes" },
@@ -136,28 +185,21 @@ export function AppSidebar({ initialCategories, ...props }: AppSidebarProps) {
       icon: Layers,
       isActive: ["/categories", "/tags", "/people"].includes(pathname),
       items: [
-        { title: "Categories", url: "/categories", isActive: pathname === "/categories" },
+        { title: "Taxonomy", url: "/categories", isActive: pathname === "/categories" },
         { title: "Tags", url: "/tags", isActive: pathname === "/tags" },
         { title: "People", url: "/people", isActive: pathname === "/people" },
       ],
     },
+  ]
+
+  const typesItems = [
     {
-      title: "Types",
+      title: "Resource Types",
       url: "/resources",
       icon: Tag,
       isActive: pathname === "/resources" && activeTypeParam !== null,
       items: typeSubItems,
     },
-    // Categories collapsible — only rendered when there are DB categories
-    ...(categorySubItems.length > 0
-      ? [{
-        title: "Categories",
-        url: "/categories",
-        icon: BookOpen,
-        isActive: categorySubItems.some(c => c.isActive),
-        items: categorySubItems,
-      }]
-      : []),
   ]
 
   const adminItems = isAdmin
@@ -175,13 +217,13 @@ export function AppSidebar({ initialCategories, ...props }: AppSidebarProps) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <Link href="/">
+              <Link href="/explore">
                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                  <Command className="size-4" />
+                  <LogoMark className="size-5!" />
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">Volt</span>
-                  <span className="truncate text-xs">v2.0</span>
+                  <span className="truncate font-medium">UI Volt</span>
+                  <span className="truncate text-xs">v2.3.0</span>
                 </div>
               </Link>
             </SidebarMenuButton>
@@ -190,7 +232,12 @@ export function AppSidebar({ initialCategories, ...props }: AppSidebarProps) {
       </SidebarHeader>
 
       <SidebarContent>
-        <NavMain items={platformItems} label="Platform" />
+        <NavMain items={exploreItems} label="Explore" />
+        <NavMain items={workspaceItems} label="Workspace" />
+        {collectionItems.length > 0 && (
+          <NavMain items={collectionItems} label="Collections" />
+        )}
+        <NavMain items={typesItems} label="Types" />
 
         {isMounted && adminItems.length > 0 && (
           <NavSecondary items={adminItems} label="Admin" className="mt-auto" />

@@ -21,7 +21,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { FieldGroup, Field, FieldLabel } from "@/components/ui/field";
 import { addResourceAction, updateResourceAction, getResourceAction } from "@/lib/actions/resources";
-import { Category, ResourceType, ResourceStatus, Resource } from "@/types";
+import { Category, ResourceType, Resource } from "@/types";
 
 interface ShareClientProps {
   categories: Category[];
@@ -45,7 +45,6 @@ export function ShareClient({ categories }: ShareClientProps) {
   const [description, setDescription] = useState("");
   const [categoryId, setCategoryId] = useState("none");
   const [resourceType, setResourceType] = useState<ResourceType>("website");
-  const [resourceStatus, setResourceStatus] = useState<ResourceStatus>("saved");
   const [favorite, setFavorite] = useState(false);
 
   // Parse OS shared params
@@ -86,7 +85,6 @@ export function ShareClient({ categories }: ShareClientProps) {
       description: extractedDesc,
       categoryId: "", // default to Inbox/Uncategorized
       tags: [],
-      status: "saved",
       type: "website",
       favorite: false,
       projectIds: [],
@@ -112,7 +110,6 @@ export function ShareClient({ categories }: ShareClientProps) {
                 setDescription(item.description || "");
                 setCategoryId(item.categoryId || "none");
                 setResourceType((item.type as ResourceType) || "website");
-                setResourceStatus((item.status as ResourceStatus) || "saved");
                 setFavorite(!!item.favorite);
               }
             })
@@ -144,7 +141,6 @@ export function ShareClient({ categories }: ShareClientProps) {
         description,
         categoryId: categoryId === "none" ? "" : categoryId,
         type: resourceType,
-        status: resourceStatus,
         favorite,
       };
 
@@ -344,7 +340,7 @@ export function ShareClient({ categories }: ShareClientProps) {
                           <SelectGroup>
                             <SelectItem value="none" className="text-xs">Uncategorized</SelectItem>
                             {categories.map((cat) => (
-                              <SelectItem key={cat.id || String(cat._id)} value={cat.id || String(cat._id)} className="text-xs">
+                              <SelectItem key={cat.slug || String(cat._id)} value={cat.slug || String(cat._id)} className="text-xs">
                                 {cat.name}
                               </SelectItem>
                             ))}
@@ -381,25 +377,7 @@ export function ShareClient({ categories }: ShareClientProps) {
 
                   {/* Status & Favorite */}
                   <div className="grid grid-cols-2 gap-3 items-center">
-                    {/* Status Dropdown */}
-                    <Field>
-                      <FieldLabel htmlFor="status" className="text-xs font-semibold text-muted-foreground">
-                        Status
-                      </FieldLabel>
-                      <Select value={resourceStatus} onValueChange={(val) => setResourceStatus(val as ResourceStatus)}>
-                        <SelectTrigger id="status" className="h-8 text-xs w-full bg-background/50">
-                          <SelectValue placeholder="Saved" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-popover border shadow-md">
-                          <SelectGroup>
-                            <SelectItem value="saved" className="text-xs">Saved</SelectItem>
-                            <SelectItem value="reviewing" className="text-xs">Reviewing</SelectItem>
-                            <SelectItem value="using" className="text-xs">Using</SelectItem>
-                            <SelectItem value="archived" className="text-xs">Archived</SelectItem>
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                    </Field>
+
 
                     {/* Favorite Switch Toggle */}
                     <div className="flex items-center justify-between p-2 rounded-lg border bg-background/25 border-border/40 h-8 self-end">

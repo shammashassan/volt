@@ -52,7 +52,8 @@ interface UserTableProps {
 
 export function UserTable({ users, onApprove, onSetRole, onBan, onDelete, currentUserId }: UserTableProps) {
   return (
-    <Table>
+    <div className="rounded-xl overflow-hidden">
+      <Table>
       <TableHeader className="bg-muted/50">
         <TableRow>
           <TableHead className="w-[250px]">User</TableHead>
@@ -146,5 +147,6 @@ export function UserTable({ users, onApprove, onSetRole, onBan, onDelete, curren
         ))}
       </TableBody>
     </Table >
+    </div>
   )
 }

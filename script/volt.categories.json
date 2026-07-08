@@ -1,216 +1,265 @@
-[
-  {
-    "_id": {
-      "$oid": "69f76dfbf9d4cc57c0d09b3a"
-    },
-    "id": "customize",
-    "description": "Visual Generators & CSS Tools",
-    "icon": "Wrench",
-    "image": "/images/categories/customize.png",
-    "title": "Customize",
-    "order": 7,
-    "updatedAt": {
-      "$date": "2026-05-25T14:33:01.295Z"
-    }
+[{
+  "_id": {
+    "$oid": "6a2a9152dfcc57be2f33dee2"
   },
-  {
-    "_id": {
-      "$oid": "69f76dfcf9d4cc57c0d09b3d"
-    },
-    "id": "search",
-    "description": "Developer Search Tools & Engines",
-    "icon": "Search",
-    "image": "/images/categories/search.png",
-    "title": "Search",
-    "order": 14,
-    "updatedAt": {
-      "$date": "2026-05-25T14:33:52.719Z"
-    }
+  "id": "ai-agents",
+  "name": "AI & Agents",
+  "title": "AI & Agents",
+  "description": "AI SDKs, Components & Agent Skills",
+  "icon": "Bot",
+  "image": "/images/categories/agents.png",
+  "order": 12,
+  "userId": "69f4e8bdc404fa0372c3277e",
+  "createdAt": {
+    "$date": "2026-06-11T10:43:30.872Z"
   },
-  {
-    "_id": {
-      "$oid": "69f78e00b46f5a881292c227"
-    },
-    "id": "pages",
-    "title": "Pages",
-    "description": "Complete website layouts to accelerate development and ensure high-fidelity design consistency.",
-    "icon": "Layout",
-    "createdAt": {
-      "$date": "2026-05-03T18:03:44.427Z"
-    },
-    "order": 4,
-    "updatedAt": {
-      "$date": "2026-05-04T16:32:31.374Z"
-    }
-  },
-  {
-    "_id": {
-      "$oid": "69f8b5f21e7ba71eb6d5fe72"
-    },
-    "id": "inspiration",
-    "title": "Inspiration",
-    "description": "Design inspiration and showcases.",
-    "icon": "Sparkles",
-    "createdAt": {
-      "$date": "2026-05-04T15:06:26.407Z"
-    },
-    "order": 13,
-    "updatedAt": {
-      "$date": "2026-05-04T16:36:06.093Z"
-    }
-  },
-  {
-    "_id": {
-      "$oid": "6a145d75d07d16ca17c1ebb2"
-    },
-    "id": "charts",
-    "title": "Charts",
-    "description": "Data visualization components, interactive graphs, and dashboard patterns for design engineering workflows.",
-    "icon": "Globe",
-    "order": 6,
-    "createdAt": {
-      "$date": "2026-05-25T14:32:21.719Z"
-    },
-    "updatedAt": {
-      "$date": "2026-05-25T14:32:52.127Z"
-    }
-  },
-  {
-    "_id": {
-      "$oid": "69f76dfdf9d4cc57c0d09b3f"
-    },
-    "id": "ai-agents",
-    "description": "AI SDKs, Components & Agent Skills",
-    "icon": "Bot",
-    "image": "/images/categories/agents.png",
-    "title": "AI & Agents",
-    "order": 12,
-    "updatedAt": {
-      "$date": "2026-05-04T16:35:33.192Z"
-    }
-  },
-  {
-    "_id": {
-      "$oid": "69f8bcf8e87e6ac6c7b514d3"
-    },
-    "id": "icons",
-    "title": "Icons",
-    "description": "Scalable vector assets for building intuitive interfaces and enhancing visual communication.",
-    "icon": "Shapes",
-    "createdAt": {
-      "$date": "2026-05-04T15:36:24.686Z"
-    },
-    "updatedAt": {
-      "$date": "2026-05-04T16:34:38.173Z"
-    },
-    "order": 8
-  },
-  {
-    "_id": {
-      "$oid": "69f76dfdf9d4cc57c0d09b3e"
-    },
-    "id": "audio",
-    "description": "Audio Utilities & Sound Components",
-    "icon": "Volume2",
-    "image": "/images/categories/audio.png",
-    "title": "Audio",
-    "order": 10,
-    "updatedAt": {
-      "$date": "2026-05-04T16:35:13.646Z"
-    }
-  },
-  {
-    "_id": {
-      "$oid": "69f78388c0448cb2ec819ef8"
-    },
-    "id": "blocks",
-    "title": "Blocks",
-    "description": "Pre-built, modular UI sections to accelerate layout development and engineering.",
-    "icon": "LayoutGrid",
-    "createdAt": {
-      "$date": "2026-05-03T17:19:04.037Z"
-    },
-    "order": 3,
-    "updatedAt": {
-      "$date": "2026-05-04T16:32:17.329Z"
-    }
-  },
-  {
-    "_id": {
-      "$oid": "69f8a70fd0fae3e4c1f89968"
-    },
-    "id": "components",
-    "title": "Components",
-    "description": "Reusable UI components, patterns, and systems for efficient design engineering workflows.",
-    "icon": "Component",
-    "createdAt": {
-      "$date": "2026-05-04T14:02:55.970Z"
-    },
-    "order": 2,
-    "updatedAt": {
-      "$date": "2026-05-04T16:32:07.179Z"
-    }
-  },
-  {
-    "_id": {
-      "$oid": "69f76dfcf9d4cc57c0d09b3c"
-    },
-    "id": "maps",
-    "description": "Map Components & Geospatial Tools",
-    "icon": "Map",
-    "image": "/images/categories/maps.png",
-    "title": "Maps",
-    "order": 9,
-    "updatedAt": {
-      "$date": "2026-05-04T16:35:00.684Z"
-    }
-  },
-  {
-    "_id": {
-      "$oid": "69f8b65c1e7ba71eb6d5fe73"
-    },
-    "id": "motion-3d",
-    "title": "Motion & 3D",
-    "description": "Animations, transitions, 3D scenes, interactive visuals, and immersive web experiences.",
-    "icon": "Command",
-    "createdAt": {
-      "$date": "2026-05-04T15:08:12.193Z"
-    },
-    "order": 5,
-    "updatedAt": {
-      "$date": "2026-05-09T16:54:39.120Z"
-    }
-  },
-  {
-    "_id": {
-      "$oid": "69f8b938beac1488e8dbe1bc"
-    },
-    "id": "interactions",
-    "title": "Interactions",
-    "description": "Interactive UI patterns and advanced input systems for building dynamic, user-driven experiences.",
-    "icon": "MousePointer2",
-    "createdAt": {
-      "$date": "2026-05-04T15:20:24.603Z"
-    },
-    "order": 11,
-    "updatedAt": {
-      "$date": "2026-05-04T16:35:24.097Z"
-    }
-  },
-  {
-    "_id": {
-      "$oid": "69f8c76494362db9c3730b9b"
-    },
-    "id": "ui-library",
-    "title": "UI Library",
-    "description": "Reusable UI components, design systems, and frameworks for building scalable, consistent interfaces.",
-    "icon": "Library",
-    "createdAt": {
-      "$date": "2026-05-04T16:20:52.352Z"
-    },
-    "order": 1,
-    "updatedAt": {
-      "$date": "2026-05-04T16:31:48.741Z"
-    }
+  "updatedAt": {
+    "$date": "2026-05-04T16:35:33.192Z"
   }
-]
+},
+{
+  "_id": {
+    "$oid": "6a2a9152dfcc57be2f33dee5"
+  },
+  "id": "blocks",
+  "name": "Blocks",
+  "title": "Blocks",
+  "description": "Pre-built, modular UI sections to accelerate layout development and engineering.",
+  "icon": "LayoutGrid",
+  "image": "",
+  "order": 3,
+  "userId": "69f4e8bdc404fa0372c3277e",
+  "createdAt": {
+    "$date": "2026-05-03T17:19:04.037Z"
+  },
+  "updatedAt": {
+    "$date": "2026-05-04T16:32:17.329Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6a2a9152dfcc57be2f33dee1"
+  },
+  "id": "charts",
+  "name": "Charts",
+  "title": "Charts",
+  "description": "Data visualization components, interactive graphs, and dashboard patterns for design engineering workflows.",
+  "icon": "Globe",
+  "image": "",
+  "order": 6,
+  "userId": "69f4e8bdc404fa0372c3277e",
+  "createdAt": {
+    "$date": "2026-05-25T14:32:21.719Z"
+  },
+  "updatedAt": {
+    "$date": "2026-05-25T14:32:52.127Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6a2a9152dfcc57be2f33dee6"
+  },
+  "id": "components",
+  "name": "Components",
+  "title": "Components",
+  "description": "Reusable UI components, patterns, and systems for efficient design engineering workflows.",
+  "icon": "Component",
+  "image": "",
+  "order": 2,
+  "userId": "69f4e8bdc404fa0372c3277e",
+  "createdAt": {
+    "$date": "2026-05-04T14:02:55.970Z"
+  },
+  "updatedAt": {
+    "$date": "2026-05-04T16:32:07.179Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6a2a9152dfcc57be2f33dedd"
+  },
+  "id": "customize",
+  "name": "Customize",
+  "title": "Customize",
+  "description": "Visual Generators & CSS Tools",
+  "icon": "Wrench",
+  "image": "/images/categories/customize.png",
+  "order": 7,
+  "userId": "69f4e8bdc404fa0372c3277e",
+  "createdAt": {
+    "$date": "2026-06-11T10:43:30.871Z"
+  },
+  "updatedAt": {
+    "$date": "2026-05-25T14:33:01.295Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6a2a9152dfcc57be2f33dee3"
+  },
+  "id": "icons",
+  "name": "Icons",
+  "title": "Icons",
+  "description": "Scalable vector assets for building intuitive interfaces and enhancing visual communication.",
+  "icon": "Shapes",
+  "image": "",
+  "order": 8,
+  "userId": "69f4e8bdc404fa0372c3277e",
+  "createdAt": {
+    "$date": "2026-05-04T15:36:24.686Z"
+  },
+  "updatedAt": {
+    "$date": "2026-05-04T16:34:38.173Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6a2a9152dfcc57be2f33dee0"
+  },
+  "id": "inspiration",
+  "name": "Inspiration",
+  "title": "Inspiration",
+  "description": "Design inspiration and showcases.",
+  "icon": "Sparkles",
+  "image": "",
+  "order": 13,
+  "userId": "69f4e8bdc404fa0372c3277e",
+  "createdAt": {
+    "$date": "2026-05-04T15:06:26.407Z"
+  },
+  "updatedAt": {
+    "$date": "2026-05-04T16:36:06.093Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6a2a9152dfcc57be2f33dee9"
+  },
+  "id": "interactions",
+  "name": "Interactions",
+  "title": "Interactions",
+  "description": "Interactive UI patterns and advanced input systems for building dynamic, user-driven experiences.",
+  "icon": "MousePointer2",
+  "image": "",
+  "order": 11,
+  "userId": "69f4e8bdc404fa0372c3277e",
+  "createdAt": {
+    "$date": "2026-05-04T15:20:24.603Z"
+  },
+  "updatedAt": {
+    "$date": "2026-05-04T16:35:24.097Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6a2a9152dfcc57be2f33dee7"
+  },
+  "id": "maps",
+  "name": "Maps",
+  "title": "Maps",
+  "description": "Map Components & Geospatial Tools",
+  "icon": "Map",
+  "image": "/images/categories/maps.png",
+  "order": 9,
+  "userId": "69f4e8bdc404fa0372c3277e",
+  "createdAt": {
+    "$date": "2026-06-11T10:43:30.872Z"
+  },
+  "updatedAt": {
+    "$date": "2026-05-04T16:35:00.684Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6a4539b78190a677e5c8f20c"
+  },
+  "name": "Media",
+  "description": "Curated assets for integrating and managing high-quality multimedia content within modern design engineering workflows.",
+  "icon": "Shapes",
+  "color": "",
+  "order": 10,
+  "id": "media",
+  "userId": "69f4e8bdc404fa0372c3277e",
+  "createdAt": {
+    "$date": "2026-07-01T16:00:55.866Z"
+  },
+  "updatedAt": {
+    "$date": "2026-07-01T16:00:55.866Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6a2a9152dfcc57be2f33dee8"
+  },
+  "id": "motion-3d",
+  "name": "Motion & 3D",
+  "title": "Motion & 3D",
+  "description": "Animations, transitions, 3D scenes, interactive visuals, and immersive web experiences.",
+  "icon": "Command",
+  "image": "",
+  "order": 5,
+  "userId": "69f4e8bdc404fa0372c3277e",
+  "createdAt": {
+    "$date": "2026-05-04T15:08:12.193Z"
+  },
+  "updatedAt": {
+    "$date": "2026-05-09T16:54:39.120Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6a2a9152dfcc57be2f33dedf"
+  },
+  "id": "pages",
+  "name": "Pages",
+  "title": "Pages",
+  "description": "Complete website layouts to accelerate development and ensure high-fidelity design consistency.",
+  "icon": "Layout",
+  "image": "",
+  "order": 4,
+  "userId": "69f4e8bdc404fa0372c3277e",
+  "createdAt": {
+    "$date": "2026-05-03T18:03:44.427Z"
+  },
+  "updatedAt": {
+    "$date": "2026-05-04T16:32:31.374Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6a2a9152dfcc57be2f33dede"
+  },
+  "id": "search",
+  "name": "Search",
+  "title": "Search",
+  "description": "Developer Search Tools & Engines",
+  "icon": "Search",
+  "image": "/images/categories/search.png",
+  "order": 14,
+  "userId": "69f4e8bdc404fa0372c3277e",
+  "createdAt": {
+    "$date": "2026-06-11T10:43:30.871Z"
+  },
+  "updatedAt": {
+    "$date": "2026-05-25T14:33:52.719Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6a2a9152dfcc57be2f33deea"
+  },
+  "id": "ui-library",
+  "name": "UI Library",
+  "title": "UI Library",
+  "description": "Reusable UI components, design systems, and frameworks for building scalable, consistent interfaces.",
+  "icon": "Library",
+  "image": "",
+  "order": 1,
+  "userId": "69f4e8bdc404fa0372c3277e",
+  "createdAt": {
+    "$date": "2026-05-04T16:20:52.352Z"
+  },
+  "updatedAt": {
+    "$date": "2026-05-04T16:31:48.741Z"
+  }
+}]

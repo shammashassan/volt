@@ -56,13 +56,13 @@ const STATUS_CONFIG: Record<ProjectStatus, { label: string; variant: "secondary"
 export function ProjectsContent({ initialProjects }: ProjectsContentProps) {
   const [projects, setProjects] = useState<Project[]>(initialProjects)
   const [filter, setFilter] = useState<"all" | ProjectStatus>("all")
-  
+
   // Dialog state
   const [isOpen, setIsOpen] = useState(false)
   const [editingProject, setEditingProject] = useState<Project | null>(null)
   const [projectToDelete, setProjectToDelete] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
-  
+
   // Form states
   const [formName, setFormName] = useState("")
   const [formDescription, setFormDescription] = useState("")
@@ -181,15 +181,15 @@ export function ProjectsContent({ initialProjects }: ProjectsContentProps) {
               Manage your milestones and align saved learning tracks or assets under specific projects.
             </p>
           </div>
-          <Button onClick={handleOpenCreate} className="w-full sm:w-auto shrink-0 font-bold">
-            <Plus className="mr-2 h-4 w-4" />
+          <Button onClick={handleOpenCreate}>
+            <Plus />
             New Project
           </Button>
         </div>
-      </section>
+      </section >
 
       {/* Main Content section */}
-      <section className="px-4 lg:px-6">
+      < section className="px-4 lg:px-6" >
         <div className="max-w-7xl flex flex-col gap-6">
           {/* Mobile filter using Select */}
           <div className="sm:hidden w-full">
@@ -248,8 +248,8 @@ export function ProjectsContent({ initialProjects }: ProjectsContentProps) {
                 const status = STATUS_CONFIG[project.status] || { label: "Active", variant: "primary" as const }
                 const id = project._id?.toString() || project.id || ""
                 return (
-                  <Card 
-                    key={id} 
+                  <Card
+                    key={id}
                     className="cursor-pointer group flex flex-col justify-between transition-all hover:shadow-lg hover:border-primary/20 bg-card/30 backdrop-blur-xs"
                     onClick={() => router.push(`/projects/${id}`)}
                   >
@@ -407,7 +407,7 @@ export function ProjectsContent({ initialProjects }: ProjectsContentProps) {
             </AlertDialogContent>
           </AlertDialog>
         </div>
-      </section>
-    </div>
+      </section >
+    </div >
   )
 }

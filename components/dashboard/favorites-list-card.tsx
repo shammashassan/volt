@@ -38,7 +38,7 @@ export function FavoritesListCard({ resources }: FavoritesListCardProps) {
                     <ScrollArea className="h-[200px] w-full">
                         <div className="flex flex-col gap-1.5 pr-3">
                             {resources.map(res => {
-                                const rawUrl = res.link || res.url || ""
+                                const rawUrl = res.url || ""
                                 const targetUrl = /^(https?:)?\/\//i.test(rawUrl) ? rawUrl : `https://${rawUrl}`
                                 return (
                                     <a
@@ -50,7 +50,7 @@ export function FavoritesListCard({ resources }: FavoritesListCardProps) {
                                     >
                                         <div className="flex min-w-0 flex-col pr-2">
                                             <span className="truncate text-xs font-semibold text-foreground transition-colors group-hover/item:text-primary">
-                                                {res.name || res.title}
+                                                {res.title}
                                             </span>
                                             <span className="truncate text-[10px] text-muted-foreground/60">
                                                 {rawUrl}

@@ -1,7 +1,7 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import { Resource } from "@/lib/data"
+import { Resource } from "@/types"
 import { Badge } from "@/components/ui/badge"
 import {
   DropdownMenu,
@@ -45,43 +45,43 @@ const getCategoryVariant = (category: string) => {
 
 export const columns = (
   onEdit: (resource: Resource) => void,
-  onDelete: (link: string) => void
+  onDelete: (id: string) => void
 ): ColumnDef<Resource>[] => [
     {
-      accessorKey: "name",
-      header: "Name",
+      accessorKey: "title",
+      header: "Title",
       cell: ({ row }) => (
         <a
-          href={row.original.link}
+          href={row.original.url}
           target="_blank"
           rel="noopener noreferrer"
           className="font-medium hover:text-primary transition-colors"
         >
-          {row.getValue("name")}
+          {row.getValue("title")}
         </a>
       ),
     },
     {
-      accessorKey: "category",
+      accessorKey: "categoryId",
       header: "Category",
       cell: ({ row }) => {
-        const category = row.getValue("category") as string
+        const category = row.getValue("categoryId") as string
         const variant = getCategoryVariant(category)
         return (
           <Badge variant={variant} appearance="outline" className="capitalize">
-            {category}
+            {category || "Uncategorized"}
           </Badge>
         )
       },
     },
     {
-      accessorKey: "featured",
-      header: "Featured",
+      accessorKey: "favorite",
+      header: "Favorite",
       cell: ({ row }) => (
         <div className="flex items-center">
-          {row.getValue("featured") ? (
-            <Badge variant="secondary" >
-              Featured
+          {row.getValue("favorite") ? (
+            <Badge variant="secondary">
+              Favorite
             </Badge>
           ) : (
             <Badge variant="outline">
@@ -92,18 +92,18 @@ export const columns = (
       ),
     },
     {
-      accessorKey: "link",
+      accessorKey: "url",
       header: "URL",
       cell: ({ row }) => {
-        const link = row.getValue("link") as string
+        const url = row.getValue("url") as string
         return (
           <a
-            href={link}
+            href={url}
             target="_blank"
             rel="noopener noreferrer"
             className="block max-w-[200px] truncate text-xs text-muted-foreground hover:text-primary hover:underline transition-colors"
           >
-            {link}
+            {url}
           </a>
         )
       },
@@ -112,6 +112,7 @@ export const columns = (
       id: "actions",
       cell: ({ row }) => {
         const resource = row.original
+        const resourceId = resource._id?.toString() || resource.id || ""
 
         return (
           <DropdownMenu>
@@ -130,7 +131,7 @@ export const columns = (
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 className="text-destructive"
-                onClick={() => onDelete(resource.link)}
+                onClick={() => onDelete(resourceId)}
               >
                 <Trash className="mr-2 h-4 w-4" />
                 Delete

@@ -3,7 +3,7 @@
 import { revalidatePath, updateTag } from "next/cache";
 import clientPromise from "../mongodb";
 import { ObjectId } from "mongodb";
-import { ResourceStatus, ResourceType } from "@/types";
+import { ResourceType } from "@/types";
 import { getSessionUser, getErrorMessage } from "../auth-utils";
 import { getResources } from "@/lib/queries/resources";
 import { SearchIndexRepository } from "@/lib/repositories/search-index.repository";
@@ -19,7 +19,6 @@ export async function addResourceAction(
     tags: string[];
     notes?: string;
     whySaved?: string;
-    status: ResourceStatus;
     type: ResourceType;
     favorite: boolean;
     projectIds: string[];
@@ -50,7 +49,6 @@ export async function addResourceAction(
         tags: [],
         notes: "",
         whySaved: "",
-        status: "saved" as ResourceStatus,
         type: "website" as ResourceType,
         favorite: featured,
         projectIds: [],
@@ -119,22 +117,15 @@ export async function updateResourceAction(idOrLink: string, data: Record<string
 
     const updateData: Record<string, unknown> = { ...data, updatedAt: new Date() };
     delete updateData._id;
+    delete updateData.status;
+    delete updateData.featured;
+    delete updateData.category;
+    delete updateData.link;
+    delete updateData.name;
 
     // Map old fields if they are present in the update object
-    if (updateData.name) {
-      updateData.title = updateData.name;
-    }
-    if (updateData.link) {
-      updateData.url = updateData.link;
-    }
-    if (updateData.category) {
-      updateData.categoryId = updateData.category === "none" ? "" : updateData.category;
-    }
     if (updateData.categoryId !== undefined) {
       updateData.categoryId = updateData.categoryId === "none" ? "" : updateData.categoryId;
-    }
-    if (updateData.featured !== undefined) {
-      updateData.favorite = updateData.featured;
     }
     if (typeof updateData.order === "string") {
       updateData.order = parseInt(updateData.order) || 0;
@@ -245,19 +236,25 @@ export async function useResourceAction(id: string) {
   }
 }
 
-export async function updateResourceOrdersAction(updates: { link: string; order: number }[]) {
+export async function updateResourceOrdersAction(updates: { id: string; order: number }[]) {
   try {
     const user = await getSessionUser();
     const client = await clientPromise;
     const db = client.db();
 
     await Promise.all(
-      updates.map(({ link, order }) =>
-        db.collection("resources").updateOne(
-          { url: link, userId: user.id }, 
+      updates.map(({ id, order }) => {
+        const query: Record<string, unknown> = { userId: user.id };
+        if (ObjectId.isValid(id)) {
+          query._id = new ObjectId(id);
+        } else {
+          query.id = id;
+        }
+        return db.collection("resources").updateOne(
+          query,
           { $set: { order, updatedAt: new Date() } }
-        )
-      )
+        );
+      })
     );
     return { success: true };
   } catch (error) {

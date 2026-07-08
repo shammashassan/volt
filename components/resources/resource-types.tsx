@@ -1,6 +1,6 @@
 import * as React from "react"
 import { Globe, FileText, Bookmark, Wrench } from "lucide-react"
-import { ResourceType, ResourceStatus } from "@/types"
+import { ResourceType } from "@/types"
 
 // Custom SVGs for brand icons (missing from lucide-react v1.7.0)
 export const YoutubeIcon = (props: React.ComponentPropsWithoutRef<"svg">) => (
@@ -95,13 +95,6 @@ export const RESOURCE_TYPES: ResourceTypeConfig[] = [
   { value: "reddit", label: "Reddit", icon: Bookmark },
   { value: "article", label: "Article", icon: FileText },
   { value: "tool", label: "Tool", icon: Wrench },
-]
-
-export const STATUS_OPTIONS: { value: ResourceStatus; label: string }[] = [
-  { value: "saved", label: "Saved" },
-  { value: "reviewing", label: "Reviewing" },
-  { value: "using", label: "Using" },
-  { value: "archived", label: "Archived" },
 ]
 
 export function getResourceTypeInfo(typeStr: string): ResourceTypeConfig | undefined {

@@ -3,7 +3,7 @@
 import * as React from "react"
 import { CodeBlock } from "@/components/code-block"
 import { Badge } from "@/components/ui/badge"
-import { Terminal, Zap, Layers, Sparkles, ShieldCheck, SquareTerminal } from "lucide-react"
+import { Terminal, Zap, Layers, Sparkles, ShieldCheck, SquareTerminal, Database } from "lucide-react"
 
 const commandGroups = [
   {
@@ -36,6 +36,25 @@ const commandGroups = [
         name: "Better Auth",
         description: "Initialize Better Auth in your project.",
         code: "npx auth init",
+        language: "bash"
+      }
+    ]
+  },
+  {
+    title: "Database",
+    icon: <Database className="size-5 text-teal-500" />,
+    description: "Database drivers and ODM/ORM tools for data persistence.",
+    commands: [
+      {
+        name: "MongoDB",
+        description: "The official MongoDB driver for Node.js.",
+        code: "npm install mongodb",
+        language: "bash"
+      },
+      {
+        name: "Mongoose",
+        description: "Elegant MongoDB object modeling for Node.js.",
+        code: "npm install mongoose",
         language: "bash"
       }
     ]
@@ -95,9 +114,21 @@ const commandGroups = [
     description: "Essential tools for every developer.",
     commands: [
       {
+        name: "Zod",
+        description: "TypeScript-first schema validation with static type inference.",
+        code: "npm install zod",
+        language: "bash"
+      },
+      {
         name: "Lucide Icons",
         description: "The most popular icon library for React.",
         code: "npm install lucide-react",
+        language: "bash"
+      },
+      {
+        name: "Nuqs",
+        description: "Type-safe search params state manager for Next.js.",
+        code: "npm install nuqs",
         language: "bash"
       },
       {
@@ -105,7 +136,7 @@ const commandGroups = [
         description: "Utility for merging tailwind classes without conflicts.",
         code: "npm install tailwind-merge clsx",
         language: "bash"
-      }
+      },
     ]
   }
 ]

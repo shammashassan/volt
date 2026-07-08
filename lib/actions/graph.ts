@@ -64,9 +64,9 @@ export async function getGraphDataAction() {
     };
 
     categories.forEach((cat) => {
-      const id = cat.id || cat._id?.toString();
+      const id = cat.slug || cat._id?.toString();
       if (id) {
-        addNode(id, cat.name || cat.title || "Untitled Category", "category", `/categories/${id}`, 3, cat.description);
+        addNode(id, cat.name || "Untitled Category", "category", `/resources?category=${id}`, 3, cat.description);
       }
     });
 
@@ -122,10 +122,10 @@ export async function getGraphDataAction() {
     resources.forEach((res) => {
       const id = res.id || res._id?.toString();
       if (id) {
-        addNode(id, res.title || res.name, "resource", res.url || res.link, 1.5, res.description);
+        addNode(id, res.title, "resource", res.url, 1.5, res.description);
 
         // Resource -> category
-        const catId = res.categoryId || res.category;
+        const catId = res.categoryId;
         if (catId) {
           addLink(id, catId, "resource-category");
         }

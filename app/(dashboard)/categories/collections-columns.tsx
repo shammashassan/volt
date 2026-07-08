@@ -1,7 +1,7 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import { Category } from "@/types"
+import { Collection } from "@/types"
 import { Button } from "@/components/ui/button"
 import { MoreHorizontal, Edit, Trash } from "lucide-react"
 import {
@@ -14,16 +14,16 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { ICON_MAP } from "@/lib/icons"
 
-export const columns = (
-  onEdit: (category: Category) => void,
+export const collectionsColumns = (
+  onEdit: (collection: Collection) => void,
   onDelete: (id: string) => void
-): ColumnDef<Category>[] => [
+): ColumnDef<Collection>[] => [
   {
     accessorKey: "name",
     header: "Name",
     cell: ({ row }) => {
       const iconName = row.original.icon
-      const Icon = ICON_MAP[iconName || "Rocket"]
+      const Icon = ICON_MAP[iconName || "Code"]
       return (
         <div className="flex items-center gap-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted text-muted-foreground ring-1 ring-border">
@@ -44,15 +44,6 @@ export const columns = (
     )
   },
   {
-    accessorKey: "collectionId",
-    header: "Collection",
-    cell: ({ row }) => (
-      <span className="capitalize text-xs font-semibold text-primary/80">
-        {row.getValue("collectionId")}
-      </span>
-    )
-  },
-  {
     accessorKey: "order",
     header: "Order",
     cell: ({ row }) => (
@@ -65,7 +56,7 @@ export const columns = (
     accessorKey: "description",
     header: "Description",
     cell: ({ row }) => (
-      <p className="max-w-[300px] truncate text-muted-foreground text-sm">
+      <p className="max-w-[400px] truncate text-muted-foreground text-sm">
         {row.getValue("description")}
       </p>
     )
@@ -73,8 +64,8 @@ export const columns = (
   {
     id: "actions",
     cell: ({ row }) => {
-      const category = row.original
-      const categoryId = category._id?.toString() || category.slug
+      const collection = row.original
+      const collectionId = collection._id?.toString() || collection.slug
 
       return (
         <DropdownMenu>
@@ -86,14 +77,14 @@ export const columns = (
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => onEdit(category)}>
+            <DropdownMenuItem onClick={() => onEdit(collection)}>
               <Edit className="mr-2 h-4 w-4" />
               Edit
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
               className="text-destructive focus:text-destructive"
-              onClick={() => onDelete(categoryId)}
+              onClick={() => onDelete(collectionId)}
             >
               <Trash className="mr-2 h-4 w-4" />
               Delete

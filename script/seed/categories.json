@@ -1,0 +1,20 @@
+[
+  { "slug": "ui-library", "name": "UI Libraries", "icon": "Library", "order": 1, "collectionId": "dev-design", "description": "Design systems and component frameworks." },
+  { "slug": "components", "name": "Components", "icon": "Component", "order": 2, "collectionId": "dev-design", "description": "Copy-paste components and UI patterns." },
+  { "slug": "blocks", "name": "Blocks & Layouts", "icon": "LayoutGrid", "order": 3, "collectionId": "dev-design", "description": "Pre-built layout sections and section blocks." },
+  { "slug": "pages", "name": "Pages & Templates", "icon": "Layout", "order": 4, "collectionId": "dev-design", "description": "Full website templates and boilerplates." },
+  { "slug": "motion-3d", "name": "Motion & 3D", "icon": "Command", "order": 5, "collectionId": "dev-design", "description": "Animations, transitions, and 3D scenes." },
+  { "slug": "interactions", "name": "Interactions", "icon": "MousePointer2", "order": 6, "collectionId": "dev-design", "description": "Hover effects, gesture behaviors, and micro-interactions." },
+  { "slug": "charts", "name": "Charts & Graphs", "icon": "Globe", "order": 7, "collectionId": "dev-design", "description": "Data visualization and dashboard components." },
+  { "slug": "icons", "name": "Icons & Assets", "icon": "Shapes", "order": 8, "collectionId": "dev-design", "description": "Scalable vector assets and illustration packages." },
+  { "slug": "maps", "name": "Maps & Geospatial", "icon": "Map", "order": 9, "collectionId": "dev-design", "description": "Map components and geospatial widgets." },
+  { "slug": "customize", "name": "Visual Generators", "icon": "Wrench", "order": 10, "collectionId": "tools-utilities", "description": "CSS builders, shadow, gradient, and layout generators." },
+  { "slug": "ai-agents", "name": "AI & Agents", "icon": "Bot", "order": 11, "collectionId": "tools-utilities", "description": "AI SDKs, LLM custom agents, and prompt libraries." },
+  { "slug": "search", "name": "Search & Reference", "icon": "Search", "order": 12, "collectionId": "tools-utilities", "description": "Developer search indices and reference portals." },
+  { "slug": "inspiration", "name": "Design Inspiration", "icon": "Sparkles", "order": 13, "collectionId": "curation-media", "description": "Design showcases, portfolios, and design awards galleries." },
+  { "slug": "media", "name": "Media Assets", "icon": "Volume2", "order": 14, "collectionId": "curation-media", "description": "Sound utilities and stock assets." },
+  { "slug": "watch-later", "name": "Watch Later", "icon": "Play", "order": 15, "collectionId": "personal-lists", "description": "YouTube links, tech tutorials, and video walkthroughs." },
+  { "slug": "read-later", "name": "Read Later", "icon": "BookOpen", "order": 16, "collectionId": "personal-lists", "description": "Articles, newsletters, and tech blog posts to read." },
+  { "slug": "github-explore", "name": "GitHub Explore", "icon": "Code", "order": 17, "collectionId": "personal-lists", "description": "Repositories to star, explore, or build upon later." },
+  { "slug": "wishlist", "name": "Wishlist", "icon": "CreditCard", "order": 18, "collectionId": "personal-lists", "description": "Developer hardware, courses, and SaaS subscriptions." }
+]

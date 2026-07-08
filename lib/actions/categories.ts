@@ -9,10 +9,12 @@ import { getCategories } from "@/lib/queries/categories";
 
 export async function addCategoryAction(
   dataOrForm: FormData | {
+    slug: string;
     name: string;
     description?: string;
-    color?: string;
     icon?: string;
+    order?: number;
+    collectionId: string;
   }
 ) {
   try {
@@ -23,19 +25,20 @@ export async function addCategoryAction(
     let category: Record<string, unknown>;
 
     if (dataOrForm instanceof FormData) {
-      const id = dataOrForm.get("id") as string;
-      const title = dataOrForm.get("title") as string;
+      const slug = dataOrForm.get("slug") as string;
+      const name = dataOrForm.get("name") as string;
       const description = dataOrForm.get("description") as string;
       const icon = dataOrForm.get("icon") as string;
       const order = parseInt(dataOrForm.get("order") as string) || 0;
+      const collectionId = dataOrForm.get("collectionId") as string;
 
       category = {
-        name: title,
+        slug: slug.toLowerCase().trim(),
+        name,
         description,
         icon,
-        color: "",
         order,
-        id, // For backward compatibility
+        collectionId,
         userId: user.id,
         createdAt: new Date(),
         updatedAt: new Date()
@@ -43,15 +46,27 @@ export async function addCategoryAction(
     } else {
       category = {
         ...dataOrForm,
+        slug: dataOrForm.slug.toLowerCase().trim(),
         userId: user.id,
         createdAt: new Date(),
         updatedAt: new Date()
       };
     }
 
+    // Check for duplicate category slug for this user
+    const existing = await db.collection("categories").findOne({
+      userId: user.id,
+      slug: category.slug
+    });
+
+    if (existing) {
+      return { success: false, error: "A category with this slug already exists." };
+    }
+
     const result = await db.collection("categories").insertOne(category);
     revalidatePath("/explore");
     revalidatePath("/categories");
+    revalidatePath("/resources");
     updateTag(`explore-body-${user.id}`);
     updateTag(`dashboard-stats-${user.id}`);
     return { success: true, id: result.insertedId.toString() };
@@ -60,7 +75,7 @@ export async function addCategoryAction(
   }
 }
 
-export async function updateCategoryAction(idOrOldId: string, data: Record<string, unknown>) {
+export async function updateCategoryAction(idOrSlug: string, data: Record<string, unknown>) {
   try {
     const user = await getSessionUser();
     const client = await clientPromise;
@@ -69,21 +84,51 @@ export async function updateCategoryAction(idOrOldId: string, data: Record<strin
     const updateData: Record<string, unknown> = { ...data, updatedAt: new Date() };
     delete updateData._id;
 
-    if (updateData.title) {
-      updateData.name = updateData.title;
+    if (typeof updateData.order === "string") {
+      updateData.order = parseInt(updateData.order) || 0;
+    }
+    if (typeof updateData.slug === "string") {
+      updateData.slug = updateData.slug.toLowerCase().trim();
     }
 
-    const query: Record<string, unknown> = { userId: user.id };
-    if (ObjectId.isValid(idOrOldId)) {
-      query._id = new ObjectId(idOrOldId);
+    const query: any = { userId: user.id };
+    if (ObjectId.isValid(idOrSlug)) {
+      query._id = new ObjectId(idOrSlug);
     } else {
-      query.id = idOrOldId;
+      query.slug = idOrSlug;
+    }
+
+    // If slug is changing, verify no duplicates
+    if (updateData.slug) {
+      const existing = await db.collection("categories").findOne({
+        userId: user.id,
+        slug: updateData.slug,
+        _id: { $ne: query._id || null }
+      });
+      if (existing) {
+        return { success: false, error: "A category with this slug already exists." };
+      }
+    }
+
+    // Get current category to know if slug changed
+    const current = await db.collection("categories").findOne(query);
+    if (!current) {
+      return { success: false, error: "Category not found" };
     }
 
     await db.collection("categories").updateOne(query, { $set: updateData });
+
+    // If slug changed, update all referencing resources
+    if (updateData.slug && updateData.slug !== current.slug) {
+      await db.collection("resources").updateMany(
+        { userId: user.id, categoryId: current.slug },
+        { $set: { categoryId: updateData.slug, updatedAt: new Date() } }
+      );
+    }
+
     revalidatePath("/explore");
     revalidatePath("/categories");
-    revalidatePath(`/categories/${idOrOldId}`);
+    revalidatePath("/resources");
     updateTag(`explore-body-${user.id}`);
     updateTag(`dashboard-stats-${user.id}`);
     return { success: true };
@@ -92,17 +137,17 @@ export async function updateCategoryAction(idOrOldId: string, data: Record<strin
   }
 }
 
-export async function deleteCategoryAction(idOrOldId: string) {
+export async function deleteCategoryAction(idOrSlug: string) {
   try {
     const user = await getSessionUser();
     const client = await clientPromise;
     const db = client.db();
 
     const query: Record<string, unknown> = { userId: user.id };
-    if (ObjectId.isValid(idOrOldId)) {
-      query._id = new ObjectId(idOrOldId);
+    if (ObjectId.isValid(idOrSlug)) {
+      query._id = new ObjectId(idOrSlug);
     } else {
-      query.id = idOrOldId;
+      query.slug = idOrSlug;
     }
 
     const categoryDoc = await db.collection("categories").findOne(query);
@@ -110,31 +155,23 @@ export async function deleteCategoryAction(idOrOldId: string) {
       return { success: false, error: "Category not found" };
     }
 
-    const slugId = categoryDoc.id || "";
-    const oidStr = categoryDoc._id.toString();
-
-    // Check if category has resources referencing it by either slug or _id
-    const categoryMatchQuery = {
-      $or: [
-        { category: slugId },
-        { category: oidStr },
-        { categoryId: slugId },
-        { categoryId: oidStr }
-      ].filter(q => Object.values(q)[0] !== "")
-    };
-
-    // Check if category has resources
+    // Check if category has resources referencing it by categoryId (or legacy category field)
     const resourcesCount = await db.collection("resources").countDocuments({ 
       userId: user.id, 
-      ...categoryMatchQuery 
+      $or: [
+        { categoryId: categoryDoc.slug },
+        { category: categoryDoc.slug }
+      ]
     });
+
     if (resourcesCount > 0) {
-      return { success: false, error: "Cannot delete category that contains resources" };
+      return { success: false, error: "Cannot delete category that contains resources." };
     }
 
     await db.collection("categories").deleteOne({ _id: categoryDoc._id });
     revalidatePath("/explore");
     revalidatePath("/categories");
+    revalidatePath("/resources");
     updateTag(`explore-body-${user.id}`);
     updateTag(`dashboard-stats-${user.id}`);
     return { success: true };
@@ -155,7 +192,7 @@ export async function getCategoriesAction() {
         { $match: { userId: user.id } },
         {
           $group: {
-            _id: { $ifNull: [ "$categoryId", "$category" ] },
+            _id: "$categoryId",
             count: { $sum: 1 }
           }
         }
@@ -169,11 +206,10 @@ export async function getCategoriesAction() {
     });
 
     const categoriesWithCounts = categories.map(cat => {
-      const idCount = cat.id ? (countMap.get(cat.id) || 0) : 0;
-      const oidCount = (cat as any)._id ? (countMap.get((cat as any)._id) || 0) : 0;
+      const count = cat.slug ? (countMap.get(cat.slug) || 0) : 0;
       return {
         ...cat,
-        resourceCount: idCount + oidCount
+        resourceCount: count
       };
     });
 

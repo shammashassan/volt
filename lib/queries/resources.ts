@@ -13,10 +13,7 @@ export const getResourcesByCategoryId = cache(async (categoryId: string, userId:
   const db = await getDb();
   const query = {
     userId,
-    $or: [
-      { category: categoryId },
-      { categoryId }
-    ]
+    categoryId
   };
   const resources = await db.collection("resources").find(query).sort({ order: 1, createdAt: -1 }).toArray();
   return serialize(resources.map(mapResourceDoc)) as unknown as Resource[];
@@ -88,8 +85,7 @@ export const getRecommendedResources = cache(
       .collection("resources")
       .find({
         userId,
-        recentlyViewedAt: { $exists: false },
-        status: { $ne: "archived" },
+        recentlyViewedAt: { $exists: false }
       })
       .sort({ createdAt: -1 })
       .limit(limit)

@@ -1222,7 +1222,7 @@ export function NotesContent({
                       onValueChange={setFormRelatedResources}
                       filter={(item, query) => {
                         const res = resources.find((r) => (r._id?.toString() || r.id) === item)
-                        const name = res ? (res.title || res.name || "") : item
+                        const name = res ? (res.title || "") : item
                         return name.toLowerCase().includes(query.toLowerCase())
                       }}
                     >
@@ -1232,7 +1232,7 @@ export function NotesContent({
                             <React.Fragment>
                               {values.map((val) => {
                                 const res = resources.find((r) => (r._id?.toString() || r.id) === val)
-                                return <ComboboxChip key={val}>{res ? (res.title || res.name) : val}</ComboboxChip>
+                                return <ComboboxChip key={val}>{res ? res.title : val}</ComboboxChip>
                               })}
                               <ComboboxChipsInput placeholder="Link resources…" />
                             </React.Fragment>
@@ -1244,7 +1244,7 @@ export function NotesContent({
                         <ComboboxList>
                           {(item: string) => {
                             const res = resources.find((r) => (r._id?.toString() || r.id) === item)
-                            return <ComboboxItem key={item} value={item}>{res ? (res.title || res.name) : item}</ComboboxItem>
+                            return <ComboboxItem key={item} value={item}>{res ? res.title : item}</ComboboxItem>
                           }}
                         </ComboboxList>
                       </ComboboxContent>
@@ -1518,7 +1518,7 @@ export function NotesContent({
                               </div>
                               <div className="min-w-0 flex-1">
                                 <p className="text-sm font-semibold truncate group-hover:text-primary transition-colors">
-                                  {res.title || res.name}
+                                  {res.title}
                                 </p>
                                 <p className="text-xs text-muted-foreground truncate">{res.url}</p>
                               </div>

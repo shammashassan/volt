@@ -1,6 +1,5 @@
 import { ObjectId } from "mongodb";
 
-export type ResourceStatus = "saved" | "reviewing" | "using" | "archived";
 export type ProjectStatus = "active" | "completed" | "paused";
 export type ResourceType =
   | "website"
@@ -15,15 +14,26 @@ export type ResourceType =
 
 export type PersonType = "developer" | "designer" | "founder" | "creator" | "company";
 
+export interface Collection {
+  _id?: ObjectId | string;
+  slug: string;        // Immutable slug identifier (e.g., "dev-design")
+  name: string;        // Presentation name (e.g., "Dev & Design")
+  description?: string;
+  icon?: string;       // Lucide icon identifier
+  order: number;       // Manual sorting order
+  userId: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export interface Category {
   _id?: ObjectId | string;
-  id?: string; // Standardized string ID for frontend components
-  name: string;
-  title?: string; // For backwards compatibility
+  slug: string;        // Immutable slug identifier (e.g., "ui-library")
+  name: string;        // Presentation name (e.g., "UI Libraries")
   description?: string;
-  color?: string; // Hex or HSL color representation
-  icon?: string; // Lucide icon identifier
-  order?: number; // Sorting order
+  icon?: string;
+  order: number;
+  collectionId: string; // References Collection.slug
   userId: string;
   createdAt: Date;
   updatedAt: Date;
@@ -31,27 +41,21 @@ export interface Category {
 
 export interface Resource {
   _id?: ObjectId | string;
-  id?: string; // Standardized string ID for frontend components
+  id?: string;
   title: string;
-  name: string; // For backwards compatibility
   url: string;
-  link: string; // For backwards compatibility
-  description: string; // For backwards compatibility
-  categoryId?: string; // References Category._id (or custom ID)
-  category: string; // For backwards compatibility
+  description: string;
+  categoryId: string;   // References Category.slug
   tags: string[];
   notes?: string;
   whySaved?: string;
-  status: ResourceStatus;
   type: ResourceType;
   favorite: boolean;
-  featured?: boolean; // For backwards compatibility
-  logo?: string; // For backwards compatibility
-  order?: number; // For backwards compatibility
+  order: number;        // Manual order within Category
   userId: string;
   projectIds: string[]; // References Project._id
-  personIds: string[]; // References Person._id
-  useCount: number; // For tracking "Most Used"
+  personIds: string[];  // References Person._id
+  useCount: number;     // For tracking "Most Used"
   createdAt: Date;
   updatedAt: Date;
   recentlyViewedAt?: Date;

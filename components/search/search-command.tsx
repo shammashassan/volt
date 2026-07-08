@@ -125,7 +125,7 @@ export function SearchCommand() {
 
   const onSelectResource = async (resource: Resource) => {
     setOpen(false)
-    const rawUrl = resource.url || resource.link || ""
+    const rawUrl = resource.url || ""
     const targetUrl = /^(https?:)?\/\//i.test(rawUrl) ? rawUrl : `https://${rawUrl}`
     window.open(targetUrl, "_blank")
     try {
@@ -287,15 +287,15 @@ export function SearchCommand() {
             <CommandGroup heading="Categories">
               {results.categories.map((category) => {
                 const Icon = (category.icon && ICON_MAP[category.icon as keyof typeof ICON_MAP]) || FolderIcon
-                const catId = category._id?.toString() || category.id
+                const catId = category._id?.toString() || category.slug
                 return (
                   <CommandItem
                     key={catId}
-                    onSelect={() => onSelectEntity(`/categories/${category.id || catId}`)}
+                    onSelect={() => onSelectEntity(`/resources?category=${category.slug || catId}`)}
                     className="flex items-center gap-2"
                   >
                     <Icon className="size-4 text-muted-foreground/85" aria-hidden="true" />
-                    <span className="font-medium text-foreground">{category.name || category.title}</span>
+                    <span className="font-medium text-foreground">{category.name}</span>
                   </CommandItem>
                 )
               })}
@@ -315,7 +315,7 @@ export function SearchCommand() {
                   >
                     <div className="flex items-center gap-2">
                       <ExternalLinkIcon className="size-4 text-muted-foreground/60" aria-hidden="true" />
-                      <span className="font-medium text-foreground">{resource.title || resource.name}</span>
+                      <span className="font-medium text-foreground">{resource.title}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-[9px] uppercase tracking-wider text-muted-foreground/50 bg-muted px-1.5 py-0.5 rounded">

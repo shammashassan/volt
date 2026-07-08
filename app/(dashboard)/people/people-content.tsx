@@ -200,8 +200,8 @@ export function PeopleContent({ initialPeople }: PeopleContentProps) {
               Track creators, developers, designers, or organizations to reference and connect them with saved assets.
             </p>
           </div>
-          <Button onClick={handleOpenCreate} className="w-full sm:w-auto shrink-0 font-bold">
-            <Plus className="mr-2 h-4 w-4" />
+          <Button onClick={handleOpenCreate}>
+            <Plus />
             Track Person
           </Button>
         </div>

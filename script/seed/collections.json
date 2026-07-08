@@ -1,0 +1,6 @@
+[
+  { "slug": "dev-design", "name": "Dev & Design", "icon": "Code", "order": 1, "description": "UI systems, modular components, layouts, and visual assets." },
+  { "slug": "tools-utilities", "name": "Tools & Utilities", "icon": "Wrench", "order": 2, "description": "CSS generators, AI assistants, and developer search reference docs." },
+  { "slug": "curation-media", "name": "Curation & Media", "icon": "Sparkles", "order": 3, "description": "Award design galleries and multimedia design assets." },
+  { "slug": "personal-lists", "name": "Personal Lists", "icon": "ListTodo", "order": 4, "description": "Watch later tutorials, articles, and GitHub repositories." }
+]

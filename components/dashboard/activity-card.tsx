@@ -17,7 +17,7 @@ interface ActivityCardProps {
 }
 
 function ResourceLink({ resource }: { resource: Resource }) {
-    const rawUrl = resource.link || resource.url || ""
+    const rawUrl = resource.url || ""
     const targetUrl = /^(https?:)?\/\//i.test(rawUrl) ? rawUrl : `https://${rawUrl}`
 
     return (
@@ -29,7 +29,7 @@ function ResourceLink({ resource }: { resource: Resource }) {
         >
             <div className="flex min-w-0 flex-col pr-2">
                 <span className="truncate text-xs font-semibold text-foreground transition-colors group-hover/item:text-primary">
-                    {resource.name || resource.title}
+                    {resource.title}
                 </span>
                 <span className="truncate text-[10px] text-muted-foreground/70">
                     {resource.description || rawUrl}
@@ -46,9 +46,9 @@ export function ActivityCard({ recentlyViewed, recommended, spotlight }: Activit
     const [tab, setTab] = useState(defaultTab)
 
     const spotlightUrl = spotlight
-        ? /^(https?:)?\/\//i.test(spotlight.link || spotlight.url || "")
-            ? spotlight.link || spotlight.url || ""
-            : `https://${spotlight.link || spotlight.url || ""}`
+        ? /^(https?:)?\/\//i.test(spotlight.url || "")
+            ? spotlight.url || ""
+            : `https://${spotlight.url || ""}`
         : ""
 
     return (
@@ -134,7 +134,7 @@ export function ActivityCard({ recentlyViewed, recommended, spotlight }: Activit
                                         </div>
                                         <div className="flex flex-col gap-0.5">
                                             <p className="text-xs font-bold leading-snug text-foreground">
-                                                {spotlight.name || spotlight.title}
+                                                {spotlight.title}
                                             </p>
                                             {spotlight.description && (
                                                 <p className="line-clamp-2 text-[10px] leading-relaxed text-muted-foreground">

@@ -34,8 +34,9 @@ import {
   addPersonAction
 } from "@/lib/actions";
 import { getCategoriesAction } from "@/lib/actions/categories";
+import { getCollectionsAction } from "@/lib/actions/collections";
 import { searchAction } from "@/lib/actions/search";
-import { Category, Resource, Project, Person, ResourceType, ProjectStatus, PersonType } from "@/types";
+import { Category, Collection, Resource, Project, Person, ResourceType, ProjectStatus, PersonType } from "@/types";
 
 type CaptureType = "resource" | "note" | "category" | "project" | "person" | null;
 
@@ -59,6 +60,7 @@ export function QuickCaptureProvider({ children }: { children: React.ReactNode }
   
   // Relations data
   const [categories, setCategories] = useState<Category[]>([]);
+  const [collections, setCollections] = useState<Collection[]>([]);
   const [resources, setResources] = useState<Resource[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [people, setPeople] = useState<Person[]>([]);
@@ -76,13 +78,17 @@ export function QuickCaptureProvider({ children }: { children: React.ReactNode }
     if (activeType) {
       const loadRelations = async () => {
         try {
-          const [catResult, searchResult] = await Promise.all([
+          const [catResult, collResult, searchResult] = await Promise.all([
             getCategoriesAction(),
+            getCollectionsAction(),
             searchAction("")
           ]);
 
           if (catResult.success && Array.isArray(catResult.data)) {
-            setCategories(catResult.data);
+            setCategories(catResult.data as unknown as Category[]);
+          }
+          if (collResult.success && Array.isArray(collResult.data)) {
+            setCollections(collResult.data as unknown as Collection[]);
           }
           if (searchResult.success && searchResult.data) {
             setResources(searchResult.data.resources || []);
@@ -105,6 +111,7 @@ export function QuickCaptureProvider({ children }: { children: React.ReactNode }
         activeType={activeType}
         closeCapture={closeCapture}
         categories={categories}
+        collections={collections}
         resources={resources}
         projects={projects}
         people={people}
@@ -117,6 +124,7 @@ interface DrawersProps {
   activeType: CaptureType;
   closeCapture: () => void;
   categories: Category[];
+  collections: Collection[];
   resources: Resource[];
   projects: Project[];
   people: Person[];
@@ -126,6 +134,7 @@ function QuickCaptureDrawers({
   activeType,
   closeCapture,
   categories,
+  collections,
   resources,
   projects,
   people
@@ -166,8 +175,9 @@ function QuickCaptureDrawers({
 
   // 3. Category
   const [catName, setCatName] = useState("");
+  const [catSlug, setCatSlug] = useState("");
+  const [catCollectionId, setCatCollectionId] = useState("");
   const [catDescription, setCatDescription] = useState("");
-  const [catColor, setCatColor] = useState("#3b82f6");
   const [catIcon, setCatIcon] = useState("Rocket");
 
   // 4. Project
@@ -204,8 +214,9 @@ function QuickCaptureDrawers({
     setNoteRelatedPeople([]);
 
     setCatName("");
+    setCatSlug("");
+    setCatCollectionId("");
     setCatDescription("");
-    setCatColor("#3b82f6");
     setCatIcon("Rocket");
 
     setProjName("");
@@ -237,7 +248,6 @@ function QuickCaptureDrawers({
       whySaved: resWhySaved || undefined,
       notes: resNotes || undefined,
       favorite: false,
-      status: "saved",
       projectIds: resProjectIds,
       personIds: resPersonIds
     });
@@ -285,12 +295,17 @@ function QuickCaptureDrawers({
       toast.error("Category Name is required");
       return;
     }
+    if (!catSlug) {
+      toast.error("Category Slug is required");
+      return;
+    }
     setSubmitting(true);
     const result = await addCategoryAction({
+      slug: catSlug,
       name: catName,
       description: catDescription || undefined,
-      color: catColor || undefined,
-      icon: catIcon || undefined
+      icon: catIcon || undefined,
+      collectionId: catCollectionId || (collections[0]?.slug || ""),
     });
     setSubmitting(false);
     if (result.success) {
@@ -413,8 +428,8 @@ function QuickCaptureDrawers({
                       <SelectContent>
                         <SelectItem value="none">Uncategorized</SelectItem>
                         {categories.map((c) => (
-                          <SelectItem key={c.id || c._id?.toString()} value={c.id || c._id?.toString() || ""}>
-                            {c.name || c.title}
+                          <SelectItem key={c.slug || c._id?.toString()} value={c.slug || c._id?.toString() || ""}>
+                            {c.name}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -580,7 +595,7 @@ function QuickCaptureDrawers({
                       onValueChange={setNoteRelatedResources}
                       filter={(item, query) => {
                         const r = resources.find((res) => (res._id?.toString() || res.id) === item)
-                        const name = r ? (r.title || r.name || "") : item
+                        const name = r ? (r.title || "") : item
                         return name.toLowerCase().includes(query.toLowerCase())
                       }}
                     >
@@ -592,7 +607,7 @@ function QuickCaptureDrawers({
                                 const r = resources.find((res) => (res._id?.toString() || res.id) === val)
                                 return (
                                   <ComboboxChip key={val}>
-                                    {r ? (r.title || r.name) : val}
+                                    {r ? r.title : val}
                                   </ComboboxChip>
                                 )
                               })}
@@ -608,7 +623,7 @@ function QuickCaptureDrawers({
                             const r = resources.find((res) => (res._id?.toString() || res.id) === item)
                             return (
                               <ComboboxItem key={item} value={item}>
-                                {r ? (r.title || r.name) : item}
+                                {r ? r.title : item}
                               </ComboboxItem>
                             )
                           }}
@@ -737,19 +752,31 @@ function QuickCaptureDrawers({
               <div className="px-6 py-4">
                 <FieldGroup>
                   <Field>
+                    <FieldLabel htmlFor="cat-slug">Category ID (Slug) *</FieldLabel>
+                    <Input id="cat-slug" name="slug" autoComplete="off" placeholder="e.g. ui-library" value={catSlug} onChange={e => setCatSlug(e.target.value)} required />
+                  </Field>
+                  <Field>
                     <FieldLabel htmlFor="cat-name">Category Name *</FieldLabel>
-                    <Input id="cat-name" name="name" autoComplete="off" placeholder="e.g. Polish" value={catName} onChange={e => setCatName(e.target.value)} required />
+                    <Input id="cat-name" name="name" autoComplete="off" placeholder="e.g. UI Libraries" value={catName} onChange={e => setCatName(e.target.value)} required />
+                  </Field>
+                  <Field>
+                    <FieldLabel htmlFor="cat-collection">Parent Collection *</FieldLabel>
+                    <Select value={catCollectionId} onValueChange={setCatCollectionId}>
+                      <SelectTrigger id="cat-collection">
+                        <SelectValue placeholder="Select Collection" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {collections.map(coll => (
+                          <SelectItem key={coll.slug} value={coll.slug}>
+                            {coll.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </Field>
                   <Field>
                     <FieldLabel htmlFor="cat-description">Description</FieldLabel>
                     <Textarea id="cat-description" name="description" autoComplete="off" placeholder="A brief description of this section…" value={catDescription} onChange={e => setCatDescription(e.target.value)} />
-                  </Field>
-                  <Field>
-                    <FieldLabel htmlFor="cat-color">Color Hex</FieldLabel>
-                    <div className="flex gap-2 items-center">
-                      <Input id="cat-color" type="color" className="w-12 h-10 p-1 cursor-pointer" value={catColor} onChange={e => setCatColor(e.target.value)} />
-                      <Input type="text" value={catColor} onChange={e => setCatColor(e.target.value)} placeholder="#000000" className="flex-1" />
-                    </div>
                   </Field>
                   <Field>
                     <FieldLabel htmlFor="cat-icon">Lucide Icon Name</FieldLabel>

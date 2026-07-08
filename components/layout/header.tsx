@@ -1,6 +1,6 @@
 import React, { useRef } from 'react'
 import Link from 'next/link'
-import { Logo } from './logo'
+import { Logo } from '../brand/logo'
 import { Menu, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ModeToggle } from './mode-toggle'
@@ -47,15 +47,15 @@ export const HeroHeader = ({ startReveal = false }: { startReveal?: boolean }) =
             opacity: 1,
             duration: 1.6
         })
-        .fromTo('.nav-item-anim', {
-            y: -10,
-            opacity: 0
-        }, {
-            y: 0,
-            opacity: 1,
-            duration: 1.2,
-            stagger: 0.08
-        }, '<+0.4')
+            .fromTo('.nav-item-anim', {
+                y: -10,
+                opacity: 0
+            }, {
+                y: 0,
+                opacity: 1,
+                duration: 1.2,
+                stagger: 0.08
+            }, '<+0.4')
     }, { scope: containerRef, dependencies: [startReveal] })
 
     return (

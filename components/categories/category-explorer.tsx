@@ -51,7 +51,7 @@ export function CategoryExplorer({ initialCategories }: CategoryExplorerProps) {
         const resourceCount = category.resourceCount || 0
         
         return (
-          <Link key={category.id} href={`/categories/${category.id}`} className="group block">
+          <Link key={category.slug} href={`/resources?category=${category.slug}`} className="group block">
             <Card className="h-full border-border/40 bg-card/40 backdrop-blur-sm transition-[border-color,background-color,shadow] duration-300 group-hover:border-primary/30 group-hover:bg-card group-hover:shadow-2xl group-hover:shadow-primary/5">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/5 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
@@ -64,7 +64,7 @@ export function CategoryExplorer({ initialCategories }: CategoryExplorerProps) {
               </CardHeader>
               <CardContent>
                 <CardTitle className="text-xl font-black tracking-tight mb-2 lowercase italic group-hover:text-primary transition-colors">
-                  {category.title}
+                  {category.name}
                 </CardTitle>
                 <p className="line-clamp-2 text-sm leading-relaxed text-muted-foreground/80">
                   {category.description}

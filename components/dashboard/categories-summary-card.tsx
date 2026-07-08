@@ -79,17 +79,17 @@ export function CategoriesSummaryCard({ categories = [] }: CategoriesSummaryCard
                 <ScrollArea className="h-[160px] w-full">
                     <div className="flex flex-col gap-3 pr-3.5">
                         {topCategories.map(cat => {
-                            const title = cat.title || cat.name || "Untitled"
+                            const title = cat.name || "Untitled"
                             const count = cat.resourceCount || 0
                             const density = maxResourceCount > 0 ? (count / maxResourceCount) * 100 : 0
                             const Icon = (cat.icon && ICON_MAP[cat.icon as keyof typeof ICON_MAP]) || FolderOpen
-                            const catId = cat.id || cat._id?.toString()
+                            const catId = cat.slug || cat._id?.toString()
 
                             return (
                                 <div key={catId} className="flex flex-col gap-1 group/item">
                                     <div className="flex items-center justify-between gap-2">
                                         <Link
-                                            href={`/categories/${catId}`}
+                                            href={`/resources?category=${catId}`}
                                             className="flex items-center gap-1.5 min-w-0 hover:text-primary transition-colors"
                                         >
                                             <Icon className="size-3 shrink-0 text-amber-500/60 group-hover/item:text-amber-500 transition-colors" />

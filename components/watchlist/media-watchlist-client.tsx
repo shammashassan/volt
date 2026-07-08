@@ -210,8 +210,8 @@ export function MediaWatchlistClient({ initialItems }: MediaWatchlistClientProps
               Track movies, series, and anime. Press <Kbd>Ctrl</Kbd>+<Kbd>M</Kbd> to search database.
             </p>
           </div>
-          <Button onClick={() => setSearchOpen(true)} className="w-full sm:w-auto shrink-0 gap-2 font-bold">
-            <Plus className="size-4" />
+          <Button onClick={() => setSearchOpen(true)}>
+            <Plus />
             Add Media
           </Button>
         </div>

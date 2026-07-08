@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useState } from "react"
-import { Category, ResourceType, ResourceStatus } from "@/types"
+import { Category, ResourceType } from "@/types"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -82,7 +82,6 @@ export function QuickSaveContent({ categories, initialUrl = "", initialTitle = "
       tags: tagsArray,
       whySaved,
       notes,
-      status: "saved" as ResourceStatus,
       type: resourceType,
       favorite: false,
       projectIds: [],
@@ -190,7 +189,7 @@ export function QuickSaveContent({ categories, initialUrl = "", initialTitle = "
               <SelectContent>
                 <SelectItem value="none">Uncategorized</SelectItem>
                 {categories.map((cat) => (
-                  <SelectItem key={cat.id || cat._id?.toString()} value={cat.id || cat._id?.toString() || ""}>
+                  <SelectItem key={cat.slug || cat._id?.toString()} value={cat.slug || cat._id?.toString() || ""}>
                     {cat.name}
                   </SelectItem>
                 ))}

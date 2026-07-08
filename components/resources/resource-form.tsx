@@ -28,8 +28,8 @@ import {
 } from "@/components/ui/combobox"
 import { Sparkles, Check, Star, Loader2, Folder, User, ExternalLink, Trash2 } from "lucide-react"
 import { toast } from "sonner"
-import { RESOURCE_TYPES, STATUS_OPTIONS } from "@/components/resources/resource-types"
-import { ResourceStatus, ResourceType } from "@/types"
+import { RESOURCE_TYPES } from "@/components/resources/resource-types"
+import { ResourceType } from "@/types"
 
 interface ResourceFormProps {
   initialData?: any
@@ -59,7 +59,6 @@ export function ResourceForm({
   const [link, setLink] = useState(initialData?.url || initialData?.link || "")
   const [categoryId, setCategoryId] = useState(initialData?.categoryId || initialData?.category || "none")
   const [type, setType] = useState<ResourceType>(initialData?.type || "website")
-  const [status, setStatus] = useState<ResourceStatus>(initialData?.status || "saved")
   const [favorite, setFavorite] = useState(!!(initialData?.favorite || initialData?.featured))
   const [description, setDescription] = useState(initialData?.description || "")
   const [whySaved, setWhySaved] = useState(initialData?.whySaved || "")
@@ -109,7 +108,6 @@ export function ResourceForm({
       tags: tagsArray,
       notes,
       whySaved,
-      status,
       type,
       favorite,
       projectIds,
@@ -178,8 +176,8 @@ export function ResourceForm({
               <SelectContent>
                 <SelectItem value="none">Uncategorized</SelectItem>
                 {categories.map((cat) => (
-                  <SelectItem key={cat.id || cat._id?.toString()} value={cat.id || cat._id?.toString() || ""}>
-                    {cat.title || cat.name}
+                  <SelectItem key={cat.slug || cat._id?.toString()} value={cat.slug || cat._id?.toString() || ""}>
+                    {cat.name}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -202,21 +200,7 @@ export function ResourceForm({
             </Select>
           </Field>
 
-          <Field>
-            <FieldLabel htmlFor="status">Status</FieldLabel>
-            <Select value={status} onValueChange={(v) => setStatus(v as ResourceStatus)}>
-              <SelectTrigger id="status" className="bg-background/40">
-                <SelectValue placeholder="Select Status" />
-              </SelectTrigger>
-              <SelectContent>
-                {STATUS_OPTIONS.map((s) => (
-                  <SelectItem key={s.value} value={s.value}>
-                    {s.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </Field>
+
 
           <Field className="flex flex-col justify-end">
             <FieldLabel htmlFor="favorite">Favorite</FieldLabel>

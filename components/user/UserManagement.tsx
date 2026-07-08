@@ -9,12 +9,10 @@ import {
   CheckCircle2,
   UsersIcon
 } from "lucide-react"
-import { Separator } from "@/components/ui/separator"
 import { toast } from "sonner"
 import { authClient } from "@/lib/auth-client"
 import { useRouter } from "next/navigation"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -153,8 +151,8 @@ export function UserManagement({ initialUsers }: { initialUsers: UserData[] }) {
               Manage user roles, approvals, and account statuses.
             </p>
           </div>
-          <Button onClick={() => setIsCreateModalOpen(true)} className="w-full sm:w-auto shrink-0 font-bold">
-            <UserPlus className="mr-2 h-4 w-4" />
+          <Button onClick={() => setIsCreateModalOpen(true)}>
+            <UserPlus />
             Create User
           </Button>
         </div>
@@ -163,36 +161,25 @@ export function UserManagement({ initialUsers }: { initialUsers: UserData[] }) {
       {/* Main Content section */}
       <section className="px-4 lg:px-6">
         <div className="max-w-7xl flex flex-col gap-6">
-          {/* Mobile Select dropdown */}
-          <div className="md:hidden w-full mb-4">
-            <Select value={activeTab} onValueChange={setActiveTab}>
-              <SelectTrigger className="w-full h-10 font-medium">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="active">Active Users ({activeUsers.length})</SelectItem>
-                <SelectItem value="pending">Signup Requests ({pendingUsers.length})</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="hidden md:grid w-full grid-cols-2 max-w-[400px] mb-4">
-              <TabsTrigger value="active" className="gap-2">
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <TabsList className="mb-2">
+              <TabsTrigger value="active">
+                <UsersIcon />
                 Active Users
-                <Badge variant="secondary">
+                <Badge variant="secondary" size="sm">
                   {activeUsers.length}
                 </Badge>
               </TabsTrigger>
-              <TabsTrigger value="pending" className="gap-2">
+              <TabsTrigger value="pending">
+                <CheckCircle2 />
                 Signup Requests
-                <Badge variant={pendingUsers.length > 0 ? "secondary" : "outline"} className="h-5 px-1.5 min-w-[20px] justify-center">
+                <Badge variant={pendingUsers.length > 0 ? "secondary" : "outline"} size="sm">
                   {pendingUsers.length}
                 </Badge>
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="active" className="border rounded-xl bg-card/40 backdrop-blur-sm overflow-hidden">
+            <TabsContent value="active">
               <UserTable
                 users={activeUsers}
                 onApprove={handleApprove}
@@ -203,7 +190,7 @@ export function UserManagement({ initialUsers }: { initialUsers: UserData[] }) {
               />
             </TabsContent>
 
-            <TabsContent value="pending" className="border rounded-xl bg-card/40 backdrop-blur-sm overflow-hidden">
+            <TabsContent value="pending">
               {pendingUsers.length > 0 ? (
                 <UserTable
                   users={pendingUsers}

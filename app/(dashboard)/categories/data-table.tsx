@@ -71,7 +71,7 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className="w-full">
-      <div className="flex items-center justify-between py-4">
+      <div className="flex items-center justify-between pb-4">
         <div className="flex flex-1 items-center space-x-2">
           <Input
             placeholder={`Filter by ${searchKey}...`}

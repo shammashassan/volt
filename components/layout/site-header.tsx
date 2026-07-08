@@ -14,19 +14,21 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator
 } from "@/components/ui/breadcrumb"
-import { usePathname } from "next/navigation"
+import { usePathname, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { Home } from "lucide-react"
 
-import { Category } from "@/types"
+import { Category, Collection } from "@/types"
 import { getCategoriesAction } from "@/lib/actions/categories"
 
 interface SiteHeaderProps {
   initialCategories?: Category[]
+  initialCollections?: Collection[]
 }
 
-export function SiteHeader({ initialCategories }: SiteHeaderProps) {
+export function SiteHeader({ initialCategories, initialCollections }: SiteHeaderProps) {
   const pathname = usePathname()
+  const searchParams = useSearchParams()
   const [categories, setCategories] = useState<Category[]>(initialCategories || [])
   const isHome = pathname === "/"
 
@@ -51,8 +53,8 @@ export function SiteHeader({ initialCategories }: SiteHeaderProps) {
     fetchCategories()
   }, [initialCategories])
 
-  const categoryId = pathname.split("/").pop()
-  const category = Array.isArray(categories) ? categories.find(c => c.id === categoryId) : undefined
+  const activeCategoryParam = searchParams?.get("category") || null
+  const category = Array.isArray(categories) ? categories.find(c => c.slug === activeCategoryParam) : undefined
 
   return (
     <header className="sticky top-0 z-50 flex h-(--header-height) shrink-0 items-center gap-2 border-b bg-background/80 backdrop-blur-md transition-all ease-linear">
@@ -77,7 +79,7 @@ export function SiteHeader({ initialCategories }: SiteHeaderProps) {
               {!isHome && (
                 <BreadcrumbItem>
                   <BreadcrumbPage className="text-foreground">
-                    {category ? category.title : (pathname.includes('/categories/') ? "Category" : pathname.split('/').filter(Boolean).pop())}
+                    {category ? category.name : (pathname.includes('/categories') ? "Categories" : pathname.split('/').filter(Boolean).pop())}
                   </BreadcrumbPage>
                 </BreadcrumbItem>
               )}

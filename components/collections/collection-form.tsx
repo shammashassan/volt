@@ -16,24 +16,23 @@ import { Field, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { Sparkles, Check } from "lucide-react"
 import { ICON_LABELS, ICON_MAP } from "@/lib/icons"
 import { toast } from "sonner"
-import { Category, Collection } from "@/types"
+import { Collection } from "@/types"
 
-interface CategoryFormFieldsProps {
-  initialData?: Partial<Category>
-  collections: Collection[]
+interface CollectionFormFieldsProps {
+  initialData?: Partial<Collection>
 }
 
-export function CategoryFormFields({ initialData, collections }: CategoryFormFieldsProps) {
+export function CollectionFormFields({ initialData }: CollectionFormFieldsProps) {
   const [copied, setCopied] = useState(false)
   const [name, setName] = useState(initialData?.name || "")
 
   const copyPrompt = () => {
-    const prompt = `Write a short, professional description for a UI resource category titled "${name}". 
-The description should be concise (max 15 words) and highlight the value for design engineers. 
+    const prompt = `Write a short, professional description for a database collection space titled "${name}". 
+The description should be concise (max 15 words) and highlight the value for curators. 
 Examples: 
-- UI Blocks, Layout Inspiration & Design Showcases
-- Reusable UI Components & Design Systems
-- Animations, Interactions & Effects`
+- Development & Design engineering resource libraries
+- Utilities, Developer Tools & General Workspace bookmarks
+- Curated Media, Blogs & Video Channels`
 
     navigator.clipboard.writeText(prompt)
     setCopied(true)
@@ -44,12 +43,12 @@ Examples:
   return (
     <FieldGroup className="py-2">
       <Field>
-        <FieldLabel htmlFor="slug">Category ID (URL Slug)</FieldLabel>
+        <FieldLabel htmlFor="slug">Collection ID (URL Slug)</FieldLabel>
         <Input
           id="slug"
           name="slug"
           defaultValue={initialData?.slug}
-          placeholder="e.g. ui-library"
+          placeholder="e.g. tools-utilities"
           required
           disabled={!!initialData}
         />
@@ -62,25 +61,9 @@ Examples:
           name="name"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder="e.g. UI Libraries"
+          placeholder="e.g. Tools & Utilities"
           required
         />
-      </Field>
-
-      <Field>
-        <FieldLabel htmlFor="collectionId">Parent Collection</FieldLabel>
-        <Select name="collectionId" defaultValue={initialData?.collectionId || (collections[0]?.slug || "")}>
-          <SelectTrigger id="collectionId" className="w-full">
-            <SelectValue placeholder="Select a collection" />
-          </SelectTrigger>
-          <SelectContent>
-            {collections.map((coll) => (
-              <SelectItem key={coll.slug} value={coll.slug}>
-                {coll.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
       </Field>
 
       <div className="grid grid-cols-2 gap-4">
@@ -96,7 +79,7 @@ Examples:
         </Field>
         <Field>
           <FieldLabel htmlFor="icon">Icon</FieldLabel>
-          <Select name="icon" defaultValue={initialData?.icon || "Rocket"}>
+          <Select name="icon" defaultValue={initialData?.icon || "Code"}>
             <SelectTrigger id="icon" className="w-full">
               <SelectValue placeholder="Select an icon" />
             </SelectTrigger>
@@ -137,7 +120,7 @@ Examples:
           id="description"
           name="description"
           defaultValue={initialData?.description}
-          placeholder="Briefly describe this category..."
+          placeholder="Briefly describe this collection..."
           required
           className="min-h-[80px]"
         />

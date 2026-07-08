@@ -108,8 +108,8 @@ export function TagsContent({ resources, notes, people }: TagsContentProps) {
     const sortedResources = [...rawResources].sort((a, b) => {
       let comparison = 0
       if (sortBy === "alpha") {
-        const titleA = a.title || a.name || ""
-        const titleB = b.title || b.name || ""
+        const titleA = a.title || ""
+        const titleB = b.title || ""
         comparison = titleA.localeCompare(titleB)
       } else if (sortBy === "date") {
         const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0
@@ -121,8 +121,8 @@ export function TagsContent({ resources, notes, people }: TagsContentProps) {
         const countB = b.useCount || 0
         comparison = countA - countB
         if (comparison === 0) {
-          const titleA = a.title || a.name || ""
-          const titleB = b.title || b.name || ""
+          const titleA = a.title || ""
+          const titleB = b.title || ""
           comparison = titleB.localeCompare(titleA)
         }
       }

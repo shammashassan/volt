@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 import { ArrowRightIcon, TrendingUpIcon } from "lucide-react"
 import { Resource } from "@/types"
-import { Resource as DataResource } from "@/lib/data"
+
 
 interface ExploreMobileTabsProps {
   recentlyAdded: Resource[]
@@ -56,7 +56,7 @@ export function ExploreMobileTabs({
         {recentlyAdded.map((resource: Resource) => (
           <ResourceCard
             key={resource.id || resource._id?.toString()}
-            resource={resource as unknown as DataResource}
+            resource={resource}
           />
         ))}
       </TabsContent>
@@ -66,7 +66,7 @@ export function ExploreMobileTabs({
           {recentlyViewed.map((resource: Resource) => (
             <ResourceCard
               key={resource.id || resource._id?.toString()}
-              resource={resource as unknown as DataResource}
+              resource={resource}
             />
           ))}
         </TabsContent>
@@ -78,7 +78,7 @@ export function ExploreMobileTabs({
             {mostUsed.map((res: Resource, idx: number) => (
               <a
                 key={res.id || res._id?.toString()}
-                href={res.url || res.link}
+                href={res.url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center justify-between p-2 rounded-md hover:bg-accent transition-colors group"
@@ -88,7 +88,7 @@ export function ExploreMobileTabs({
                     {String(idx + 1).padStart(2, "0")}
                   </span>
                   <span className="text-sm truncate group-hover:text-primary transition-colors">
-                    {res.title || res.name}
+                    {res.title}
                   </span>
                 </div>
                 <Badge variant="secondary" className="shrink-0 ml-2 tabular-nums">
