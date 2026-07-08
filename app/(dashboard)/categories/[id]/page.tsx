@@ -1,5 +1,7 @@
 import { getResourcesByCategoryId } from "@/lib/queries/resources";
 import { getCategoryById, getCategories } from "@/lib/queries/categories";
+import { getProjects } from "@/lib/queries/projects";
+import { getPeople } from "@/lib/queries/people";
 import { Badge } from "@/components/ui/badge"
 import { FileText } from "lucide-react"
 import { ICON_MAP } from "@/lib/icons"
@@ -72,10 +74,12 @@ async function CategoryPageContent({ categoryId }: CategoryPageContentProps) {
   }
   const userId = session.user.id
 
-  const [category, resources, categories] = await Promise.all([
+  const [category, resources, categories, projects, people] = await Promise.all([
     getCategoryById(categoryId, userId),
     getResourcesByCategoryId(categoryId, userId),
-    getCategories(userId)
+    getCategories(userId),
+    getProjects(userId),
+    getPeople(userId)
   ])
 
   if (!category) {
@@ -124,6 +128,8 @@ async function CategoryPageContent({ categoryId }: CategoryPageContentProps) {
             categories={categories}
             resources={categoryResources}
             isAdmin={isAdmin}
+            projects={projects}
+            people={people}
           />
         </div>
       </section>

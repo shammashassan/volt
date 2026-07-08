@@ -24,17 +24,19 @@ interface CategoryActionsProps {
   categories: any[]
   resources: Resource[]
   isAdmin: boolean
+  projects: any[]
+  people: any[]
 }
 
-export function CategoryActions({ categoryId, categories, resources, isAdmin }: CategoryActionsProps) {
+export function CategoryActions({ categoryId, categories, resources, isAdmin, projects, people }: CategoryActionsProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [editMode, setEditMode] = useState(false)
   const router = useRouter()
 
-  const onSubmit = async (formData: FormData) => {
+  const onSubmit = async (data: any) => {
     setIsLoading(true)
-    const result = await addResourceAction(formData)
+    const result = await addResourceAction(data)
     if (result.success) {
       toast.success("Resource added successfully")
       setIsOpen(false)
@@ -97,6 +99,8 @@ export function CategoryActions({ categoryId, categories, resources, isAdmin }: 
             onSubmit={onSubmit}
             isLoading={isLoading}
             categories={categories}
+            projects={projects}
+            people={people}
           />
         </DialogContent>
       </Dialog>

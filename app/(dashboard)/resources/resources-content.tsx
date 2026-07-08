@@ -3,6 +3,7 @@
 import * as React from "react"
 import { useState, useMemo, useEffect, useRef, useCallback } from "react"
 import { ResourceCard } from "@/components/resources/resource-card"
+import { ResourceForm } from "@/components/resources/resource-form"
 
 // ---------------------------------------------------------------------------
 // Progressive rendering — only mount cards that are near / in the viewport.
@@ -239,20 +240,6 @@ export function ResourcesContent({
   // Delete confirmation state: stores the resource to be deleted
   const [deleteTarget, setDeleteTarget] = useState<Resource | null>(null)
 
-  // Form states (controlled)
-  const [formTitle, setFormTitle] = useState("")
-  const [formUrl, setFormUrl] = useState("")
-  const [formDescription, setFormDescription] = useState("")
-  const [formCategoryId, setFormCategoryId] = useState("none")
-  const [formTags, setFormTags] = useState("")
-  const [formNotes, setFormNotes] = useState("")
-  const [formWhySaved, setFormWhySaved] = useState("")
-  const [formStatus, setFormStatus] = useState<ResourceStatus>("saved")
-  const [formType, setFormType] = useState<ResourceType>("website")
-  const [formFavorite, setFormFavorite] = useState(false)
-  const [formProjectIds, setFormProjectIds] = useState<string[]>([])
-  const [formPersonIds, setFormPersonIds] = useState<string[]>([])
-
   // Refresh local resources when props change
   React.useEffect(() => {
     setResources(initialResources)
@@ -308,30 +295,6 @@ export function ResourcesContent({
   const handleCardClick = React.useCallback(async (resource: Resource) => {
     setSelectedResource(resource)
     setIsCreating(false)
-
-    // Set form fields
-    setFormTitle(resource.title || resource.name || "")
-    setFormUrl(resource.url || resource.link || "")
-    setFormDescription(resource.description || "")
-    {
-      const rawCatId = resource.categoryId || resource.category || "none"
-      // Resolve to whichever value matches a SelectItem (cat._id or cat.id),
-      // since older resources may store the legacy slug-style category id
-      // while categories now expose a Mongo _id as well.
-      const matchedCat = categories.find(
-        (c) => (c._id?.toString() || c.id) === rawCatId || c.id === rawCatId || c._id?.toString() === rawCatId
-      )
-      setFormCategoryId(matchedCat ? (matchedCat.id || matchedCat._id?.toString() || "none") : (rawCatId || "none"))
-    }
-    setFormTags((resource.tags || []).join(", "))
-    setFormNotes(resource.notes || "")
-    setFormWhySaved(resource.whySaved || "")
-    setFormStatus(resource.status || "saved")
-    setFormType(resource.type || "website")
-    setFormFavorite(!!(resource.favorite || resource.featured))
-    setFormProjectIds(resource.projectIds || [])
-    setFormPersonIds(resource.personIds || [])
-
     setIsDialogOpen(true)
 
     // Track view asynchronously
@@ -339,69 +302,20 @@ export function ResourcesContent({
     if (resId) {
       trackResourceViewAction(resId).catch((err) => console.error(err))
     }
-  }, [categories])
+  }, [])
 
   // Open sheet for create
   const handleOpenCreate = () => {
     setSelectedResource(null)
     setIsCreating(true)
-
-    // Reset form fields
-    setFormTitle("")
-    setFormUrl("")
-    setFormDescription("")
-    setFormCategoryId("none")
-    setFormTags("")
-    setFormNotes("")
-    setFormWhySaved("")
-    setFormStatus("saved")
-    setFormType("website")
-    setFormFavorite(false)
-    setFormProjectIds([])
-    setFormPersonIds([])
-
     setIsDialogOpen(true)
   }
 
   // Save changes (Update or Create)
-  const handleSave = async () => {
-    if (!formTitle.trim()) {
-      toast.error("Title is required")
-      return
-    }
-    if (!formUrl.trim()) {
-      toast.error("URL is required")
-      return
-    }
-
+  const handleSave = async (data: any) => {
     setIsSaving(true)
-    const tagsArray = formTags
-      .split(",")
-      .map((t) => t.trim())
-      .filter((t) => t !== "")
-
-    const data: Record<string, unknown> = {
-      title: formTitle,
-      url: formUrl,
-      description: formDescription,
-      categoryId: formCategoryId === "none" ? undefined : formCategoryId,
-      tags: tagsArray,
-      notes: formNotes,
-      whySaved: formWhySaved,
-      status: formStatus,
-      type: formType,
-      favorite: formFavorite,
-      projectIds: formProjectIds,
-      personIds: formPersonIds,
-      // old format compatibility
-      name: formTitle,
-      link: formUrl,
-      category: formCategoryId === "none" ? undefined : formCategoryId,
-      featured: formFavorite,
-    }
-
     if (isCreating) {
-      const result = await addResourceAction(data as unknown as Parameters<typeof addResourceAction>[0])
+      const result = await addResourceAction(data)
       if (result.success) {
         toast.success("Resource created successfully")
         setIsDialogOpen(false)
@@ -589,303 +503,27 @@ export function ResourcesContent({
             }
           }}
         >
-          <form onSubmit={(e) => { e.preventDefault(); handleSave(); }}>
-            <DialogHeader>
-              <DialogTitle>
-                {isCreating ? "Add new resource" : formTitle || "Resource details"}
-              </DialogTitle>
-              <DialogDescription>
-                {isCreating ? "Create a new entry in your knowledge graph." : "Edit parameters and link connections below."}
-              </DialogDescription>
-            </DialogHeader>
+          <DialogHeader>
+            <DialogTitle>
+              {isCreating ? "Add new resource" : selectedResource?.title || selectedResource?.name || "Resource details"}
+            </DialogTitle>
+            <DialogDescription>
+              {isCreating ? "Create a new entry in your knowledge graph." : "Edit parameters and link connections below."}
+            </DialogDescription>
+          </DialogHeader>
 
-            <FieldGroup className="flex-1 flex flex-col gap-5 py-2">
-              {/* Title */}
-              <Field>
-                <FieldLabel>Title</FieldLabel>
-                <Input
-                  placeholder="React Component Library"
-                  value={formTitle}
-                  onChange={(e) => setFormTitle(e.target.value)}
-                  className="bg-background/40"
-                />
-              </Field>
-
-              {/* URL */}
-              <Field>
-                <div className="flex items-center justify-between">
-                  <FieldLabel>URL</FieldLabel>
-                  {formUrl && (() => {
-                    const targetUrl = /^(https?:)?\/\//i.test(formUrl) ? formUrl : `https://${formUrl}`
-                    return (
-                      <a
-                        href={targetUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-[10px] font-bold text-primary flex items-center gap-1 hover:underline"
-                      >
-                        Open Link <ExternalLink className="size-2.5" />
-                      </a>
-                    )
-                  })()}
-                </div>
-                <Input
-                  placeholder="https://example.com"
-                  value={formUrl}
-                  onChange={(e) => setFormUrl(e.target.value)}
-                  className="bg-background/40"
-                />
-              </Field>
-
-              {/* Category, Type, Status & Favorite Row */}
-              <div className="grid grid-cols-2 gap-4">
-                <Field>
-                  <FieldLabel>Category</FieldLabel>
-                  <Select value={formCategoryId} onValueChange={setFormCategoryId}>
-                    <SelectTrigger className="bg-background/40">
-                      <SelectValue placeholder="Select Category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="none">Uncategorized</SelectItem>
-                      {categories.map((cat) => (
-                        <SelectItem key={cat.id || cat._id?.toString()} value={cat.id || cat._id?.toString() || ""}>
-                          {cat.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </Field>
-
-                <Field>
-                  <FieldLabel>Type</FieldLabel>
-                  <Select value={formType} onValueChange={(v) => setFormType(v as ResourceType)}>
-                    <SelectTrigger className="bg-background/40">
-                      <SelectValue placeholder="Select Type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {RESOURCE_TYPES.map((t) => (
-                        <SelectItem key={t.value} value={t.value}>
-                          {t.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </Field>
-
-                <Field>
-                  <FieldLabel>Status</FieldLabel>
-                  <Select value={formStatus} onValueChange={(v) => setFormStatus(v as ResourceStatus)}>
-                    <SelectTrigger className="bg-background/40">
-                      <SelectValue placeholder="Select Status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {STATUS_OPTIONS.map((s) => (
-                        <SelectItem key={s.value} value={s.value}>
-                          {s.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </Field>
-
-                <Field className="flex flex-col justify-end">
-                  <FieldLabel>Favorite</FieldLabel>
-                  <Toggle
-                    id="form-fav"
-                    pressed={formFavorite}
-                    onPressedChange={setFormFavorite}
-                    variant="outline"
-                    className="justify-start px-3 gap-2"
-                  >
-                    <Star className={`size-3.5 ${formFavorite ? "fill-current" : ""}`} />
-                    <span className="text-xs font-medium">Favorite / Star</span>
-                  </Toggle>
-                </Field>
-              </div>
-
-              {/* Description */}
-              <Field>
-                <FieldLabel>Description</FieldLabel>
-                <Textarea
-                  placeholder="A brief summary of the resource..."
-                  value={formDescription}
-                  onChange={(e) => setFormDescription(e.target.value)}
-                  rows={2}
-                  className="bg-background/40"
-                />
-              </Field>
-
-              {/* Why Saved */}
-              <Field>
-                <FieldLabel>Why Saved / Context</FieldLabel>
-                <Textarea
-                  placeholder="Why did you bookmark this? e.g. 'Use for landing page animation'"
-                  value={formWhySaved}
-                  onChange={(e) => setFormWhySaved(e.target.value)}
-                  rows={2}
-                  className="bg-background/40 animate-pulse-slow"
-                />
-              </Field>
-
-              {/* Editable Notes */}
-              <Field>
-                <FieldLabel>Personal Notes</FieldLabel>
-                <Textarea
-                  placeholder="Add rich details, usage code snippets, setup rules..."
-                  value={formNotes}
-                  onChange={(e) => setFormNotes(e.target.value)}
-                  rows={4}
-                  className="bg-background/40 font-mono text-xs"
-                />
-              </Field>
-
-              {/* Tags */}
-              <Field>
-                <FieldLabel>Tags (comma-separated)</FieldLabel>
-                <Input
-                  placeholder="react, tailwind, animation, ui"
-                  value={formTags}
-                  onChange={(e) => setFormTags(e.target.value)}
-                  className="bg-background/40"
-                />
-              </Field>
-
-              {/* Bidirectional Relationships Box */}
-              <div className="flex flex-col gap-4 border border-border/40 rounded-xl p-4 bg-muted/20">
-                {/* Link Projects */}
-                <Field>
-                  <FieldLabel className="flex items-center gap-1">
-                    <Folder className="size-3 text-primary" /> Associated Projects
-                  </FieldLabel>
-                  <Combobox
-                    multiple
-                    autoHighlight
-                    items={projects.map((p) => p._id?.toString() || p.id || "")}
-                    value={formProjectIds}
-                    onValueChange={setFormProjectIds}
-                    filter={(item, query) => {
-                      const proj = projects.find((p) => (p._id?.toString() || p.id) === item)
-                      const name = proj ? (proj.name || "") : item
-                      return name.toLowerCase().includes(query.toLowerCase())
-                    }}
-                  >
-                    <ComboboxChips ref={projectsAnchor} className="w-full">
-                      <ComboboxValue>
-                        {(values: string[]) => (
-                          <React.Fragment>
-                            {values.map((val) => {
-                              const proj = projects.find((p) => (p._id?.toString() || p.id) === val)
-                              return (
-                                <ComboboxChip key={val}>
-                                  {proj ? proj.name : val}
-                                </ComboboxChip>
-                              )
-                            })}
-                            <ComboboxChipsInput placeholder="Link projects..." />
-                          </React.Fragment>
-                        )}
-                      </ComboboxValue>
-                    </ComboboxChips>
-                    <ComboboxContent anchor={projectsAnchor} className="z-50 bg-popover border border-border rounded-lg shadow-md max-h-[300px]">
-                      <ComboboxEmpty>No projects found.</ComboboxEmpty>
-                      <ComboboxList>
-                        {(item: string) => {
-                          const proj = projects.find((p) => (p._id?.toString() || p.id) === item)
-                          return (
-                            <ComboboxItem key={item} value={item}>
-                              {proj ? proj.name : item}
-                            </ComboboxItem>
-                          )
-                        }}
-                      </ComboboxList>
-                    </ComboboxContent>
-                  </Combobox>
-                </Field>
-
-                {/* Link People */}
-                <Field>
-                  <FieldLabel className="flex items-center gap-1">
-                    <User className="size-3 text-blue-500" /> Associated People
-                  </FieldLabel>
-                  <Combobox
-                    multiple
-                    autoHighlight
-                    items={people.map((p) => p._id?.toString() || p.id || "")}
-                    value={formPersonIds}
-                    onValueChange={setFormPersonIds}
-                    filter={(item, query) => {
-                      const person = people.find((p) => (p._id?.toString() || p.id) === item)
-                      const name = person ? (person.name || "") : item
-                      return name.toLowerCase().includes(query.toLowerCase())
-                    }}
-                  >
-                    <ComboboxChips ref={peopleAnchor} className="w-full">
-                      <ComboboxValue>
-                        {(values: string[]) => (
-                          <React.Fragment>
-                            {values.map((val) => {
-                              const person = people.find((p) => (p._id?.toString() || p.id) === val)
-                              return (
-                                <ComboboxChip key={val}>
-                                  {person ? person.name : val}
-                                </ComboboxChip>
-                              )
-                            })}
-                            <ComboboxChipsInput placeholder="Link people..." />
-                          </React.Fragment>
-                        )}
-                      </ComboboxValue>
-                    </ComboboxChips>
-                    <ComboboxContent anchor={peopleAnchor} className="z-50 bg-popover border border-border rounded-lg shadow-md max-h-[300px]">
-                      <ComboboxEmpty>No people found.</ComboboxEmpty>
-                      <ComboboxList>
-                        {(item: string) => {
-                          const person = people.find((p) => (p._id?.toString() || p.id) === item)
-                          return (
-                            <ComboboxItem key={item} value={item}>
-                              {person ? person.name : item}
-                            </ComboboxItem>
-                          )
-                        }}
-                      </ComboboxList>
-                    </ComboboxContent>
-                  </Combobox>
-                </Field>
-              </div>
-            </FieldGroup>
-
-            <DialogFooter>
-              {!isCreating && (
-                <Button
-                  variant="destructive"
-                  onClick={handleDelete}
-                  disabled={isDeleting || isSaving}
-                  type="button"
-                  className="gap-2"
-                >
-                  {isDeleting ? (
-                    <Loader2 className="size-4 animate-spin" />
-                  ) : (
-                    <Trash2 className="size-4" />
-                  )}
-                  Delete
-                </Button>
-              )}
-              <div className="flex items-center gap-2 ml-auto">
-                <Button variant="outline" type="button" onClick={() => setIsDialogOpen(false)}>
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={isSaving || isDeleting} className="gap-2">
-                  {isSaving ? (
-                    <Loader2 className="size-4 animate-spin" />
-                  ) : (
-                    <Save className="size-4" />
-                  )}
-                  {isCreating ? "Create" : "Save Changes"}
-                </Button>
-              </div>
-            </DialogFooter>
-          </form>
+          <ResourceForm
+            key={selectedResource?._id?.toString() || selectedResource?.id || "new"}
+            initialData={selectedResource}
+            categories={categories}
+            projects={projects}
+            people={people}
+            onSubmit={handleSave}
+            isLoading={isSaving}
+            onCancel={() => setIsDialogOpen(false)}
+            onDelete={selectedResource ? handleDelete : undefined}
+            isDeleting={isDeleting}
+          />
         </DialogContent>
       </Dialog>
 
