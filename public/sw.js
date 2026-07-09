@@ -1,7 +1,7 @@
 const CACHE_NAME = 'volt-pwa-cache-v2';
 const ASSETS_TO_CACHE = [
   '/',
-  '/site.webmanifest',
+  '/manifest.webmanifest',
   '/android-chrome-192x192.png',
   '/android-chrome-512x512.png',
   '/file.svg',
