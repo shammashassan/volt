@@ -116,7 +116,36 @@ export async function updateCategoryAction(idOrSlug: string, data: Record<string
       return { success: false, error: "Category not found" };
     }
 
-    await db.collection("categories").updateOne(query, { $set: updateData });
+    if (typeof updateData.order === "number" && updateData.order !== current.order) {
+      const newOrder = updateData.order;
+
+      const otherCategories = await db
+        .collection("categories")
+        .find({ userId: user.id, _id: { $ne: current._id } })
+        .sort({ order: 1, name: 1 })
+        .toArray();
+
+      const newOrderedList = [...otherCategories];
+      const targetIndex = Math.max(0, Math.min(newOrder, otherCategories.length));
+      newOrderedList.splice(targetIndex, 0, current);
+
+      const bulkOps = newOrderedList.map((cat, idx) => {
+        const isCurrent = cat._id.toString() === current._id.toString();
+        const updateFields = isCurrent
+          ? { ...updateData, order: idx }
+          : { order: idx, updatedAt: new Date() };
+        return {
+          updateOne: {
+            filter: { _id: cat._id },
+            update: { $set: updateFields }
+          }
+        };
+      });
+
+      await db.collection("categories").bulkWrite(bulkOps);
+    } else {
+      await db.collection("categories").updateOne(query, { $set: updateData });
+    }
 
     // If slug changed, update all referencing resources
     if (updateData.slug && updateData.slug !== current.slug) {

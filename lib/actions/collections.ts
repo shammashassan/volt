@@ -109,7 +109,36 @@ export async function updateCollectionAction(idOrSlug: string, data: Record<stri
       return { success: false, error: "Collection not found" };
     }
 
-    await db.collection("collections").updateOne(query, { $set: updateData });
+    if (typeof updateData.order === "number" && updateData.order !== current.order) {
+      const newOrder = updateData.order;
+
+      const otherCollections = await db
+        .collection("collections")
+        .find({ userId: user.id, _id: { $ne: current._id } })
+        .sort({ order: 1, name: 1 })
+        .toArray();
+
+      const newOrderedList = [...otherCollections];
+      const targetIndex = Math.max(0, Math.min(newOrder, otherCollections.length));
+      newOrderedList.splice(targetIndex, 0, current);
+
+      const bulkOps = newOrderedList.map((coll, idx) => {
+        const isCurrent = coll._id.toString() === current._id.toString();
+        const updateFields = isCurrent
+          ? { ...updateData, order: idx }
+          : { order: idx, updatedAt: new Date() };
+        return {
+          updateOne: {
+            filter: { _id: coll._id },
+            update: { $set: updateFields }
+          }
+        };
+      });
+
+      await db.collection("collections").bulkWrite(bulkOps);
+    } else {
+      await db.collection("collections").updateOne(query, { $set: updateData });
+    }
 
     // If slug changed, update all referencing categories
     if (updateData.slug && updateData.slug !== current.slug) {

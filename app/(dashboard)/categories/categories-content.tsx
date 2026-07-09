@@ -97,13 +97,16 @@ export function CategoriesContent({
     const formData = new FormData(e.currentTarget)
 
     if (editingCategory) {
-      const data = {
+      const data: Record<string, any> = {
         name: formData.get("name"),
-        slug: formData.get("slug"),
         description: formData.get("description"),
         icon: formData.get("icon"),
         order: parseInt(formData.get("order") as string) || 0,
         collectionId: formData.get("collectionId"),
+      }
+      const slug = formData.get("slug")
+      if (slug) {
+        data.slug = slug
       }
       const categoryId = editingCategory._id?.toString() || editingCategory.slug
       const result = await updateCategoryAction(categoryId, data)
@@ -159,12 +162,15 @@ export function CategoriesContent({
     const formData = new FormData(e.currentTarget)
 
     if (editingCollection) {
-      const data = {
+      const data: Record<string, any> = {
         name: formData.get("name"),
-        slug: formData.get("slug"),
         description: formData.get("description"),
         icon: formData.get("icon"),
         order: parseInt(formData.get("order") as string) || 0,
+      }
+      const slug = formData.get("slug")
+      if (slug) {
+        data.slug = slug
       }
       const collectionId = editingCollection._id?.toString() || editingCollection.slug
       const result = await updateCollectionAction(collectionId, data)
