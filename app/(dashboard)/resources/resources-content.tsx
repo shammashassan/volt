@@ -4,6 +4,7 @@ import * as React from "react"
 import { useState, useMemo, useEffect, useRef, useCallback } from "react"
 import { ResourceCard } from "@/components/resources/resource-card"
 import { ResourceForm } from "@/components/resources/resource-form"
+import { motion, AnimatePresence } from "motion/react"
 
 // DnD Kit imports
 import {
@@ -111,6 +112,7 @@ import {
   Layers,
   ArrowUpDown,
   Check,
+  GripVertical,
 } from "lucide-react"
 
 import { RESOURCE_TYPES } from "@/components/resources/resource-types"
@@ -144,15 +146,12 @@ function SortableCard({ resource, priority, onEdit, onDelete, isDraggingEnabled 
     transition,
     opacity: isDragging ? 0.5 : 1,
     zIndex: isDragging ? 10 : 1,
-    cursor: isDraggingEnabled ? "grab" : "default",
-    touchAction: isDraggingEnabled ? "none" : "auto",
   }
 
   return (
     <div
       ref={setNodeRef}
       style={style}
-      {...(isDraggingEnabled ? { ...attributes, ...listeners } : {})}
       className="relative group transition-shadow"
     >
       <ResourceCard
@@ -163,12 +162,27 @@ function SortableCard({ resource, priority, onEdit, onDelete, isDraggingEnabled 
         disableRedirect={isDraggingEnabled}
       />
       {isDraggingEnabled && (
-        <div className="absolute inset-0 border-2 border-dashed border-primary/40 rounded-2xl pointer-events-none bg-primary/2 flex items-center justify-center">
-          <div className="opacity-0 group-hover:opacity-100 bg-background/90 text-primary border border-border px-2.5 py-1.5 rounded-lg text-xs font-semibold shadow-xs transition-opacity flex items-center gap-1.5">
-            <ArrowUpDown className="size-3.5" />
-            Drag to Reorder
+        <>
+          {/* Visual indicator (dashed border overlay) */}
+          <div className="absolute inset-0 border-2 border-dashed border-primary/40 rounded-2xl pointer-events-none bg-primary/2 flex items-center justify-center">
+            <div className="opacity-0 group-hover:opacity-100 bg-background/90 text-primary border border-border px-2.5 py-1.5 rounded-lg text-xs font-semibold shadow-xs transition-opacity flex items-center gap-1.5">
+              <GripVertical className="size-3.5" />
+              Drag handle to reorder
+            </div>
           </div>
-        </div>
+
+          {/* Dedicated Drag Handle Button */}
+          <button
+            type="button"
+            {...attributes}
+            {...listeners}
+            className="absolute top-2 left-2 flex h-8 w-8 items-center justify-center rounded-lg bg-background/95 hover:bg-background border border-border/60 text-muted-foreground hover:text-foreground active:text-primary transition-all shadow-md cursor-grab active:cursor-grabbing z-50 touch-none"
+            title="Drag to Reorder"
+            aria-label="Drag to Reorder"
+          >
+            <GripVertical className="size-4" />
+          </button>
+        </>
       )}
     </div>
   )
@@ -692,6 +706,37 @@ export function ResourcesContent({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <AnimatePresence>
+        {isReorderActive && (
+          <motion.div
+            initial={{ opacity: 0, y: 50, x: "-50%" }}
+            animate={{ opacity: 1, y: 0, x: "-50%" }}
+            exit={{ opacity: 0, y: 50, x: "-50%" }}
+            transition={{ type: "spring", stiffness: 300, damping: 25 }}
+            className="fixed bottom-6 left-1/2 z-50 flex items-center gap-4 px-4 py-2.5 bg-card/90 backdrop-blur-md border border-primary/20 shadow-xl rounded-full"
+          >
+            <div className="flex items-center gap-2 pl-1.5">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+              </span>
+              <p className="text-xs font-semibold text-foreground/90 whitespace-nowrap">
+                Reordering Active
+              </p>
+            </div>
+            <div className="h-4 w-px bg-border" />
+            <Button
+              size="sm"
+              onClick={() => setIsReorderActive(false)}
+              className="h-8 rounded-full px-4 text-xs font-bold shadow-xs cursor-pointer"
+            >
+              <Check className="size-3.5 mr-1" />
+              Done Ordering
+            </Button>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
