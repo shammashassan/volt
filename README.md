@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://shieldcn.dev/header/glow.svg?title=Volt&subtitle=Personal%20Knowledge%20Operating%20System&theme=zinc&logo=command" alt="Volt Header Banner" width="100%" />
+  <img src="public/readme-banner.svg" alt="Volt Header Banner" width="100%" />
 </p>
 
 <p align="center">
