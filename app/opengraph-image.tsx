@@ -44,7 +44,6 @@ export default function Image() {
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            zIndex: 10,
           }}
         >
           {/* Logo Mark (Volt symbol) */}
@@ -119,13 +118,12 @@ export default function Image() {
             right: '0',
             display: 'flex',
             justifyContent: 'center',
-            color: '#3f3f46',
-            fontSize: '14px',
+            color: '#52525b',
+            fontSize: '16px',
             fontWeight: 500,
-            letterSpacing: '0.08em',
+            letterSpacing: '0.05em',
             textTransform: 'uppercase',
             fontFamily: 'system-ui, -apple-system, sans-serif',
-            zIndex: 10,
           }}
         >
           ui-volt.vercel.app
