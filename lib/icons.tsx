@@ -44,6 +44,10 @@ import {
   Image,
   Music,
   Code2,
+  BarChart3,
+  Camera,
+  Brush,
+  PenTool,
   type LucideIcon
 } from "lucide-react"
 import * as React from "react"
@@ -110,7 +114,11 @@ export const ICON_MAP: Record<string, LucideIcon> = {
   Image,
   Music,
   Code2,
-  Github
+  Github,
+  BarChart3,
+  Camera,
+  Brush,
+  PenTool,
 }
 
 export const ICON_LABELS = Object.keys(ICON_MAP).sort().map(key => ({
