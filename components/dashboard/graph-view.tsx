@@ -626,10 +626,6 @@ export function GraphView({ data }: { data: GraphData }) {
         }
       })
 
-      // 2. Draw Nodes
-      const totalActiveNodes = activeNodes.length
-      const zoom = state.transform.scale
-
       activeNodes.forEach((node) => {
         const visual = node.visual || {
           scale: 1.0,
