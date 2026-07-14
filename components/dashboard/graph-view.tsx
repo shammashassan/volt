@@ -701,7 +701,7 @@ export function GraphView({ data }: { data: GraphData }) {
         if (iconPath) {
           ctx.save()
           ctx.translate(node.x, node.y)
-          const iconScale = (R_inner * 0.48) / 24
+          const iconScale = (R_inner * 0.96) / 24
           ctx.scale(iconScale, iconScale)
           ctx.translate(-12, -12)
 
@@ -1059,7 +1059,7 @@ export function GraphView({ data }: { data: GraphData }) {
               >
                 {Object.keys(filters).map((type) => {
                   const Icon = TYPE_ICONS[type as keyof typeof TYPE_ICONS] || FileText
-                  const theme = isDark ? GRAPH_THEME.dark : GRAPH_THEME.light
+                  const theme = (mounted && isDark) ? GRAPH_THEME.dark : GRAPH_THEME.light
                   const typeConfig = theme.nodeTypes[type as keyof typeof theme.nodeTypes] || theme.nodeTypes.note
                   const color = typeConfig.color
                   const isSelected = filters[type]
