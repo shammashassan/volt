@@ -447,19 +447,25 @@ export function GraphView({ data }: { data: GraphData }) {
     return () => canvas.removeEventListener("wheel", onWheel)
   }, [mounted])
 
-  // Main rendering and animation loop
+  // Handle resize and fullscreen change events once on mount
   useEffect(() => {
-    let animationFrameId: number
-
     const handleResize = () => {
       const canvas = canvasRef.current
       const container = containerRef.current
       if (!canvas || !container) return
 
-      canvas.width = container.clientWidth
-      canvas.height = container.clientHeight
-      stateRef.current.width = container.clientWidth
-      stateRef.current.height = container.clientHeight
+      const width = container.clientWidth
+      const height = container.clientHeight
+      const dpr = window.devicePixelRatio || 1
+
+      canvas.width = width * dpr
+      canvas.height = height * dpr
+      canvas.style.width = `${width}px`
+      canvas.style.height = `${height}px`
+
+      stateRef.current.width = width
+      stateRef.current.height = height
+      stateRef.current.alpha = 0.2 // reheat slightly on resize
     }
 
     const handleFullscreenChange = () => {
@@ -469,7 +475,19 @@ export function GraphView({ data }: { data: GraphData }) {
 
     window.addEventListener("resize", handleResize)
     document.addEventListener("fullscreenchange", handleFullscreenChange)
+    
+    // Initial call to configure size on mount
     handleResize()
+
+    return () => {
+      window.removeEventListener("resize", handleResize)
+      document.removeEventListener("fullscreenchange", handleFullscreenChange)
+    }
+  }, [])
+
+  // Main rendering and animation loop
+  useEffect(() => {
+    let animationFrameId: number
 
     const render = () => {
       const canvas = canvasRef.current
@@ -504,10 +522,12 @@ export function GraphView({ data }: { data: GraphData }) {
         state.alpha *= 0.97 // decay / cooling rate
       }
 
-      // Clear Canvas
-      ctx.clearRect(0, 0, state.width, state.height)
+      // Clear Canvas using physical dimensions
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
 
       ctx.save()
+      const dpr = window.devicePixelRatio || 1
+      ctx.scale(dpr, dpr)
       // Apply pan & zoom transform matrix
       ctx.translate(state.transform.x, state.transform.y)
       ctx.scale(state.transform.scale, state.transform.scale)
@@ -622,11 +642,9 @@ export function GraphView({ data }: { data: GraphData }) {
     render()
 
     return () => {
-      window.removeEventListener("resize", handleResize)
-      document.removeEventListener("fullscreenchange", handleFullscreenChange)
       cancelAnimationFrame(animationFrameId)
     }
-  }, [filters, isDark, hoveredNode, selectedNode, searchQuery, isFullscreen])
+  }, [filters, isDark, hoveredNode, selectedNode, searchQuery])
 
 
 
