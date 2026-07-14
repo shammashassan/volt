@@ -178,13 +178,6 @@ export class ReminderService {
     bus.publish('reminder.due', { reminderId: id, userId: reminder.userId });
   }
 
-  public static async cleanupOldReminders(): Promise<number> {
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    console.log(`[Scheduler] Purging completed reminders older than ${thirtyDaysAgo.toISOString()}`);
-    return this.repo.hardDeleteCompleted(thirtyDaysAgo);
-  }
-
   public static async processDueReminders(): Promise<number> {
     const now = new Date();
     const due = await this.repo.findDue(now);

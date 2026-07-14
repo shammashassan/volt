@@ -48,12 +48,23 @@ import {
 import { cn } from "@/lib/utils"
 import { GraphData, GraphNode } from "@/lib/actions/graph"
 
+interface NodeVisualState {
+  scale: number;
+  targetScale: number;
+  glow: number;
+  targetGlow: number;
+  opacity: number;
+  targetOpacity: number;
+  pulse: number;
+}
+
 interface SimulationNode extends GraphNode {
   x: number;
   y: number;
   vx: number;
   vy: number;
   radius: number;
+  visual?: NodeVisualState;
 }
 
 interface SimulationLink {
@@ -70,6 +81,42 @@ const TYPE_COLORS = {
   resource: { light: "#0ea5e9", dark: "#38bdf8", label: "Resource", icon: BookOpen },
 }
 
+const GRAPH_THEME = {
+  light: {
+    background: "#ffffff",
+    text: "#09090b",
+    edge: "rgba(9, 9, 11, 0.08)",
+    selection: "#000000",
+    nodeTypes: {
+      category: { color: "#059669", accent: "#34d399", label: "Category" },
+      project: { color: "#7c3aed", accent: "#a78bfa", label: "Project" },
+      person: { color: "#e11d48", accent: "#fb7185", label: "Person" },
+      note: { color: "#d97706", accent: "#fb923c", label: "Note" },
+      resource: { color: "#0284c7", accent: "#38bdf8", label: "Resource" },
+    }
+  },
+  dark: {
+    background: "#09090b",
+    text: "#fafafa",
+    edge: "rgba(250, 250, 250, 0.08)",
+    selection: "#ffffff",
+    nodeTypes: {
+      category: { color: "#34d399", accent: "#059669", label: "Category" },
+      project: { color: "#a78bfa", accent: "#7c3aed", label: "Project" },
+      person: { color: "#fb7185", accent: "#e11d48", label: "Person" },
+      note: { color: "#fb923c", accent: "#d97706", label: "Note" },
+      resource: { color: "#38bdf8", accent: "#0284c7", label: "Resource" },
+    }
+  }
+};
+
+function hexToRgba(hex: string, alpha: number): string {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
 export function GraphView({ data }: { data: GraphData }) {
   const router = useRouter()
   const { resolvedTheme } = useTheme()
@@ -77,6 +124,19 @@ export function GraphView({ data }: { data: GraphData }) {
 
   const containerRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const iconCacheRef = useRef<Record<string, Path2D> | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      iconCacheRef.current = {
+        category: new Path2D("M 12 3 L 20 7 L 12 11 L 4 7 Z M 4 12 L 12 16 L 20 12 M 4 17 L 12 21 L 20 17"),
+        project: new Path2D("M 4 4 H 20 V 20 H 4 Z M 4 9 H 20 M 9 4 V 20 M 15 4 V 20"),
+        person: new Path2D("M 12 8 A 3.5 3.5 0 1 0 12 1 A 3.5 3.5 0 1 0 12 8 Z M 4 20 C 4 15 8 13 12 13 C 16 13 20 15 20 20"),
+        note: new Path2D("M 5 3 H 14 L 19 8 V 21 H 5 Z M 14 3 V 8 H 19 M 8 12 H 16 M 8 16 H 13"),
+        resource: new Path2D("M 10 14 A 3.5 3.5 0 0 0 15 14 L 18 11 A 3.5 3.5 0 0 0 13 6 L 11.5 7.5 M 14 10 A 3.5 3.5 0 0 0 9 10 L 6 13 A 3.5 3.5 0 0 0 11 18 L 12.5 16.5")
+      };
+    }
+  }, []);
 
   // Simulation physics parameters
   const kRepulsion = 45000
@@ -313,6 +373,15 @@ export function GraphView({ data }: { data: GraphData }) {
         vx: 0,
         vy: 0,
         radius: n.val * 8 + 8, // node size based on val
+        visual: {
+          scale: 1.0,
+          targetScale: 1.0,
+          glow: 0.0,
+          targetGlow: 0.0,
+          opacity: 1.0,
+          targetOpacity: 1.0,
+          pulse: 1.0
+        }
       }
     })
 

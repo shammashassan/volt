@@ -57,14 +57,6 @@ export class ReminderRepository {
     const res = await col.deleteOne(query);
     return res.deletedCount > 0;
   }
-
-  async hardDeleteCompleted(olderThan: Date): Promise<number> {
-    const col = await this.getCollection();
-    const res = await col.deleteMany({
-      status: 'completed',
-      updatedAt: { $lte: olderThan }
-    });
-    return res.deletedCount;
-  }
 }
+
 

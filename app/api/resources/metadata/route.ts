@@ -48,13 +48,34 @@ export async function GET(request: Request) {
                        html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+name=["']description["']/i)
     const description = ogDescMatch ? ogDescMatch[1] : (descMatch ? descMatch[1] : "")
 
-    // 3. Reliable Favicon service
+    // 3. Regex parse for Preview Image (OG/Twitter)
+    const ogImageMatch = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i) || 
+                          html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i)
+    const twitterImageMatch = html.match(/<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)["']/i) || 
+                              html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+name=["']twitter:image["']/i)
+    const imageUrl = (ogImageMatch ? ogImageMatch[1] : (twitterImageMatch ? twitterImageMatch[1] : "")).trim()
+
+    let resolvedImageUrl = imageUrl
+    if (imageUrl && !/^https?:\/\//i.test(imageUrl)) {
+      try {
+        if (imageUrl.startsWith("/")) {
+          resolvedImageUrl = `${urlObj.protocol}//${urlObj.host}${imageUrl}`
+        } else {
+          resolvedImageUrl = `${urlObj.protocol}//${urlObj.host}/${imageUrl}`
+        }
+      } catch {
+        // ignore resolving error
+      }
+    }
+
+    // 4. Reliable Favicon service
     const faviconUrl = `https://www.google.com/s2/favicons?sz=64&domain=${urlObj.hostname}`
 
     return NextResponse.json({
       title: title.trim() || urlObj.hostname.replace("www.", ""),
       description: description.trim() || "No description available",
       faviconUrl,
+      imageUrl: resolvedImageUrl,
     })
   } catch (error) {
     // Fallback if fetch completely fails (e.g. invalid domain name)
@@ -64,12 +85,14 @@ export async function GET(request: Request) {
         title: urlObj.hostname.replace("www.", ""),
         description: "No preview description available",
         faviconUrl: `https://www.google.com/s2/favicons?sz=64&domain=${urlObj.hostname}`,
+        imageUrl: "",
       })
     } catch {
       return NextResponse.json({
         title: "Saved Resource",
         description: "No preview description available",
         faviconUrl: "",
+        imageUrl: "",
       })
     }
   }

@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { JobRegistry, Job } from '@/lib/services/automation-registry';
 import { ReminderService } from '@/lib/services/reminder.service';
-import { NotificationService } from '@/lib/services/notification.service';
 import { WatchlistService } from '@/lib/services/watchlist.service';
 import { SchedulerService } from '@/lib/scheduler/scheduler.service';
 import { getDb } from '@/lib/db';
@@ -84,16 +83,6 @@ class RetryFailedSchedulesJob implements Job {
   }
 }
 
-class CleanupJob implements Job {
-  name = 'CleanupJob';
-  priority = 4;
-  async run() {
-    const notificationsPurged = await NotificationService.purgeOldNotifications();
-    const remindersPurged = await ReminderService.cleanupOldReminders();
-    return { itemsProcessed: notificationsPurged + remindersPurged };
-  }
-}
-
 export async function GET(req: NextRequest) {
   try {
     const authHeader = req.headers.get('authorization');
@@ -108,8 +97,7 @@ export async function GET(req: NextRequest) {
     const registry = new JobRegistry([
       new ReminderJob(),
       new WatchlistSyncJob(),
-      new RetryFailedSchedulesJob(),
-      new CleanupJob()
+      new RetryFailedSchedulesJob()
     ]);
 
     const results = await registry.runAll();

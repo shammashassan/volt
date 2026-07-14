@@ -40,10 +40,5 @@ export class NotificationService {
   public static async deleteNotification(id: string, userId: UserId): Promise<boolean> {
     return this.repo.softDelete(id, userId);
   }
-
-  public static async purgeOldNotifications(): Promise<number> {
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    return this.repo.hardDeleteExpired(thirtyDaysAgo);
-  }
 }
+

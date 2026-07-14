@@ -1,13 +1,14 @@
 "use client"
 
 import * as React from "react"
-import { useMemo, useState, useEffect, useCallback } from "react"
+import { useMemo, useState, useEffect, useCallback, useRef } from "react"
 import Image from "next/image"
 import { Card, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
-import { ExternalLinkIcon, PencilIcon, Trash2Icon } from "lucide-react"
+import { ExternalLinkIcon, PencilIcon, Trash2Icon, Globe } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { trackResourceViewAction, useResourceAction } from "@/lib/actions"
+import { getResourceTypeInfo } from "./resource-types"
 
 // Minimum data structure a resource must have to be rendered by ResourceCard
 export interface ResourceCardData {
@@ -16,6 +17,7 @@ export interface ResourceCardData {
   description: string
   id?: string
   _id?: unknown
+  type?: string
 }
 
 interface ResourceCardProps<T> {
@@ -64,105 +66,147 @@ function getFallbackImage(name: string): string {
 const MAX_MICROLINK_RETRIES = 4
 const RETRY_BASE_DELAY_MS = 3000
 
-function useScreenshot<T extends ResourceCardData>(resource: T) {
+const GRADIENTS = [
+  "from-blue-600 to-indigo-700",
+  "from-violet-600 to-purple-700",
+  "from-pink-600 to-rose-700",
+  "from-emerald-600 to-teal-700",
+  "from-amber-500 to-orange-700",
+]
+
+function getGradient(title: string) {
+  let hash = 0
+  for (let i = 0; i < title.length; i++) {
+    hash = title.charCodeAt(i) + ((hash << 5) - hash)
+  }
+  const index = Math.abs(hash) % GRADIENTS.length
+  return GRADIENTS[index]
+}
+
+function getInitials(title: string): string {
+  const cleanTitle = title.replace(/^(https?:\/\/)?(www\.)?/, "").trim()
+  if (!cleanTitle) return "R"
+  const parts = cleanTitle.split(/[\s\-_.\/]+/).filter(Boolean)
+  if (parts.length === 0) return "R"
+  if (parts.length === 1) {
+    return parts[0].slice(0, 2).toUpperCase()
+  }
+  return (parts[0][0] + (parts[1]?.[0] || "")).toUpperCase()
+}
+
+function useScreenshot<T extends ResourceCardData>(resource: T, shouldLoad: boolean) {
   const normalizedUrl = useMemo(() => normalizeUrl(resource.url || ""), [resource.url])
 
   const previewUrl = useMemo(() => {
     return getPreviewUrl(normalizedUrl, resource.title)
   }, [normalizedUrl, resource.title])
 
-  const [imgSrc, setImgSrc] = useState(previewUrl)
+  const [imgSrc, setImgSrc] = useState("")
   const [isLoading, setIsLoading] = useState(true)
+  const [isRetrying, setIsRetrying] = useState(false)
+  // 0 = metadata (fetching), 1 = microlink, 2 = wp.com/mshots, 3 = css fallback
+  const [stage, setStage] = useState(0)
 
-  // Tracks which fallback stage we are on:
-  //   0 = microlink (retrying), 1 = wp.com/mshots, 2 = avatar (final)
-  const fallbackStage = React.useRef(0)
-  // How many times we've retried the current Microlink URL
-  const retryCount = React.useRef(0)
-  const retryTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null)
+  const retryTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  // React standard pattern to sync state when preview URL changes
+  // React standard pattern to sync state when preview URL changes or shouldLoad becomes true
   useEffect(() => {
-    // Reset everything when the URL changes
+    if (!shouldLoad) return
+
+    let active = true
     if (retryTimer.current) clearTimeout(retryTimer.current)
-    fallbackStage.current = 0
-    retryCount.current = 0
-    setImgSrc(previewUrl)
-    setIsLoading(true)
-  }, [previewUrl])
 
-  // Cleanup timer on unmount
-  useEffect(() => {
+    // Reset everything when the URL changes or shouldLoad becomes true
+    setIsLoading(true)
+    setIsRetrying(false)
+    setStage(0)
+
+    const fetchMetadata = async () => {
+      try {
+        const res = await fetch(`/api/resources/metadata?url=${encodeURIComponent(normalizedUrl)}`)
+        if (!active) return
+
+        if (res.ok) {
+          const data = await res.json()
+          if (data.imageUrl) {
+            setImgSrc(data.imageUrl)
+            return
+          }
+        }
+      } catch (err) {
+        console.error("Metadata fetch failed", err)
+      }
+
+      // No imageUrl found or fetch failed -> go to Stage 1 (Microlink)
+      if (active) {
+        setStage(1)
+        setImgSrc(previewUrl)
+      }
+    }
+
+    void fetchMetadata()
+
     return () => {
+      active = false
       if (retryTimer.current) clearTimeout(retryTimer.current)
     }
-  }, [])
+  }, [previewUrl, normalizedUrl, shouldLoad])
 
   const handleLoad = useCallback(() => {
     setIsLoading(false)
+    setIsRetrying(false)
   }, [])
 
   const handleError = useCallback(() => {
+    if (!shouldLoad) return
     if (retryTimer.current) clearTimeout(retryTimer.current)
 
-    if (fallbackStage.current === 0) {
-      // Stage 0: Microlink — retry with exponential backoff before giving up
-      if (retryCount.current < MAX_MICROLINK_RETRIES) {
-        const delay = RETRY_BASE_DELAY_MS * Math.pow(2, retryCount.current)
-        retryCount.current += 1
-        retryTimer.current = setTimeout(() => {
-          // Bust the cache by appending a timestamp so the browser re-fetches
-          setImgSrc(
-            `${previewUrl}&_retry=${retryCount.current}`
-          )
-        }, delay)
-      } else {
-        // Microlink exhausted → try wp.com/mshots
-        fallbackStage.current = 1
-        retryCount.current = 0
-        if (normalizedUrl) {
-          setImgSrc(
-            `https://s0.wp.com/mshots/v1/${encodeURIComponent(normalizedUrl)}?w=600&h=400`
-          )
+    // Set retrying state to true immediately to hide the broken image icon
+    setIsRetrying(true)
+
+    retryTimer.current = setTimeout(() => {
+      setIsRetrying(false)
+
+      setStage((prevStage) => {
+        const nextStage = prevStage + 1
+        if (nextStage === 1) {
+          // Move from OG Image -> Microlink
+          setImgSrc(previewUrl)
+        } else if (nextStage === 2) {
+          // Move from Microlink -> WordPress Mshots
+          if (normalizedUrl) {
+            setImgSrc(
+              `https://s0.wp.com/mshots/v1/${encodeURIComponent(normalizedUrl)}?w=600&h=400`
+            )
+          } else {
+            setIsLoading(false)
+            return 3
+          }
         } else {
-          fallbackStage.current = 2
-          setImgSrc(getFallbackImage(resource.title))
+          // Move to CSS fallback
           setIsLoading(false)
+          return 3
         }
-      }
-    } else if (fallbackStage.current === 1) {
-      // Stage 1: wp.com/mshots failed — retry once after a delay, then avatar
-      if (retryCount.current === 0 && normalizedUrl) {
-        retryCount.current = 1
-        retryTimer.current = setTimeout(() => {
-          setImgSrc(
-            `https://s0.wp.com/mshots/v1/${encodeURIComponent(normalizedUrl)}?w=600&h=400&_retry=1`
-          )
-        }, RETRY_BASE_DELAY_MS)
-      } else {
-        fallbackStage.current = 2
-        setImgSrc(getFallbackImage(resource.title))
-        setIsLoading(false)
-      }
-    } else {
-      // Stage 2: Final avatar fallback — nothing more to try
-      setImgSrc(getFallbackImage(resource.title))
-      setIsLoading(false)
-    }
-  }, [previewUrl, normalizedUrl, resource.title])
+        return nextStage
+      })
+    }, 150)
+  }, [previewUrl, normalizedUrl, shouldLoad])
 
   // Check if image is already completed (cached) when source or ref changes
   const [imgElement, setImgElement] = useState<HTMLImageElement | null>(null)
 
   useEffect(() => {
+    if (!shouldLoad) return
     if (imgElement && imgElement.complete) {
       setIsLoading(false)
+      setIsRetrying(false)
     }
-  }, [imgElement, imgSrc])
+  }, [imgElement, imgSrc, shouldLoad])
 
   return {
-    imgSrc,
-    isLoading,
+    imgSrc: isRetrying ? "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" : imgSrc,
+    isLoading: (isLoading || isRetrying) && stage < 3,
+    hasError: stage === 3,
     handleLoad,
     handleError,
     setImgElement,
@@ -274,7 +318,58 @@ const ResourceCardComponent = function ResourceCardComponent<
     [targetUrl]
   )
 
-  const { imgSrc, isLoading, handleLoad, handleError, setImgElement } = useScreenshot(resource)
+  const [hasBeenVisible, setHasBeenVisible] = useState(priority)
+  const containerRef = useRef<HTMLElement | null>(null)
+
+  useEffect(() => {
+    if (priority) return
+
+    const el = containerRef.current
+    if (!el) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          setHasBeenVisible(true)
+          observer.disconnect()
+        }
+      },
+      { rootMargin: "200px" }
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [priority])
+
+  const { imgSrc, isLoading, hasError, handleLoad, handleError, setImgElement } = useScreenshot(resource, hasBeenVisible)
+
+  const typeInfo = getResourceTypeInfo(resource.type || "website")
+  const TypeIcon = typeInfo?.icon || Globe
+
+  const fallbackCard = (
+    <div className={cn(
+      "absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br text-white font-bold p-4 select-none",
+      getGradient(resource.title)
+    )}>
+      {/* Icon in top-left */}
+      <div className="absolute top-3 left-3 flex h-7 w-7 items-center justify-center rounded-lg bg-white/10 backdrop-blur-xs text-white/90">
+        <TypeIcon className="size-4" />
+      </div>
+      {/* Initials */}
+      <div className="text-3xl tracking-wide font-black drop-shadow-xs opacity-90">
+        {getInitials(resource.title)}
+      </div>
+      {/* Domain text */}
+      <div className="absolute bottom-3 left-3 text-[10px] uppercase tracking-wider font-semibold opacity-60">
+        {(() => {
+          try {
+            return new URL(normalizeUrl(resource.url || "")).hostname.replace("www.", "")
+          } catch {
+            return ""
+          }
+        })()}
+      </div>
+    </div>
+  )
 
   const resourceId = resource.id || (resource._id as string | undefined)?.toString()
   const handleTrack = useCallback(() => {
@@ -287,25 +382,28 @@ const ResourceCardComponent = function ResourceCardComponent<
   const content = (
     <Card className="relative h-full overflow-hidden p-0 border-border/40 bg-card/60 transition-[border-color,background-color,shadow,transform] duration-300 hover:border-primary/20 hover:bg-card hover:shadow-lg hover:shadow-primary/5 will-change-[transform,shadow]">
       <div className="relative aspect-video w-full overflow-hidden bg-muted/30 will-change-transform">
-        {isLoading && (
+        {(isLoading || !hasBeenVisible) && (
           <Skeleton className="absolute inset-0 rounded-none z-40" />
         )}
-        <Image
-          ref={setImgElement}
-          src={imgSrc}
-          alt={resource.title}
-          width={600}
-          height={400}
-          className={cn(
-            "h-full w-full object-cover transition-all duration-500 group-hover:scale-105",
-            isLoading ? "opacity-0" : "opacity-100"
-          )}
-          onLoad={handleLoad}
-          onError={handleError}
-          unoptimized={true}
-          priority={priority}
-          loading={priority ? undefined : "lazy"}
-        />
+        {hasBeenVisible && !hasError && (
+          <Image
+            ref={setImgElement}
+            src={imgSrc || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"}
+            alt={resource.title}
+            width={600}
+            height={400}
+            className={cn(
+              "h-full w-full object-cover transition-all duration-500 group-hover:scale-105",
+              isLoading ? "opacity-0" : "opacity-100"
+            )}
+            onLoad={handleLoad}
+            onError={handleError}
+            unoptimized={true}
+            priority={priority}
+            loading={priority ? undefined : "lazy"}
+          />
+        )}
+        {hasError && fallbackCard}
 
         <ResourceCardOverlay
           targetUrl={targetUrl}
@@ -330,6 +428,7 @@ const ResourceCardComponent = function ResourceCardComponent<
   if (onClick) {
     return (
       <div
+        ref={containerRef as any}
         onClick={(e) => {
           handleTrack()
           onClick(e)
@@ -343,7 +442,7 @@ const ResourceCardComponent = function ResourceCardComponent<
 
   if (disableRedirect) {
     return (
-      <div className="block group h-full focus-visible:outline-hidden">
+      <div ref={containerRef as any} className="block group h-full focus-visible:outline-hidden">
         {content}
       </div>
     )
@@ -351,6 +450,7 @@ const ResourceCardComponent = function ResourceCardComponent<
 
   return (
     <a
+      ref={containerRef as any}
       {...externalProps}
       onClick={handleTrack}
       className="block group h-full focus-visible:outline-hidden"

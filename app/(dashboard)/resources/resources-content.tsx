@@ -31,7 +31,7 @@ const BATCH_SIZE = 24
 
 function useVirtualizedItems<T>(items: T[]) {
   const [visibleCount, setVisibleCount] = useState(BATCH_SIZE)
-  const sentinelRef = useRef<HTMLDivElement | null>(null)
+  const observerRef = useRef<IntersectionObserver | null>(null)
 
   useEffect(() => {
     setVisibleCount(BATCH_SIZE)
@@ -41,18 +41,36 @@ function useVirtualizedItems<T>(items: T[]) {
     setVisibleCount((prev) => Math.min(prev + BATCH_SIZE, items.length))
   }, [items.length])
 
+  const sentinelRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (observerRef.current) {
+        observerRef.current.disconnect()
+        observerRef.current = null
+      }
+
+      if (node) {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            if (entries[0]?.isIntersecting) {
+              loadMore()
+            }
+          },
+          { rootMargin: "400px" }
+        )
+        observer.observe(node)
+        observerRef.current = observer
+      }
+    },
+    [loadMore]
+  )
+
   useEffect(() => {
-    const el = sentinelRef.current
-    if (!el) return
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0]?.isIntersecting) loadMore()
-      },
-      { rootMargin: "400px" }
-    )
-    observer.observe(el)
-    return () => observer.disconnect()
-  }, [loadMore])
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect()
+      }
+    }
+  }, [])
 
   return {
     visibleItems: items.slice(0, visibleCount),

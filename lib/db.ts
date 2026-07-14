@@ -126,7 +126,20 @@ export const getDb = cache(async () => {
       // Watchlist indexes
       db.collection("watchlist").createIndex({ userId: 1, source: 1, externalId: 1 }, { unique: true }),
       db.collection("watchlist").createIndex({ userId: 1, status: 1, type: 1 }),
-      db.collection("watchlist").createIndex({ userId: 1, updatedAt: -1 })
+      db.collection("watchlist").createIndex({ userId: 1, updatedAt: -1 }),
+
+      // Notifications TTL indexes
+      db.collection("notifications").createIndex({ deletedAt: 1 }, { expireAfterSeconds: 2592000 }),
+      db.collection("notifications").createIndex({ readAt: 1 }, { expireAfterSeconds: 2592000 }),
+
+      // Reminders Partial TTL index (expires 30 days after updated/completed)
+      db.collection("reminders").createIndex(
+        { updatedAt: 1 },
+        { 
+          expireAfterSeconds: 2592000, 
+          partialFilterExpression: { status: "completed" } 
+        }
+      )
     ]).catch(err => console.error("Error ensuring database indexes:", err));
 
     globalWithIndexes._mongoIndexesEnsured = true;

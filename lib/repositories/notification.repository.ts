@@ -59,15 +59,5 @@ export class NotificationRepository {
     );
     return res.modifiedCount > 0;
   }
-
-  async hardDeleteExpired(olderThan: Date): Promise<number> {
-    const col = await this.getCollection();
-    const res = await col.deleteMany({
-      $or: [
-        { deletedAt: { $lte: olderThan } },
-        { createdAt: { $lte: olderThan } } // 90 days retention limits
-      ]
-    });
-    return res.deletedCount;
-  }
 }
+
