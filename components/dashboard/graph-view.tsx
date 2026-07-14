@@ -73,12 +73,12 @@ interface SimulationLink {
   type: string;
 }
 
-const TYPE_COLORS = {
-  category: { light: "#10b981", dark: "#34d399", label: "Category", icon: Layers },
-  project: { light: "#8b5cf6", dark: "#a78bfa", label: "Project", icon: FolderKanban },
-  person: { light: "#f43f5e", dark: "#fb7185", label: "Person", icon: User },
-  note: { light: "#f97316", dark: "#fb923c", label: "Note", icon: FileText },
-  resource: { light: "#0ea5e9", dark: "#38bdf8", label: "Resource", icon: BookOpen },
+const TYPE_ICONS = {
+  category: Layers,
+  project: FolderKanban,
+  person: User,
+  note: FileText,
+  resource: BookOpen,
 }
 
 const GRAPH_THEME = {
@@ -122,6 +122,7 @@ export function GraphView({ data }: { data: GraphData }) {
   const { resolvedTheme } = useTheme()
   const isDark = resolvedTheme === "dark"
 
+
   const containerRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const iconCacheRef = useRef<Record<string, Path2D> | null>(null);
@@ -155,6 +156,11 @@ export function GraphView({ data }: { data: GraphData }) {
   const [searchQuery, setSearchQuery] = useState("")
   const [hoveredNode, setHoveredNode] = useState<SimulationNode | null>(null)
   const [selectedNode, setSelectedNode] = useState<SimulationNode | null>(null)
+
+  const tooltipTheme = isDark ? GRAPH_THEME.dark : GRAPH_THEME.light
+  const tooltipTypeConfig = hoveredNode
+    ? (tooltipTheme.nodeTypes[hoveredNode.type as keyof typeof tooltipTheme.nodeTypes] || tooltipTheme.nodeTypes.note)
+    : null
   const [mounted, setMounted] = useState(false)
   const [isTouchDevice, setIsTouchDevice] = useState(false)
   const [isFullscreen, setIsFullscreen] = useState(false)
@@ -497,11 +503,8 @@ export function GraphView({ data }: { data: GraphData }) {
       if (!canvas || !ctx) return
 
       // Compute active/filtered nodes and links
-      const activeNodes = state.nodes.filter((n) => filters[n.type])
-      const activeNodeIds = new Set(activeNodes.map((n) => n.id))
-      const activeLinks = state.links.filter(
-        (l) => activeNodeIds.has(l.source.id) && activeNodeIds.has(l.target.id)
-      )
+      const activeNodes = state.nodes;
+      const activeLinks = state.links;
 
       // Update visual animations and state mapping
       activeNodes.forEach((node) => {
@@ -594,11 +597,12 @@ export function GraphView({ data }: { data: GraphData }) {
           (selectedNode && (link.source.id === selectedNode.id || link.target.id === selectedNode.id))
 
         if (!isHighlighted) {
-          const opacity = hasActiveFocus ? 0.02 : 0.08
+          const nodeOpacity = Math.min(link.source.visual?.opacity ?? 1.0, link.target.visual?.opacity ?? 1.0);
+          const edgeOpacity = (hasActiveFocus ? 0.02 : 0.08) * nodeOpacity;
           ctx.beginPath()
           ctx.moveTo(link.source.x, link.source.y)
           ctx.lineTo(link.target.x, link.target.y)
-          ctx.strokeStyle = isDark ? `rgba(255, 255, 255, ${opacity})` : `rgba(0, 0, 0, ${opacity})`
+          ctx.strokeStyle = isDark ? `rgba(255, 255, 255, ${edgeOpacity})` : `rgba(0, 0, 0, ${edgeOpacity})`
           ctx.lineWidth = baseLineWidth
           ctx.stroke()
         }
@@ -611,10 +615,12 @@ export function GraphView({ data }: { data: GraphData }) {
           (selectedNode && (link.source.id === selectedNode.id || link.target.id === selectedNode.id))
 
         if (isHighlighted) {
+          const nodeOpacity = Math.min(link.source.visual?.opacity ?? 1.0, link.target.visual?.opacity ?? 1.0);
+          const edgeOpacity = 0.6 * nodeOpacity;
           ctx.beginPath()
           ctx.moveTo(link.source.x, link.source.y)
           ctx.lineTo(link.target.x, link.target.y)
-          ctx.strokeStyle = isDark ? "rgba(255, 255, 255, 0.6)" : "rgba(0, 0, 0, 0.6)"
+          ctx.strokeStyle = isDark ? `rgba(255, 255, 255, ${edgeOpacity})` : `rgba(0, 0, 0, ${edgeOpacity})`
           ctx.lineWidth = 1.8 * baseLineWidth
           ctx.stroke()
         }
@@ -635,8 +641,9 @@ export function GraphView({ data }: { data: GraphData }) {
           pulse: 1.0
         }
 
-        const colorCfg = TYPE_COLORS[node.type as keyof typeof TYPE_COLORS] || TYPE_COLORS.note
-        const accentColor = isDark ? colorCfg.dark : colorCfg.light
+        const theme = isDark ? GRAPH_THEME.dark : GRAPH_THEME.light;
+        const typeConfig = theme.nodeTypes[node.type as keyof typeof theme.nodeTypes] || theme.nodeTypes.note;
+        const accentColor = typeConfig.color;
 
         const matchesSearch =
           searchQuery.trim() !== "" &&
@@ -669,7 +676,7 @@ export function GraphView({ data }: { data: GraphData }) {
         ctx.shadowColor = accentColor
         ctx.shadowBlur = visual.glow * 10
         ctx.strokeStyle = hexToRgba(accentColor, 0.25 + visual.glow * 0.75)
-        ctx.lineWidth = 1.8
+        ctx.lineWidth = baseLineWidth
         ctx.stroke()
         ctx.shadowBlur = 0 // reset shadow for inner elements
 
@@ -677,11 +684,11 @@ export function GraphView({ data }: { data: GraphData }) {
         const R_inner = R * 0.75
         const gradient = ctx.createRadialGradient(node.x, node.y, 0, node.x, node.y, R_inner)
         if (isDark) {
-          gradient.addColorStop(0, "rgba(24, 24, 27, 0.75)")
-          gradient.addColorStop(1, "rgba(39, 39, 42, 0.9)")
+          gradient.addColorStop(0, "rgba(30, 30, 35, 0.55)")
+          gradient.addColorStop(1, "rgba(30, 30, 35, 0.30)")
         } else {
-          gradient.addColorStop(0, "rgba(255, 255, 255, 0.9)")
-          gradient.addColorStop(1, "rgba(244, 244, 245, 0.95)")
+          gradient.addColorStop(0, "rgba(255, 255, 255, 0.75)")
+          gradient.addColorStop(1, "rgba(255, 255, 255, 0.45)")
         }
 
         ctx.beginPath()
@@ -690,7 +697,7 @@ export function GraphView({ data }: { data: GraphData }) {
         ctx.fill()
 
         ctx.strokeStyle = hexToRgba(accentColor, 0.4 + visual.glow * 0.4)
-        ctx.lineWidth = 1.2
+        ctx.lineWidth = baseLineWidth
         ctx.stroke()
 
         // -- 2d. Cached Icon --
@@ -698,7 +705,7 @@ export function GraphView({ data }: { data: GraphData }) {
         if (iconPath) {
           ctx.save()
           ctx.translate(node.x, node.y)
-          const iconScale = (R_inner * 0.96) / 24
+          const iconScale = (R_inner * 0.48) / 24
           ctx.scale(iconScale, iconScale)
           ctx.translate(-12, -12)
 
@@ -712,24 +719,26 @@ export function GraphView({ data }: { data: GraphData }) {
         }
 
         // -- 2e. Adaptive Labels --
-        let shouldRenderLabel = false
-        if (totalActiveNodes < 500) {
-          shouldRenderLabel = zoom > 0.6 || isActiveNode
-        } else if (totalActiveNodes >= 500 && totalActiveNodes <= 2000) {
-          shouldRenderLabel = isActiveNode
+        const totalNodes = activeNodes.length
+        let shouldShowLabel = false
+
+        if (totalNodes < 500) {
+          shouldShowLabel = true
+        } else if (totalNodes <= 2000) {
+          shouldShowLabel = !!(isHovered || isSelected || matchesSearch)
         } else {
-          shouldRenderLabel = zoom > 0.85 && isActiveNode
+          shouldShowLabel = (state.transform.scale > 0.85) && !!(isHovered || isSelected || matchesSearch)
         }
 
-        if (shouldRenderLabel) {
+        if (shouldShowLabel) {
           ctx.save()
           // Render with opacity 0.55 (idle) or 1.0 (active)
           ctx.globalAlpha = visual.opacity * (isActiveNode ? 1.0 : 0.55)
           ctx.fillStyle = isDark ? "#ffffff" : "#09090b"
           
-          const fontSize = isActiveNode ? "11.5px" : "11px"
-          const fontWeight = isActiveNode ? "bold" : "normal"
-          ctx.font = `${fontWeight} ${fontSize} Inter, sans-serif`
+          const isActiveLabel = isActiveNode
+          const fontSize = isActiveLabel ? 11.5 : 11
+          ctx.font = `normal ${fontSize}px Inter, sans-serif`
           ctx.textAlign = "center"
           ctx.textBaseline = "top"
           ctx.fillText(node.label, node.x, node.y + R + 6)
@@ -750,7 +759,8 @@ export function GraphView({ data }: { data: GraphData }) {
         
         // Convert to absolute viewport-relative coordinates
         const clientX = rect.left + screenX
-        const clientY = rect.top + screenY - state.hoveredNode.radius - 8
+        const R_screen = state.hoveredNode.radius * (state.hoveredNode.visual?.scale || 1.0) * state.transform.scale
+        const clientY = rect.top + screenY - R_screen - 8
         
         tooltip.style.left = `${clientX}px`
         tooltip.style.top = `${clientY}px`
@@ -1052,9 +1062,10 @@ export function GraphView({ data }: { data: GraphData }) {
                 className="bg-background/40 p-0.5 rounded-lg border gap-1"
               >
                 {Object.keys(filters).map((type) => {
-                  const colorCfg = TYPE_COLORS[type as keyof typeof TYPE_COLORS]
-                  const Icon = colorCfg.icon
-                  const color = isDark ? colorCfg.dark : colorCfg.light
+                  const Icon = TYPE_ICONS[type as keyof typeof TYPE_ICONS] || FileText
+                  const theme = isDark ? GRAPH_THEME.dark : GRAPH_THEME.light
+                  const typeConfig = theme.nodeTypes[type as keyof typeof theme.nodeTypes] || theme.nodeTypes.note
+                  const color = typeConfig.color
                   const isSelected = filters[type]
                   const activeCount = data.nodes.filter((n) => n.type === type).length
 
@@ -1070,11 +1081,11 @@ export function GraphView({ data }: { data: GraphData }) {
                               : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                           )}
                         >
-                          <Icon className="size-3.5" style={{ color: mounted ? color : colorCfg.light }} />
+                          <Icon className="size-3.5" style={{ color: color }} />
                         </ToggleGroupItem>
                       </TooltipTrigger>
                       <TooltipContent side="bottom" className="text-xs">
-                        {colorCfg.label} ({activeCount} nodes)
+                        {typeConfig.label} ({activeCount} nodes)
                       </TooltipContent>
                     </Tooltip>
                   )
@@ -1297,22 +1308,18 @@ export function GraphView({ data }: { data: GraphData }) {
         style={{ display: "none", position: "fixed", transform: "translate(-50%, -100%)" }}
         className="z-50 pointer-events-none bg-popover/90 backdrop-blur-md text-popover-foreground rounded-xl border shadow-lg p-3.5 w-64 flex flex-col gap-1.5 animate-in fade-in zoom-in-95 duration-150"
       >
-        {hoveredNode && (
+        {hoveredNode && tooltipTypeConfig && (
           <>
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2">
                 <span
                   className="size-2 rounded-full"
                   style={{
-                    backgroundColor: mounted
-                      ? isDark
-                        ? TYPE_COLORS[hoveredNode.type].dark
-                        : TYPE_COLORS[hoveredNode.type].light
-                      : TYPE_COLORS[hoveredNode.type].light,
+                    backgroundColor: tooltipTypeConfig.color,
                   }}
                 />
                 <span className="text-[10px] uppercase font-mono tracking-wider text-muted-foreground">
-                  {TYPE_COLORS[hoveredNode.type].label}
+                  {tooltipTypeConfig.label}
                 </span>
               </div>
               {hoveredNode.link && (
