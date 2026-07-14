@@ -503,6 +503,57 @@ export function GraphView({ data }: { data: GraphData }) {
         (l) => activeNodeIds.has(l.source.id) && activeNodeIds.has(l.target.id)
       )
 
+      // Update visual animations and state mapping
+      activeNodes.forEach((node) => {
+        if (!node.visual) {
+          node.visual = {
+            scale: 1.0,
+            targetScale: 1.0,
+            glow: 0.0,
+            targetGlow: 0.0,
+            opacity: 1.0,
+            targetOpacity: 1.0,
+            pulse: 1.0
+          };
+        }
+
+        const isHovered = hoveredNode && hoveredNode.id === node.id;
+        const isSelected = selectedNode && selectedNode.id === node.id;
+        const isDragged = state.draggedNodeIndex !== null && state.nodes[state.draggedNodeIndex].id === node.id;
+        const matchesSearch = searchQuery.trim() !== "" && node.label.toLowerCase().includes(searchQuery.toLowerCase());
+
+        // Target determinations
+        if (isHovered) {
+          node.visual.targetScale = 1.12;
+          node.visual.targetGlow = 1.0;
+        } else if (isSelected) {
+          node.visual.targetScale = 1.16;
+          node.visual.targetGlow = 1.0;
+        } else if (isDragged) {
+          node.visual.targetScale = 1.08;
+          node.visual.targetGlow = 0.5;
+        } else {
+          node.visual.targetScale = 1.0;
+          node.visual.targetGlow = 0.0;
+        }
+
+        // Pulse logic for search highlights
+        if (matchesSearch) {
+          node.visual.pulse = 1.0 + Math.sin(Date.now() * 0.007) * 0.08;
+          node.visual.targetScale = 1.18 * node.visual.pulse;
+          node.visual.targetGlow = 0.8;
+        }
+
+        // Target opacity
+        const isFilteredOut = !filters[node.type];
+        node.visual.targetOpacity = isFilteredOut ? 0.15 : 1.0;
+
+        // Visual spring interpolations
+        node.visual.scale += (node.visual.targetScale - node.visual.scale) * 0.15;
+        node.visual.glow += (node.visual.targetGlow - node.visual.glow) * 0.18;
+        node.visual.opacity += (node.visual.targetOpacity - node.visual.opacity) * 0.15;
+      });
+
       // Run real-time physics tick if a node is being dragged or simulation hasn't stabilized
       // (When dragging, we pin the dragged node to the mouse position)
       if (state.draggedNodeIndex !== null) {
@@ -533,87 +584,159 @@ export function GraphView({ data }: { data: GraphData }) {
       ctx.scale(state.transform.scale, state.transform.scale)
 
       // 1. Draw Links/Edges
-      ctx.lineWidth = 1.2
+      const baseLineWidth = Math.max(0.8, 1 / state.transform.scale)
+      const hasActiveFocus = !!(hoveredNode || selectedNode)
+
+      // Pass 1: Draw dimmed/unrelated edges
       activeLinks.forEach((link) => {
-        const isHoveredLink =
-          hoveredNode &&
-          (link.source.id === hoveredNode.id || link.target.id === hoveredNode.id)
+        const isHighlighted =
+          (hoveredNode && (link.source.id === hoveredNode.id || link.target.id === hoveredNode.id)) ||
+          (selectedNode && (link.source.id === selectedNode.id || link.target.id === selectedNode.id))
 
-        ctx.beginPath()
-        ctx.moveTo(link.source.x, link.source.y)
-        ctx.lineTo(link.target.x, link.target.y)
-
-        if (isHoveredLink) {
-          ctx.strokeStyle = isDark ? "rgba(255, 255, 255, 0.4)" : "rgba(0, 0, 0, 0.3)"
-          ctx.lineWidth = 2
-        } else {
-          ctx.strokeStyle = isDark ? "rgba(255, 255, 255, 0.08)" : "rgba(0, 0, 0, 0.06)"
-          ctx.lineWidth = 1.2
+        if (!isHighlighted) {
+          const opacity = hasActiveFocus ? 0.02 : 0.08
+          ctx.beginPath()
+          ctx.moveTo(link.source.x, link.source.y)
+          ctx.lineTo(link.target.x, link.target.y)
+          ctx.strokeStyle = isDark ? `rgba(255, 255, 255, ${opacity})` : `rgba(0, 0, 0, ${opacity})`
+          ctx.lineWidth = baseLineWidth
+          ctx.stroke()
         }
-        ctx.stroke()
+      })
+
+      // Pass 2: Draw active/highlighted edges
+      activeLinks.forEach((link) => {
+        const isHighlighted =
+          (hoveredNode && (link.source.id === hoveredNode.id || link.target.id === hoveredNode.id)) ||
+          (selectedNode && (link.source.id === selectedNode.id || link.target.id === selectedNode.id))
+
+        if (isHighlighted) {
+          ctx.beginPath()
+          ctx.moveTo(link.source.x, link.source.y)
+          ctx.lineTo(link.target.x, link.target.y)
+          ctx.strokeStyle = isDark ? "rgba(255, 255, 255, 0.6)" : "rgba(0, 0, 0, 0.6)"
+          ctx.lineWidth = 1.8 * baseLineWidth
+          ctx.stroke()
+        }
       })
 
       // 2. Draw Nodes
-      activeNodes.forEach((node) => {
-        const colorCfg = TYPE_COLORS[node.type]
-        const color = isDark ? colorCfg.dark : colorCfg.light
+      const totalActiveNodes = activeNodes.length
+      const zoom = state.transform.scale
 
-        // Check if node is matching search query
+      activeNodes.forEach((node) => {
+        const visual = node.visual || {
+          scale: 1.0,
+          targetScale: 1.0,
+          glow: 0.0,
+          targetGlow: 0.0,
+          opacity: 1.0,
+          targetOpacity: 1.0,
+          pulse: 1.0
+        }
+
+        const colorCfg = TYPE_COLORS[node.type as keyof typeof TYPE_COLORS] || TYPE_COLORS.note
+        const accentColor = isDark ? colorCfg.dark : colorCfg.light
+
         const matchesSearch =
           searchQuery.trim() !== "" &&
           node.label.toLowerCase().includes(searchQuery.toLowerCase())
 
         const isHovered = hoveredNode && hoveredNode.id === node.id
         const isSelected = selectedNode && selectedNode.id === node.id
+        const isActiveNode = !!(isHovered || isSelected || matchesSearch)
 
-        // Node circle draw
-        ctx.beginPath()
-        ctx.arc(node.x, node.y, node.radius, 0, 2 * Math.PI)
+        const R = node.radius * visual.scale
 
-        // Draw shadow glow if hovered or highlighted by search
-        if (isHovered || matchesSearch) {
-          ctx.shadowColor = color
-          ctx.shadowBlur = 15
-        } else {
-          ctx.shadowBlur = 0
+        ctx.save()
+        // Apply node opacity
+        ctx.globalAlpha = visual.opacity
+
+        // -- 2a. Selection Halo Layer --
+        if (isSelected) {
+          ctx.beginPath()
+          ctx.arc(node.x, node.y, R + 6, 0, 2 * Math.PI)
+          ctx.strokeStyle = isDark ? "#ffffff" : "#000000"
+          ctx.lineWidth = baseLineWidth
+          ctx.setLineDash([2, 3])
+          ctx.stroke()
+          ctx.setLineDash([]) // reset
         }
 
-        ctx.fillStyle = isDark ? "rgba(24, 24, 27, 0.9)" : "rgba(255, 255, 255, 0.95)"
+        // -- 2b. Outer Ring --
+        ctx.beginPath()
+        ctx.arc(node.x, node.y, R, 0, 2 * Math.PI)
+        ctx.shadowColor = accentColor
+        ctx.shadowBlur = visual.glow * 10
+        ctx.strokeStyle = hexToRgba(accentColor, 0.25 + visual.glow * 0.75)
+        ctx.lineWidth = 1.8
+        ctx.stroke()
+        ctx.shadowBlur = 0 // reset shadow for inner elements
+
+        // -- 2c. Inner Glass Circle --
+        const R_inner = R * 0.75
+        const gradient = ctx.createRadialGradient(node.x, node.y, 0, node.x, node.y, R_inner)
+        if (isDark) {
+          gradient.addColorStop(0, "rgba(24, 24, 27, 0.75)")
+          gradient.addColorStop(1, "rgba(39, 39, 42, 0.9)")
+        } else {
+          gradient.addColorStop(0, "rgba(255, 255, 255, 0.9)")
+          gradient.addColorStop(1, "rgba(244, 244, 245, 0.95)")
+        }
+
+        ctx.beginPath()
+        ctx.arc(node.x, node.y, R_inner, 0, 2 * Math.PI)
+        ctx.fillStyle = gradient
         ctx.fill()
 
-        ctx.lineWidth = isSelected ? 3.5 : isHovered ? 2.5 : 1.8
-        ctx.strokeStyle = color
+        ctx.strokeStyle = hexToRgba(accentColor, 0.4 + visual.glow * 0.4)
+        ctx.lineWidth = 1.2
         ctx.stroke()
 
-        // Clear shadow settings for text/labels
-        ctx.shadowBlur = 0
+        // -- 2d. Cached Icon --
+        const iconPath = iconCacheRef.current?.[node.type]
+        if (iconPath) {
+          ctx.save()
+          ctx.translate(node.x, node.y)
+          const iconScale = (R_inner * 0.96) / 24
+          ctx.scale(iconScale, iconScale)
+          ctx.translate(-12, -12)
 
-        // Draw abbreviation code inside the node center
-        ctx.fillStyle = color
-        ctx.font = `bold ${Math.max(10, node.radius - 2)}px Inter, sans-serif`
-        ctx.textAlign = "center"
-        ctx.textBaseline = "middle"
-        const typeAbbrev = node.type.charAt(0).toUpperCase()
-        ctx.fillText(typeAbbrev, node.x, node.y)
+          ctx.beginPath()
+          ctx.strokeStyle = accentColor
+          ctx.lineWidth = baseLineWidth / iconScale
+          ctx.lineCap = "round"
+          ctx.lineJoin = "round"
+          ctx.stroke(iconPath)
+          ctx.restore()
+        }
 
-        // Draw node title text label
-        // When zoom scale is small, only render labels for hovered/selected nodes
-        const showLabel = state.transform.scale > 0.6 || isHovered || isSelected || matchesSearch
+        // -- 2e. Adaptive Labels --
+        let shouldRenderLabel = false
+        if (totalActiveNodes < 500) {
+          shouldRenderLabel = zoom > 0.6 || isActiveNode
+        } else if (totalActiveNodes >= 500 && totalActiveNodes <= 2000) {
+          shouldRenderLabel = isActiveNode
+        } else {
+          shouldRenderLabel = zoom > 0.85 && isActiveNode
+        }
 
-        if (showLabel) {
-          ctx.fillStyle = isDark
-            ? isHovered || isSelected || matchesSearch
-              ? "#ffffff"
-              : "#a1a1aa"
-            : isHovered || isSelected || matchesSearch
-              ? "#09090b"
-              : "#71717a"
+        if (shouldRenderLabel) {
+          ctx.save()
+          // Render with opacity 0.55 (idle) or 1.0 (active)
+          ctx.globalAlpha = visual.opacity * (isActiveNode ? 1.0 : 0.55)
+          ctx.fillStyle = isDark ? "#ffffff" : "#09090b"
           
-          ctx.font = `${isHovered || isSelected || matchesSearch ? "bold" : "normal"} 11px Inter, sans-serif`
+          const fontSize = isActiveNode ? "11.5px" : "11px"
+          const fontWeight = isActiveNode ? "bold" : "normal"
+          ctx.font = `${fontWeight} ${fontSize} Inter, sans-serif`
           ctx.textAlign = "center"
           ctx.textBaseline = "top"
-          ctx.fillText(node.label, node.x, node.y + node.radius + 6)
+          ctx.fillText(node.label, node.x, node.y + R + 6)
+          ctx.restore()
         }
+
+        ctx.restore()
       })
 
       ctx.restore()
