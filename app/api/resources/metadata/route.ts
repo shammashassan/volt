@@ -29,7 +29,7 @@ export async function GET(request: Request) {
       return NextResponse.json({
         title: urlObj.hostname.replace("www.", ""),
         description: "No preview description available",
-        faviconUrl: `https://www.google.com/s2/favicons?sz=64&domain=${urlObj.hostname}`,
+        faviconUrl: `${urlObj.origin}/favicon.ico`,
       })
     }
 
@@ -68,8 +68,38 @@ export async function GET(request: Request) {
       }
     }
 
-    // 4. Reliable Favicon service
-    const faviconUrl = `https://www.google.com/s2/favicons?sz=64&domain=${urlObj.hostname}`
+    // 4. Robust Favicon extraction from HTML
+    const iconRegexes = [
+      /<link[^>]+rel=["'](?:shortcut )?icon["'][^>]+href=["']([^"']+)["']/i,
+      /<link[^>]+href=["']([^"']+)["'][^>]+rel=["'](?:shortcut )?icon["']/i,
+      /<link[^>]+rel=["']apple-touch-icon(?:-precomposed)?["'][^>]+href=["']([^"']+)["']/i,
+      /<link[^>]+href=["']([^"']+)["'][^>]+rel=["']apple-touch-icon(?:-precomposed)?["']/i,
+    ]
+
+    let foundIcon = ""
+    for (const regex of iconRegexes) {
+      const match = html.match(regex)
+      if (match && match[1]) {
+        foundIcon = match[1].trim()
+        break
+      }
+    }
+
+    let faviconUrl = ""
+    if (foundIcon) {
+      if (foundIcon.startsWith("//")) {
+        faviconUrl = `${urlObj.protocol}${foundIcon}`
+      } else if (foundIcon.startsWith("/")) {
+        faviconUrl = `${urlObj.origin}${foundIcon}`
+      } else if (/^https?:\/\//i.test(foundIcon)) {
+        faviconUrl = foundIcon
+      } else {
+        faviconUrl = `${urlObj.origin}/${foundIcon}`
+      }
+    } else {
+      // Fallback to domain root /favicon.ico
+      faviconUrl = `${urlObj.origin}/favicon.ico`
+    }
 
     return NextResponse.json({
       title: title.trim() || urlObj.hostname.replace("www.", ""),
@@ -84,7 +114,7 @@ export async function GET(request: Request) {
       return NextResponse.json({
         title: urlObj.hostname.replace("www.", ""),
         description: "No preview description available",
-        faviconUrl: `https://www.google.com/s2/favicons?sz=64&domain=${urlObj.hostname}`,
+        faviconUrl: `${urlObj.origin}/favicon.ico`,
         imageUrl: "",
       })
     } catch {

@@ -36,11 +36,13 @@ export function QuickSaveCard() {
         description: string
         faviconUrl: string
     } | null>(null)
+    const [iconFailed, setIconFailed] = useState(false)
 
     const handleUrlChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const val = e.target.value
         setUrl(val)
         setMetadata(null)
+        setIconFailed(false)
         if (val.trim() && val.includes(".") && val.length > 4) {
             try {
                 setFetchingMetadata(true)
@@ -206,14 +208,12 @@ export function QuickSaveCard() {
                         ) : (
                             <div className="flex flex-col gap-1.5">
                                 <div className="flex items-center gap-2 min-w-0">
-                                    {metadata?.faviconUrl ? (
+                                    {metadata?.faviconUrl && !iconFailed ? (
                                         <img
                                             src={metadata.faviconUrl}
                                             alt=""
                                             className="size-4 shrink-0 rounded object-contain"
-                                            onError={e => {
-                                                (e.currentTarget as HTMLImageElement).style.display = "none"
-                                            }}
+                                            onError={() => setIconFailed(true)}
                                         />
                                     ) : (
                                         <Globe className="size-4 shrink-0 text-muted-foreground/40" />
