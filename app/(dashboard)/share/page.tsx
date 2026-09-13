@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { getCategoriesAction } from "@/lib/actions/categories";
+import { fetchUrlMetadata } from "@/lib/services/metadata.service";
 import { ShareClient } from "@/components/share/share-client";
 
 function ShareSkeleton() {
@@ -18,12 +19,38 @@ function ShareSkeleton() {
   );
 }
 
-async function ShareContentWrapper() {
+interface SharePageProps {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}
+
+async function ShareContentWrapper({ searchParams }: SharePageProps) {
   const session = await auth.api.getSession({
-    headers: await headers()
+    headers: await headers(),
   });
   if (!session) {
     redirect("/login");
+  }
+
+  const resolvedParams = await searchParams;
+  const urlParam = typeof resolvedParams.url === "string" ? resolvedParams.url : "";
+  const textParam = typeof resolvedParams.text === "string" ? resolvedParams.text : "";
+  const titleParam = typeof resolvedParams.title === "string" ? resolvedParams.title : "";
+
+  // Extract valid URL from parameters
+  let extractedUrl = "";
+  const urlRegex = /(https?:\/\/[^\s]+)/g;
+  const matchUrl = urlParam.match(urlRegex) || textParam.match(urlRegex);
+  if (matchUrl) {
+    extractedUrl = matchUrl[0];
+  }
+
+  let initialMetadata = null;
+  if (extractedUrl && extractedUrl.includes(".")) {
+    try {
+      initialMetadata = await fetchUrlMetadata(extractedUrl);
+    } catch {
+      // silent fallback
+    }
   }
 
   // Fetch categories to pass to the client Quick-Save interface
@@ -32,15 +59,20 @@ async function ShareContentWrapper() {
 
   return (
     <div className="flex flex-1 items-center justify-center p-4 lg:p-6 min-h-[calc(100vh-var(--header-height)-4rem)]">
-      <ShareClient categories={categories} />
+      <ShareClient
+        categories={categories}
+        initialUrl={extractedUrl}
+        initialTitle={titleParam}
+        initialMetadata={initialMetadata}
+      />
     </div>
   );
 }
 
-export default function SharePage() {
+export default function SharePage({ searchParams }: SharePageProps) {
   return (
     <Suspense fallback={<ShareSkeleton />}>
-      <ShareContentWrapper />
+      <ShareContentWrapper searchParams={searchParams} />
     </Suspense>
   );
 }

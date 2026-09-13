@@ -3,6 +3,7 @@ import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 import { auth } from "@/lib/auth"
 import { getCategories } from "@/lib/queries/categories";
+import { fetchUrlMetadata } from "@/lib/services/metadata.service"
 import { QuickSaveContent } from "./quick-save-content"
 
 interface PageProps {
@@ -29,13 +30,23 @@ export default async function QuickSavePage({ searchParams }: PageProps) {
   const userId = session.user.id
   const categories = await getCategories(userId)
 
+  let initialMetadata = null
+  if (url && url.includes(".")) {
+    try {
+      initialMetadata = await fetchUrlMetadata(url)
+    } catch {
+      // silent fallback
+    }
+  }
+
   if (embed) {
     return (
-      <div className="w-full min-h-screen bg-background">
+      <div className="w-full min-h-screen bg-background overflow-y-auto">
         <QuickSaveContent
           categories={categories}
           initialUrl={url}
           initialTitle={title}
+          initialMetadata={initialMetadata}
         />
       </div>
     )
@@ -48,6 +59,7 @@ export default async function QuickSavePage({ searchParams }: PageProps) {
           categories={categories}
           initialUrl={url}
           initialTitle={title}
+          initialMetadata={initialMetadata}
         />
       </div>
     </div>

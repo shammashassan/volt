@@ -1,10 +1,19 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
 import { toast } from "sonner";
-import { Loader2, Link2, Star, Check, AlertCircle } from "lucide-react";
+import {
+  Loader2,
+  Link2,
+  Star,
+  Check,
+  AlertCircle,
+  Globe,
+  ChevronRight,
+  PlusCircle,
+} from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,77 +29,137 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { FieldGroup, Field, FieldLabel } from "@/components/ui/field";
+import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupButton } from "@/components/ui/input-group";
 import { addResourceAction, updateResourceAction, getResourceAction } from "@/lib/actions/resources";
 import { Category, ResourceType, Resource } from "@/types";
+import { UrlMetadata } from "@/lib/services/metadata.service";
 
 interface ShareClientProps {
   categories: Category[];
+  initialUrl?: string;
+  initialTitle?: string;
+  initialMetadata?: UrlMetadata | null;
 }
 
-export function ShareClient({ categories }: ShareClientProps) {
+function detectResourceType(urlStr: string): ResourceType {
+  try {
+    if (!urlStr) return "website";
+    const cleanUrl = urlStr.trim();
+    const url = new URL(cleanUrl.startsWith("http") ? cleanUrl : `https://${cleanUrl}`);
+    const host = url.hostname.toLowerCase();
+    if (host.includes("youtube.com") || host.includes("youtu.be")) return "youtube";
+    if (host.includes("github.com")) return "github";
+    if (host.includes("reddit.com")) return "reddit";
+    if (host.includes("linkedin.com")) return "linkedin";
+    if (host.includes("facebook.com")) return "facebook";
+    if (host.includes("instagram.com")) return "instagram";
+    return "website";
+  } catch {
+    return "website";
+  }
+}
+
+export function ShareClient({
+  categories,
+  initialUrl = "",
+  initialTitle = "",
+  initialMetadata = null,
+}: ShareClientProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const hasTriggeredSave = useRef(false);
+  const debounceTimer = useRef<NodeJS.Timeout | null>(null);
 
-  // States
-  const [status, setStatus] = useState<"parsing" | "saving" | "success" | "error">("parsing");
+  // Parse OS shared params (fallback if not provided as props)
+  const titleParam = initialTitle || searchParams.get("title") || "";
+  const textParam = searchParams.get("text") || "";
+  const urlParam = searchParams.get("url") || "";
+
+  // Extract valid URL from parameters
+  let sharedUrl = initialUrl;
+  if (!sharedUrl) {
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    const matchUrl = urlParam.match(urlRegex) || textParam.match(urlRegex);
+    if (matchUrl) {
+      sharedUrl = matchUrl[0];
+    }
+  }
+
+  // Lifecycle status
+  const [status, setStatus] = useState<"idle" | "fetching" | "saving" | "success" | "error">(() => {
+    return sharedUrl ? "saving" : "idle";
+  });
   const [errorMsg, setErrorMsg] = useState("");
   const [resourceId, setResourceId] = useState<string | null>(null);
   const [isDuplicateLink, setIsDuplicateLink] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
 
   // Form Fields
-  const [title, setTitle] = useState("");
-  const [url, setUrl] = useState("");
-  const [description, setDescription] = useState("");
+  const [title, setTitle] = useState(initialMetadata?.title || titleParam || "");
+  const [url, setUrl] = useState(sharedUrl || "");
+  const [description, setDescription] = useState(initialMetadata?.description || "");
+  const [faviconUrl, setFaviconUrl] = useState(initialMetadata?.faviconUrl || "");
+  const [iconFailed, setIconFailed] = useState(false);
   const [categoryId, setCategoryId] = useState("none");
-  const [resourceType, setResourceType] = useState<ResourceType>("website");
+  const [resourceType, setResourceType] = useState<ResourceType>(() => detectResourceType(sharedUrl));
   const [favorite, setFavorite] = useState(false);
 
-  // Parse OS shared params
-  const titleParam = searchParams.get("title") || "";
-  const textParam = searchParams.get("text") || "";
-  const urlParam = searchParams.get("url") || "";
+  // Quick save manual input state (idle mode)
+  const [manualUrl, setManualUrl] = useState("");
+  const [isFetchingManualMeta, setIsFetchingManualMeta] = useState(false);
+  const [manualMeta, setManualMeta] = useState<UrlMetadata | null>(null);
 
-  // Extract valid URL from parameters
-  let extractedUrl = "";
-  const urlRegex = /(https?:\/\/[^\s]+)/g;
-  const matchUrl = urlParam.match(urlRegex) || textParam.match(urlRegex);
-  if (matchUrl) {
-    extractedUrl = matchUrl[0];
-  }
+  // Execute save for a given URL and metadata
+  const executeSave = useCallback(
+    async (targetUrl: string, metaToUse?: UrlMetadata | null) => {
+      setStatus("saving");
+      try {
+        let resolvedMeta = metaToUse;
+        if (!resolvedMeta) {
+          setStatus("fetching");
+          try {
+            const res = await fetch(`/api/resources/metadata?url=${encodeURIComponent(targetUrl)}`);
+            if (res.ok) {
+              resolvedMeta = await res.json();
+            }
+          } catch {
+            // fallback to domain
+          }
+        }
 
-  const extractedTitle = titleParam || (extractedUrl ? new URL(extractedUrl).hostname : "Shared Link");
-  const extractedDesc = textParam && textParam !== extractedUrl ? textParam : "";
+        setStatus("saving");
 
-  // Run auto-save immediately on load
-  useEffect(() => {
-    if (hasTriggeredSave.current) return;
-    if (!extractedUrl) {
-      setStatus("error");
-      setErrorMsg("No valid URL was found in the shared content. Make sure you share a valid webpage link.");
-      return;
-    }
+        let fallbackHostname = "";
+        try {
+          fallbackHostname = new URL(targetUrl.startsWith("http") ? targetUrl : `https://${targetUrl}`).hostname;
+        } catch {
+          fallbackHostname = "Shared Link";
+        }
 
-    hasTriggeredSave.current = true;
-    setStatus("saving");
+        const finalTitle = resolvedMeta?.title || titleParam || fallbackHostname;
+        const finalDesc = resolvedMeta?.description || (textParam && textParam !== targetUrl ? textParam : "");
+        const detectedType = detectResourceType(targetUrl);
 
-    setTitle(extractedTitle);
-    setUrl(extractedUrl);
-    setDescription(extractedDesc);
+        setTitle(finalTitle);
+        setUrl(targetUrl);
+        setDescription(finalDesc);
+        setResourceType(detectedType);
+        if (resolvedMeta?.faviconUrl) {
+          setFaviconUrl(resolvedMeta.faviconUrl);
+        }
 
-    addResourceAction({
-      title: extractedTitle,
-      url: extractedUrl,
-      description: extractedDesc,
-      categoryId: "", // default to Inbox/Uncategorized
-      tags: [],
-      type: "website",
-      favorite: false,
-      projectIds: [],
-      personIds: [],
-    })
-      .then((res) => {
+        const res = await addResourceAction({
+          title: finalTitle,
+          url: targetUrl,
+          description: finalDesc,
+          categoryId: "", // Default to Inbox
+          tags: [],
+          type: detectedType,
+          favorite: false,
+          projectIds: [],
+          personIds: [],
+        });
+
         if (res.success && res.id) {
           setResourceId(res.id);
           setStatus("success");
@@ -99,36 +168,83 @@ export function ShareClient({ categories }: ShareClientProps) {
           const dupId = res.id;
           setResourceId(dupId);
           setIsDuplicateLink(true);
-          
-          // Fetch existing resource to pre-populate current database configuration
-          getResourceAction(dupId)
-            .then((getResult) => {
-              if (getResult.success && getResult.data) {
-                const item = getResult.data as Resource;
-                setTitle(item.title || "");
-                setUrl(item.url || "");
-                setDescription(item.description || "");
-                setCategoryId(item.categoryId || "none");
-                setResourceType((item.type as ResourceType) || "website");
-                setFavorite(!!item.favorite);
-              }
-            })
-            .finally(() => {
-              setStatus("success");
-              toast.warning("This URL is already in your library!");
-            });
+
+          // Fetch existing resource
+          const getResult = await getResourceAction(dupId);
+          if (getResult.success && getResult.data) {
+            const item = getResult.data as Resource;
+            setTitle(item.title || "");
+            setUrl(item.url || "");
+            setDescription(item.description || "");
+            setCategoryId(item.categoryId || "none");
+            setResourceType((item.type as ResourceType) || "website");
+            setFavorite(!!item.favorite);
+          }
+          setStatus("success");
+          toast.warning("This URL is already in your library!");
         } else {
           setStatus("error");
           setErrorMsg(res.error || "Failed to auto-save the link.");
         }
-      })
-      .catch((err) => {
+      } catch (err: unknown) {
         setStatus("error");
-        setErrorMsg(err.message || "An unexpected error occurred during quick save.");
-      });
-  }, [extractedUrl, extractedTitle, extractedDesc]);
+        setErrorMsg(err instanceof Error ? err.message : "An unexpected error occurred during quick save.");
+      }
+    },
+    [titleParam, textParam]
+  );
 
-  // Submit quick edit updates
+  // Auto-save on mount if sharedUrl is present
+  useEffect(() => {
+    if (hasTriggeredSave.current) return;
+    if (!sharedUrl) {
+      setStatus("idle");
+      return;
+    }
+
+    hasTriggeredSave.current = true;
+    executeSave(sharedUrl, initialMetadata);
+  }, [sharedUrl, initialMetadata, executeSave]);
+
+  // Handle manual input in idle mode (debounced metadata fetch)
+  const handleManualUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setManualUrl(val);
+    setManualMeta(null);
+
+    if (debounceTimer.current) clearTimeout(debounceTimer.current);
+
+    if (val.trim() && val.includes(".") && val.trim().length > 4) {
+      setIsFetchingManualMeta(true);
+      debounceTimer.current = setTimeout(async () => {
+        try {
+          const res = await fetch(`/api/resources/metadata?url=${encodeURIComponent(val.trim())}`);
+          if (res.ok) {
+            const data: UrlMetadata = await res.json();
+            setManualMeta(data);
+          }
+        } catch {
+          // silent fallback
+        } finally {
+          setIsFetchingManualMeta(false);
+        }
+      }, 350);
+    } else {
+      setIsFetchingManualMeta(false);
+    }
+  };
+
+  const handleManualSave = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const targetUrl = manualUrl.trim();
+    if (!targetUrl) {
+      toast.error("Please enter a URL to save");
+      return;
+    }
+    await executeSave(targetUrl, manualMeta);
+  };
+
+  // Submit quick edit updates in success view
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!resourceId) return;
@@ -136,9 +252,9 @@ export function ShareClient({ categories }: ShareClientProps) {
     setIsUpdating(true);
     try {
       const updateData = {
-        title,
-        url,
-        description,
+        title: title.trim(),
+        url: url.trim(),
+        description: description.trim(),
         categoryId: categoryId === "none" ? "" : categoryId,
         type: resourceType,
         favorite,
@@ -171,14 +287,105 @@ export function ShareClient({ categories }: ShareClientProps) {
           <span>Quick Capture</span>
         </CardTitle>
         <CardDescription className="text-xs">
-          Volt PWA Mobile Share Target Gateway
+          Volt PWA Mobile Quick Save Gateway
         </CardDescription>
       </CardHeader>
 
       <CardContent className="min-h-[220px] flex flex-col justify-center">
         <AnimatePresence mode="wait">
-          {/* 1. SAVING/PARSING LOADER */}
-          {(status === "parsing" || status === "saving") && (
+          {/* 1. IDLE STATE — Quick Save Input Panel */}
+          {status === "idle" && (
+            <motion.div
+              key="idle-panel"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="space-y-4 py-2"
+            >
+              <form onSubmit={handleManualSave} className="space-y-3">
+                <FieldGroup>
+                  <Field>
+                    <FieldLabel htmlFor="manual-url" className="text-xs font-semibold text-muted-foreground">
+                      Paste or Type URL
+                    </FieldLabel>
+                    <InputGroup>
+                      <InputGroupAddon align="inline-start">
+                        {manualMeta?.faviconUrl ? (
+                          <img
+                            src={manualMeta.faviconUrl}
+                            alt=""
+                            className="size-4 shrink-0 rounded object-contain"
+                          />
+                        ) : (
+                          <Globe className="size-4 text-muted-foreground/60" />
+                        )}
+                      </InputGroupAddon>
+                      <InputGroupInput
+                        id="manual-url"
+                        type="text"
+                        value={manualUrl}
+                        onChange={handleManualUrlChange}
+                        placeholder="https://example.com"
+                        autoFocus
+                      />
+                      <InputGroupAddon align="inline-end">
+                        {isFetchingManualMeta && (
+                          <Loader2 className="size-3.5 animate-spin text-primary" />
+                        )}
+                        <InputGroupButton
+                          type="submit"
+                          disabled={!manualUrl.trim()}
+                          size="icon-xs"
+                          title="Save to Workspace"
+                        >
+                          <ChevronRight className="size-3.5" />
+                        </InputGroupButton>
+                      </InputGroupAddon>
+                    </InputGroup>
+                  </Field>
+                </FieldGroup>
+
+                {/* Live Preview of Metadata */}
+                {manualMeta && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    className="p-3 rounded-lg border border-border/50 bg-background/50 space-y-1.5"
+                  >
+                    <div className="flex items-center gap-2">
+                      {manualMeta.faviconUrl && (
+                        <img
+                          src={manualMeta.faviconUrl}
+                          alt=""
+                          className="size-4 shrink-0 rounded object-contain"
+                        />
+                      )}
+                      <span className="text-xs font-semibold text-foreground truncate">
+                        {manualMeta.title}
+                      </span>
+                    </div>
+                    {manualMeta.description && (
+                      <p className="text-[11px] text-muted-foreground line-clamp-2 leading-relaxed pl-6 border-l border-border/40 ml-2">
+                        {manualMeta.description}
+                      </p>
+                    )}
+                  </motion.div>
+                )}
+
+                <Button
+                  type="submit"
+                  disabled={!manualUrl.trim()}
+                  className="w-full cursor-pointer mt-2"
+                >
+                  <PlusCircle className="size-4 mr-2" />
+                  Save to Workspace
+                </Button>
+              </form>
+            </motion.div>
+          )}
+
+          {/* 2. SAVING / FETCHING LOADER */}
+          {(status === "fetching" || status === "saving") && (
             <motion.div
               key="loader"
               initial={{ opacity: 0, y: 10 }}
@@ -191,15 +398,17 @@ export function ShareClient({ categories }: ShareClientProps) {
                 <div className="absolute size-4 bg-primary/10 rounded-full animate-ping" />
               </div>
               <div className="space-y-1">
-                <h3 className="font-semibold text-sm text-foreground">Saving shared link...</h3>
+                <h3 className="font-semibold text-sm text-foreground">
+                  {status === "fetching" ? "Fetching title & description…" : "Saving resource to Workspace…"}
+                </h3>
                 <p className="text-xs text-muted-foreground max-w-xs mx-auto">
-                  Adding resource to your second brain&apos;s uncategorized inbox.
+                  Automatically capturing metadata into your second brain inbox.
                 </p>
               </div>
             </motion.div>
           )}
 
-          {/* 2. ERROR STATE */}
+          {/* 3. ERROR STATE */}
           {status === "error" && (
             <motion.div
               key="error"
@@ -218,17 +427,17 @@ export function ShareClient({ categories }: ShareClientProps) {
                 </p>
               </div>
               <div className="flex gap-2.5 mt-2">
-                <Button variant="outline" size="sm" onClick={() => router.push("/")}>
-                  Go to Dashboard
+                <Button variant="outline" size="sm" onClick={() => setStatus("idle")}>
+                  Enter URL Manually
                 </Button>
-                <Button size="sm" onClick={() => router.refresh()}>
-                  Try Again
+                <Button size="sm" onClick={() => router.push("/")}>
+                  Go to Dashboard
                 </Button>
               </div>
             </motion.div>
           )}
 
-          {/* 3. SUCCESS + QUICK EDIT PANEL */}
+          {/* 4. SUCCESS + QUICK EDIT PANEL */}
           {status === "success" && (
             <motion.div
               key="success-form"
@@ -262,12 +471,12 @@ export function ShareClient({ categories }: ShareClientProps) {
                   </motion.svg>
                 </motion.div>
                 <h3 className="font-bold text-base text-foreground">
-                  {isDuplicateLink ? "Resource Already Saved" : "Link Saved successfully!"}
+                  {isDuplicateLink ? "Resource Already Saved" : "Link Saved Successfully!"}
                 </h3>
                 <p className="text-[11px] text-muted-foreground">
-                  {isDuplicateLink 
-                    ? "This link is already in your second brain." 
-                    : "Saved to your Inbox. Categorize it below or close this window."}
+                  {isDuplicateLink
+                    ? "This link is already in your library. You can update its details or category below."
+                    : "Saved to your Inbox with title & description. Organize it below or close this window."}
                 </p>
               </div>
 
@@ -302,14 +511,32 @@ export function ShareClient({ categories }: ShareClientProps) {
                     <FieldLabel htmlFor="url" className="text-xs font-semibold text-muted-foreground">
                       URL Link
                     </FieldLabel>
-                    <Input
-                      id="url"
-                      value={url}
-                      onChange={(e) => setUrl(e.target.value)}
-                      placeholder="https://example.com"
-                      className="h-8 text-xs bg-background/50 border-input"
-                      required
-                    />
+                    <InputGroup>
+                      <InputGroupAddon align="inline-start">
+                        {faviconUrl && !iconFailed ? (
+                          <img
+                            src={faviconUrl}
+                            alt=""
+                            className="size-3.5 shrink-0 rounded object-contain"
+                            onError={() => setIconFailed(true)}
+                          />
+                        ) : (
+                          <Globe className="size-3.5 text-muted-foreground/60" />
+                        )}
+                      </InputGroupAddon>
+                      <InputGroupInput
+                        id="url"
+                        value={url}
+                        onChange={(e) => {
+                          const newUrl = e.target.value;
+                          setUrl(newUrl);
+                          setResourceType(detectResourceType(newUrl));
+                        }}
+                        placeholder="https://example.com"
+                        className="h-8 text-xs bg-background/50 border-input"
+                        required
+                      />
+                    </InputGroup>
                   </Field>
 
                   {/* Description */}
@@ -322,7 +549,7 @@ export function ShareClient({ categories }: ShareClientProps) {
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
                       placeholder="Enter resource description..."
-                      className="min-h-[64px] text-xs bg-background/50 border-input resize-y"
+                      className="min-h-[56px] text-xs bg-background/50 border-input resize-y"
                     />
                   </Field>
 
@@ -338,9 +565,15 @@ export function ShareClient({ categories }: ShareClientProps) {
                         </SelectTrigger>
                         <SelectContent className="bg-popover border shadow-md">
                           <SelectGroup>
-                            <SelectItem value="none" className="text-xs">Uncategorized</SelectItem>
+                            <SelectItem value="none" className="text-xs">
+                              Uncategorized
+                            </SelectItem>
                             {categories.map((cat) => (
-                              <SelectItem key={cat.slug || String(cat._id)} value={cat.slug || String(cat._id)} className="text-xs">
+                              <SelectItem
+                                key={cat.slug || String(cat._id)}
+                                value={cat.slug || String(cat._id)}
+                                className="text-xs"
+                              >
                                 {cat.name}
                               </SelectItem>
                             ))}
@@ -360,15 +593,33 @@ export function ShareClient({ categories }: ShareClientProps) {
                         </SelectTrigger>
                         <SelectContent className="bg-popover border shadow-md">
                           <SelectGroup>
-                            <SelectItem value="website" className="text-xs">Website</SelectItem>
-                            <SelectItem value="youtube" className="text-xs">YouTube</SelectItem>
-                            <SelectItem value="github" className="text-xs">GitHub</SelectItem>
-                            <SelectItem value="linkedin" className="text-xs">LinkedIn</SelectItem>
-                            <SelectItem value="instagram" className="text-xs">Instagram</SelectItem>
-                            <SelectItem value="facebook" className="text-xs">Facebook</SelectItem>
-                            <SelectItem value="reddit" className="text-xs">Reddit</SelectItem>
-                            <SelectItem value="article" className="text-xs">Article</SelectItem>
-                            <SelectItem value="tool" className="text-xs">Tool</SelectItem>
+                            <SelectItem value="website" className="text-xs">
+                              Website
+                            </SelectItem>
+                            <SelectItem value="youtube" className="text-xs">
+                              YouTube
+                            </SelectItem>
+                            <SelectItem value="github" className="text-xs">
+                              GitHub
+                            </SelectItem>
+                            <SelectItem value="linkedin" className="text-xs">
+                              LinkedIn
+                            </SelectItem>
+                            <SelectItem value="instagram" className="text-xs">
+                              Instagram
+                            </SelectItem>
+                            <SelectItem value="facebook" className="text-xs">
+                              Facebook
+                            </SelectItem>
+                            <SelectItem value="reddit" className="text-xs">
+                              Reddit
+                            </SelectItem>
+                            <SelectItem value="article" className="text-xs">
+                              Article
+                            </SelectItem>
+                            <SelectItem value="tool" className="text-xs">
+                              Tool
+                            </SelectItem>
                           </SelectGroup>
                         </SelectContent>
                       </Select>
@@ -377,10 +628,8 @@ export function ShareClient({ categories }: ShareClientProps) {
 
                   {/* Status & Favorite */}
                   <div className="grid grid-cols-2 gap-3 items-center">
-
-
                     {/* Favorite Switch Toggle */}
-                    <div className="flex items-center justify-between p-2 rounded-lg border bg-background/25 border-border/40 h-8 self-end">
+                    <div className="flex items-center justify-between p-2 rounded-lg border bg-background/25 border-border/40 h-8 self-end col-span-2 sm:col-span-1">
                       <div className="flex items-center gap-2">
                         <Star className={`size-4 ${favorite ? "fill-amber-400 text-amber-400" : "text-muted-foreground"}`} />
                         <Label htmlFor="favorite" className="text-xs font-medium cursor-pointer">
@@ -425,3 +674,4 @@ export function ShareClient({ categories }: ShareClientProps) {
     </Card>
   );
 }
+
