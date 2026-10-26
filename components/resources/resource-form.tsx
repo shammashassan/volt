@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/select"
 import { Toggle } from "@/components/ui/toggle"
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field"
+import { DialogFooter } from "@/components/ui/dialog"
 import {
   Combobox,
   ComboboxChip,
@@ -27,7 +28,7 @@ import {
   useComboboxAnchor,
 } from "@/components/ui/combobox"
 import { Sparkles, Check, Star, Loader2, Folder, User, ExternalLink, Trash2 } from "lucide-react"
-import { toast } from "sonner"
+import { toast } from "@/components/ui/toast"
 import { RESOURCE_TYPES } from "@/components/resources/resource-types"
 import { ResourceType } from "@/types"
 
@@ -77,10 +78,16 @@ export function ResourceForm({
 
   const copyPrompt = () => {
     const prompt = `Research and write a concise, compelling 1-sentence description for the UI resource "${name}" (${link}). \nFocus on what makes it unique for design engineers or developers.\nFormat the response as a single sentence without quotes.`
-    navigator.clipboard.writeText(prompt)
-    setCopied(true)
-    toast.success("AI Prompt copied to clipboard!")
-    setTimeout(() => setCopied(false), 2000)
+    const promise = navigator.clipboard.writeText(prompt).then(() => {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    })
+
+    toast.promise(promise, {
+      loading: "Copying AI Prompt...",
+      success: "AI Prompt copied to clipboard!",
+      error: "Failed to copy to clipboard",
+    })
   }
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -390,39 +397,38 @@ export function ResourceForm({
         </Field>
       </FieldGroup>
 
-      <div className="flex items-center gap-2 border-t border-border/40 pt-4 mt-2">
-        {onDelete && (
+      <DialogFooter className="mt-6 flex flex-row items-center justify-between sm:justify-between">
+        {onDelete ? (
           <Button
             variant="destructive"
             onClick={onDelete}
             disabled={isDeleting || isLoading}
             type="button"
-            className="gap-2"
           >
             {isDeleting ? (
-              <Loader2 className="size-4 animate-spin" />
+              <Loader2 className="animate-spin" data-icon="inline-start" />
             ) : (
-              <Trash2 className="size-4" />
+              <Trash2 data-icon="inline-start" />
             )}
             Delete
           </Button>
-        )}
-        <div className="flex items-center gap-2 ml-auto">
+        ) : <div />}
+        <div className="flex items-center gap-2">
           {onCancel && (
             <Button variant="outline" type="button" onClick={onCancel}>
               Cancel
             </Button>
           )}
-          <Button type="submit" disabled={isLoading || isDeleting} className="gap-2">
+          <Button type="submit" disabled={isLoading || isDeleting}>
             {isLoading ? (
-              <Loader2 className="size-4 animate-spin" />
+              <Loader2 className="animate-spin" data-icon="inline-start" />
             ) : (
-              <Check className="size-4" />
+              <Check data-icon="inline-start" />
             )}
             {isEdit ? "Save Changes" : "Create Resource"}
           </Button>
         </div>
-      </div>
+      </DialogFooter>
     </form>
   )
 }

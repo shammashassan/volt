@@ -2,11 +2,11 @@ import { getCachedNotifications } from "@/lib/queries/notifications";
 import { NotificationsContent } from "@/components/notifications/notifications-view";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Metadata } from "next";
+import type { Metadata } from "next";
 import { getSessionUser } from "@/lib/auth-utils";
 
 export const metadata: Metadata = {
-  title: "Notifications - Volt",
+  title: "Notifications",
   description: "View and manage your activities, reminders, and alerts.",
 };
 

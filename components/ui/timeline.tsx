@@ -1,6 +1,7 @@
 "use client";
 
-import { Slot } from "radix-ui";
+import { mergeProps } from "@base-ui/react/merge-props";
+import { useRender } from "@base-ui/react/use-render";
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
@@ -86,27 +87,27 @@ function TimelineContent({
 }
 
 // TimelineDate
-interface TimelineDateProps extends React.HTMLAttributes<HTMLTimeElement> {
-  asChild?: boolean;
-}
+interface TimelineDateProps extends useRender.ComponentProps<"time"> {}
 
 function TimelineDate({
-  asChild = false,
   className,
+  render,
   ...props
 }: TimelineDateProps) {
-  const Comp = asChild ? Slot.Root : "time";
-
-  return (
-    <Comp
-      className={cn(
-        "mb-1 block font-medium text-muted-foreground text-xs group-data-[orientation=vertical]/timeline:max-sm:h-4",
-        className,
-      )}
-      data-slot="timeline-date"
-      {...props}
-    />
-  );
+  return useRender({
+    defaultTagName: "time",
+    render,
+    props: mergeProps<"time">(
+      {
+        className: cn(
+          "mb-1 block font-medium text-muted-foreground text-xs group-data-[orientation=vertical]/timeline:max-sm:h-4",
+          className,
+        ),
+        "data-slot": "timeline-date",
+      } as React.ComponentProps<"time">,
+      props,
+    ),
+  });
 }
 
 // TimelineHeader
@@ -120,29 +121,29 @@ function TimelineHeader({
 }
 
 // TimelineIndicator
-interface TimelineIndicatorProps extends React.HTMLAttributes<HTMLDivElement> {
-  asChild?: boolean;
-}
+interface TimelineIndicatorProps extends useRender.ComponentProps<"div"> {}
 
 function TimelineIndicator({
-  asChild = false,
   className,
   children,
+  render,
   ...props
 }: TimelineIndicatorProps) {
-  return (
-    <div
-      aria-hidden="true"
-      className={cn(
-        "group-data-[orientation=horizontal]/timeline:-top-6 group-data-[orientation=horizontal]/timeline:-translate-y-1/2 group-data-[orientation=vertical]/timeline:-left-6 group-data-[orientation=vertical]/timeline:-translate-x-1/2 absolute size-4 rounded-full border-2 border-primary/20 group-data-[orientation=vertical]/timeline:top-0 group-data-[orientation=horizontal]/timeline:left-0 group-data-completed/timeline-item:border-primary",
-        className,
-      )}
-      data-slot="timeline-indicator"
-      {...props}
-    >
-      {children}
-    </div>
-  );
+  return useRender({
+    defaultTagName: "div",
+    render,
+    props: mergeProps<"div">(
+      {
+        "aria-hidden": "true",
+        className: cn(
+          "group-data-[orientation=horizontal]/timeline:-top-6 group-data-[orientation=horizontal]/timeline:-translate-y-1/2 group-data-[orientation=vertical]/timeline:-left-6 group-data-[orientation=vertical]/timeline:-translate-x-1/2 absolute size-4 rounded-full border-2 border-primary/20 group-data-[orientation=vertical]/timeline:top-0 group-data-[orientation=horizontal]/timeline:left-0 group-data-completed/timeline-item:border-primary",
+          className,
+        ),
+        "data-slot": "timeline-indicator",
+      } as React.ComponentProps<"div">,
+      { ...props, children },
+    ),
+  });
 }
 
 // TimelineItem

@@ -3,6 +3,7 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   // Enable component caching as in Dime project
   cacheComponents: true,
+  partialPrefetching: true,
   images: {
     remotePatterns: [
       {

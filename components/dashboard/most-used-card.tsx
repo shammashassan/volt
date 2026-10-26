@@ -85,8 +85,14 @@ export function MostUsedCard({ resources }: MostUsedCardProps) {
                                 Resources you click will be ranked here by use count.
                             </p>
                         </div>
-                        <Button variant="ghost" size="sm" className="h-6 text-[10px] px-2 mt-0.5" asChild>
-                            <Link href="/resources">Start exploring →</Link>
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-6 text-[10px] px-2 mt-0.5"
+                            render={<Link href="/resources" />}
+                            nativeButton={false}
+                        >
+                            Start exploring →
                         </Button>
                     </div>
                 )}

@@ -46,6 +46,8 @@ Preferred:
 
 Avoid (private dashboard routes):
 - `/login`
+- `/sign-in`
+- `/sign-up`
 - `/pending-approval`
 - `/account`
 - `/explore`

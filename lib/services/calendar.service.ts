@@ -18,7 +18,7 @@ export class CalendarService {
       deletedAt: { $exists: false }
     }).toArray();
 
-    let ics = [
+    const ics = [
       'BEGIN:VCALENDAR',
       'VERSION:2.0',
       'PRODID:-//Volt//Personal Knowledge OS//EN',

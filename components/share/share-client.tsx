@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
-import { toast } from "sonner";
+import { toast } from "@/components/ui/toast";
 import {
   Loader2,
   Link2,
@@ -148,44 +148,57 @@ export function ShareClient({
           setFaviconUrl(resolvedMeta.faviconUrl);
         }
 
-        const res = await addResourceAction({
-          title: finalTitle,
-          url: targetUrl,
-          description: finalDesc,
-          categoryId: "", // Default to Inbox
-          tags: [],
-          type: detectedType,
-          favorite: false,
-          projectIds: [],
-          personIds: [],
-        });
+        const savePromise = (async () => {
+          const res = await addResourceAction({
+            title: finalTitle,
+            url: targetUrl,
+            description: finalDesc,
+            categoryId: "", // Default to Inbox
+            tags: [],
+            type: detectedType,
+            favorite: false,
+            projectIds: [],
+            personIds: [],
+          });
 
-        if (res.success && res.id) {
-          setResourceId(res.id);
-          setStatus("success");
-          toast.success("Link saved to Inbox!");
-        } else if ((res as { isDuplicate?: boolean }).isDuplicate && res.id) {
-          const dupId = res.id;
-          setResourceId(dupId);
-          setIsDuplicateLink(true);
+          if (res.success && res.id) {
+            setResourceId(res.id);
+            setStatus("success");
+            return { isDuplicate: false };
+          } else if ((res as { isDuplicate?: boolean }).isDuplicate && res.id) {
+            const dupId = res.id;
+            setResourceId(dupId);
+            setIsDuplicateLink(true);
 
-          // Fetch existing resource
-          const getResult = await getResourceAction(dupId);
-          if (getResult.success && getResult.data) {
-            const item = getResult.data as Resource;
-            setTitle(item.title || "");
-            setUrl(item.url || "");
-            setDescription(item.description || "");
-            setCategoryId(item.categoryId || "none");
-            setResourceType((item.type as ResourceType) || "website");
-            setFavorite(!!item.favorite);
+            // Fetch existing resource
+            const getResult = await getResourceAction(dupId);
+            if (getResult.success && getResult.data) {
+              const item = getResult.data as Resource;
+              setTitle(item.title || "");
+              setUrl(item.url || "");
+              setDescription(item.description || "");
+              setCategoryId(item.categoryId || "none");
+              setResourceType((item.type as ResourceType) || "website");
+              setFavorite(!!item.favorite);
+            }
+            setStatus("success");
+            return { isDuplicate: true };
+          } else {
+            setStatus("error");
+            const err = res.error || "Failed to auto-save the link.";
+            setErrorMsg(err);
+            throw new Error(err);
           }
-          setStatus("success");
-          toast.warning("This URL is already in your library!");
-        } else {
-          setStatus("error");
-          setErrorMsg(res.error || "Failed to auto-save the link.");
-        }
+        })();
+
+        await toast.promise(savePromise, {
+          loading: "Saving link to Inbox...",
+          success: (data: { isDuplicate: boolean }) =>
+            data.isDuplicate
+              ? "This URL is already in your library!"
+              : "Link saved to Inbox!",
+          error: (err: any) => err?.message || "Failed to auto-save the link.",
+        });
       } catch (err: unknown) {
         setStatus("error");
         setErrorMsg(err instanceof Error ? err.message : "An unexpected error occurred during quick save.");
@@ -260,16 +273,21 @@ export function ShareClient({
         favorite,
       };
 
-      const res = await updateResourceAction(resourceId, updateData);
-      if (res.success) {
-        toast.success("Resource categorized successfully!");
+      const updateOp = updateResourceAction(resourceId, updateData).then((res) => {
+        if (!res.success) {
+          throw new Error(res.error || "Failed to update resource.");
+        }
         router.push("/resources");
-      } else {
-        toast.error(res.error || "Failed to update resource.");
-      }
-    } catch (err: unknown) {
-      const errMsg = err instanceof Error ? err.message : "An error occurred while updating the resource.";
-      toast.error(errMsg);
+        return res;
+      });
+
+      await toast.promise(updateOp, {
+        loading: "Updating resource...",
+        success: "Resource categorized successfully!",
+        error: (err: any) => err?.message || "Failed to update resource.",
+      });
+    } catch {
+      // toast.promise displays error
     } finally {
       setIsUpdating(false);
     }

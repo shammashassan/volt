@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { Card, CardHeader, CardContent } from "@/components/ui/card"
 import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupButton } from "@/components/ui/input-group"
 import { Separator } from "@/components/ui/separator"
@@ -9,9 +9,9 @@ import {
     HoverCardContent,
     HoverCardTrigger,
 } from "@/components/ui/hover-card"
-import { Popover, PopoverContent, PopoverAnchor } from "@/components/ui/popover"
+import { Popover, PopoverContent } from "@/components/ui/popover"
 import { PlusCircle, Loader2, Globe, Info, ChevronRight } from "lucide-react"
-import { toast } from "sonner"
+import { toast } from "@/components/ui/toast"
 import { addResourceAction } from "@/lib/actions"
 import { useRouter } from "next/navigation"
 
@@ -27,6 +27,7 @@ function getDomainFromUrl(url: string): string {
 
 export function QuickSaveCard() {
     const router = useRouter()
+    const formRef = useRef<HTMLFormElement>(null)
     const [url, setUrl] = useState("")
     const [loading, setLoading] = useState(false)
     const [fetchingMetadata, setFetchingMetadata] = useState(false)
@@ -65,24 +66,32 @@ export function QuickSaveCard() {
         const title = metadata?.title || getDomainFromUrl(url) || "Saved Resource"
         const description = metadata?.description || ""
         try {
-            const result = await addResourceAction({
-                title, url, description,
-                categoryId: "", tags: [],
-                whySaved: "quick save", notes: "",
-                type: "website",
-                favorite: false, projectIds: [], personIds: [],
-            })
-            if (result.success) {
-                toast.success("Saved to Workspace!")
-                setUrl("")
-                setMetadata(null)
-                setShowPreview(false)
-                router.refresh()
-            } else {
-                toast.error(result.error || "Failed to save resource")
-            }
+            await toast.promise(
+                (async () => {
+                    const result = await addResourceAction({
+                        title, url, description,
+                        categoryId: "", tags: [],
+                        whySaved: "quick save", notes: "",
+                        type: "website",
+                        favorite: false, projectIds: [], personIds: [],
+                    })
+                    if (!result.success) {
+                        throw new Error(result.error || "Failed to save resource")
+                    }
+                    setUrl("")
+                    setMetadata(null)
+                    setShowPreview(false)
+                    router.refresh()
+                    return result
+                })(),
+                {
+                    loading: "Saving to Workspace...",
+                    success: "Saved to Workspace!",
+                    error: (err: any) => (err instanceof Error ? err.message : String(err)) || "Failed to save resource",
+                }
+            )
         } catch {
-            toast.error("An error occurred")
+            // Handled by toast.promise
         } finally {
             setLoading(false)
         }
@@ -104,16 +113,20 @@ export function QuickSaveCard() {
                 </div>
 
                 {/* Tips — (i) hover card */}
-                <HoverCard openDelay={200} closeDelay={100}>
-                    <HoverCardTrigger asChild>
-                        <button
-                            type="button"
-                            className="flex size-5 items-center justify-center rounded-full text-muted-foreground/30 transition-colors hover:text-muted-foreground/70"
-                        >
-                            <Info className="size-3.5" />
-                            <span className="sr-only">Tips</span>
-                        </button>
-                    </HoverCardTrigger>
+                <HoverCard>
+                    <HoverCardTrigger
+                        delay={200}
+                        closeDelay={100}
+                        render={
+                            <button
+                                type="button"
+                                className="flex size-5 items-center justify-center rounded-full text-muted-foreground/30 transition-colors hover:text-muted-foreground/70"
+                            >
+                                <Info className="size-3.5" />
+                                <span className="sr-only">Tips</span>
+                            </button>
+                        }
+                    />
                     <HoverCardContent align="end" sideOffset={6} className="w-56 p-3">
                         <div className="flex flex-col gap-2">
                             <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground/60">
@@ -142,63 +155,63 @@ export function QuickSaveCard() {
             {/* Body */}
             <CardContent className="flex flex-1 flex-col justify-center p-0">
                 <Popover open={showPreview} onOpenChange={setShowPreview}>
-                    <PopoverAnchor asChild>
-                        <form
-                            onSubmit={e => {
-                                e.preventDefault()
-                                handleSave()
-                            }}
-                            className="w-full"
-                        >
-                            <InputGroup>
-                                <InputGroupAddon align="inline-start">
-                                    <Globe />
+                    <form
+                        ref={formRef}
+                        onSubmit={e => {
+                            e.preventDefault()
+                            handleSave()
+                        }}
+                        className="w-full"
+                    >
+                        <InputGroup>
+                            <InputGroupAddon align="inline-start">
+                                <Globe />
+                            </InputGroupAddon>
+                            <InputGroupInput
+                                type="text"
+                                value={url}
+                                onChange={handleUrlChange}
+                                placeholder="Paste a URL to save…"
+                                disabled={loading}
+                            />
+                            {url.trim() && (
+                                <InputGroupAddon align="inline-end">
+                                    <InputGroupButton
+                                        onClick={() => setShowPreview(prev => !prev)}
+                                        variant="ghost"
+                                        size="icon-xs"
+                                        title="Toggle preview details"
+                                    >
+                                        {fetchingMetadata ? (
+                                            <Loader2 className="size-3.5 animate-spin text-primary" />
+                                        ) : (
+                                            <Info className={`size-3.5 transition-colors ${showPreview ? "text-primary" : ""}`} />
+                                        )}
+                                    </InputGroupButton>
+                                    <InputGroupButton
+                                        type="submit"
+                                        disabled={loading}
+                                        size="icon-xs"
+                                        title="Save to Workspace"
+                                    >
+                                        {loading ? (
+                                            <Loader2 className="size-3.5 animate-spin" />
+                                        ) : (
+                                            <ChevronRight className="size-3.5" />
+                                        )}
+                                    </InputGroupButton>
                                 </InputGroupAddon>
-                                <InputGroupInput
-                                    type="text"
-                                    value={url}
-                                    onChange={handleUrlChange}
-                                    placeholder="Paste a URL to save…"
-                                    disabled={loading}
-                                />
-                                {url.trim() && (
-                                    <InputGroupAddon align="inline-end">
-                                        <InputGroupButton
-                                            onClick={() => setShowPreview(prev => !prev)}
-                                            variant="ghost"
-                                            size="icon-xs"
-                                            title="Toggle preview details"
-                                        >
-                                            {fetchingMetadata ? (
-                                                <Loader2 className="size-3.5 animate-spin text-primary" />
-                                            ) : (
-                                                <Info className={`size-3.5 transition-colors ${showPreview ? "text-primary" : ""}`} />
-                                            )}
-                                        </InputGroupButton>
-                                        <InputGroupButton
-                                            type="submit"
-                                            disabled={loading}
-                                            size="icon-xs"
-                                            title="Save to Workspace"
-                                        >
-                                            {loading ? (
-                                                <Loader2 className="size-3.5 animate-spin" />
-                                            ) : (
-                                                <ChevronRight className="size-3.5" />
-                                            )}
-                                        </InputGroupButton>
-                                    </InputGroupAddon>
-                                )}
-                            </InputGroup>
-                        </form>
-                    </PopoverAnchor>
+                            )}
+                        </InputGroup>
+                    </form>
 
                     <PopoverContent
+                        anchor={formRef}
                         align="start"
                         side="top"
                         sideOffset={6}
-                        onOpenAutoFocus={(e) => e.preventDefault()}
-                        className="w-(--radix-popover-trigger-width)"
+                        initialFocus={false}
+                        className="w-(--anchor-width)"
                     >
                         {fetchingMetadata ? (
                             <div className="flex items-center gap-2 py-1">

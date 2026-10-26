@@ -21,6 +21,13 @@ import {
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
+  Empty,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+  EmptyDescription,
+} from "@/components/ui/empty"
+import {
   MoreHorizontal,
   CheckCircle2,
   Ban,
@@ -29,7 +36,8 @@ import {
   ShieldAlert,
   Trash2,
   Mail,
-  User
+  User,
+  Users,
 } from "lucide-react"
 
 interface UserData {
@@ -52,101 +60,143 @@ interface UserTableProps {
 
 export function UserTable({ users, onApprove, onSetRole, onBan, onDelete, currentUserId }: UserTableProps) {
   return (
-    <div className="rounded-xl overflow-hidden">
-      <Table>
-      <TableHeader className="bg-muted/50">
-        <TableRow>
-          <TableHead className="w-[250px]">User</TableHead>
-          <TableHead>Role</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead className="text-right">Actions</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {users.map((user: UserData) => (
-          <TableRow key={user.id} className="hover:bg-muted/30 transition-colors">
-            <TableCell>
-              <div className="flex flex-col">
-                <span className="font-bold text-foreground/90">{user.name}</span>
-                <span className="text-xs text-muted-foreground flex items-center gap-1">
-                  <Mail className="size-3" />
-                  {user.email}
-                </span>
-              </div>
-            </TableCell>
-            <TableCell>
-              <Badge variant="outline" className="capitalize">
-                {user.role === "admin" ? (
-                  <ShieldCheck className="mr-1 size-3" />
-                ) : (
-                  <User className="mr-1 size-3" />
-                )}
-                {user.role}
-              </Badge>
-            </TableCell>
-            <TableCell>
-              <div className="flex gap-2">
-                {!user.isApproved && (
-                  <Badge variant="warning">
-                    Pending
-                  </Badge>
-                )}
-                {user.isApproved && (
-                  <Badge variant="success">
-                    Approved
-                  </Badge>
-                )}
-                {user.banned && (
-                  <Badge variant="destructive">
-                    Banned
-                  </Badge>
-                )}
-              </div>
-            </TableCell>
-            <TableCell className="text-right">
-              {user.id !== currentUserId ? (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="size-8 p-0">
-                      <MoreHorizontal className="size-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-48">
-                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                    {!user.isApproved && (
-                      <DropdownMenuItem onClick={() => onApprove(user.id)} className="text-emerald-500 focus:text-emerald-500">
-                        <CheckCircle2 className="mr-2 size-4" />
-                        Approve User
-                      </DropdownMenuItem>
+    <div className="rounded-xl border border-border/50 bg-card overflow-hidden shadow-xs">
+      <div className="overflow-x-auto">
+        <Table>
+          <TableHeader className="bg-muted/40">
+            <TableRow>
+              <TableHead className="w-[280px] h-10 text-xs font-semibold">User</TableHead>
+              <TableHead className="h-10 text-xs font-semibold">Role</TableHead>
+              <TableHead className="h-10 text-xs font-semibold">Status</TableHead>
+              <TableHead className="h-10 text-xs font-semibold text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {users.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={4} className="h-44 text-center">
+                  <Empty className="py-8 border-0">
+                    <EmptyHeader>
+                      <EmptyMedia variant="icon">
+                        <Users className="size-4" />
+                      </EmptyMedia>
+                      <EmptyTitle>No users found</EmptyTitle>
+                      <EmptyDescription>
+                        No user accounts matched the current filter criteria.
+                      </EmptyDescription>
+                    </EmptyHeader>
+                  </Empty>
+                </TableCell>
+              </TableRow>
+            ) : (
+              users.map((user: UserData) => (
+                <TableRow key={user.id} className="hover:bg-muted/30 transition-colors">
+                  <TableCell>
+                    <div className="flex flex-col">
+                      <span className="font-medium text-foreground">{user.name}</span>
+                      <span className="text-xs text-muted-foreground flex items-center gap-1.5 mt-0.5">
+                        <Mail className="size-3" />
+                        {user.email}
+                      </span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="outline" className="capitalize gap-1 text-xs">
+                      {user.role === "admin" ? (
+                        <ShieldCheck className="size-3 text-primary" />
+                      ) : (
+                        <User className="size-3 text-muted-foreground" />
+                      )}
+                      {user.role}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex flex-wrap gap-1.5">
+                      {!user.isApproved && (
+                        <Badge variant="warning" className="text-xs">
+                          Pending
+                        </Badge>
+                      )}
+                      {user.isApproved && (
+                        <Badge variant="success" className="text-xs">
+                          Approved
+                        </Badge>
+                      )}
+                      {user.banned && (
+                        <Badge variant="destructive" className="text-xs">
+                          Banned
+                        </Badge>
+                      )}
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    {user.id !== currentUserId ? (
+                      <DropdownMenu>
+                        <DropdownMenuTrigger
+                          render={
+                            <Button variant="ghost" size="icon-sm" className="size-8 p-0">
+                              <span className="sr-only">Open actions menu</span>
+                              <MoreHorizontal className="size-4" />
+                            </Button>
+                          }
+                        />
+                        <DropdownMenuContent align="end" className="w-48">
+                          <DropdownMenuGroup>
+                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                            {!user.isApproved && (
+                              <DropdownMenuItem
+                                onClick={() => onApprove(user.id)}
+                                className="text-emerald-500 focus:text-emerald-500"
+                              >
+                                <CheckCircle2 className="size-4" />
+                                <span>Approve User</span>
+                              </DropdownMenuItem>
+                            )}
+                          </DropdownMenuGroup>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuGroup>
+                            <DropdownMenuItem
+                              onClick={() => onSetRole(user.id, user.role === "admin" ? "user" : "admin")}
+                            >
+                              {user.role === "admin" ? (
+                                <ShieldAlert className="size-4" />
+                              ) : (
+                                <ShieldCheck className="size-4" />
+                              )}
+                              <span>Make {user.role === "admin" ? "User" : "Admin"}</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => onBan(user.id, !!user.banned)}
+                              className={user.banned ? "text-emerald-500" : "text-amber-500"}
+                            >
+                              {user.banned ? <Unlock className="size-4" /> : <Ban className="size-4" />}
+                              <span>{user.banned ? "Unban User" : "Ban User"}</span>
+                            </DropdownMenuItem>
+                          </DropdownMenuGroup>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuGroup>
+                            <DropdownMenuItem
+                              onClick={() => onDelete(user.id)}
+                              className="text-destructive focus:text-destructive"
+                            >
+                              <Trash2 className="size-4" />
+                              <span>Delete User</span>
+                            </DropdownMenuItem>
+                          </DropdownMenuGroup>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    ) : (
+                      <Badge variant="outline" className="text-xs font-mono">
+                        You
+                      </Badge>
                     )}
-                    <DropdownMenuSeparator />
-                    <DropdownMenuGroup>
-                      <DropdownMenuItem onClick={() => onSetRole(user.id, user.role === "admin" ? "user" : "admin")}>
-                        {user.role === "admin" ? <ShieldAlert className="mr-2 size-4" /> : <ShieldCheck className="mr-2 size-4" />}
-                        Make {user.role === "admin" ? "User" : "Admin"}
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => onBan(user.id, !!user.banned)} className={user.banned ? "text-emerald-500" : "text-amber-500"}>
-                        {user.banned ? <Unlock className="mr-2 size-4" /> : <Ban className="mr-2 size-4" />}
-                        {user.banned ? "Unban User" : "Ban User"}
-                      </DropdownMenuItem>
-                    </DropdownMenuGroup>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => onDelete(user.id)} className="text-red-500 focus:text-red-500">
-                      <Trash2 className="mr-2 size-4" />
-                      Delete User
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              ) : (
-                <Badge variant="outline">
-                  You
-                </Badge>
-              )}
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table >
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   )
 }

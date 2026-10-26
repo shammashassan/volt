@@ -40,6 +40,15 @@ export class NotificationRepository {
     return res.modifiedCount > 0;
   }
 
+  async markAllRead(userId: UserId): Promise<boolean> {
+    const col = await this.getCollection();
+    const res = await col.updateMany(
+      { userId, readAt: { $exists: false } },
+      { $set: { readAt: new Date(), updatedAt: new Date() } }
+    );
+    return res.modifiedCount > 0;
+  }
+
   async archive(id: string, userId: UserId): Promise<boolean> {
     const col = await this.getCollection();
     const query = ObjectId.isValid(id) ? { _id: new ObjectId(id), userId } : { id, userId };

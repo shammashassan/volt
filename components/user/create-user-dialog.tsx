@@ -15,12 +15,13 @@ import { Input } from "@/components/ui/input"
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field"
-import { toast } from "sonner"
+import { toast } from "@/components/ui/toast"
 import { authClient } from "@/lib/auth-client"
 
 interface CreateUserDialogProps {
@@ -41,28 +42,35 @@ export function CreateUserDialog({ open, onOpenChange, onSuccess }: CreateUserDi
     const password = formData.get("password") as string
     const role = formData.get("role") as "user" | "admin"
 
-    const { error } = await authClient.admin.createUser({
-        email,
-        name,
-        password,
-        role,
-        data: { isApproved: true }
+    const promise = authClient.admin.createUser({
+      email,
+      name,
+      password,
+      role,
+      data: { isApproved: true }
+    }).then(({ error }) => {
+      if (error) {
+        throw new Error(error.message || "Failed to create user")
+      }
+      onSuccess()
+      onOpenChange(false)
     })
 
-    if (error) {
-        toast.error(error.message)
-    } else {
-        toast.success("User created successfully")
-        onSuccess()
-        onOpenChange(false)
+    try {
+      await toast.promise(promise, {
+        loading: "Creating user...",
+        success: "User created successfully",
+        error: (err: any) => err?.message || "Failed to create user",
+      })
+    } finally {
+      setIsLoading(false)
     }
-    setIsLoading(false)
   }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <form onSubmit={handleSubmit}>
-        <DialogContent className="sm:max-w-[425px] overflow-y-auto max-h-[90vh] no-scrollbar">
+      <DialogContent className="sm:max-w-[425px] overflow-y-auto max-h-[90vh] no-scrollbar">
+        <form onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle>Create New User</DialogTitle>
             <DialogDescription>
@@ -89,8 +97,10 @@ export function CreateUserDialog({ open, onOpenChange, onSuccess }: CreateUserDi
                   <SelectValue placeholder="Select a role" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="user">User</SelectItem>
-                  <SelectItem value="admin">Admin</SelectItem>
+                  <SelectGroup>
+                    <SelectItem value="user">User</SelectItem>
+                    <SelectItem value="admin">Admin</SelectItem>
+                  </SelectGroup>
                 </SelectContent>
               </Select>
             </Field>
@@ -101,8 +111,8 @@ export function CreateUserDialog({ open, onOpenChange, onSuccess }: CreateUserDi
             </Button>
             <Button type="submit" disabled={isLoading}>Create User</Button>
           </DialogFooter>
-        </DialogContent>
-      </form>
+        </form>
+      </DialogContent>
     </Dialog>
   )
 }

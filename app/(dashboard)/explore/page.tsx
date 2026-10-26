@@ -1,5 +1,6 @@
 import { Suspense } from "react"
 import { redirect } from "next/navigation"
+import type { Metadata } from "next"
 import { cacheLife, cacheTag } from "next/cache"
 import { getSessionUser } from "@/lib/auth-utils"
 import { getDb } from "@/lib/db"
@@ -15,6 +16,11 @@ import {
 } from "@/lib/queries/resources"
 import { WorkspaceBento } from "@/components/dashboard/workspace-bento"
 import { Skeleton } from "@/components/ui/skeleton"
+
+export const metadata: Metadata = {
+  title: "Explore",
+  description: "Workspace overview, recently added resources, and knowledge activity.",
+}
 
 async function getUnreadNotificationsCount(userId: string) {
   const db = await getDb()
@@ -117,37 +123,25 @@ async function WorkspaceDashboardBody({
   )
 }
 
-/**
- * WorkspaceSkeleton mirrors the 4-row bento layout exactly so the Suspense
- * fallback feels native rather than generic.
- *
- * Uses <Skeleton> throughout — no bare animate-pulse divs.
- */
 function WorkspaceSkeleton() {
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 py-6 lg:px-6">
-      {/* Header */}
       <div className="flex flex-col gap-2 border-b border-border pb-6">
         <Skeleton className="h-3 w-28 rounded" />
         <Skeleton className="h-8 w-64 rounded-md" />
       </div>
 
-      {/* Grid Container */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Row 0: Focus, My Day, Watchlist Upcoming */}
         <Skeleton className="h-[148px] rounded-xl lg:col-span-1 order-1 lg:order-0" />
         <Skeleton className="h-[148px] rounded-xl lg:col-span-1 order-2 lg:order-0" />
         <Skeleton className="h-[148px] rounded-xl lg:col-span-1 order-3 lg:order-0" />
 
-        {/* Row 1: Command Center & Quick Save */}
         <Skeleton className="h-28 rounded-xl lg:col-span-2 order-4 lg:order-0" />
         <Skeleton className="h-24 rounded-xl lg:col-span-1 order-5 lg:order-0" />
 
-        {/* Row 2: Workspace Activity & Workspace Health */}
         <Skeleton className="h-64 rounded-xl lg:col-span-2 order-6 lg:order-0" />
         <Skeleton className="h-[210px] rounded-xl lg:col-span-1 order-8 lg:order-0" />
 
-        {/* Row 3: Recently Added & Categories Summary */}
         <div className="lg:col-span-2 order-7 lg:order-0 flex flex-col gap-3">
           <div className="flex items-center justify-between px-1">
             <Skeleton className="h-4 w-28 rounded" />
@@ -162,7 +156,6 @@ function WorkspaceSkeleton() {
         </div>
         <Skeleton className="h-[288px] rounded-xl lg:col-span-1 order-9 lg:order-0" />
 
-        {/* Row 4: Most Used Resources & Favorites */}
         <Skeleton className="h-[270px] rounded-xl lg:col-span-2 order-10 lg:order-0" />
         <Skeleton className="h-[270px] rounded-xl lg:col-span-1 order-11 lg:order-0" />
       </div>
@@ -170,7 +163,7 @@ function WorkspaceSkeleton() {
   )
 }
 
-export default async function ExplorePage() {
+async function ExploreContentWrapper() {
   let user: { id: string; name?: string | null }
   try {
     user = await getSessionUser()
@@ -178,14 +171,20 @@ export default async function ExplorePage() {
     redirect("/login")
   }
 
-    return (
-        <div className="@container/main flex flex-1 flex-col gap-6 pb-2">
+  return (
+    <WorkspaceDashboardBody
+      userId={user.id}
+      userName={user.name || "Developer"}
+    />
+  )
+}
+
+export default function ExplorePage() {
+  return (
+    <div className="@container/main flex flex-1 flex-col gap-6 pb-2">
       <Suspense fallback={<WorkspaceSkeleton />}>
-        <WorkspaceDashboardBody
-          userId={user.id}
-          userName={user.name || "Developer"}
-        />
+        <ExploreContentWrapper />
       </Suspense>
     </div>
   )
-}
+}

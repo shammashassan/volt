@@ -6,6 +6,12 @@ import { redirect } from "next/navigation"
 import { Suspense } from "react"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Network } from "lucide-react"
+import type { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "Knowledge Graph",
+  description: "Visualize connection vectors and bidirectional links in your personal knowledge network.",
+}
 
 function GraphSkeleton() {
   return (

@@ -48,8 +48,8 @@ export function WatchlistCard({ item, onUpdateStatus, onUpdateRating, onDelete }
     const target = e.target as HTMLElement;
     if (
       target.closest('[role="dialog"]') ||
-      target.closest('[data-radix-portal]') ||
-      target.closest('[data-radix-popper-content-wrapper]') ||
+      target.closest('[data-slot*="popover"]') ||
+      target.closest('[data-slot*="portal"]') ||
       target.closest('[data-vaul-drawer]')
     ) return;
     const cardEl = document.getElementById(`watchlist-card-${item._id}`);
@@ -174,15 +174,17 @@ export function WatchlistCard({ item, onUpdateStatus, onUpdateRating, onDelete }
 
             {/* Status chip */}
             <Popover open={statusPopoverOpen} onOpenChange={setStatusPopoverOpen}>
-              <PopoverTrigger asChild>
-                <button
-                  aria-label="Change status"
-                  className="w-full text-[10px] h-7 font-semibold px-2 rounded-lg border border-white/15 bg-white/10 hover:bg-white/20 active:bg-white/25 text-white transition-colors flex items-center justify-center gap-1.5 backdrop-blur-sm cursor-pointer select-none"
-                >
-                  <span className="text-xs leading-none shrink-0">{activeStatus.icon}</span>
-                  <span className="text-[10px] truncate">{activeStatus.label}</span>
-                </button>
-              </PopoverTrigger>
+              <PopoverTrigger
+                render={
+                  <button
+                    aria-label="Change status"
+                    className="w-full text-[10px] h-7 font-semibold px-2 rounded-lg border border-white/15 bg-white/10 hover:bg-white/20 active:bg-white/25 text-white transition-colors flex items-center justify-center gap-1.5 backdrop-blur-sm cursor-pointer select-none"
+                  >
+                    <span className="text-xs leading-none shrink-0">{activeStatus.icon}</span>
+                    <span className="text-[10px] truncate">{activeStatus.label}</span>
+                  </button>
+                }
+              />
               <PopoverContent className="w-36 p-1" align="start">
                 {(Object.keys(WATCHLIST_STATUS_LABELS) as WatchlistStatus[]).map((statusKey) => {
                   const option = WATCHLIST_STATUS_LABELS[statusKey];
@@ -218,20 +220,22 @@ export function WatchlistCard({ item, onUpdateStatus, onUpdateRating, onDelete }
                 if (open) setTempRating(item.rating ?? null);
               }}
             >
-              <PopoverTrigger asChild>
-                <button
-                  aria-label="Change rating"
-                  className={cn(
-                    "w-full text-[10px] h-7 px-2 font-semibold rounded-lg border border-white/15 bg-white/10 hover:bg-white/20 active:bg-white/25 text-white transition-colors flex items-center justify-center gap-1.5 backdrop-blur-sm cursor-pointer",
-                    item.rating && "border-primary/60 bg-primary/20 hover:bg-primary/30"
-                  )}
-                >
-                  <Star className={cn("h-3 w-3 shrink-0", item.rating ? "fill-primary text-primary" : "text-white/50")} />
-                  <span className={cn("text-[10px] font-semibold tabular-nums", item.rating ? "text-primary font-bold" : "text-white/80")}>
-                    {item.rating ? `${item.rating} / 10` : "Rate"}
-                  </span>
-                </button>
-              </PopoverTrigger>
+              <PopoverTrigger
+                render={
+                  <button
+                    aria-label="Change rating"
+                    className={cn(
+                      "w-full text-[10px] h-7 px-2 font-semibold rounded-lg border border-white/15 bg-white/10 hover:bg-white/20 active:bg-white/25 text-white transition-colors flex items-center justify-center gap-1.5 backdrop-blur-sm cursor-pointer",
+                      item.rating && "border-primary/60 bg-primary/20 hover:bg-primary/30"
+                    )}
+                  >
+                    <Star className={cn("h-3 w-3 shrink-0", item.rating ? "fill-primary text-primary" : "text-white/50")} />
+                    <span className={cn("text-[10px] font-semibold tabular-nums", item.rating ? "text-primary font-bold" : "text-white/80")}>
+                      {item.rating ? `${item.rating} / 10` : "Rate"}
+                    </span>
+                  </button>
+                }
+              />
               <PopoverContent className="w-56 p-3" align="end">
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
@@ -247,8 +251,8 @@ export function WatchlistCard({ item, onUpdateStatus, onUpdateRating, onDelete }
                       min={1}
                       max={10}
                       step={1}
-                      onValueChange={(val) => setTempRating(val[0])}
-                      onValueCommit={(val) => onUpdateRating(item._id!, val[0])}
+                      onValueChange={(val) => setTempRating(Array.isArray(val) ? val[0] : val)}
+                      onValueCommitted={(val) => onUpdateRating(item._id!, Array.isArray(val) ? val[0] : val)}
                     />
                     <span
                       aria-hidden="true"

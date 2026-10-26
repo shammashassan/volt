@@ -99,8 +99,14 @@ export function ActivityCard({ recentlyViewed, recommended, spotlight }: Activit
                                                 Resources you open will appear here.
                                             </p>
                                         </div>
-                                        <Button variant="ghost" size="sm" className="h-6 text-[10px] px-2" asChild>
-                                            <Link href="/resources">Browse your stack →</Link>
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            className="h-6 text-[10px] px-2"
+                                            render={<Link href="/resources" />}
+                                            nativeButton={false}
+                                        >
+                                            Browse your stack →
                                         </Button>
                                     </div>
                                 )}

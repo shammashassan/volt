@@ -112,11 +112,15 @@ export function CategoriesSummaryCard({ categories = [] }: CategoriesSummaryCard
 
             {/* Card Footer containing CTA */}
             <CardFooter>
-                <Button variant="outline" size="sm" asChild className="w-full">
-                    <Link href="/categories">
-                        Manage categories
-                        <ArrowRight />
-                    </Link>
+                <Button
+                    variant="outline"
+                    size="sm"
+                    render={<Link href="/categories" />}
+                    nativeButton={false}
+                    className="w-full"
+                >
+                    Manage categories
+                    <ArrowRight />
                 </Button>
             </CardFooter>
         </Card>

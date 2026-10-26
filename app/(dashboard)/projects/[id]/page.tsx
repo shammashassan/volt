@@ -1,12 +1,31 @@
 import { getProjectById } from "@/lib/queries/projects";
 import { getResourcesByProjectId } from "@/lib/queries/resources";
 import { getNotesByProjectId } from "@/lib/queries/notes";
-import { ProjectContent } from "./project-content"
+import { ProjectContent } from "@/components/projects/project-content";
 import { auth } from "@/lib/auth"
 import { headers } from "next/headers"
 import { redirect, notFound } from "next/navigation"
 import { Suspense } from "react"
 import { Skeleton } from "@/components/ui/skeleton"
+import type { Metadata } from "next"
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}): Promise<Metadata> {
+  const { id } = await params
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  })
+  if (!session) return { title: "Project" }
+  const project = await getProjectById(id, session.user.id)
+  if (!project) return { title: "Project" }
+  return {
+    title: project.name,
+    description: project.description || `Connected resources, notes, and progress for ${project.name}`,
+  }
+}
 
 function ProjectDetailSkeleton() {
   return (
@@ -67,7 +86,8 @@ function ProjectDetailSkeleton() {
   )
 }
 
-async function ProjectDetailContentWrapper({ id }: { id: string }) {
+async function ProjectDetailContentWrapper({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
   const session = await auth.api.getSession({
     headers: await headers()
   })
@@ -95,12 +115,10 @@ async function ProjectDetailContentWrapper({ id }: { id: string }) {
   )
 }
 
-export default async function ProjectDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params
-  
+export default function ProjectDetailPage(props: { params: Promise<{ id: string }> }) {
   return (
     <Suspense fallback={<ProjectDetailSkeleton />}>
-      <ProjectDetailContentWrapper id={id} />
+      <ProjectDetailContentWrapper {...props} />
     </Suspense>
   )
 }

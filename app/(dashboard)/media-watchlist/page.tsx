@@ -1,10 +1,10 @@
 import React from "react";
 import { getWatchlistAction } from "@/lib/queries/watchlist";
 import { MediaWatchlistClient } from "@/components/watchlist/media-watchlist-client";
-import { Metadata } from "next";
+import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Media Watchlist - Volt",
+  title: "Media Watchlist",
   description: "Track movies, series, and anime in one place.",
 };
 

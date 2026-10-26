@@ -53,11 +53,10 @@ export class WatchlistService {
         const fetchedEpisode = details.nextEpisodeNumber;
         const storedDate = item.metadata.nextEpisodeDate;
 
-        if (fetchedEpisode && fetchedEpisode > storedEpisode && storedEpisode > lastNotifiedEpisode) {
-          newEpisodeAired = true;
-          airedEpisodeNumber = storedEpisode;
-        } else if (!fetchedEpisode && storedDate && new Date(storedDate) <= now && storedEpisode > lastNotifiedEpisode) {
-          // Next episode is null/undefined, meaning the final episode has aired
+        const hasRolledOver = Boolean(fetchedEpisode && fetchedEpisode > storedEpisode);
+        const hasAirDatePassed = Boolean(storedDate && new Date(storedDate) <= now);
+
+        if ((hasRolledOver || hasAirDatePassed) && storedEpisode > lastNotifiedEpisode) {
           newEpisodeAired = true;
           airedEpisodeNumber = storedEpisode;
         }

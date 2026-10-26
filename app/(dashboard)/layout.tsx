@@ -3,69 +3,41 @@ import { AppSidebar } from "@/components/layout/app-sidebar"
 import { SiteFooter } from "@/components/layout/site-footer"
 import { SiteHeader } from "@/components/layout/site-header"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
-import { QuickCaptureProvider } from "@/components/layout/quick-capture-drawers"
-import { getCategories } from "@/lib/queries/categories";
-import { getCollections } from "@/lib/queries/collections";
-import { auth } from "@/lib/auth"
-import { headers } from "next/headers"
-import { redirect } from "next/navigation"
+import { NotificationsProvider } from "@/components/notifications/notifications-provider"
+import { requireApprovedUser } from "@/lib/auth-utils"
 import { NuqsAdapter } from "nuqs/adapters/next/app"
 
-export default async function DashboardLayout({
+async function AuthGuard() {
+  await requireApprovedUser()
+  return null
+}
+
+export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const session = await auth.api.getSession({
-    headers: await headers()
-  })
-  if (!session) {
-    redirect("/login")
-  }
-  const userId = session.user.id
-  const [categories, collections] = await Promise.all([
-    getCategories(userId),
-    getCollections(userId)
-  ])
-
   return (
     <NuqsAdapter>
-      <div className="[--header-height:calc(--spacing(14))] flex min-h-screen w-full">
-        <QuickCaptureProvider>
+      <NotificationsProvider>
+        <Suspense fallback={null}>
+          <AuthGuard />
+        </Suspense>
+        <div className="[--header-height:calc(--spacing(14))] flex min-h-screen w-full">
           <SidebarProvider className="flex flex-col">
-            <Suspense fallback={
-              <header className="sticky top-0 z-50 flex h-(--header-height) shrink-0 items-center gap-2 border-b bg-background/80 backdrop-blur-md transition-all ease-linear w-full px-4 lg:px-6" />
-            }>
-              <SiteHeader initialCategories={categories} initialCollections={collections} />
-            </Suspense>
+            <SiteHeader />
             <div className="flex flex-1">
-              <Suspense fallback={
-                <div className="w-64 border-r bg-sidebar h-screen hidden md:block" />
-              }>
-                <AppSidebar variant="inset" collapsible="icon" initialCategories={categories} initialCollections={collections} />
-              </Suspense>
+              <AppSidebar variant="inset" collapsible="icon" />
               <SidebarInset className="bg-background overflow-hidden">
                 <div className="flex flex-1 flex-col pt-0">
-                  <Suspense fallback={
-                    <div className="flex-1 space-y-6 p-8 animate-pulse">
-                      <div className="h-8 w-1/3 bg-muted rounded-lg" />
-                      <div className="h-4 w-2/3 bg-muted rounded-md" />
-                      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 mt-6">
-                        {Array.from({ length: 6 }).map((_, i) => (
-                          <div key={i} className="h-40 bg-muted rounded-xl" />
-                        ))}
-                      </div>
-                    </div>
-                  }>
-                    {children}
-                  </Suspense>
+                  {children}
                 </div>
               </SidebarInset>
             </div>
             <SiteFooter />
           </SidebarProvider>
-        </QuickCaptureProvider>
-      </div>
+        </div>
+      </NotificationsProvider>
     </NuqsAdapter>
   )
 }

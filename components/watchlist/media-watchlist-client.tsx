@@ -1,18 +1,31 @@
 "use client";
 
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
 import { WatchlistItem, SearchResult, WatchlistStatus } from "@/types/watchlist";
 import { WatchlistGrid } from "./watchlist-grid";
 import { AddMediaDialog } from "./add-media-dialog";
 import { Button } from "@/components/ui/button";
-import { Plus, Search, Film, Star, Filter } from "lucide-react";
-import { toast } from "sonner";
+import {
+  Plus,
+  Search,
+  Film,
+  Star,
+  Filter,
+  Sparkles,
+  Play,
+  Clock,
+  CheckCircle2,
+  XCircle,
+  Layers,
+} from "lucide-react";
+import { toast } from "@/components/ui/toast";
 import { useQueryState } from "nuqs";
 import { createWatchlistItemAction, updateWatchlistItemAction, deleteWatchlistItemAction } from "@/lib/actions/watchlist";
 import { Kbd } from "@/components/ui/kbd";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Toggle } from "@/components/ui/toggle";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Select,
   SelectTrigger,
@@ -27,7 +40,6 @@ import {
   EmptyDescription,
   EmptyMedia,
 } from "@/components/ui/empty";
-import { WATCHLIST_STATUS_LABELS } from "@/lib/constants/watchlist";
 
 interface MediaWatchlistClientProps {
   initialItems: WatchlistItem[];
@@ -37,8 +49,8 @@ export function MediaWatchlistClient({ initialItems }: MediaWatchlistClientProps
   const [items, setItems] = useState<WatchlistItem[]>(initialItems);
   const [searchOpen, setSearchOpen] = useState(false);
 
-  // URL State Filters (Nuqs)
-  const [statusFilter, setStatusFilter] = useQueryState("status", { defaultValue: "all" });
+  // URL State Filters (Nuqs) - Defaults to 'active' (Planned + Watching)
+  const [statusFilter, setStatusFilter] = useQueryState("status", { defaultValue: "active" });
   const [typeFilter, setTypeFilter] = useQueryState("type", { defaultValue: "all" });
   const [q, setQ] = useQueryState("q", { defaultValue: "" });
   const [ratedFilter, setRatedFilter] = useQueryState("rated", {
@@ -64,19 +76,69 @@ export function MediaWatchlistClient({ initialItems }: MediaWatchlistClientProps
     setSearchValue(currentQ);
   }
 
+  const activeStatus = statusFilter || "active";
+  const tabsContainerRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll selected tab into view when active tab changes on smaller screens
+  useEffect(() => {
+    if (!tabsContainerRef.current) return;
+    const activeTab = tabsContainerRef.current.querySelector<HTMLElement>('[data-active], [data-state="active"]');
+    if (activeTab) {
+      activeTab.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
+    }
+  }, [activeStatus]);
+
+  // Tab count badges (reflecting current search, type, and rating filters)
+  const tabCounts = useMemo(() => {
+    const matching = items.filter((item) => {
+      const title = (item.metadata?.title || "").toLowerCase();
+      const matchesSearch = !q || title.includes(q.toLowerCase());
+      const matchesType = typeFilter === "all" || !typeFilter || item.type === typeFilter;
+      const matchesRated = !ratedFilter || (item.rating !== undefined && item.rating !== null);
+      return matchesSearch && matchesType && matchesRated;
+    });
+
+    let watching = 0;
+    let planned = 0;
+    let completed = 0;
+    let dropped = 0;
+
+    for (const item of matching) {
+      if (item.status === "watching") watching++;
+      else if (item.status === "planned") planned++;
+      else if (item.status === "completed") completed++;
+      else if (item.status === "dropped") dropped++;
+    }
+
+    return {
+      active: watching + planned,
+      watching,
+      planned,
+      completed,
+      dropped,
+      all: matching.length,
+    };
+  }, [items, q, typeFilter, ratedFilter]);
+
   // Filter Logic
   const filteredItems = useMemo(() => {
     return items.filter((item) => {
       const title = (item.metadata?.title || "").toLowerCase();
       const matchesSearch = !q || title.includes(q.toLowerCase());
 
-      const matchesStatus = statusFilter === "all" || !statusFilter || item.status === statusFilter;
+      let matchesStatus = true;
+      if (activeStatus === "active") {
+        matchesStatus = item.status === "planned" || item.status === "watching";
+      } else if (activeStatus !== "all") {
+        matchesStatus = item.status === activeStatus;
+      }
+
       const matchesType = typeFilter === "all" || !typeFilter || item.type === typeFilter;
       const matchesRated = !ratedFilter || (item.rating !== undefined && item.rating !== null);
 
       return matchesSearch && matchesStatus && matchesType && matchesRated;
     });
-  }, [items, q, statusFilter, typeFilter, ratedFilter]);
+  }, [items, q, activeStatus, typeFilter, ratedFilter]);
 
   // 1. Add Media Handlers
   const handleAddMedia = async (result: SearchResult) => {
@@ -110,33 +172,37 @@ export function MediaWatchlistClient({ initialItems }: MediaWatchlistClientProps
     };
 
     setItems((prev) => [optimisticItem, ...prev]);
-    const toastId = toast.loading(`Adding "${result.title}" to watchlist...`);
 
-    // Server Request
-    const res = await createWatchlistItemAction({
+    const promise = createWatchlistItemAction({
       externalId: result.externalId,
       source: result.source,
       type: result.type,
       status: "planned",
       metadata: optimisticItem.metadata,
-    });
-
-    if (!res.success) {
-      setItems((prev) => prev.filter((i) => i._id !== tempId));
-      toast.error(res.error || "Failed to add item.", { id: toastId });
-    } else if (res.exists) {
-      // Remove temp and place existing in local list if not there
-      setItems((prev) => {
-        const filtered = prev.filter((i) => i._id !== tempId);
-        if (filtered.some((i) => i._id === res.data?._id)) return filtered;
-        return [res.data!, ...filtered];
-      });
-      toast.info("Already in your watchlist.", { id: toastId });
-    } else {
+    }).then((res) => {
+      if (!res.success) {
+        setItems((prev) => prev.filter((i) => i._id !== tempId));
+        throw new Error(res.error || "Failed to add item.");
+      }
+      if (res.exists) {
+        // Remove temp and place existing in local list if not there
+        setItems((prev) => {
+          const filtered = prev.filter((i) => i._id !== tempId);
+          if (filtered.some((i) => i._id === res.data?._id)) return filtered;
+          return [res.data!, ...filtered];
+        });
+        return "Already in your watchlist.";
+      }
       // Swap temp with actual DB inserted item
       setItems((prev) => prev.map((i) => (i._id === tempId ? res.data! : i)));
-      toast.success(`Added "${result.title}" to watchlist`, { id: toastId });
-    }
+      return `Added "${result.title}" to watchlist`;
+    });
+
+    toast.promise(promise, {
+      loading: `Adding "${result.title}" to watchlist...`,
+      success: (msg: string) => msg,
+      error: (err: any) => err?.message || "Failed to add item.",
+    });
   };
 
   // 2. Update Status Handlers
@@ -147,13 +213,19 @@ export function MediaWatchlistClient({ initialItems }: MediaWatchlistClientProps
       prev.map((i) => (i._id === id ? { ...i, status, updatedAt: new Date() } : i))
     );
 
-    const res = await updateWatchlistItemAction(id, { status });
-    if (!res.success) {
-      setItems(oldItems);
-      toast.error(res.error || "Failed to update status.");
-    } else {
-      toast.success(`Updated status`);
-    }
+    const promise = updateWatchlistItemAction(id, { status }).then((res) => {
+      if (!res.success) {
+        setItems(oldItems);
+        throw new Error(res.error || "Failed to update status.");
+      }
+      return res;
+    });
+
+    toast.promise(promise, {
+      loading: "Updating status...",
+      success: "Updated status",
+      error: (err: any) => err?.message || "Failed to update status.",
+    });
   };
 
   // 3. Update Rating Handlers
@@ -163,13 +235,19 @@ export function MediaWatchlistClient({ initialItems }: MediaWatchlistClientProps
       prev.map((i) => (i._id === id ? { ...i, rating: rating ?? undefined, updatedAt: new Date() } : i))
     );
 
-    const res = await updateWatchlistItemAction(id, { rating });
-    if (!res.success) {
-      setItems(oldItems);
-      toast.error(res.error || "Failed to update rating.");
-    } else {
-      toast.success(rating ? `Rated ${rating}/10` : "Cleared rating");
-    }
+    const promise = updateWatchlistItemAction(id, { rating }).then((res) => {
+      if (!res.success) {
+        setItems(oldItems);
+        throw new Error(res.error || "Failed to update rating.");
+      }
+      return res;
+    });
+
+    toast.promise(promise, {
+      loading: "Updating rating...",
+      success: rating ? `Rated ${rating}/10` : "Cleared rating",
+      error: (err: any) => err?.message || "Failed to update rating.",
+    });
   };
 
   // 4. Delete Handlers
@@ -178,13 +256,19 @@ export function MediaWatchlistClient({ initialItems }: MediaWatchlistClientProps
     const targetItem = items.find((i) => i._id === id);
     setItems((prev) => prev.filter((i) => i._id !== id));
 
-    const res = await deleteWatchlistItemAction(id);
-    if (!res.success) {
-      setItems(oldItems);
-      toast.error(res.error || "Failed to delete item.");
-    } else {
-      toast.success(`Deleted "${targetItem?.metadata?.title || "item"}"`);
-    }
+    const promise = deleteWatchlistItemAction(id).then((res) => {
+      if (!res.success) {
+        setItems(oldItems);
+        throw new Error(res.error || "Failed to delete item.");
+      }
+      return res;
+    });
+
+    toast.promise(promise, {
+      loading: "Deleting item...",
+      success: `Deleted "${targetItem?.metadata?.title || "item"}"`,
+      error: (err: any) => err?.message || "Failed to delete item.",
+    });
   };
 
   return (
@@ -217,68 +301,133 @@ export function MediaWatchlistClient({ initialItems }: MediaWatchlistClientProps
         </div>
       </section>
 
-      {/* Filter Toolbar */}
+      {/* Controls Section: Status Tabs & Filter Toolbar */}
       <section className="px-4 lg:px-6">
-        <div className="p-4 border border-border/40 bg-card/30 backdrop-blur-sm rounded-2xl flex flex-col gap-4 lg:flex-row lg:items-center max-w-7xl">
-          {/* Search */}
-          <div className="relative flex-1">
-            <Input
-              placeholder="Search watchlist..."
-              value={searchValue}
-              onChange={(e) => setSearchValue(e.target.value)}
-            />
-          </div>
+        <div className="flex flex-col gap-4 max-w-7xl">
+          {/* Status Tabs Navigation */}
+          <Tabs
+            value={activeStatus}
+            onValueChange={(val) => setStatusFilter(val === "active" ? null : (val as string))}
+            className="w-full"
+          >
+            {/* Stationary Tab Container: border, background & shape remain fixed */}
+            <div className="w-full sm:w-fit max-w-full p-1 bg-muted/60 border border-border/40 rounded-xl overflow-hidden">
+              {/* Scrollable Options/Text inside the tab container */}
+              <TabsList
+                ref={tabsContainerRef}
+                className="group-data-horizontal/tabs:h-auto p-0 bg-transparent border-0 rounded-none w-full max-w-full flex flex-nowrap items-center justify-start gap-1 overflow-x-auto no-scrollbar scroll-smooth"
+              >
+                <TabsTrigger
+                  value="active"
+                  className="h-8 shrink-0 gap-1.5 sm:gap-2 px-2.5 sm:px-3 text-xs font-semibold rounded-lg cursor-pointer transition-all scroll-m-2"
+                >
+                  <Sparkles className="size-3.5 text-primary shrink-0" />
+                  <span>Active</span>
+                  <Badge variant="secondary" size="xs" className="rounded-full px-1.5 min-w-4 font-bold">
+                    {tabCounts.active}
+                  </Badge>
+                </TabsTrigger>
 
-          <div className="flex flex-wrap gap-3 items-center w-full lg:w-auto">
-            {/* Status Filter */}
-            <Select
-              value={statusFilter || "all"}
-              onValueChange={(val) => setStatusFilter(val === "all" ? null : val)}
-            >
-              <SelectTrigger className="w-[140px] h-10 bg-background/50 border-border/60">
-                <SelectValue placeholder="All Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                {(Object.keys(WATCHLIST_STATUS_LABELS) as WatchlistStatus[]).map((key) => {
-                  const option = WATCHLIST_STATUS_LABELS[key];
-                  return (
-                    <SelectItem key={key} value={key}>
-                      <span className="flex items-center gap-2">
-                        <span className="text-[10px]">{option.icon}</span>
-                        <span>{option.label}</span>
-                      </span>
-                    </SelectItem>
-                  );
-                })}
-              </SelectContent>
-            </Select>
+                <TabsTrigger
+                  value="watching"
+                  className="h-8 shrink-0 gap-1.5 sm:gap-2 px-2.5 sm:px-3 text-xs font-semibold rounded-lg cursor-pointer transition-all scroll-m-2"
+                >
+                  <Play className="size-3.5 text-blue-500 fill-blue-500/20 shrink-0" />
+                  <span>Watching</span>
+                  <Badge variant="secondary" size="xs" className="rounded-full px-1.5 min-w-4 font-bold">
+                    {tabCounts.watching}
+                  </Badge>
+                </TabsTrigger>
 
-            {/* Type Filter */}
-            <Select
-              value={typeFilter || "all"}
-              onValueChange={(val) => setTypeFilter(val === "all" ? null : val)}
-            >
-              <SelectTrigger className="w-[140px] h-10 bg-background/50 border-border/60">
-                <SelectValue placeholder="All Types" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Types</SelectItem>
-                <SelectItem value="movie">Movie</SelectItem>
-                <SelectItem value="series">Series</SelectItem>
-                <SelectItem value="anime">Anime</SelectItem>
-              </SelectContent>
-            </Select>
+                <TabsTrigger
+                  value="planned"
+                  className="h-8 shrink-0 gap-1.5 sm:gap-2 px-2.5 sm:px-3 text-xs font-semibold rounded-lg cursor-pointer transition-all scroll-m-2"
+                >
+                  <Clock className="size-3.5 text-amber-500 shrink-0" />
+                  <span>Planned</span>
+                  <Badge variant="secondary" size="xs" className="rounded-full px-1.5 min-w-4 font-bold">
+                    {tabCounts.planned}
+                  </Badge>
+                </TabsTrigger>
 
-            {/* Rated Toggle */}
-            <Toggle
-              pressed={ratedFilter || false}
-              onPressedChange={(pressed) => setRatedFilter(pressed || null)}
-              variant="outline"
-            >
-              <Star className={`size-3.5 mr-2 ${ratedFilter ? "fill-current" : ""}`} />
-              <span>Rated</span>
-            </Toggle>
+                <TabsTrigger
+                  value="completed"
+                  className="h-8 shrink-0 gap-1.5 sm:gap-2 px-2.5 sm:px-3 text-xs font-semibold rounded-lg cursor-pointer transition-all scroll-m-2"
+                >
+                  <CheckCircle2 className="size-3.5 text-emerald-500 shrink-0" />
+                  <span>Completed</span>
+                  <Badge variant="secondary" size="xs" className="rounded-full px-1.5 min-w-4 font-bold">
+                    {tabCounts.completed}
+                  </Badge>
+                </TabsTrigger>
+
+                <TabsTrigger
+                  value="dropped"
+                  className="h-8 shrink-0 gap-1.5 sm:gap-2 px-2.5 sm:px-3 text-xs font-semibold rounded-lg cursor-pointer transition-all scroll-m-2"
+                >
+                  <XCircle className="size-3.5 text-muted-foreground shrink-0" />
+                  <span>Dropped</span>
+                  <Badge variant="secondary" size="xs" className="rounded-full px-1.5 min-w-4 font-bold">
+                    {tabCounts.dropped}
+                  </Badge>
+                </TabsTrigger>
+
+                <TabsTrigger
+                  value="all"
+                  className="h-8 shrink-0 gap-1.5 sm:gap-2 px-2.5 sm:px-3 text-xs font-semibold rounded-lg cursor-pointer transition-all scroll-m-2"
+                >
+                  <Layers className="size-3.5 text-muted-foreground shrink-0" />
+                  <span>All</span>
+                  <Badge variant="secondary" size="xs" className="rounded-full px-1.5 min-w-4 font-bold">
+                    {tabCounts.all}
+                  </Badge>
+                </TabsTrigger>
+              </TabsList>
+            </div>
+          </Tabs>
+
+          {/* Search & Sub-filters Toolbar */}
+          <div className="p-3 sm:p-4 border border-border/40 bg-card/30 backdrop-blur-sm rounded-2xl flex flex-col gap-3 sm:flex-row sm:items-center">
+            {/* Search */}
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
+              <Input
+                placeholder="Search watchlist..."
+                value={searchValue}
+                onChange={(e) => setSearchValue(e.target.value)}
+                className="pl-9 bg-background/50 border-border/60 h-9"
+              />
+            </div>
+
+            <div className="flex flex-wrap gap-2.5 items-center w-full sm:w-auto">
+              {/* Type Filter */}
+              <Select
+                value={typeFilter || "all"}
+                onValueChange={(val) => setTypeFilter(val === "all" ? null : val)}
+              >
+                <SelectTrigger className="w-[130px] h-9 bg-background/50 border-border/60">
+                  <SelectValue placeholder="All Types" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Types</SelectItem>
+                  <SelectItem value="movie">Movie</SelectItem>
+                  <SelectItem value="series">Series</SelectItem>
+                  <SelectItem value="anime">Anime</SelectItem>
+                </SelectContent>
+              </Select>
+
+              {/* Rated Toggle */}
+              <Toggle
+                pressed={ratedFilter || false}
+                onPressedChange={(pressed) => setRatedFilter(pressed || null)}
+                variant="outline"
+                size="sm"
+                className="h-9 px-3 border-border/60 bg-background/50 data-[state=on]:bg-primary/10 data-[state=on]:text-primary"
+              >
+                <Star className={`size-3.5 mr-1.5 ${ratedFilter ? "fill-current" : ""}`} />
+                <span>Rated</span>
+              </Toggle>
+            </div>
           </div>
         </div>
       </section>
@@ -295,10 +444,11 @@ export function MediaWatchlistClient({ initialItems }: MediaWatchlistClientProps
                   </EmptyMedia>
                   <EmptyTitle>No media yet</EmptyTitle>
                   <EmptyDescription>
-                    Track movies, series, and anime in one place.
+                    Track movies, series, and anime in one place. Press <Kbd>Ctrl</Kbd>+<Kbd>M</Kbd> or click Add Media to begin.
                   </EmptyDescription>
                 </EmptyHeader>
                 <Button onClick={() => setSearchOpen(true)} className="mt-4" size="sm">
+                  <Plus className="size-4 mr-1.5" />
                   Add Media
                 </Button>
               </Empty>
@@ -308,21 +458,64 @@ export function MediaWatchlistClient({ initialItems }: MediaWatchlistClientProps
                   <EmptyMedia variant="icon">
                     <Filter />
                   </EmptyMedia>
-                  <EmptyTitle>No media matches the selected filters</EmptyTitle>
-                  <EmptyDescription>Try resetting your filters.</EmptyDescription>
+                  <EmptyTitle>
+                    {activeStatus === "active"
+                      ? "No active media in queue"
+                      : activeStatus === "watching"
+                      ? "No media currently watching"
+                      : activeStatus === "planned"
+                      ? "No media planned"
+                      : activeStatus === "completed"
+                      ? "No completed media"
+                      : activeStatus === "dropped"
+                      ? "No dropped media"
+                      : "No media matches the selected filters"}
+                  </EmptyTitle>
+                  <EmptyDescription>
+                    {activeStatus === "active" && items.length > 0 && !q && (!typeFilter || typeFilter === "all") && !ratedFilter
+                      ? "All caught up! You don't have anything currently in Watching or Planned."
+                      : "Try adjusting your filters or search keywords."}
+                  </EmptyDescription>
                 </EmptyHeader>
-                <Button
-                  variant="link"
-                  className="text-xs mt-2 cursor-pointer"
-                  onClick={() => {
-                    setStatusFilter("all");
-                    setTypeFilter("all");
-                    setSearchValue("");
-                    setRatedFilter(null);
-                  }}
-                >
-                  Clear Filters
-                </Button>
+                <div className="flex flex-wrap gap-2 justify-center mt-3">
+                  {activeStatus === "active" && tabCounts.completed > 0 && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setStatusFilter("completed")}
+                    >
+                      <CheckCircle2 className="size-3.5 mr-1.5 text-emerald-500" />
+                      View Completed ({tabCounts.completed})
+                    </Button>
+                  )}
+                  {activeStatus !== "all" && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setStatusFilter("all");
+                        setTypeFilter("all");
+                        setSearchValue("");
+                        setRatedFilter(null);
+                      }}
+                    >
+                      View All Media ({items.length})
+                    </Button>
+                  )}
+                  {(q || (typeFilter && typeFilter !== "all") || ratedFilter) && (
+                    <Button
+                      variant="link"
+                      size="sm"
+                      onClick={() => {
+                        setTypeFilter("all");
+                        setSearchValue("");
+                        setRatedFilter(null);
+                      }}
+                    >
+                      Clear Search & Sub-filters
+                    </Button>
+                  )}
+                </div>
               </Empty>
             )
           ) : (

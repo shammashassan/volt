@@ -5,6 +5,12 @@ import { Suspense } from "react";
 import { getCategoriesAction } from "@/lib/actions/categories";
 import { fetchUrlMetadata } from "@/lib/services/metadata.service";
 import { ShareClient } from "@/components/share/share-client";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Quick Share",
+  description: "Share and save web links directly to your Volt workspace.",
+};
 
 function ShareSkeleton() {
   return (

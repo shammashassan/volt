@@ -224,7 +224,7 @@ export function HeroSection({ startReveal = false }: { startReveal?: boolean }) 
 
         {/* GPU-Accelerated Spotlight Glow (no blend mode composition overhead, no layout thrashing) */}
         <div
-          className="spotlight-glow absolute pointer-events-none w-[1000px] h-[1000px] -left-[500px] -top-[500px] rounded-full opacity-0 will-change-transform"
+          className="spotlight-glow absolute pointer-events-none w-250 h-250 -left-125 -top-125 rounded-full opacity-0 will-change-transform"
           style={{
             background: 'radial-gradient(circle, rgba(120,119,198,0.15) 0%, transparent 65%)',
           }}
@@ -232,19 +232,19 @@ export function HeroSection({ startReveal = false }: { startReveal?: boolean }) 
 
         {/* Glow Orbs (using pure radial-gradients, avoiding expensive CSS blur filters entirely) */}
         <div
-          className="bg-glow-1 absolute left-1/2 top-0 h-[800px] w-[800px] -translate-x-1/2 rounded-full will-change-transform"
+          className="bg-glow-1 absolute left-1/2 top-0 h-200 w-200 -translate-x-1/2 rounded-full will-change-transform"
           style={{
             background: 'radial-gradient(circle, rgba(99,102,241,0.04) 0%, transparent 70%)',
           }}
         />
         <div
-          className="bg-glow-2 absolute right-0 top-1/4 h-[400px] w-[400px] rounded-full will-change-transform"
+          className="bg-glow-2 absolute right-0 top-1/4 h-100 w-100 rounded-full will-change-transform"
           style={{
             background: 'radial-gradient(circle, rgba(99,102,241,0.06) 0%, transparent 70%)',
           }}
         />
         <div
-          className="bg-glow-3 absolute left-0 bottom-0 h-[600px] w-[600px] rounded-full will-change-transform"
+          className="bg-glow-3 absolute left-0 bottom-0 h-150 w-150 rounded-full will-change-transform"
           style={{
             background: 'radial-gradient(circle, rgba(99,102,241,0.03) 0%, transparent 70%)',
           }}

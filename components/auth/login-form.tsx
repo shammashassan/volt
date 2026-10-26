@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input"
 import { useState } from "react"
 import { Eye, EyeOff, Loader2 } from "lucide-react"
 import { authClient } from "@/lib/auth-client"
-import { toast } from "sonner"
+import { toast } from "@/components/ui/toast"
 import { useRouter, useSearchParams } from "next/navigation"
 import Image from "next/image"
 
@@ -37,44 +37,63 @@ export function LoginForm({
     const name = formData.get("name") as string
 
     if (isSignUp) {
-      await authClient.signUp.email({
-        email,
-        password,
-        name,
-        callbackURL: "/pending-approval"
-      }, {
-        onSuccess: () => {
-          toast.success("Signup successful! Please wait for admin approval.")
-          router.push("/pending-approval")
-          router.refresh()
-        },
-        onError: (ctx) => {
-          toast.error(ctx.error.message || "Signup failed")
-          setIsLoading(false)
+      const promise = (async () => {
+        const { data, error } = await authClient.signUp.email({
+          email,
+          password,
+          name,
+          callbackURL: "/pending-approval",
+        })
+        if (error) {
+          throw new Error(error.message || "Signup failed")
         }
-      })
+        router.push("/pending-approval")
+        router.refresh()
+        return data
+      })()
+
+      try {
+        await toast.promise(promise, {
+          loading: "Creating account...",
+          success: "Signup successful! Please wait for admin approval.",
+          error: (err: unknown) =>
+            typeof err === "string" ? err : (err as { message?: string })?.message || "Signup failed",
+        })
+      } finally {
+        setIsLoading(false)
+      }
     } else {
-      await authClient.signIn.email({
-        email,
-        password,
-        callbackURL: callbackURL
-      }, {
-        onSuccess: (ctx) => {
-          const user = ctx.data.user as { isApproved?: boolean; role?: string }
-          if (!user.isApproved && user.role !== "admin") {
-            toast.info("Your account is pending approval.")
-            router.push("/pending-approval")
-          } else {
-            toast.success("Login successful")
-            router.push(callbackURL)
-            router.refresh()
-          }
-        },
-        onError: (ctx) => {
-          toast.error(ctx.error.message || "Login failed")
-          setIsLoading(false)
+      const promise = (async () => {
+        const { data, error } = await authClient.signIn.email({
+          email,
+          password,
+          callbackURL,
+        })
+        if (error) {
+          throw new Error(error.message || "Login failed")
         }
-      })
+        const user = data?.user as { isApproved?: boolean; role?: string }
+        if (!user?.isApproved && user?.role !== "admin") {
+          router.push("/pending-approval")
+          return { isPending: true }
+        } else {
+          router.push(callbackURL)
+          router.refresh()
+          return { isPending: false }
+        }
+      })()
+
+      try {
+        await toast.promise(promise, {
+          loading: "Signing in...",
+          success: (res: { isPending: boolean }) =>
+            res.isPending ? "Your account is pending approval." : "Login successful",
+          error: (err: unknown) =>
+            typeof err === "string" ? err : (err as { message?: string })?.message || "Login failed",
+        })
+      } finally {
+        setIsLoading(false)
+      }
     }
   }
 

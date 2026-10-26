@@ -1,10 +1,16 @@
 import { Suspense } from "react"
 import { getPeople } from "@/lib/queries/people";
-import { PeopleContent } from "./people-content"
+import { PeopleContent } from "@/components/people/people-content";
 import { auth } from "@/lib/auth"
 import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 import { Skeleton } from "@/components/ui/skeleton"
+import type { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "People",
+  description: "Manage your professional directory, mentors, creators, and contacts.",
+}
 
 function PeopleSkeleton() {
   return (

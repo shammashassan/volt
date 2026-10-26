@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useRef } from 'react'
-import { BentoGrid, BentoCard } from '@/components/bento-grid'
+import { BentoGrid, BentoCard } from './bento-grid'
 import {
   Command,
   Layers,

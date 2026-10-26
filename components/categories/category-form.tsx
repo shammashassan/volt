@@ -15,7 +15,7 @@ import {
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { Sparkles, Check } from "lucide-react"
 import { ICON_LABELS, ICON_MAP } from "@/lib/icons"
-import { toast } from "sonner"
+import { toast } from "@/components/ui/toast"
 import { Category, Collection } from "@/types"
 
 interface CategoryFormFieldsProps {
@@ -35,10 +35,16 @@ Examples:
 - Reusable UI Components & Design Systems
 - Animations, Interactions & Effects`
 
-    navigator.clipboard.writeText(prompt)
-    setCopied(true)
-    toast.success("AI Prompt copied to clipboard!")
-    setTimeout(() => setCopied(false), 2000)
+    const promise = navigator.clipboard.writeText(prompt).then(() => {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    })
+
+    toast.promise(promise, {
+      loading: "Copying AI Prompt...",
+      success: "AI Prompt copied to clipboard!",
+      error: "Failed to copy to clipboard",
+    })
   }
 
   return (

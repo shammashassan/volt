@@ -4,7 +4,6 @@ import * as React from "react"
 import { useState, useEffect } from "react"
 import {
   BookOpen,
-  Command,
   UsersIcon,
   LibraryIcon,
   LayoutGrid,
@@ -27,6 +26,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarRail,
 } from "@/components/ui/sidebar"
 import Link from "next/link"
 import { usePathname, useSearchParams } from "next/navigation"
@@ -43,7 +43,95 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   initialCollections?: Collection[]
 }
 
-export function AppSidebar({ initialCategories, initialCollections, ...props }: AppSidebarProps) {
+function SidebarNavFallback() {
+  const exploreItems = [
+    {
+      title: "Dashboard",
+      url: "/explore",
+      icon: LayoutGrid,
+      isActive: false,
+    },
+    {
+      title: "Resources",
+      url: "/resources",
+      icon: LibraryIcon,
+      isActive: false,
+    },
+    {
+      title: "Knowledge Graph",
+      url: "/graph",
+      icon: Network,
+      isActive: false,
+    },
+    {
+      title: "CLI Commands",
+      url: "/commands",
+      icon: SquareTerminal,
+      isActive: false,
+    },
+  ]
+
+  const workspaceItems = [
+    {
+      title: "Workspace",
+      url: "/projects",
+      icon: FolderOpen,
+      isActive: false,
+      items: [
+        { title: "Projects", url: "/projects", isActive: false },
+        { title: "Notes", url: "/notes", isActive: false },
+        { title: "Reminders", url: "/reminders", isActive: false },
+      ],
+    },
+    {
+      title: "Media Watchlist",
+      url: "/media-watchlist",
+      icon: Film,
+      isActive: false,
+    },
+    {
+      title: "Organize",
+      url: "/categories",
+      icon: Layers,
+      isActive: false,
+      items: [
+        { title: "Taxonomy", url: "/categories", isActive: false },
+        { title: "Tags", url: "/tags", isActive: false },
+        { title: "People", url: "/people", isActive: false },
+      ],
+    },
+  ]
+
+  const typesItems = [
+    {
+      title: "Resource Types",
+      url: "/resources",
+      icon: Tag,
+      isActive: false,
+      items: RESOURCE_TYPES.map(type => ({
+        title: type.label,
+        url: `/resources?type=${type.value}`,
+        isActive: false,
+      })),
+    },
+  ]
+
+  return (
+    <>
+      <NavMain items={exploreItems} label="Explore" />
+      <NavMain items={workspaceItems} label="Workspace" />
+      <NavMain items={typesItems} label="Types" />
+    </>
+  )
+}
+
+function SidebarNavContent({
+  initialCategories,
+  initialCollections,
+}: {
+  initialCategories?: Category[]
+  initialCollections?: Collection[]
+}) {
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const activeTypeParam = searchParams?.get("type") || null
@@ -158,7 +246,6 @@ export function AppSidebar({ initialCategories, initialCollections, ...props }: 
       icon: SquareTerminal,
       isActive: pathname === "/commands"
     },
-
   ]
 
   const workspaceItems = [
@@ -166,7 +253,7 @@ export function AppSidebar({ initialCategories, initialCollections, ...props }: 
       title: "Workspace",
       url: "/projects",
       icon: FolderOpen,
-      isActive: ["/projects", "/notes", "/reminders", "/commands"].includes(pathname),
+      isActive: ["/projects", "/notes", "/reminders"].includes(pathname),
       items: [
         { title: "Projects", url: "/projects", isActive: pathname === "/projects" },
         { title: "Notes", url: "/notes", isActive: pathname === "/notes" },
@@ -203,9 +290,26 @@ export function AppSidebar({ initialCategories, initialCollections, ...props }: 
   ]
 
   const adminItems = isAdmin
-    ? [{ title: "Manage Users", url: "/users", icon: UsersIcon }]
+    ? [{ title: "Manage Users", url: "/users", icon: UsersIcon, isActive: pathname === "/users" }]
     : []
 
+  return (
+    <>
+      <NavMain items={exploreItems} label="Explore" />
+      <NavMain items={workspaceItems} label="Workspace" />
+      {collectionItems.length > 0 && (
+        <NavMain items={collectionItems} label="Collections" />
+      )}
+      <NavMain items={typesItems} label="Types" />
+
+      {isMounted && adminItems.length > 0 && (
+        <NavSecondary items={adminItems} label="Admin" className="mt-auto" />
+      )}
+    </>
+  )
+}
+
+export function AppSidebar({ initialCategories, initialCollections, ...props }: AppSidebarProps) {
   return (
     <Sidebar
       variant="inset"
@@ -216,37 +320,32 @@ export function AppSidebar({ initialCategories, initialCollections, ...props }: 
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg" asChild>
-              <Link href="/explore">
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                  <LogoMark className="size-5!" />
-                </div>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">UI Volt</span>
-                  <span className="truncate text-xs">v2.3.0</span>
-                </div>
-              </Link>
+            <SidebarMenuButton size="lg" render={<Link href="/explore" />}>
+              <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+                <LogoMark className="size-5!" />
+              </div>
+              <div className="grid flex-1 text-left text-sm leading-tight">
+                <span className="truncate font-medium">UI Volt</span>
+                <span className="truncate text-xs">v2.3.0</span>
+              </div>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
 
       <SidebarContent>
-        <NavMain items={exploreItems} label="Explore" />
-        <NavMain items={workspaceItems} label="Workspace" />
-        {collectionItems.length > 0 && (
-          <NavMain items={collectionItems} label="Collections" />
-        )}
-        <NavMain items={typesItems} label="Types" />
-
-        {isMounted && adminItems.length > 0 && (
-          <NavSecondary items={adminItems} label="Admin" className="mt-auto" />
-        )}
+        <React.Suspense fallback={<SidebarNavFallback />}>
+          <SidebarNavContent
+            initialCategories={initialCategories}
+            initialCollections={initialCollections}
+          />
+        </React.Suspense>
       </SidebarContent>
 
       <SidebarFooter>
         <NavUser />
       </SidebarFooter>
+      <SidebarRail />
     </Sidebar>
   )
 }

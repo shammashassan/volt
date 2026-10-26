@@ -4,7 +4,7 @@ import { getDb, serialize } from "@/lib/db";
 import { getSessionUser, getErrorMessage } from "@/lib/auth-utils";
 import { updateTag } from "next/cache";
 import { ObjectId } from "mongodb";
-import { createWatchlistItemSchema, updateWatchlistStatusSchema, updateWatchlistRatingSchema } from "@/lib/validations/watchlist.schema";
+import { createWatchlistItemSchema, updateWatchlistStatusSchema, updateWatchlistRatingSchema } from "@/lib/schemas/watchlist.schema";
 import { WatchlistItem } from "@/types/watchlist";
 import { WatchlistService } from "@/lib/services/watchlist.service";
 

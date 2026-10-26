@@ -27,7 +27,7 @@ import {
   Network
 } from "lucide-react"
 import { ICON_MAP } from "@/lib/icons"
-import { useQuickCapture } from "@/components/layout/quick-capture-drawers"
+
 import { trackResourceViewAction } from "@/lib/actions"
 import { searchAction } from "@/lib/actions/search"
 import { Category, Resource, Note, Project, Person } from "@/types"
@@ -59,7 +59,7 @@ export function SearchCommand() {
   })
   const [isLoading, setIsLoading] = React.useState(false)
   const router = useRouter()
-  const { openCapture } = useQuickCapture()
+
 
   React.useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -145,9 +145,13 @@ export function SearchCommand() {
 
   const handleQuickCreate = (type: "resource" | "note" | "category" | "project" | "person") => {
     setOpen(false)
-    setTimeout(() => {
-      openCapture(type)
-    }, 150)
+    if (type === "resource") router.push("/resources?new=true")
+    else if (type === "note") router.push("/notes?new=true")
+    else if (type === "category") router.push("/categories?new=category")
+    else if (type === "project") router.push("/projects?new=true")
+    else if (type === "person") router.push("/people?new=true")
+
+
   }
 
   const hasResults =

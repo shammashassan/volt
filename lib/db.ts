@@ -1,52 +1,56 @@
-import clientPromise from "./mongodb";
-import { Category, Resource, Note, Project, Person } from "@/types";
-import { cache } from "react";
-import { ObjectId } from "mongodb";
-
+import { Category, Resource, Note, Project, Person } from "@/types"
+import { getDb, db } from "./db/client"
+export { getDb, db }
 
 // Helper function to recursively convert ObjectId, Date and other objects with custom prototypes/methods into plain serializable values.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function serialize<T>(obj: T): any {
   if (obj === null || obj === undefined) {
-    return obj;
+    return obj
   }
 
   if (Array.isArray(obj)) {
-    return obj.map(serialize);
+    return obj.map(serialize)
   }
 
   if (obj instanceof Date) {
-    return obj.toISOString();
+    return obj.toISOString()
   }
 
   if (typeof obj === "object") {
     // MongoDB ObjectId has toHexString
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     if (typeof (obj as any).toHexString === "function") {
-      return (obj as any).toHexString();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return (obj as any).toHexString()
     }
 
     // Fallback checking for ObjectId-like objects
     if (
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (obj as any)._bsontype === "ObjectID" ||
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (obj as any).constructor?.name === "ObjectID" ||
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (obj as any).constructor?.name === "ObjectId"
     ) {
-      return (obj as any).toString();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return (obj as any).toString()
     }
 
-    const result: any = {};
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const result: any = {}
     for (const key of Object.keys(obj)) {
-      result[key] = serialize((obj as any)[key]);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      result[key] = serialize((obj as any)[key])
     }
-    return result;
+    return result
   }
 
-  return obj;
+  return obj
 }
 
-const globalWithIndexes = global as typeof globalThis & {
-  _mongoIndexesEnsured?: boolean;
-};
-
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function mapResourceDoc(r: any): Resource {
   return {
     ...r,
@@ -65,10 +69,11 @@ export function mapResourceDoc(r: any): Resource {
     type: r.type || "website",
     userId: r.userId || "",
     createdAt: r.createdAt || new Date(),
-    updatedAt: r.updatedAt || new Date()
-  };
+    updatedAt: r.updatedAt || new Date(),
+  }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function mapNoteDoc(n: any): Note {
   return {
     ...n,
@@ -83,67 +88,6 @@ export function mapNoteDoc(n: any): Note {
     relatedProjects: n.relatedProjects || [],
     relatedPeople: n.relatedPeople || [],
     createdAt: n.createdAt || new Date(),
-    updatedAt: n.updatedAt || new Date()
-  };
-}
-
-export const getDb = cache(async () => {
-  const client = await clientPromise;
-  const db = client.db();
-
-  if (!globalWithIndexes._mongoIndexesEnsured) {
-    Promise.all([
-      // Resources indexes
-      db.collection("resources").createIndex({ userId: 1, createdAt: -1 }),
-      db.collection("resources").createIndex({ userId: 1, favorite: 1 }),
-      db.collection("resources").createIndex({ userId: 1, recentlyViewedAt: -1 }),
-      db.collection("resources").createIndex({ userId: 1, useCount: -1, recentlyUsedAt: -1 }),
-      db.collection("resources").createIndex({ userId: 1, order: 1, createdAt: -1 }),
-      db.collection("resources").createIndex({ userId: 1, categoryId: 1 }),
-      db.collection("resources").createIndex({ userId: 1, category: 1 }),
-      db.collection("resources").createIndex({ userId: 1, projectIds: 1 }),
-      db.collection("resources").createIndex({ userId: 1, personIds: 1 }),
-      db.collection("resources").createIndex({ title: "text", url: "text", tags: "text", description: "text", whySaved: "text", notes: "text" }),
-
-      // Notes indexes
-      db.collection("notes").createIndex({ userId: 1, pinned: -1, updatedAt: -1 }),
-      db.collection("notes").createIndex({ userId: 1, relatedProjects: 1 }),
-      db.collection("notes").createIndex({ userId: 1, relatedPeople: 1 }),
-      db.collection("notes").createIndex({ title: "text", content: "text", tags: "text" }),
-
-      // People indexes
-      db.collection("people").createIndex({ userId: 1, name: 1 }),
-      db.collection("people").createIndex({ name: "text", notes: "text", tags: "text" }),
-
-      // Projects indexes
-      db.collection("projects").createIndex({ userId: 1, updatedAt: -1 }),
-      db.collection("projects").createIndex({ name: "text", description: "text" }),
-
-      // Categories indexes
-      db.collection("categories").createIndex({ userId: 1, name: 1 }),
-      db.collection("categories").createIndex({ name: "text", description: "text" }),
-
-      // Watchlist indexes
-      db.collection("watchlist").createIndex({ userId: 1, source: 1, externalId: 1 }, { unique: true }),
-      db.collection("watchlist").createIndex({ userId: 1, status: 1, type: 1 }),
-      db.collection("watchlist").createIndex({ userId: 1, updatedAt: -1 }),
-
-      // Notifications TTL indexes
-      db.collection("notifications").createIndex({ deletedAt: 1 }, { expireAfterSeconds: 2592000 }),
-      db.collection("notifications").createIndex({ readAt: 1 }, { expireAfterSeconds: 2592000 }),
-
-      // Reminders Partial TTL index (expires 30 days after updated/completed)
-      db.collection("reminders").createIndex(
-        { updatedAt: 1 },
-        { 
-          expireAfterSeconds: 2592000, 
-          partialFilterExpression: { status: "completed" } 
-        }
-      )
-    ]).catch(err => console.error("Error ensuring database indexes:", err));
-
-    globalWithIndexes._mongoIndexesEnsured = true;
+    updatedAt: n.updatedAt || new Date(),
   }
-  return db;
-});
-
+}

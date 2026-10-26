@@ -15,7 +15,7 @@ import {
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { Sparkles, Check } from "lucide-react"
 import { ICON_LABELS, ICON_MAP } from "@/lib/icons"
-import { toast } from "sonner"
+import { toast } from "@/components/ui/toast"
 import { Collection } from "@/types"
 
 interface CollectionFormFieldsProps {
@@ -34,10 +34,16 @@ Examples:
 - Utilities, Developer Tools & General Workspace bookmarks
 - Curated Media, Blogs & Video Channels`
 
-    navigator.clipboard.writeText(prompt)
-    setCopied(true)
-    toast.success("AI Prompt copied to clipboard!")
-    setTimeout(() => setCopied(false), 2000)
+    const promise = navigator.clipboard.writeText(prompt).then(() => {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    })
+
+    toast.promise(promise, {
+      loading: "Copying AI Prompt...",
+      success: "AI Prompt copied to clipboard!",
+      error: "Failed to copy to clipboard",
+    })
   }
 
   return (

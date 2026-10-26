@@ -5,6 +5,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/layout/theme-provider";
 import { Suspense } from "react";
 import { PWARegister } from "@/components/layout/pwa-register";
+import { Toaster } from "@/components/ui/toast";
 
 const inter = Inter({
   variable: "--font-sans",
@@ -14,10 +15,13 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"),
-  title: "Volt",
+  title: {
+    default: "Volt - Personal Knowledge Operating System",
+    template: "%s | Volt",
+  },
   description: "Volt v2.0 - The personal knowledge operating system. Save, organize, and link resources, notes, categories, people, and media watchlists.",
   openGraph: {
-    title: "Volt",
+    title: "Volt - Personal Knowledge Operating System",
     description: "Volt v2.0 - The personal knowledge operating system. Save, organize, and link resources, notes, categories, people, and media watchlists.",
     siteName: "Volt",
     locale: "en_US",
@@ -25,15 +29,13 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Volt",
+    title: "Volt - Personal Knowledge Operating System",
     description: "Volt v2.0 - The personal knowledge operating system. Save, organize, and link resources, notes, categories, people, and media watchlists.",
   },
   verification: {
     google: "-Yn2JXXqhEK1dVAiHMaEM_OapfXKA3OHM32EwznOG5o"
   }
 };
-
-import { Toaster } from "@/components/ui/sonner"
 
 export default function RootLayout({
   children,
@@ -53,15 +55,11 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <TooltipProvider>
-            <PWARegister />
-            {/* <LenisProvider> */}
-            <Suspense fallback={<div className="flex-1 min-h-screen bg-background" />}>
+            <TooltipProvider>
+              <PWARegister />
               {children}
-            </Suspense>
-            {/* </LenisProvider> */}
-            <Toaster position="top-right" />
-          </TooltipProvider>
+              <Toaster />
+            </TooltipProvider>
         </ThemeProvider>
       </body>
     </html>

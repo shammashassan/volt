@@ -3,6 +3,13 @@ import { headers } from "next/headers";
 import { UserManagement, UserData } from "@/components/user/UserManagement";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
+import type { Metadata } from "next";
+import { requireAdmin } from "@/lib/auth-utils";
+
+export const metadata: Metadata = {
+  title: "User Management",
+  description: "Manage accounts, authorizations, and workspace role assignments.",
+};
 
 // Skeleton loading component for Users Management page
 function UsersSkeleton() {
@@ -66,6 +73,7 @@ function UsersSkeleton() {
 
 // Asynchronous wrapper to handle data fetching
 async function UsersContentWrapper() {
+  await requireAdmin();
   const result = await auth.api.listUsers({
     query: {},
     headers: await headers()

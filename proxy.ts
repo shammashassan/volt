@@ -28,10 +28,17 @@ export async function proxy(request: NextRequest) {
 
     // getCookieCache fetches the session from the client's cookie cache,
     // avoiding database connection establishment and query on every page navigation.
-    const session = await getCookieCache(request);
+    let session = null;
+    try {
+        session = await getCookieCache(request);
+    } catch {
+        session = null;
+    }
 
     const isPublicPath =
         pathname === "/" ||
+        pathname === "/sign-in" ||
+        pathname === "/sign-up" ||
         pathname === "/login" ||
         pathname === "/pending-approval";
 
@@ -48,23 +55,28 @@ export async function proxy(request: NextRequest) {
         if (isPublicPath) {
             return NextResponse.next();
         }
-        return NextResponse.redirect(new URL("/login", request.url));
+        return NextResponse.redirect(new URL("/sign-in", request.url));
     }
 
     // Session exists, handle redirects
-    const user = session.user as { isApproved?: boolean; role?: string };
-    const isApproved = user.isApproved;
+    const user = session.user as { isApproved?: boolean; approved?: boolean; role?: string };
+    const isApproved = user.isApproved || user.approved;
     const role = user.role;
 
-    if (!isApproved) {
+    if (!isApproved && role !== "admin") {
         if (pathname !== "/pending-approval" && !pathname.startsWith("/api/auth")) {
             return NextResponse.redirect(new URL("/pending-approval", request.url));
         }
         return NextResponse.next();
     }
 
-    // Approved user
-    if (pathname === "/pending-approval" || pathname === "/login") {
+    // Approved user visiting auth/approval pages should be routed directly to dashboard
+    if (
+        pathname === "/pending-approval" ||
+        pathname === "/login" ||
+        pathname === "/sign-in" ||
+        pathname === "/sign-up"
+    ) {
         return NextResponse.redirect(new URL("/explore", request.url));
     }
 

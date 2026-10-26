@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { BellIcon, RefreshCcwIcon, AlertTriangle } from "lucide-react";
+import { Bell as BellIcon, BellDot, RefreshCcw as RefreshCcwIcon, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
@@ -20,11 +19,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
-import { Notification } from "@/types/notification";
-import {
-  getNotificationsAction,
-  markNotificationReadAction,
-} from "@/lib/actions/notifications";
+import { useNotifications } from "./notifications-provider";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { completeReminderAction } from "@/lib/actions/reminders";
@@ -101,24 +96,29 @@ export function EmptyMuted({ onRefresh }: { onRefresh?: () => void }) {
   );
 }
 
+function formatRelativeTime(date: Date) {
+  const rtf = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
+  const elapsed = new Date(date).getTime() - Date.now();
+  const seconds = Math.round(elapsed / 1000);
+  const minutes = Math.round(seconds / 60);
+  const hours = Math.round(minutes / 60);
+  const days = Math.round(hours / 24);
+  if (Math.abs(days) > 0) return rtf.format(days, "day");
+  if (Math.abs(hours) > 0) return rtf.format(hours, "hour");
+  if (Math.abs(minutes) > 0) return rtf.format(minutes, "minute");
+  return "just now";
+}
+
 export function NotificationMenu() {
-  const [notifications, setNotifications] = useState<Notification[]>([]);
   const router = useRouter();
-  const unreadCount = notifications.filter((n) => !n.readAt).length;
-  const hasNotifications = notifications.length > 0;
-
-  const fetchNotifications = async () => {
-    const res = await getNotificationsAction();
-    if (res.success && res.data) {
-      setNotifications(res.data);
-    }
-  };
-
-  useEffect(() => {
-    fetchNotifications();
-    const interval = setInterval(fetchNotifications, 60000);
-    return () => clearInterval(interval);
-  }, []);
+  const {
+    notifications,
+    unreadCount,
+    hasNotifications,
+    fetchNotifications,
+    markAsRead,
+    markAllAsRead,
+  } = useNotifications();
 
   const handleOpenChange = (open: boolean) => {
     if (open) {
@@ -127,68 +127,38 @@ export function NotificationMenu() {
   };
 
   const handleMarkAllAsRead = async () => {
-    const unread = notifications.filter((n) => !n.readAt);
-    if (unread.length === 0) return;
-    await Promise.all(
-      unread.map((n) => markNotificationReadAction(n._id as string))
-    );
-    setNotifications(
-      notifications.map((n) => ({ ...n, readAt: n.readAt || new Date() }))
-    );
+    await markAllAsRead();
   };
 
   const handleNotificationClick = async (id: string) => {
-    const notification = notifications.find((n) => n._id === id);
-    if (!notification || notification.readAt) return;
-
-    setNotifications(
-      notifications.map((n) =>
-        n._id === id ? { ...n, readAt: new Date() } : n
-      )
-    );
-    await markNotificationReadAction(id);
-    router.refresh();
+    await markAsRead(id);
   };
 
   const handleCompleteReminderClick = async (notificationId: string, reminderId: string) => {
     await completeReminderAction(reminderId);
-    setNotifications((prev) =>
-      prev.map((n) => (n._id === notificationId ? { ...n, readAt: new Date() } : n))
-    );
-    await markNotificationReadAction(notificationId);
+    await markAsRead(notificationId);
     router.refresh();
-  };
-
-  const getRelativeTime = (date: Date) => {
-    const rtf = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
-    const elapsed = new Date(date).getTime() - Date.now();
-    const seconds = Math.round(elapsed / 1000);
-    const minutes = Math.round(seconds / 60);
-    const hours = Math.round(minutes / 60);
-    const days = Math.round(hours / 24);
-    if (Math.abs(days) > 0) return rtf.format(days, "day");
-    if (Math.abs(hours) > 0) return rtf.format(hours, "hour");
-    if (Math.abs(minutes) > 0) return rtf.format(minutes, "minute");
-    return "just now";
   };
 
   return (
     <DropdownMenu onOpenChange={handleOpenChange}>
-      <DropdownMenuTrigger asChild>
-        <Button
-          aria-label="Open notifications"
-          size="icon"
-          variant="ghost"
-          className="relative"
-        >
-          <BellIcon aria-hidden="true" />
-          {unreadCount > 0 && (
-            <span
-              aria-hidden="true"
-              className="absolute top-1 right-1 size-1.5 rounded-full bg-primary"
-            />
-          )}
-        </Button>
+      <DropdownMenuTrigger
+        render={
+          <Button
+            aria-label={unreadCount > 0 ? `Open notifications (${unreadCount} unread)` : "Open notifications"}
+            size="icon"
+            variant="ghost"
+          />
+        }
+      >
+        {unreadCount > 0 ? (
+          <BellDot
+            className="size-4 [&_circle]:fill-primary [&_circle]:stroke-primary"
+            aria-hidden="true"
+          />
+        ) : (
+          <BellIcon className="size-4" aria-hidden="true" />
+        )}
       </DropdownMenuTrigger>
 
       <DropdownMenuContent className="w-80" align="end">
@@ -222,20 +192,21 @@ export function NotificationMenu() {
                   return (
                     <DropdownMenuItem
                       key={notification._id as string}
-                      asChild
+                      render={
+                        <Link
+                          href={notification.link!}
+                          onClick={(e) => {
+                            if (!notification.readAt) {
+                              e.preventDefault();
+                              isReminder && notification.reminderId
+                                ? handleCompleteReminderClick(notification._id as string, notification.reminderId)
+                                : handleNotificationClick(notification._id as string);
+                            }
+                            // already read → navigate naturally
+                          }}
+                        />
+                      }
                     >
-                      <Link
-                        href={notification.link!}
-                        onClick={(e) => {
-                          if (!notification.readAt) {
-                            e.preventDefault();
-                            isReminder && notification.reminderId
-                              ? handleCompleteReminderClick(notification._id as string, notification.reminderId)
-                              : handleNotificationClick(notification._id as string);
-                          }
-                          // already read → navigate naturally
-                        }}
-                      >
                         <Item size="xs" className="w-full p-2">
                           <NotificationIcon
                             type={notification.type}
@@ -265,7 +236,7 @@ export function NotificationMenu() {
                                   : "text-muted-foreground/40 group-focus/dropdown-menu-item:text-muted-foreground/40!"
                               )}
                             >
-                              {getRelativeTime(notification.createdAt)}
+                              {formatRelativeTime(notification.createdAt)}
                             </span>
                           </ItemContent>
 
@@ -276,7 +247,6 @@ export function NotificationMenu() {
                             </div>
                           )}
                         </Item>
-                      </Link>
                     </DropdownMenuItem>
                   );
                 }
@@ -316,7 +286,7 @@ export function NotificationMenu() {
                               : "text-muted-foreground/40 group-focus/dropdown-menu-item:text-muted-foreground/40!"
                           )}
                         >
-                          {getRelativeTime(notification.createdAt)}
+                          {formatRelativeTime(notification.createdAt)}
                         </span>
                       </ItemContent>
 

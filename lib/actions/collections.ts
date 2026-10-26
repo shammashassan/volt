@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import clientPromise from "../mongodb";
 import { ObjectId } from "mongodb";
 import { getSessionUser, getErrorMessage } from "../auth-utils";
@@ -62,6 +62,9 @@ export async function addCollectionAction(
     revalidatePath("/categories");
     revalidatePath("/resources");
     revalidatePath("/explore");
+    updateTag(`collections-${user.id}`);
+    updateTag(`explore-body-${user.id}`);
+    updateTag(`dashboard-stats-${user.id}`);
     return { success: true, id: result.insertedId.toString() };
   } catch (error) {
     return { success: false, error: getErrorMessage(error) };
@@ -151,6 +154,9 @@ export async function updateCollectionAction(idOrSlug: string, data: Record<stri
     revalidatePath("/categories");
     revalidatePath("/resources");
     revalidatePath("/explore");
+    updateTag(`collections-${user.id}`);
+    updateTag(`explore-body-${user.id}`);
+    updateTag(`dashboard-stats-${user.id}`);
     return { success: true };
   } catch (error) {
     return { success: false, error: getErrorMessage(error) };
@@ -189,6 +195,9 @@ export async function deleteCollectionAction(idOrSlug: string) {
     revalidatePath("/categories");
     revalidatePath("/resources");
     revalidatePath("/explore");
+    updateTag(`collections-${user.id}`);
+    updateTag(`explore-body-${user.id}`);
+    updateTag(`dashboard-stats-${user.id}`);
     return { success: true };
   } catch (error) {
     return { success: false, error: getErrorMessage(error) };

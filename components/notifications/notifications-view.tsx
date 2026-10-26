@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Notification } from "@/types/notification";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,20 +14,19 @@ import {
 } from "@/components/ui/item";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Bell, AlertTriangle, ChevronRight, CheckCheck } from "lucide-react";
+import { Bell, AlertTriangle, ChevronRight } from "lucide-react";
 import {
-  markNotificationReadAction,
   deleteNotificationAction,
-  getNotificationsAction,
 } from "@/lib/actions/notifications";
 import { completeReminderAction } from "@/lib/actions/reminders";
 import { EmptyMuted } from "@/components/notifications/notification-menu";
-import { toast } from "sonner";
+import { useNotifications, refreshNotifications } from "@/components/notifications/notifications-provider";
+import { toast } from "@/components/ui/toast";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 interface NotificationsContentProps {
-  initialNotifications: Notification[];
+  initialNotifications?: Notification[];
 }
 
 const TYPE_ICON: Record<string, React.ReactNode> = {
@@ -63,68 +62,60 @@ function NotificationIcon({
 
 export function NotificationsContent({ initialNotifications }: NotificationsContentProps) {
   const router = useRouter();
-  const [notifications, setNotifications] = useState<Notification[]>(initialNotifications);
-
-  useEffect(() => {
-    setNotifications(initialNotifications);
-  }, [initialNotifications]);
-
-  useEffect(() => {
-    const interval = setInterval(fetchNotifications, 60000);
-    return () => clearInterval(interval);
-  }, []);
+  const {
+    notifications,
+    unreadCount,
+    fetchNotifications,
+    markAsRead,
+    markAllAsRead,
+  } = useNotifications();
 
   const unread = notifications.filter((n) => !n.readAt);
 
-  const fetchNotifications = async () => {
-    const res = await getNotificationsAction();
-    if (res.success && res.data) setNotifications(res.data);
-  };
-
   const handleNotificationClick = async (id: string) => {
-    const notification = notifications.find((n) => n._id === id);
-    if (!notification || notification.readAt) return;
-
-    setNotifications((prev) =>
-      prev.map((n) => (n._id === id ? { ...n, readAt: new Date() } : n))
-    );
-    await markNotificationReadAction(id);
-    router.refresh();
+    await markAsRead(id);
   };
 
   const handleMarkAllAsRead = async () => {
-    const unreadList = notifications.filter((n) => !n.readAt);
-    if (unreadList.length === 0) return;
-    await Promise.all(unreadList.map((n) => markNotificationReadAction(n._id as string)));
-    setNotifications((prev) => prev.map((n) => ({ ...n, readAt: n.readAt || new Date() })));
-    toast.success("All notifications marked as read");
-    router.refresh();
+    const promise = markAllAsRead();
+    toast.promise(promise, {
+      loading: "Marking all as read...",
+      success: "All notifications marked as read",
+      error: "Failed to mark notifications as read",
+    });
   };
 
   const handleDelete = async (id: string) => {
-    const res = await deleteNotificationAction(id);
-    if (res.success) {
-      setNotifications((prev) => prev.filter((n) => n._id !== id));
-      toast.success("Notification deleted");
-      router.refresh();
-    } else {
-      toast.error("Failed to delete notification");
-    }
+    const promise = deleteNotificationAction(id).then((res) => {
+      if (!res.success) {
+        throw new Error(res.error || "Failed to delete notification");
+      }
+      refreshNotifications();
+      return res;
+    });
+
+    toast.promise(promise, {
+      loading: "Deleting notification...",
+      success: "Notification deleted",
+      error: (err: any) => err?.message || "Failed to delete notification",
+    });
   };
 
   const handleCompleteReminder = async (notificationId: string, reminderId: string) => {
-    const res = await completeReminderAction(reminderId);
-    if (res.success) {
-      // Also mark the notification as read
-      await markNotificationReadAction(notificationId);
-      setNotifications((prev) =>
-        prev.map((n) => (n._id === notificationId ? { ...n, readAt: new Date() } : n))
-      );
-      toast.success("Reminder marked as complete");
-      router.refresh();
-    } else {
-      toast.error("Failed to complete reminder");
-    }
+    const promise = completeReminderAction(reminderId).then(async (res) => {
+      if (!res.success) {
+        throw new Error(res.error || "Failed to complete reminder");
+      }
+      await markAsRead(notificationId);
+      refreshNotifications();
+      return res;
+    });
+
+    toast.promise(promise, {
+      loading: "Completing reminder...",
+      success: "Reminder marked as complete",
+      error: (err: any) => err?.message || "Failed to complete reminder",
+    });
   };
 
   const groupNotifications = (list: Notification[]) => {
@@ -163,74 +154,49 @@ export function NotificationsContent({ initialNotifications }: NotificationsCont
                 key={n._id as string}
                 variant={!n.readAt ? "muted" : "outline"}
                 className="items-start md:items-center justify-between cursor-pointer"
-                asChild={hasLink}
+                render={
+                  hasLink ? (
+                    <Link
+                      href={n.link!}
+                      replace={true}
+                      onClick={(e) => {
+                        if (!n.readAt) {
+                          e.preventDefault();
+                          isReminder && n.reminderId
+                            ? handleCompleteReminder(n._id as string, n.reminderId)
+                            : handleNotificationClick(n._id as string);
+                        }
+                      }}
+                    />
+                  ) : undefined
+                }
                 onClick={!hasLink ? () => handleNotificationClick(n._id as string) : undefined}
+                role={!hasLink ? "button" : undefined}
+                tabIndex={!hasLink ? 0 : undefined}
+                onKeyDown={!hasLink ? (e) => e.key === "Enter" && handleNotificationClick(n._id as string) : undefined}
               >
-                {hasLink ? (
-                  <Link
-                    href={n.link!}
-                    replace={true}
-                    onClick={(e) => {
-                      if (!n.readAt) {
-                        e.preventDefault();
-                        isReminder && n.reminderId
-                          ? handleCompleteReminder(n._id as string, n.reminderId)
-                          : handleNotificationClick(n._id as string);
-                      }
-                      // already read → navigate naturally
-                    }}
-                  >
-                    <NotificationIcon type={n.type} image={n.image} title={n.title} />
+                <NotificationIcon type={n.type} image={n.image} title={n.title} />
 
-                    <ItemContent className="min-w-0">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <ItemTitle>{n.title}</ItemTitle>
-                        {!n.readAt && <Badge variant="secondary">New</Badge>}
-                      </div>
-                      <ItemDescription className="text-xs leading-relaxed mt-0.5">
-                        {n.message}
-                      </ItemDescription>
-                      <span className="text-[10px] text-muted-foreground/60 font-medium mt-1 block">
-                        {new Date(n.createdAt).toLocaleDateString()}{" "}
-                        {new Date(n.createdAt).toLocaleTimeString([], {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                      </span>
-                    </ItemContent>
-
-                    <ItemActions className="self-end md:self-center shrink-0 mt-3 md:mt-0 ml-auto">
-                      {n.readAt && <ChevronRight className="size-4" />}
-                    </ItemActions>
-                  </Link>
-                ) : (
-                  <div
-                    role="button"
-                    tabIndex={0}
-                    onKeyDown={(e) => e.key === "Enter" && handleNotificationClick(n._id as string)}
-                  >
-                    <NotificationIcon type={n.type} image={n.image} title={n.title} />
-
-                    <ItemContent className="min-w-0">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <ItemTitle>{n.title}</ItemTitle>
-                        {!n.readAt && <Badge variant="secondary">New</Badge>}
-                      </div>
-                      <ItemDescription className="text-xs leading-relaxed mt-0.5">
-                        {n.message}
-                      </ItemDescription>
-                      <span className="text-[10px] text-muted-foreground/60 font-medium mt-1 block">
-                        {new Date(n.createdAt).toLocaleDateString()}{" "}
-                        {new Date(n.createdAt).toLocaleTimeString([], {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                      </span>
-                    </ItemContent>
-
-                    <ItemActions className="self-end md:self-center shrink-0 mt-3 md:mt-0 ml-auto" />
+                <ItemContent className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <ItemTitle>{n.title}</ItemTitle>
+                    {!n.readAt && <Badge variant="secondary">New</Badge>}
                   </div>
-                )}
+                  <ItemDescription className="text-xs leading-relaxed mt-0.5">
+                    {n.message}
+                  </ItemDescription>
+                  <span className="text-[10px] text-muted-foreground/60 font-medium mt-1 block">
+                    {new Date(n.createdAt).toLocaleDateString()}{" "}
+                    {new Date(n.createdAt).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </span>
+                </ItemContent>
+
+                <ItemActions className="self-end md:self-center shrink-0 mt-3 md:mt-0 ml-auto">
+                  {n.readAt && <ChevronRight className="size-4" />}
+                </ItemActions>
               </Item>
             );
           })}

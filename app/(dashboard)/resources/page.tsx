@@ -2,13 +2,19 @@ import { getResources } from "@/lib/queries/resources";
 import { getCategories } from "@/lib/queries/categories";
 import { getProjects } from "@/lib/queries/projects";
 import { getPeople } from "@/lib/queries/people";
-import { ResourcesContent } from "./resources-content"
+import { ResourcesContent } from "@/components/resources/resources-content";
 import { auth } from "@/lib/auth"
 import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 import { Resource, Category, Project, Person } from "@/types"
 import { Suspense } from "react"
 import { Skeleton } from "@/components/ui/skeleton"
+import type { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "Resources",
+  description: "Browse, filter, and organize your curated digital bookmarks and web resources.",
+}
 
 function ResourcesSkeleton() {
   return (
@@ -107,4 +113,3 @@ export default function ResourcesPage() {
     </Suspense>
   )
 }
-

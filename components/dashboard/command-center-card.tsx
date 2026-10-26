@@ -2,14 +2,10 @@
 
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
-import { useQuickCapture } from "@/components/layout/quick-capture-drawers"
 import { Search, Plus, FolderPlus, Star, LayoutGrid } from "lucide-react"
 import Link from "next/link"
 
 export function CommandCenterCard() {
-  const { openCapture } = useQuickCapture()
-
   const handleOpenSearch = () => {
     window.dispatchEvent(new CustomEvent("open-global-search"))
   }
@@ -36,8 +32,6 @@ export function CommandCenterCard() {
         </div>
       </button>
 
-      {/* <Separator className="bg-border/45" /> */}
-
       {/* Quick actions */}
       <div className="flex flex-wrap items-center gap-2">
         <span className="mr-1 font-mono text-[10px] lowercase tracking-wider text-muted-foreground/60">
@@ -47,7 +41,8 @@ export function CommandCenterCard() {
           variant="outline"
           size="sm"
           className="h-7 gap-1.5 px-2.5 text-xs font-medium"
-          onClick={() => openCapture("resource")}
+          render={<Link href="/resources?new=true" />}
+          nativeButton={false}
         >
           <Plus data-icon="inline-start" />
           Add resource
@@ -56,7 +51,8 @@ export function CommandCenterCard() {
           variant="outline"
           size="sm"
           className="h-7 gap-1.5 px-2.5 text-xs font-medium"
-          onClick={() => openCapture("category")}
+          render={<Link href="/categories?new=category" />}
+          nativeButton={false}
         >
           <FolderPlus data-icon="inline-start" />
           New category
@@ -74,12 +70,11 @@ export function CommandCenterCard() {
           variant="outline"
           size="sm"
           className="h-7 gap-1.5 px-2.5 text-xs font-medium"
-          asChild
+          render={<Link href="/categories" />}
+          nativeButton={false}
         >
-          <Link href="/categories">
-            <LayoutGrid data-icon="inline-start" />
-            Categories
-          </Link>
+          <LayoutGrid data-icon="inline-start" />
+          Categories
         </Button>
       </div>
     </Card>

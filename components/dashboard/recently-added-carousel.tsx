@@ -70,12 +70,11 @@ export function RecentlyAddedCarousel({ resources }: RecentlyAddedCarouselProps)
                         variant="ghost"
                         size="sm"
                         className="h-6 gap-1 px-2 text-[10px] font-medium text-muted-foreground/60 hover:text-foreground"
-                        asChild
+                        render={<Link href="/resources" />}
+                        nativeButton={false}
                     >
-                        <Link href="/resources">
-                            All
-                            <ArrowRight className="size-3" />
-                        </Link>
+                        All
+                        <ArrowRight className="size-3" />
                     </Button>
                 </div>
             </div>
@@ -91,8 +90,14 @@ export function RecentlyAddedCarousel({ resources }: RecentlyAddedCarouselProps)
                             Save your first resource to see it here.
                         </p>
                     </div>
-                    <Button variant="outline" size="sm" className="h-7 text-xs mt-0.5" asChild>
-                        <Link href="/resources/new">Add resource</Link>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-7 text-xs mt-0.5"
+                        render={<Link href="/resources/new" />}
+                        nativeButton={false}
+                    >
+                        Add resource
                     </Button>
                 </div>
             ) : (

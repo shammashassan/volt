@@ -35,7 +35,7 @@ import {
 } from "@/components/ui/item";
 import { createReminderFromTextAction, updateReminderAction, deleteReminderAction } from "@/lib/actions/reminders";
 import { Plus, Trash2, Calendar, Clock, ChevronDown, ChevronUp, ArrowUp, ArrowDown, Equal, ArrowUpDown } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/components/ui/toast";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
@@ -154,9 +154,10 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
     }
 
     const clientOffset = new Date().getTimezoneOffset();
-    const res = await createReminderFromTextAction(inputText, priority, attachments, clientOffset);
-    if (res.success && res.data) {
-      // Populate newly added attachments titles locally
+    const promise = createReminderFromTextAction(inputText, priority, attachments, clientOffset).then((res) => {
+      if (!res.success || !res.data) {
+        throw new Error(res.error || "Failed to add reminder");
+      }
       const populatedAttachments = attachments.map((a) => {
         let title = `Attached ${a.type}`;
         if (a.type === "note") {
@@ -176,11 +177,15 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
       setInputText("");
       setSelectedNoteId("");
       setSelectedProjectId("");
-      toast.success("Reminder added");
       router.refresh();
-    } else {
-      toast.error("Failed to add reminder");
-    }
+      return res.data;
+    });
+
+    toast.promise(promise, {
+      loading: "Adding reminder...",
+      success: "Reminder added",
+      error: (err: any) => err?.message || "Failed to add reminder",
+    });
   };
 
   const handleStatusChange = async (id: string, completedStatus: boolean) => {
@@ -190,15 +195,20 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
     // Optimistically update local state immediately so checkbox checks and item fades out instantly
     setReminders((prev) => prev.map((r) => (r._id === id ? { ...r, status: nextStatus } : r)));
 
-    const res = await updateReminderAction(id, { status: nextStatus });
-    if (res.success && res.data) {
-      toast.success(completedStatus ? "Reminder completed" : "Reminder pending");
+    const promise = updateReminderAction(id, { status: nextStatus }).then((res) => {
+      if (!res.success || !res.data) {
+        setReminders(originalReminders);
+        throw new Error(res.error || "Failed to update status");
+      }
       router.refresh();
-    } else {
-      // Revert if request fails
-      setReminders(originalReminders);
-      toast.error("Failed to update status");
-    }
+      return res.data;
+    });
+
+    toast.promise(promise, {
+      loading: "Updating reminder...",
+      success: completedStatus ? "Reminder completed" : "Reminder pending",
+      error: (err: any) => err?.message || "Failed to update status",
+    });
   };
 
   const handleDelete = async (id: string) => {
@@ -207,15 +217,20 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
     // Optimistically update local state immediately so item fades out instantly
     setReminders((prev) => prev.filter((r) => r._id !== id));
 
-    const res = await deleteReminderAction(id);
-    if (res.success) {
-      toast.success("Reminder deleted");
+    const promise = deleteReminderAction(id).then((res) => {
+      if (!res.success) {
+        setReminders(originalReminders);
+        throw new Error(res.error || "Failed to delete reminder");
+      }
       router.refresh();
-    } else {
-      // Revert if request fails
-      setReminders(originalReminders);
-      toast.error("Failed to delete reminder");
-    }
+      return res;
+    });
+
+    toast.promise(promise, {
+      loading: "Deleting reminder...",
+      success: "Reminder deleted",
+      error: (err: any) => err?.message || "Failed to delete reminder",
+    });
   };
 
   const handleCheckActive = (id: string) => {
@@ -305,16 +320,18 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
                       <Plus data-icon="inline-start" />
                       Add
                     </Button>
-                    <CollapsibleTrigger asChild>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="shrink-0"
-                      >
-                        {isAdvancedOpen ? <ChevronUp /> : <ChevronDown />}
-                        <span className="sr-only">Toggle advanced options</span>
-                      </Button>
+                    <CollapsibleTrigger
+                      render={
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="shrink-0"
+                        />
+                      }
+                    >
+                      {isAdvancedOpen ? <ChevronUp /> : <ChevronDown />}
+                      <span className="sr-only">Toggle advanced options</span>
                     </CollapsibleTrigger>
                   </div>
                 </div>

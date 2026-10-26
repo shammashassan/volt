@@ -3,12 +3,18 @@ import { getNotes } from "@/lib/queries/notes";
 import { getResources } from "@/lib/queries/resources";
 import { getProjects } from "@/lib/queries/projects";
 import { getPeople } from "@/lib/queries/people";
-import { NotesContent } from "./notes-content"
+import { NotesContent } from "@/components/notes/notes-content";
 import { auth } from "@/lib/auth"
 import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 import { Note, Resource, Project, Person } from "@/types"
 import { Skeleton } from "@/components/ui/skeleton"
+import type { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "Notes",
+  description: "Connected personal notes, knowledge fragments, and contextual documentation.",
+}
 
 function NotesSkeleton() {
   return (

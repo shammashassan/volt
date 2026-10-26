@@ -1,28 +1,25 @@
-import { LoginForm } from "@/components/auth/login-form"
-import { FlickeringGrid } from "@/components/ui/flickering-grid"
-import { Suspense } from "react"
+import { redirect } from "next/navigation";
 
-export default function LoginPage() {
-  return (
-    <div className="relative flex min-h-svh flex-col items-center justify-center overflow-hidden p-6 md:p-10">
-      <FlickeringGrid
-        className="absolute inset-0 z-0"
-        squareSize={4}
-        gridGap={6}
-        color="#60a5fa"
-        maxOpacity={0.5}
-        flickerChance={0.1}
-      />
-      <div className="relative z-10 w-full max-w-sm md:max-w-4xl">
-        <Suspense fallback={
-          <div className="flex h-40 items-center justify-center rounded-xl bg-background/60 backdrop-blur-xl">
-            <div className="size-8 rounded-full border-2 border-primary/20 border-t-primary animate-spin" />
-          </div>
-        }>
-          <LoginForm />
-        </Suspense>
-      </div>
-    </div>
-  )
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams?: Promise<Record<string, string | string[] | undefined>> | Record<string, string | string[] | undefined>;
+}) {
+  const resolvedParams = searchParams ? await searchParams : {};
+  const params = new URLSearchParams();
+
+  for (const [key, value] of Object.entries(resolvedParams || {})) {
+    if (typeof value === "string") {
+      params.set(key, value);
+    } else if (Array.isArray(value)) {
+      for (const item of value) {
+        if (typeof item === "string") {
+          params.append(key, item);
+        }
+      }
+    }
+  }
+
+  const query = params.toString();
+  redirect(query ? `/sign-in?${query}` : "/sign-in");
 }
-

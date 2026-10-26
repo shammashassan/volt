@@ -1,12 +1,18 @@
 import { getCategories } from "@/lib/queries/categories";
 import { getCollections } from "@/lib/queries/collections";
-import { CategoriesContent } from "./categories-content"
+import { CategoriesContent } from "@/components/categories/categories-content";
 import { auth } from "@/lib/auth"
 import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 import { Category, Collection } from "@/types"
 import { Suspense } from "react"
 import { Skeleton } from "@/components/ui/skeleton"
+import type { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "Categories",
+  description: "Organize and curate your resources into custom categories and collections.",
+}
 
 function CategoriesSkeleton() {
   return (
@@ -89,4 +95,3 @@ export default function CategoriesPage() {
     </Suspense>
   )
 }
-

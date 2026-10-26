@@ -9,7 +9,7 @@ import {
   CheckCircle2,
   UsersIcon
 } from "lucide-react"
-import { toast } from "sonner"
+import { toast } from "@/components/ui/toast"
 import { authClient } from "@/lib/auth-client"
 import { useRouter } from "next/navigation"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -55,57 +55,68 @@ export function UserManagement({ initialUsers }: { initialUsers: UserData[] }) {
     setUsers(initialUsers)
   }, [initialUsers])
 
-  const pendingUsers = users.filter((u) => !u.isApproved)
-  const activeUsers = users.filter((u) => u.isApproved)
+  const pendingUsers = users.filter((u) => !u.isApproved && !(u as any).approved)
+  const activeUsers = users.filter((u) => u.isApproved || (u as any).approved)
 
   const handleApprove = async (userId: string) => {
     startTransition(async () => {
-      const { error } = await authClient.admin.updateUser({
+      const promise = authClient.admin.updateUser({
         userId,
-        data: { isApproved: true }
-      })
+        data: { isApproved: true, approved: true }
+      }).then(({ error }) => {
+        if (error) {
+          throw new Error(error.message || "Failed to approve user");
+        }
+        setUsers(users.map(u => u.id === userId ? { ...u, isApproved: true, approved: true } : u));
+        router.refresh();
+      });
 
-      if (error) {
-        toast.error(error.message || "Failed to approve user")
-      } else {
-        toast.success("User approved successfully")
-        setUsers(users.map(u => u.id === userId ? { ...u, isApproved: true } : u))
-        router.refresh()
-      }
-    })
+      toast.promise(promise, {
+        loading: "Approving user...",
+        success: "User approved successfully",
+        error: (err: any) => err?.message || "Failed to approve user",
+      });
+    });
   }
 
   const handleSetRole = async (userId: string, role: string) => {
-    if (role !== "user" && role !== "admin") return
+    if (role !== "user" && role !== "admin") return;
     startTransition(async () => {
-      const { error } = await authClient.admin.setRole({ userId, role: role as "user" | "admin" })
-      if (error) {
-        toast.error(error.message || "Failed to set role")
-      } else {
-        toast.success(`Role updated to ${role}`)
-        setUsers(users.map(u => u.id === userId ? { ...u, role } : u))
-        router.refresh()
-      }
-    })
+      const promise = authClient.admin.setRole({ userId, role: role as "user" | "admin" }).then(({ error }) => {
+        if (error) {
+          throw new Error(error.message || "Failed to set role");
+        }
+        setUsers(users.map(u => u.id === userId ? { ...u, role } : u));
+        router.refresh();
+      });
+
+      toast.promise(promise, {
+        loading: "Updating role...",
+        success: `Role updated to ${role}`,
+        error: (err: any) => err?.message || "Failed to set role",
+      });
+    });
   }
 
   const handleBan = async (userId: string, isBanned: boolean) => {
     startTransition(async () => {
-      let result;
-      if (isBanned) {
-        result = await authClient.admin.unbanUser({ userId })
-      } else {
-        result = await authClient.admin.banUser({ userId })
-      }
+      const promise = (isBanned
+        ? authClient.admin.unbanUser({ userId })
+        : authClient.admin.banUser({ userId })
+      ).then((result) => {
+        if (result.error) {
+          throw new Error(result.error.message || "Failed to update ban status");
+        }
+        setUsers(users.map(u => u.id === userId ? { ...u, banned: !isBanned } : u));
+        router.refresh();
+      });
 
-      if (result.error) {
-        toast.error(result.error.message)
-      } else {
-        toast.success(isBanned ? "User unbanned" : "User banned")
-        setUsers(users.map(u => u.id === userId ? { ...u, banned: !isBanned } : u))
-        router.refresh()
-      }
-    })
+      toast.promise(promise, {
+        loading: isBanned ? "Unbanning user..." : "Banning user...",
+        success: isBanned ? "User unbanned" : "User banned",
+        error: (err: any) => err?.message || "Failed to update ban status",
+      });
+    });
   }
 
   const handleDelete = (userId: string) => {
@@ -113,19 +124,25 @@ export function UserManagement({ initialUsers }: { initialUsers: UserData[] }) {
   }
 
   const confirmDeleteUser = async () => {
-    if (!userToDelete) return
-    startTransition(async () => {
-      const { error } = await authClient.admin.removeUser({ userId: userToDelete })
+    if (!userToDelete) return;
+    const targetUserId = userToDelete;
+    setUserToDelete(null);
 
-      if (error) {
-        toast.error(error.message || "Failed to delete user")
-      } else {
-        toast.success("User deleted successfully")
-        setUsers(users.filter(u => u.id !== userToDelete))
-        router.refresh()
-      }
-      setUserToDelete(null)
-    })
+    startTransition(async () => {
+      const promise = authClient.admin.removeUser({ userId: targetUserId }).then(({ error }) => {
+        if (error) {
+          throw new Error(error.message || "Failed to delete user");
+        }
+        setUsers(users.filter(u => u.id !== targetUserId));
+        router.refresh();
+      });
+
+      toast.promise(promise, {
+        loading: "Deleting user...",
+        success: "User deleted successfully",
+        error: (err: any) => err?.message || "Failed to delete user",
+      });
+    });
   }
 
   return (

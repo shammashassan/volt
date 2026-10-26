@@ -6,6 +6,7 @@ import {
   Dialog,
   DialogContent,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -65,6 +66,7 @@ export function WatchlistDetailDialog({ item, open, onOpenChange }: WatchlistDet
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="w-[calc(100%-2rem)] max-w-sm sm:max-w-md p-0 overflow-y-auto max-h-[85dvh] no-scrollbar !gap-0 border-border/60 rounded-2xl shadow-2xl bg-card overscroll-contain [&_[data-slot=dialog-close]]:z-50 [&_[data-slot=dialog-close]]:text-white/80 [&_[data-slot=dialog-close]]:hover:text-white [&_[data-slot=dialog-close]]:bg-black/40 [&_[data-slot=dialog-close]]:backdrop-blur-sm [&_[data-slot=dialog-close]]:rounded-full [&_[data-slot=dialog-close]]:top-3 [&_[data-slot=dialog-close]]:right-3">
         <DialogTitle className="sr-only">{meta?.title || "Media Details"}</DialogTitle>
+        <DialogDescription className="sr-only">Detailed overview, release dates, and streaming information for {meta?.title || "this media"}.</DialogDescription>
 
         {/* Bleed header */}
         <div className="relative overflow-hidden shrink-0">

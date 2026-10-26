@@ -1,5 +1,6 @@
 "use client"
 
+import * as React from "react"
 import { useState, useEffect } from "react"
 import { Separator } from "@/components/ui/separator"
 import { SidebarTrigger } from "@/components/ui/sidebar"
@@ -26,7 +27,7 @@ interface SiteHeaderProps {
   initialCollections?: Collection[]
 }
 
-export function SiteHeader({ initialCategories, initialCollections }: SiteHeaderProps) {
+function HeaderBreadcrumb({ initialCategories }: { initialCategories?: Category[] }) {
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const [categories, setCategories] = useState<Category[]>(initialCategories || [])
@@ -56,6 +57,25 @@ export function SiteHeader({ initialCategories, initialCollections }: SiteHeader
   const activeCategoryParam = searchParams?.get("category") || null
   const category = Array.isArray(categories) ? categories.find(c => c.slug === activeCategoryParam) : undefined
 
+  if (isHome) return null
+
+  const label = category
+    ? category.name
+    : (pathname.includes('/categories') ? "Categories" : pathname.split('/').filter(Boolean).pop())
+
+  return (
+    <>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbPage className="text-foreground capitalize">
+          {label}
+        </BreadcrumbPage>
+      </BreadcrumbItem>
+    </>
+  )
+}
+
+export function SiteHeader({ initialCategories }: SiteHeaderProps) {
   return (
     <header className="sticky top-0 z-50 flex h-(--header-height) shrink-0 items-center gap-2 border-b bg-background/80 backdrop-blur-md transition-all ease-linear">
       <div className="flex w-full items-center justify-between gap-2 px-4 lg:gap-4 lg:px-6">
@@ -68,21 +88,14 @@ export function SiteHeader({ initialCategories, initialCollections }: SiteHeader
           <Breadcrumb className="hidden md:block">
             <BreadcrumbList>
               <BreadcrumbItem>
-                <BreadcrumbLink asChild>
-                  <Link href="/" className="flex items-center gap-2 text-muted-foreground/60 transition-colors hover:text-foreground">
-                    <Home className="size-4" />
-                    Volt
-                  </Link>
+                <BreadcrumbLink render={<Link href="/" className="flex items-center gap-2 text-muted-foreground/60 transition-colors hover:text-foreground" />}>
+                  <Home className="size-4" />
+                  Volt
                 </BreadcrumbLink>
               </BreadcrumbItem>
-              {!isHome && <BreadcrumbSeparator />}
-              {!isHome && (
-                <BreadcrumbItem>
-                  <BreadcrumbPage className="text-foreground">
-                    {category ? category.name : (pathname.includes('/categories') ? "Categories" : pathname.split('/').filter(Boolean).pop())}
-                  </BreadcrumbPage>
-                </BreadcrumbItem>
-              )}
+              <React.Suspense fallback={null}>
+                <HeaderBreadcrumb initialCategories={initialCategories} />
+              </React.Suspense>
             </BreadcrumbList>
           </Breadcrumb>
         </div>

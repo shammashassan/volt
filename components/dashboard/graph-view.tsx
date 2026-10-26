@@ -1067,18 +1067,20 @@ export function GraphView({ data }: { data: GraphData }) {
 
                   return (
                     <Tooltip key={type}>
-                      <TooltipTrigger asChild>
-                        <ToggleGroupItem
-                          value={type}
-                          className={cn(
-                            "size-7 p-0 flex items-center justify-center transition-all rounded-md cursor-pointer shrink-0",
-                            isSelected
-                              ? "bg-primary/10 text-primary border-primary/20 hover:bg-primary/15 hover:text-primary"
-                              : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                          )}
-                        >
-                          <Icon className="size-3.5" style={{ color: color }} />
-                        </ToggleGroupItem>
+                      <TooltipTrigger
+                        render={
+                          <ToggleGroupItem
+                            value={type}
+                            className={cn(
+                              "size-7 p-0 flex items-center justify-center transition-all rounded-md cursor-pointer shrink-0",
+                              isSelected
+                                ? "bg-primary/10 text-primary border-primary/20 hover:bg-primary/15 hover:text-primary"
+                                : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                            )}
+                          />
+                        }
+                      >
+                        <Icon className="size-3.5" style={{ color: color }} />
                       </TooltipTrigger>
                       <TooltipContent side="bottom" className="text-xs">
                         {typeConfig.label} ({activeCount} nodes)
@@ -1110,15 +1112,17 @@ export function GraphView({ data }: { data: GraphData }) {
 
             {/* View Settings Popover */}
             <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="xs"
-                  className="h-7 px-2 hover:bg-muted/50 rounded-md cursor-pointer shrink-0 gap-1.5 font-semibold text-xs"
-                >
-                  <SlidersHorizontal className="size-3.5" />
-                  <span className="hidden sm:inline">Options</span>
-                </Button>
+              <PopoverTrigger
+                render={
+                  <Button
+                    variant="outline"
+                    size="xs"
+                    className="h-7 px-2 hover:bg-muted/50 rounded-md cursor-pointer shrink-0 gap-1.5 font-semibold text-xs"
+                  />
+                }
+              >
+                <SlidersHorizontal className="size-3.5" />
+                <span className="hidden sm:inline">Options</span>
               </PopoverTrigger>
               <PopoverContent align="end" className="w-56 p-2 flex flex-col gap-1 bg-popover/95 backdrop-blur-md shadow-md border z-50">
                 <PopoverHeader className="pb-1 border-b">
@@ -1261,16 +1265,20 @@ export function GraphView({ data }: { data: GraphData }) {
 
         {/* Guide / Instruction Tag */}
         <div className="absolute left-4 bottom-4 z-10 hidden sm:block">
-          <HoverCard openDelay={200} closeDelay={100}>
-            <HoverCardTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="size-8 rounded-lg border bg-background/80 backdrop-blur-md shadow-sm text-muted-foreground hover:text-foreground"
-              >
-                <HelpCircle className="size-4" />
-              </Button>
-            </HoverCardTrigger>
+          <HoverCard>
+            <HoverCardTrigger
+              delay={200}
+              closeDelay={100}
+              render={
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="size-8 rounded-lg border bg-background/80 backdrop-blur-md shadow-sm text-muted-foreground hover:text-foreground"
+                >
+                  <HelpCircle className="size-4" />
+                </Button>
+              }
+            />
             <HoverCardContent side="top" align="start" className="w-72 p-3 bg-popover/90 backdrop-blur-sm shadow-md border pointer-events-none">
               <div className="flex flex-col gap-2 text-xs">
                 <h4 className="font-bold text-foreground">Graph Guide & Controls</h4>

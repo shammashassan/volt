@@ -1,12 +1,18 @@
 import { getResources } from "@/lib/queries/resources";
 import { getNotes } from "@/lib/queries/notes";
 import { getPeople } from "@/lib/queries/people";
-import { TagsContent } from "./tags-content"
+import { TagsContent } from "@/components/tags/tags-content";
 import { auth } from "@/lib/auth"
 import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 import { Suspense } from "react"
 import { Skeleton } from "@/components/ui/skeleton"
+import type { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "Tags",
+  description: "Browse resources, notes, and people grouped by shared taxonomy and keywords.",
+}
 
 function TagsSkeleton() {
   return (
@@ -89,4 +95,3 @@ export default function TagsPage() {
     </Suspense>
   )
 }
-

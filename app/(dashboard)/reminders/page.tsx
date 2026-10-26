@@ -8,7 +8,7 @@ import { getDb } from "@/lib/db";
 import { ObjectId } from "mongodb";
 
 export const metadata: Metadata = {
-  title: "Reminders - Volt",
+  title: "Reminders",
   description: "Manage checklists, tasks, and today's dynamic event timeline.",
 };
 

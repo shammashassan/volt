@@ -73,8 +73,14 @@ export function FavoritesListCard({ resources }: FavoritesListCardProps) {
                                 Star resources to pin them here for fast access.
                             </p>
                         </div>
-                        <Button variant="ghost" size="sm" className="h-6 text-[10px] px-2 mt-0.5" asChild>
-                            <Link href="/resources">Browse resources →</Link>
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-6 text-[10px] px-2 mt-0.5"
+                            render={<Link href="/resources" />}
+                            nativeButton={false}
+                        >
+                            Browse resources →
                         </Button>
                     </div>
                 )}
