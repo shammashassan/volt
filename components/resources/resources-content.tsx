@@ -611,12 +611,13 @@ export function ResourcesContent({
                 pressed={isReorderActive}
                 onPressedChange={setIsReorderActive}
                 variant="outline"
+                className="flex-1 sm:flex-initial"
               >
                 {isReorderActive ? <Check /> : <ArrowUpDown />}
                 <span>{isReorderActive ? "Done Ordering" : "Reorder Mode"}</span>
               </Toggle>
             )}
-            <Button onClick={handleOpenCreate}>
+            <Button onClick={handleOpenCreate} className="w-full sm:w-auto flex-1 sm:flex-initial">
               <Plus />
               Add Resource
             </Button>

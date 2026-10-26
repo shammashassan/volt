@@ -37,7 +37,7 @@ function ResourcesSkeleton() {
             <Skeleton className="h-5 w-96 max-w-full mt-2" />
           </div>
           {/* Button skeleton */}
-          <Skeleton className="h-10 w-full sm:w-32 shrink-0" />
+          <Skeleton className="h-8 w-full sm:w-32 rounded-lg shrink-0" />
         </div>
       </section>
 

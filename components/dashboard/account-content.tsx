@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -819,60 +820,64 @@ export function AccountContent() {
           </DialogHeader>
 
           {!totpURI ? (
-            <form onSubmit={handleStartEnable2FA} className="space-y-4 py-2">
-              <div className="grid gap-2">
-                <Label htmlFor="twofa-password">Account Password</Label>
-                <Input
-                  id="twofa-password"
-                  type="password"
-                  value={enable2FAPassword}
-                  onChange={(e) => setEnable2FAPassword(e.target.value)}
-                  required
-                  placeholder="Enter current password"
-                />
-              </div>
+            <>
+              <form id="enable-2fa-start-form" onSubmit={handleStartEnable2FA}>
+                <FieldGroup>
+                  <Field>
+                    <FieldLabel htmlFor="twofa-password">Account Password</FieldLabel>
+                    <Input
+                      id="twofa-password"
+                      type="password"
+                      value={enable2FAPassword}
+                      onChange={(e) => setEnable2FAPassword(e.target.value)}
+                      required
+                      placeholder="Enter current password"
+                    />
+                  </Field>
+                </FieldGroup>
+              </form>
               <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setShowEnable2FA(false)}>
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={isEnrolling2FA || !enable2FAPassword}>
-                  {isEnrolling2FA && <Loader2 className="mr-2 size-4 animate-spin" />}
+                <DialogClose render={<Button variant="outline">Cancel</Button>} />
+                <Button type="submit" form="enable-2fa-start-form" disabled={isEnrolling2FA || !enable2FAPassword}>
+                  {isEnrolling2FA && <Loader2 className="animate-spin" data-icon="inline-start" />}
                   Continue
                 </Button>
               </DialogFooter>
-            </form>
+            </>
           ) : (
-            <form onSubmit={handleVerify2FAEnrollment} className="flex flex-col gap-4 py-2">
-              <div className="flex flex-col gap-2">
-                <span className="text-xs text-muted-foreground uppercase font-mono">Authenticator Setup Key</span>
-                <div className="p-3 bg-muted/60 rounded-lg text-xs font-mono break-all select-all border border-border/40">
-                  {totpURI}
+            <>
+              <form id="enable-2fa-verify-form" onSubmit={handleVerify2FAEnrollment} className="flex flex-col gap-4">
+                <div className="flex flex-col gap-2">
+                  <span className="text-xs text-muted-foreground uppercase font-mono">Authenticator Setup Key</span>
+                  <div className="p-3 bg-muted/60 rounded-lg text-xs font-mono break-all select-all border border-border/40">
+                    {totpURI}
+                  </div>
                 </div>
-              </div>
-              <Field>
-                <FieldLabel htmlFor="twofa-code">Verification Code</FieldLabel>
-                <Input
-                  id="twofa-code"
-                  type="text"
-                  placeholder="e.g. 123456"
-                  value={totpCode}
-                  onChange={(e) => setTotpCode(e.target.value)}
-                  maxLength={6}
-                  required
-                  autoFocus
-                  className="text-center font-mono text-lg tracking-wider"
-                />
-              </Field>
+                <FieldGroup>
+                  <Field>
+                    <FieldLabel htmlFor="twofa-code">Verification Code</FieldLabel>
+                    <Input
+                      id="twofa-code"
+                      type="text"
+                      placeholder="e.g. 123456"
+                      value={totpCode}
+                      onChange={(e) => setTotpCode(e.target.value)}
+                      maxLength={6}
+                      required
+                      autoFocus
+                      className="text-center font-mono text-lg tracking-wider"
+                    />
+                  </Field>
+                </FieldGroup>
+              </form>
               <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setShowEnable2FA(false)}>
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={isEnrolling2FA || totpCode.trim().length < 6}>
-                  {isEnrolling2FA && <Loader2 className="mr-2 size-4 animate-spin" />}
+                <DialogClose render={<Button variant="outline">Cancel</Button>} />
+                <Button type="submit" form="enable-2fa-verify-form" disabled={isEnrolling2FA || totpCode.trim().length < 6}>
+                  {isEnrolling2FA && <Loader2 className="animate-spin" data-icon="inline-start" />}
                   Verify & Activate
                 </Button>
               </DialogFooter>
-            </form>
+            </>
           )}
         </DialogContent>
       </Dialog>
@@ -886,7 +891,7 @@ export function AccountContent() {
               Please enter your password to confirm turning off 2FA protection.
             </DialogDescription>
           </DialogHeader>
-          <form onSubmit={handleDisable2FA} className="flex flex-col gap-4 py-2">
+          <form id="disable-2fa-form" onSubmit={handleDisable2FA}>
             <FieldGroup>
               <Field>
                 <FieldLabel htmlFor="disable-twofa-password">Account Password</FieldLabel>
@@ -900,16 +905,14 @@ export function AccountContent() {
                 />
               </Field>
             </FieldGroup>
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setShowDisable2FA(false)}>
-                Cancel
-              </Button>
-              <Button type="submit" variant="destructive" disabled={isEnrolling2FA || !disable2FAPassword}>
-                {isEnrolling2FA && <Loader2 className="mr-2 size-4 animate-spin" />}
-                Disable 2FA
-              </Button>
-            </DialogFooter>
           </form>
+          <DialogFooter>
+            <DialogClose render={<Button variant="outline">Cancel</Button>} />
+            <Button type="submit" form="disable-2fa-form" variant="destructive" disabled={isEnrolling2FA || !disable2FAPassword}>
+              {isEnrolling2FA && <Loader2 className="animate-spin" data-icon="inline-start" />}
+              Disable 2FA
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 
@@ -954,7 +957,13 @@ export function AccountContent() {
       </Dialog>
 
       {/* Add Passkey Dialog */}
-      <Dialog open={showAddPasskey} onOpenChange={setShowAddPasskey}>
+      <Dialog
+        open={showAddPasskey}
+        onOpenChange={(open) => {
+          setShowAddPasskey(open)
+          if (!open) setPasskeyName("")
+        }}
+      >
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>Register New Passkey</DialogTitle>
@@ -962,7 +971,7 @@ export function AccountContent() {
               Provide a label for this device or security key (e.g. &ldquo;MacBook Touch ID&rdquo; or &ldquo;YubiKey&rdquo;).
             </DialogDescription>
           </DialogHeader>
-          <form onSubmit={handleRegisterPasskey} className="flex flex-col gap-4 py-2">
+          <form id="add-passkey-form" onSubmit={handleRegisterPasskey}>
             <FieldGroup>
               <Field>
                 <FieldLabel htmlFor="passkey-name">Passkey Label</FieldLabel>
@@ -975,16 +984,14 @@ export function AccountContent() {
                 />
               </Field>
             </FieldGroup>
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setShowAddPasskey(false)}>
-                Cancel
-              </Button>
-              <Button type="submit" disabled={isAddingPasskey}>
-                {isAddingPasskey && <Loader2 className="mr-2 size-4 animate-spin" />}
-                Register Passkey
-              </Button>
-            </DialogFooter>
           </form>
+          <DialogFooter>
+            <DialogClose render={<Button variant="outline">Cancel</Button>} />
+            <Button type="submit" form="add-passkey-form" disabled={isAddingPasskey}>
+              {isAddingPasskey && <Loader2 className="animate-spin" data-icon="inline-start" />}
+              Register Passkey
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
