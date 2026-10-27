@@ -126,13 +126,13 @@ export function SignInForm() {
         res = await signIn.email({
           email: trimmedIdentifier,
           password,
-          callbackURL: "/explore",
+          callbackURL: "/dashboard",
         })
       } else {
         res = await signIn.username({
           username: trimmedIdentifier,
           password,
-          callbackURL: "/explore",
+          callbackURL: "/dashboard",
         })
       }
 
@@ -141,7 +141,7 @@ export function SignInForm() {
       }
 
       if (res.data) {
-        router.push("/explore")
+        router.push("/dashboard")
         router.refresh()
       }
       return res.data
@@ -170,7 +170,7 @@ export function SignInForm() {
     const magicLinkPromise = (async () => {
       const { error: resError } = await authClient.signIn.magicLink({
         email: magicLinkEmail.trim(),
-        callbackURL: "/explore",
+        callbackURL: "/dashboard",
       })
 
       if (resError) {
@@ -202,7 +202,7 @@ export function SignInForm() {
       }
 
       if (data) {
-        router.push("/explore")
+        router.push("/dashboard")
         router.refresh()
       }
     })().finally(() => {
@@ -225,7 +225,7 @@ export function SignInForm() {
     const googlePromise = (async () => {
       await authClient.signIn.social({
         provider: "google",
-        callbackURL: "/explore",
+        callbackURL: "/dashboard",
         errorCallbackURL: "/sign-in",
       })
     })().finally(() => {

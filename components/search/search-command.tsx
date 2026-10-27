@@ -170,7 +170,7 @@ export function SearchCommand() {
   ];
 
   const quickActionItems = [
-    { path: "/explore", label: "Go to Dashboard", icon: LayoutDashboardIcon },
+    { path: "/dashboard", label: "Go to Dashboard", icon: LayoutDashboardIcon },
     { path: "/resources", label: "Open Resources", icon: StarIcon },
     { path: "/categories", label: "Open Categories", icon: FolderIcon },
     { path: "/graph", label: "Open Graph", icon: Network },

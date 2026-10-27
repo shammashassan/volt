@@ -42,7 +42,7 @@ export async function addPersonAction(data: {
     revalidatePath("/people");
     updateTag("people");
     updateTag(`people-${user.id}`);
-    updateTag(`explore-body-${user.id}`);
+    updateTag(`dashboard-body-${user.id}`);
     updateTag(`dashboard-stats-${user.id}`);
     return { success: true, id: result.insertedId.toString() };
   } catch (error) {
@@ -78,7 +78,7 @@ export async function updatePersonAction(id: string, data: Record<string, unknow
     revalidatePath("/people");
     updateTag("people");
     updateTag(`people-${user.id}`);
-    updateTag(`explore-body-${user.id}`);
+    updateTag(`dashboard-body-${user.id}`);
     updateTag(`dashboard-stats-${user.id}`);
     return { success: true };
   } catch (error) {
@@ -102,7 +102,7 @@ export async function deletePersonAction(id: string) {
     revalidatePath("/people");
     updateTag("people");
     updateTag(`people-${user.id}`);
-    updateTag(`explore-body-${user.id}`);
+    updateTag(`dashboard-body-${user.id}`);
     updateTag(`dashboard-stats-${user.id}`);
     return { success: true };
   } catch (error) {

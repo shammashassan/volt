@@ -99,11 +99,11 @@ export async function addResourceAction(
       entityId: result.insertedId.toString()
     });
 
-    revalidatePath("/explore");
+    revalidatePath("/dashboard");
     revalidatePath("/resources");
     updateTag("resources");
     updateTag(`resources-${user.id}`);
-    updateTag(`explore-body-${user.id}`);
+    updateTag(`dashboard-body-${user.id}`);
     updateTag(`dashboard-stats-${user.id}`);
     return { success: true, id: result.insertedId.toString() };
   } catch (error) {
@@ -154,11 +154,11 @@ export async function updateResourceAction(idOrLink: string, data: Record<string
       });
     }
 
-    revalidatePath("/explore");
+    revalidatePath("/dashboard");
     revalidatePath("/resources");
     updateTag("resources");
     updateTag(`resources-${user.id}`);
-    updateTag(`explore-body-${user.id}`);
+    updateTag(`dashboard-body-${user.id}`);
     updateTag(`dashboard-stats-${user.id}`);
     return { success: true };
   } catch (error) {
@@ -193,11 +193,11 @@ export async function deleteResourceAction(idOrLink: string) {
       await searchIndexRepo.remove(entityId);
     }
 
-    revalidatePath("/explore");
+    revalidatePath("/dashboard");
     revalidatePath("/resources");
     updateTag("resources");
     updateTag(`resources-${user.id}`);
-    updateTag(`explore-body-${user.id}`);
+    updateTag(`dashboard-body-${user.id}`);
     updateTag(`dashboard-stats-${user.id}`);
     return { success: true };
   } catch (error) {
@@ -217,7 +217,7 @@ export async function trackResourceViewAction(id: string) {
     );
     updateTag("resources");
     updateTag(`resources-${user.id}`);
-    updateTag(`explore-body-${user.id}`);
+    updateTag(`dashboard-body-${user.id}`);
     return { success: true };
   } catch (error) {
     return { success: false, error: getErrorMessage(error) };
@@ -239,7 +239,7 @@ export async function useResourceAction(id: string) {
     );
     updateTag("resources");
     updateTag(`resources-${user.id}`);
-    updateTag(`explore-body-${user.id}`);
+    updateTag(`dashboard-body-${user.id}`);
     return { success: true };
   } catch (error) {
     return { success: false, error: getErrorMessage(error) };

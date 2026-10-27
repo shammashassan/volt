@@ -1,6 +1,6 @@
 import { Skeleton } from "@/components/ui/skeleton"
 
-export default function AccountLoading() {
+export default function SettingsLoading() {
   return (
     <div className="flex flex-1 flex-col gap-8 pb-12 px-4 pt-8 lg:px-8 max-w-5xl mx-auto w-full animate-pulse">
       {/* Header */}

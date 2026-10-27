@@ -44,9 +44,9 @@ export async function createReminderAction(payload: {
 
     updateTag('reminders');
     updateTag(`reminders-${user.id}`);
-    updateTag(`explore-body-${user.id}`);
+    updateTag(`dashboard-body-${user.id}`);
     revalidatePath('/reminders');
-    revalidatePath('/explore');
+    revalidatePath('/dashboard');
     return { success: true, data: JSON.parse(JSON.stringify(reminder)) as Reminder };
   } catch (err) {
     return { success: false, error: getErrorMessage(err) };
@@ -69,9 +69,9 @@ export async function createReminderFromTextAction(text: string, priority: Remin
 
     updateTag('reminders');
     updateTag(`reminders-${user.id}`);
-    updateTag(`explore-body-${user.id}`);
+    updateTag(`dashboard-body-${user.id}`);
     revalidatePath('/reminders');
-    revalidatePath('/explore');
+    revalidatePath('/dashboard');
     return { success: true, data: JSON.parse(JSON.stringify(reminder)) as Reminder };
   } catch (err) {
     return { success: false, error: getErrorMessage(err) };
@@ -88,9 +88,9 @@ export async function updateReminderAction(id: string, updates: Partial<Reminder
 
     updateTag('reminders');
     updateTag(`reminders-${user.id}`);
-    updateTag(`explore-body-${user.id}`);
+    updateTag(`dashboard-body-${user.id}`);
     revalidatePath('/reminders');
-    revalidatePath('/explore');
+    revalidatePath('/dashboard');
     return { success: true, data: JSON.parse(JSON.stringify(reminder)) as Reminder };
   } catch (err) {
     return { success: false, error: getErrorMessage(err) };
@@ -104,9 +104,9 @@ export async function deleteReminderAction(id: string) {
 
     updateTag('reminders');
     updateTag(`reminders-${user.id}`);
-    updateTag(`explore-body-${user.id}`);
+    updateTag(`dashboard-body-${user.id}`);
     revalidatePath('/reminders');
-    revalidatePath('/explore');
+    revalidatePath('/dashboard');
     return { success: true, data: success };
   } catch (err) {
     return { success: false, error: getErrorMessage(err) };
@@ -122,10 +122,10 @@ export async function completeReminderAction(id: string) {
 
     updateTag('reminders');
     updateTag(`reminders-${user.id}`);
-    updateTag(`explore-body-${user.id}`);
+    updateTag(`dashboard-body-${user.id}`);
     revalidatePath('/reminders');
     revalidatePath('/notifications');
-    revalidatePath('/explore');
+    revalidatePath('/dashboard');
     return { success: true, data: JSON.parse(JSON.stringify(reminder)) as Reminder };
   } catch (err) {
     return { success: false, error: getErrorMessage(err) };

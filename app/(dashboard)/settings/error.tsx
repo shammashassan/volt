@@ -6,7 +6,7 @@ import { AlertCircle, RotateCcw, ArrowLeft } from "lucide-react"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
-export default function AccountError({
+export default function SettingsError({
   error,
   reset,
 }: {
@@ -14,7 +14,7 @@ export default function AccountError({
   reset: () => void
 }) {
   useEffect(() => {
-    console.error("Account settings error:", error)
+    console.error("Settings error:", error)
   }, [error])
 
   return (
@@ -24,7 +24,7 @@ export default function AccountError({
           <AlertCircle className="size-6" />
         </div>
         <div className="space-y-1">
-          <h2 className="text-lg font-bold tracking-tight text-foreground">Failed to load account settings</h2>
+          <h2 className="text-lg font-bold tracking-tight text-foreground">Failed to load settings</h2>
           <p className="text-sm text-muted-foreground leading-relaxed">
             An unexpected error occurred while loading your profile and security credentials.
           </p>
@@ -37,9 +37,9 @@ export default function AccountError({
             <RotateCcw className="size-4" />
             Try again
           </Button>
-          <Link href="/explore" className={cn(buttonVariants({ variant: "outline", size: "sm" }), "gap-2")}>
+          <Link href="/dashboard" className={cn(buttonVariants({ variant: "outline", size: "sm" }), "gap-2")}>
             <ArrowLeft className="size-4" />
-            Explore
+            Dashboard
           </Link>
         </div>
       </div>

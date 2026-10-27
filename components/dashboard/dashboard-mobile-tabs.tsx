@@ -12,18 +12,19 @@ import Link from "next/link"
 import { ArrowRightIcon, TrendingUpIcon } from "lucide-react"
 import { Resource } from "@/types"
 
-
-interface ExploreMobileTabsProps {
+export interface DashboardMobileTabsProps {
   recentlyAdded: Resource[]
   recentlyViewed: Resource[]
   mostUsed: Resource[]
 }
 
-export function ExploreMobileTabs({
+export type ExploreMobileTabsProps = DashboardMobileTabsProps
+
+export function DashboardMobileTabs({
   recentlyAdded,
   recentlyViewed,
   mostUsed,
-}: ExploreMobileTabsProps) {
+}: DashboardMobileTabsProps) {
   const [activeTab, setActiveTab] = useState("added")
 
   return (
@@ -115,3 +116,5 @@ export function ExploreMobileTabs({
     </Tabs>
   )
 }
+
+export const ExploreMobileTabs = DashboardMobileTabs

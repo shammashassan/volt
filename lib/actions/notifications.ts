@@ -37,7 +37,22 @@ export async function markNotificationReadAction(id: string) {
 
     updateTag('notifications');
     updateTag(`notifications-${user.id}`);
-    updateTag(`explore-body-${user.id}`);
+    updateTag(`dashboard-body-${user.id}`);
+    revalidatePath('/notifications');
+    return { success: true, data: success };
+  } catch (err) {
+    return { success: false, error: getErrorMessage(err) };
+  }
+}
+
+export async function markNotificationUnreadAction(id: string) {
+  try {
+    const user = await getSessionUser();
+    const success = await repo.markUnread(id, user.id);
+
+    updateTag('notifications');
+    updateTag(`notifications-${user.id}`);
+    updateTag(`dashboard-body-${user.id}`);
     revalidatePath('/notifications');
     return { success: true, data: success };
   } catch (err) {
@@ -52,8 +67,40 @@ export async function markAllNotificationsReadAction() {
 
     updateTag('notifications');
     updateTag(`notifications-${user.id}`);
-    updateTag(`explore-body-${user.id}`);
+    updateTag(`dashboard-body-${user.id}`);
     revalidatePath('/notifications');
+    return { success: true, data: success };
+  } catch (err) {
+    return { success: false, error: getErrorMessage(err) };
+  }
+}
+
+export async function clearReadNotificationsAction() {
+  try {
+    const user = await getSessionUser();
+    const success = await repo.clearAllRead(user.id);
+
+    updateTag('notifications');
+    updateTag(`notifications-${user.id}`);
+    updateTag(`dashboard-body-${user.id}`);
+    revalidatePath('/notifications');
+    revalidatePath('/dashboard');
+    return { success: true, data: success };
+  } catch (err) {
+    return { success: false, error: getErrorMessage(err) };
+  }
+}
+
+export async function clearAllNotificationsAction() {
+  try {
+    const user = await getSessionUser();
+    const success = await repo.clearAll(user.id);
+
+    updateTag('notifications');
+    updateTag(`notifications-${user.id}`);
+    updateTag(`dashboard-body-${user.id}`);
+    revalidatePath('/notifications');
+    revalidatePath('/dashboard');
     return { success: true, data: success };
   } catch (err) {
     return { success: false, error: getErrorMessage(err) };
@@ -67,7 +114,7 @@ export async function archiveNotificationAction(id: string) {
 
     updateTag('notifications');
     updateTag(`notifications-${user.id}`);
-    updateTag(`explore-body-${user.id}`);
+    updateTag(`dashboard-body-${user.id}`);
     revalidatePath('/notifications');
     return { success: true, data: success };
   } catch (err) {
@@ -82,9 +129,9 @@ export async function deleteNotificationAction(id: string) {
 
     updateTag('notifications');
     updateTag(`notifications-${user.id}`);
-    updateTag(`explore-body-${user.id}`);
+    updateTag(`dashboard-body-${user.id}`);
     revalidatePath('/notifications');
-    revalidatePath('/explore');
+    revalidatePath('/dashboard');
     return { success: true, data: success };
   } catch (err) {
     return { success: false, error: getErrorMessage(err) };

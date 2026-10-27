@@ -1,7 +1,7 @@
-const CACHE_NAME = 'volt-pwa-cache-v3';
+const CACHE_NAME = 'volt-pwa-cache-v4';
 const ASSETS_TO_CACHE = [
   '/',
-  '/explore',
+  '/dashboard',
   '/manifest.webmanifest',
   '/android-chrome-192x192.png',
   '/android-chrome-512x512.png',
@@ -74,7 +74,7 @@ self.addEventListener('fetch', (event) => {
         .catch(() => {
           // Offline fallback
           if (isPageNavigation) {
-            return caches.match('/explore').then((res) => res || caches.match('/'));
+            return caches.match('/dashboard').then((res) => res || caches.match('/'));
           }
           // If Next.js RSC request fails, try cache first, then dynamic empty offline response
           return caches.match(event.request).then((cachedResponse) => {

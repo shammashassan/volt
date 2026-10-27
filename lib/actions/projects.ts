@@ -42,7 +42,7 @@ export async function addProjectAction(data: {
     revalidatePath("/projects");
     updateTag("projects");
     updateTag(`projects-${user.id}`);
-    updateTag(`explore-body-${user.id}`);
+    updateTag(`dashboard-body-${user.id}`);
     updateTag(`dashboard-stats-${user.id}`);
     return { success: true, id: result.insertedId.toString() };
   } catch (error) {
@@ -78,7 +78,7 @@ export async function updateProjectAction(id: string, data: Record<string, unkno
     revalidatePath("/projects");
     updateTag("projects");
     updateTag(`projects-${user.id}`);
-    updateTag(`explore-body-${user.id}`);
+    updateTag(`dashboard-body-${user.id}`);
     updateTag(`dashboard-stats-${user.id}`);
     return { success: true };
   } catch (error) {
@@ -102,7 +102,7 @@ export async function deleteProjectAction(id: string) {
     revalidatePath("/projects");
     updateTag("projects");
     updateTag(`projects-${user.id}`);
-    updateTag(`explore-body-${user.id}`);
+    updateTag(`dashboard-body-${user.id}`);
     updateTag(`dashboard-stats-${user.id}`);
     return { success: true };
   } catch (error) {

@@ -48,8 +48,8 @@ Avoid (private dashboard routes):
 - `/login`
 - `/sign-in`
 - `/sign-up`
-- `/account`
-- `/explore`
+- `/settings`
+- `/dashboard`
 - `/reminders`
 - `/notifications`
 - `/resources`

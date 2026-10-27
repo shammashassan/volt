@@ -44,10 +44,10 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
 }
 
 function SidebarNavFallback() {
-  const exploreItems = [
+  const overviewItems = [
     {
       title: "Dashboard",
-      url: "/explore",
+      url: "/dashboard",
       icon: LayoutGrid,
       isActive: false,
     },
@@ -118,7 +118,7 @@ function SidebarNavFallback() {
 
   return (
     <>
-      <NavMain items={exploreItems} label="Explore" />
+      <NavMain items={overviewItems} label="Overview" />
       <NavMain items={workspaceItems} label="Workspace" />
       <NavMain items={typesItems} label="Types" />
     </>
@@ -221,12 +221,12 @@ function SidebarNavContent({
     }
   }).filter(item => item.items !== undefined)
 
-  const exploreItems = [
+  const overviewItems = [
     {
       title: "Dashboard",
-      url: "/explore",
+      url: "/dashboard",
       icon: LayoutGrid,
-      isActive: pathname === "/explore",
+      isActive: pathname === "/dashboard",
     },
     {
       title: "Resources",
@@ -295,7 +295,7 @@ function SidebarNavContent({
 
   return (
     <>
-      <NavMain items={exploreItems} label="Explore" />
+      <NavMain items={overviewItems} label="Overview" />
       <NavMain items={workspaceItems} label="Workspace" />
       {collectionItems.length > 0 && (
         <NavMain items={collectionItems} label="Collections" />
@@ -320,7 +320,7 @@ export function AppSidebar({ initialCategories, initialCollections, ...props }: 
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg" render={<Link href="/explore" />}>
+            <SidebarMenuButton size="lg" render={<Link href="/dashboard" />}>
               <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                 <LogoMark className="size-5!" />
               </div>

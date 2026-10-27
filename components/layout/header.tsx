@@ -117,7 +117,7 @@ export const HeroHeader = ({ startReveal = false }: { startReveal?: boolean }) =
                                 <ModeToggle />
                             </div>
                             <Link
-                                href="/explore"
+                                href="/dashboard"
                                 className="inline-flex h-9 w-full lg:w-auto items-center justify-center rounded-full bg-primary px-4 text-xs font-semibold text-primary-foreground shadow-sm transition-transform hover:scale-105 mt-6 lg:mt-0"
                             >
                                 Open Workspace

@@ -26,7 +26,7 @@ export default function RootError({
         <div className="space-y-1">
           <h2 className="text-xl font-bold tracking-tight text-foreground">Something went wrong</h2>
           <p className="text-sm text-muted-foreground leading-relaxed">
-            An unexpected error occurred. You can attempt to refresh the view or return to the explore view.
+            An unexpected error occurred. You can attempt to refresh the view or return to the dashboard.
           </p>
           {error.digest && (
             <p className="text-xs text-muted-foreground/60 font-mono mt-2">Error ID: {error.digest}</p>
@@ -37,9 +37,9 @@ export default function RootError({
             <RotateCcw className="size-4" />
             Try again
           </Button>
-          <Link href="/explore" className={cn(buttonVariants({ variant: "outline", size: "sm" }), "gap-2")}>
+          <Link href="/dashboard" className={cn(buttonVariants({ variant: "outline", size: "sm" }), "gap-2")}>
             <Home className="size-4" />
-            Explore
+            Dashboard
           </Link>
         </div>
       </div>

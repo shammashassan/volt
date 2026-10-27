@@ -23,11 +23,11 @@ export default function NotFound() {
         </div>
         <div className="flex flex-row gap-3 pt-3">
           <Link
-            href="/explore"
+            href="/dashboard"
             className={cn(buttonVariants({ variant: "default", size: "sm" }), "rounded-xl font-bold gap-1.5")}
           >
             <Home className="size-4" />
-            Explore
+            Dashboard
           </Link>
         </div>
       </div>

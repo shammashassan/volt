@@ -23,7 +23,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import { authClient } from "@/lib/auth-client"
-import { EllipsisVerticalIcon, CircleUserRoundIcon, LogOutIcon } from "lucide-react"
+import { EllipsisVerticalIcon, BellIcon, SettingsIcon, LogOutIcon } from "lucide-react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 
@@ -45,7 +45,7 @@ export function NavUser() {
     await authClient.signOut({
       fetchOptions: {
         onSuccess: () => {
-          router.push("/login")
+          router.push("/sign-in")
           router.refresh()
         }
       }
@@ -100,14 +100,14 @@ export function NavUser() {
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem
-                render={
-                  <Link href="/account" className="flex w-full items-center">
-                    <CircleUserRoundIcon className="mr-2 size-4" />
-                    Account
-                  </Link>
-                }
-              />
+              <DropdownMenuItem render={<Link href="/notifications" />}>
+                <BellIcon />
+                Notifications
+              </DropdownMenuItem>
+              <DropdownMenuItem render={<Link href="/settings" />}>
+                <SettingsIcon />
+                Settings
+              </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout}>

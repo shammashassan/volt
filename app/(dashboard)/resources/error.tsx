@@ -37,9 +37,9 @@ export default function ResourcesError({
             <RotateCcw className="size-4" />
             Try again
           </Button>
-          <Link href="/explore" className={cn(buttonVariants({ variant: "outline", size: "sm" }), "gap-2")}>
+          <Link href="/dashboard" className={cn(buttonVariants({ variant: "outline", size: "sm" }), "gap-2")}>
             <ArrowLeft className="size-4" />
-            Explore
+            Dashboard
           </Link>
         </div>
       </div>

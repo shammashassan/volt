@@ -45,7 +45,7 @@ export async function addNoteAction(data: {
     revalidatePath("/notes");
     updateTag("notes");
     updateTag(`notes-${user.id}`);
-    updateTag(`explore-body-${user.id}`);
+    updateTag(`dashboard-body-${user.id}`);
     updateTag(`dashboard-stats-${user.id}`);
     return { success: true, id: result.insertedId.toString() };
   } catch (error) {
@@ -81,7 +81,7 @@ export async function updateNoteAction(id: string, data: Record<string, unknown>
     revalidatePath("/notes");
     updateTag("notes");
     updateTag(`notes-${user.id}`);
-    updateTag(`explore-body-${user.id}`);
+    updateTag(`dashboard-body-${user.id}`);
     updateTag(`dashboard-stats-${user.id}`);
     return { success: true };
   } catch (error) {
@@ -105,7 +105,7 @@ export async function deleteNoteAction(id: string) {
     revalidatePath("/notes");
     updateTag("notes");
     updateTag(`notes-${user.id}`);
-    updateTag(`explore-body-${user.id}`);
+    updateTag(`dashboard-body-${user.id}`);
     updateTag(`dashboard-stats-${user.id}`);
     return { success: true };
   } catch (error) {

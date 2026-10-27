@@ -220,7 +220,7 @@ export function LandingPageContent() {
                 </p>
                 <div className="cta-reveal-item opacity-0">
                   <Link
-                    href="/explore"
+                    href="/dashboard"
                     className="inline-flex h-16 items-center justify-center rounded-full bg-primary px-12 text-lg font-bold text-primary-foreground shadow-xl shadow-primary/20 transition-[transform,shadow,background-color] hover:scale-105 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
                   >
                     Access Workspace

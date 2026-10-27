@@ -6,7 +6,7 @@ import { AlertCircle, RotateCcw, LayoutDashboard } from "lucide-react"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
-export default function ExploreError({
+export default function DashboardError({
   error,
   reset,
 }: {
@@ -14,7 +14,7 @@ export default function ExploreError({
   reset: () => void
 }) {
   useEffect(() => {
-    console.error("Explore dashboard error:", error)
+    console.error("Dashboard error:", error)
   }, [error])
 
   return (

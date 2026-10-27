@@ -5,7 +5,11 @@ import { Notification } from "@/types/notification";
 import {
   getNotificationsAction,
   markNotificationReadAction,
+  markNotificationUnreadAction,
   markAllNotificationsReadAction,
+  deleteNotificationAction,
+  clearReadNotificationsAction,
+  clearAllNotificationsAction,
 } from "@/lib/actions/notifications";
 
 interface NotificationsContextValue {
@@ -15,7 +19,11 @@ interface NotificationsContextValue {
   isLoading: boolean;
   fetchNotifications: () => Promise<void>;
   markAsRead: (id: string) => Promise<void>;
+  markAsUnread: (id: string) => Promise<void>;
   markAllAsRead: () => Promise<void>;
+  deleteNotification: (id: string) => Promise<void>;
+  clearAll: () => Promise<void>;
+  clearRead: () => Promise<void>;
 }
 
 const NotificationsContext = createContext<NotificationsContextValue | null>(null);
@@ -111,6 +119,86 @@ export function NotificationsProvider({
     await markAllNotificationsReadAction();
   }, []);
 
+  const markAsUnread = useCallback(async (id: string) => {
+    // 1. Optimistic update in memory immediately
+    setNotifications((prev) =>
+      prev.map((n) =>
+        (n._id as string) === id ? { ...n, readAt: undefined } : n
+      )
+    );
+
+    // 2. Broadcast to other open browser tabs
+    try {
+      if (typeof window !== "undefined" && "BroadcastChannel" in window) {
+        const channel = new BroadcastChannel("volt_notifications");
+        channel.postMessage({ type: "MARK_UNREAD", id });
+        channel.close();
+      }
+    } catch {
+      // Ignore broadcast errors
+    }
+
+    // 3. Persist to DB
+    await markNotificationUnreadAction(id);
+  }, []);
+
+  const deleteNotification = useCallback(async (id: string) => {
+    // 1. Optimistic update in memory immediately
+    setNotifications((prev) => prev.filter((n) => (n._id as string) !== id));
+
+    // 2. Broadcast to other open browser tabs
+    try {
+      if (typeof window !== "undefined" && "BroadcastChannel" in window) {
+        const channel = new BroadcastChannel("volt_notifications");
+        channel.postMessage({ type: "DELETE", id });
+        channel.close();
+      }
+    } catch {
+      // Ignore broadcast errors
+    }
+
+    // 3. Persist to DB
+    await deleteNotificationAction(id);
+  }, []);
+
+  const clearRead = useCallback(async () => {
+    // 1. Optimistic update
+    setNotifications((prev) => prev.filter((n) => !n.readAt));
+
+    // 2. Broadcast to other tabs
+    try {
+      if (typeof window !== "undefined" && "BroadcastChannel" in window) {
+        const channel = new BroadcastChannel("volt_notifications");
+        channel.postMessage({ type: "CLEAR_READ" });
+        channel.close();
+      }
+    } catch {
+      // Ignore broadcast errors
+    }
+
+    // 3. Persist
+    await clearReadNotificationsAction();
+  }, []);
+
+  const clearAll = useCallback(async () => {
+    // 1. Optimistic update
+    setNotifications([]);
+
+    // 2. Broadcast to other tabs
+    try {
+      if (typeof window !== "undefined" && "BroadcastChannel" in window) {
+        const channel = new BroadcastChannel("volt_notifications");
+        channel.postMessage({ type: "CLEAR_ALL" });
+        channel.close();
+      }
+    } catch {
+      // Ignore broadcast errors
+    }
+
+    // 3. Persist
+    await clearAllNotificationsAction();
+  }, []);
+
   useEffect(() => {
     let active = true;
 
@@ -144,7 +232,12 @@ export function NotificationsProvider({
       if ("BroadcastChannel" in window) {
         broadcastChannel = new BroadcastChannel("volt_notifications");
         broadcastChannel.onmessage = (event) => {
-          if (event.data?.type === "REFRESH" || event.data?.type === "MARK_ALL_READ") {
+          if (
+            event.data?.type === "REFRESH" ||
+            event.data?.type === "MARK_ALL_READ" ||
+            event.data?.type === "CLEAR_READ" ||
+            event.data?.type === "CLEAR_ALL"
+          ) {
             fetchNotifications();
           } else if (event.data?.type === "MARK_READ" && event.data.id) {
             const readDate = event.data.readAt ? new Date(event.data.readAt) : new Date();
@@ -155,6 +248,16 @@ export function NotificationsProvider({
                   : n
               )
             );
+          } else if (event.data?.type === "MARK_UNREAD" && event.data.id) {
+            setNotifications((prev) =>
+              prev.map((n) =>
+                (n._id as string) === event.data.id
+                  ? { ...n, readAt: undefined }
+                  : n
+              )
+            );
+          } else if (event.data?.type === "DELETE" && event.data.id) {
+            setNotifications((prev) => prev.filter((n) => (n._id as string) !== event.data.id));
           }
         };
       }
@@ -185,7 +288,11 @@ export function NotificationsProvider({
         isLoading,
         fetchNotifications,
         markAsRead,
+        markAsUnread,
         markAllAsRead,
+        deleteNotification,
+        clearAll,
+        clearRead,
       }}
     >
       {children}
@@ -199,4 +306,8 @@ export function useNotifications() {
     throw new Error("useNotifications must be used within a NotificationsProvider");
   }
   return context;
+}
+
+export function useOptionalNotifications() {
+  return useContext(NotificationsContext);
 }

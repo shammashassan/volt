@@ -48,6 +48,7 @@ import {
   Trash2,
   ShieldAlert,
   UserCircle,
+  Settings,
   Key,
   Smartphone,
   Laptop,
@@ -75,7 +76,7 @@ interface PasskeyItem {
   aaguid?: string
 }
 
-export function AccountContent() {
+export function SettingsContent() {
   const { data: session, isPending } = authClient.useSession()
   const [activeTab, setActiveTab] = useState("profile")
   const [isUpdatingProfile, setIsUpdatingProfile] = useState(false)
@@ -187,7 +188,7 @@ export function AccountContent() {
           if (profileData.email !== initialProfileData.email) {
             const { error: emailError } = await authClient.changeEmail({
               newEmail: profileData.email,
-              callbackURL: "/account",
+              callbackURL: "/settings",
             })
             if (emailError) throw new Error(emailError.message || "Failed to change email")
             emailChanged = true
@@ -423,14 +424,14 @@ export function AccountContent() {
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-4">
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                <UserCircle className="size-6" />
+                <Settings className="size-6" />
               </div>
               <h1 className="text-3xl font-black tracking-tight md:text-4xl bg-clip-text text-transparent bg-linear-to-r from-foreground to-foreground/60">
-                Account Settings
+                Settings
               </h1>
             </div>
             <p className="text-base text-muted-foreground max-w-2xl font-medium">
-              Manage your personal identity, two-factor authentication, passkeys, and active sessions.
+              Manage your personal identity, security credentials, passkeys, and active sessions.
             </p>
           </div>
         </div>
@@ -445,26 +446,17 @@ export function AccountContent() {
             className="flex flex-col lg:flex-row gap-6 items-start w-full"
           >
             {/* Navigation Tabs List */}
-            <TabsList className="flex flex-col w-full lg:w-60 lg:shrink-0 bg-card p-1.5 shadow-md space-y-0.5 overflow-visible">
-              <TabsTrigger
-                value="profile"
-                className="flex items-center gap-2 justify-center lg:justify-start w-auto lg:w-full whitespace-nowrap px-4 py-2.5 text-xs lg:text-sm font-semibold cursor-pointer"
-              >
-                <User className="size-4" />
+            <TabsList>
+              <TabsTrigger value="profile">
+                <User />
                 Profile Details
               </TabsTrigger>
-              <TabsTrigger
-                value="security"
-                className="flex items-center gap-2 justify-center lg:justify-start w-auto lg:w-full whitespace-nowrap px-4 py-2.5 text-xs lg:text-sm font-semibold cursor-pointer"
-              >
-                <Lock className="size-4" />
+              <TabsTrigger value="security">
+                <Lock />
                 Security & Access
               </TabsTrigger>
-              <TabsTrigger
-                value="danger"
-                className="flex items-center gap-2 justify-center lg:justify-start w-auto lg:w-full whitespace-nowrap px-4 py-2.5 text-xs lg:text-sm font-semibold text-rose-500 hover:text-rose-600 dark:hover:text-rose-400 cursor-pointer"
-              >
-                <ShieldAlert className="size-4" />
+              <TabsTrigger value="danger" className="text-destructive">
+                <ShieldAlert />
                 Danger Zone
               </TabsTrigger>
             </TabsList>
@@ -634,7 +626,7 @@ export function AccountContent() {
                     </CardHeader>
                     <CardContent className="space-y-4 pt-2 pb-6">
                       <div className="grid gap-2">
-                        <Label htmlFor="currentPassword" text-sm font-medium>Current Password</Label>
+                        <Label htmlFor="currentPassword">Current Password</Label>
                         <Input
                           id="currentPassword"
                           type="password"
@@ -643,7 +635,7 @@ export function AccountContent() {
                         />
                       </div>
                       <div className="grid gap-2">
-                        <Label htmlFor="newPassword" text-sm font-medium>New Password</Label>
+                        <Label htmlFor="newPassword">New Password</Label>
                         <Input
                           id="newPassword"
                           type="password"
@@ -652,7 +644,7 @@ export function AccountContent() {
                         />
                       </div>
                       <div className="grid gap-2">
-                        <Label htmlFor="confirmPassword" text-sm font-medium>Confirm New Password</Label>
+                        <Label htmlFor="confirmPassword">Confirm New Password</Label>
                         <Input
                           id="confirmPassword"
                           type="password"
@@ -770,7 +762,7 @@ export function AccountContent() {
                     <AlertDialog>
                       <AlertDialogTrigger
                         render={
-                          <Button variant="destructive" className="min-w-[140px] cursor-pointer" />
+                          <Button variant="destructive" className="min-w-35 cursor-pointer" />
                         }
                       >
                         <Trash2 className="mr-2 h-4 w-4" />

@@ -1,6 +1,6 @@
 import { Skeleton } from "@/components/ui/skeleton"
 
-export default function ExploreLoading() {
+export default function DashboardLoading() {
   return (
     <div className="@container/main flex flex-1 flex-col gap-6 pb-2">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 py-6 lg:px-6 animate-pulse">
@@ -41,4 +41,3 @@ export default function ExploreLoading() {
     </div>
   )
 }
-

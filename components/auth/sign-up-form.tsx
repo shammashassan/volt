@@ -62,14 +62,14 @@ export function SignUpForm() {
         name: name.trim(),
         password,
         username: username.trim() || undefined,
-        callbackURL: "/explore",
+        callbackURL: "/dashboard",
       })
 
       if (res.error) {
         throw new Error(res.error.message || "Failed to create account")
       }
 
-      router.push("/explore")
+      router.push("/dashboard")
       router.refresh()
       return res.data
     })().finally(() => {
@@ -94,7 +94,7 @@ export function SignUpForm() {
     const googlePromise = (async () => {
       await authClient.signIn.social({
         provider: "google",
-        callbackURL: "/explore",
+        callbackURL: "/dashboard",
         errorCallbackURL: "/sign-up",
       })
     })().finally(() => {

@@ -62,12 +62,12 @@ export async function requireApprovedUser() {
 }
 
 /**
- * Page & Layout Guard: Ensures user is admin, otherwise redirects to /explore.
+ * Page & Layout Guard: Ensures user is admin, otherwise redirects to /dashboard.
  */
 export async function requireAdmin() {
   const session = await requireAuth()
   if (session.user.role !== "admin") {
-    redirect("/explore")
+    redirect("/dashboard")
   }
   return session
 }

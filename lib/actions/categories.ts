@@ -64,12 +64,12 @@ export async function addCategoryAction(
     }
 
     const result = await db.collection("categories").insertOne(category);
-    revalidatePath("/explore");
+    revalidatePath("/dashboard");
     revalidatePath("/categories");
     revalidatePath("/resources");
     updateTag("categories");
     updateTag(`categories-${user.id}`);
-    updateTag(`explore-body-${user.id}`);
+    updateTag(`dashboard-body-${user.id}`);
     updateTag(`dashboard-stats-${user.id}`);
     return { success: true, id: result.insertedId.toString() };
   } catch (error) {
@@ -157,12 +157,12 @@ export async function updateCategoryAction(idOrSlug: string, data: Record<string
       );
     }
 
-    revalidatePath("/explore");
+    revalidatePath("/dashboard");
     revalidatePath("/categories");
     revalidatePath("/resources");
     updateTag("categories");
     updateTag(`categories-${user.id}`);
-    updateTag(`explore-body-${user.id}`);
+    updateTag(`dashboard-body-${user.id}`);
     updateTag(`dashboard-stats-${user.id}`);
     return { success: true };
   } catch (error) {
@@ -202,12 +202,12 @@ export async function deleteCategoryAction(idOrSlug: string) {
     }
 
     await db.collection("categories").deleteOne({ _id: categoryDoc._id });
-    revalidatePath("/explore");
+    revalidatePath("/dashboard");
     revalidatePath("/categories");
     revalidatePath("/resources");
     updateTag("categories");
     updateTag(`categories-${user.id}`);
-    updateTag(`explore-body-${user.id}`);
+    updateTag(`dashboard-body-${user.id}`);
     updateTag(`dashboard-stats-${user.id}`);
     return { success: true };
   } catch (error) {

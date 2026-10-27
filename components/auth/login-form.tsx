@@ -25,7 +25,7 @@ export function LoginForm({
   const [isSignUp, setIsSignUp] = useState(false)
   const router = useRouter()
   const searchParams = useSearchParams()
-  const callbackURL = searchParams.get("callbackURL") || "/explore"
+  const callbackURL = searchParams.get("callbackURL") || "/dashboard"
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()

@@ -49,6 +49,34 @@ export class NotificationRepository {
     return res.modifiedCount > 0;
   }
 
+  async markUnread(id: string, userId: UserId): Promise<boolean> {
+    const col = await this.getCollection();
+    const query = ObjectId.isValid(id) ? { _id: new ObjectId(id), userId } : { id, userId };
+    const res = await col.updateOne(
+      query,
+      { $unset: { readAt: "" }, $set: { updatedAt: new Date() } }
+    );
+    return res.modifiedCount > 0;
+  }
+
+  async clearAllRead(userId: UserId): Promise<boolean> {
+    const col = await this.getCollection();
+    const res = await col.updateMany(
+      { userId, readAt: { $exists: true }, deletedAt: { $exists: false } },
+      { $set: { deletedAt: new Date(), updatedAt: new Date() } }
+    );
+    return res.modifiedCount > 0;
+  }
+
+  async clearAll(userId: UserId): Promise<boolean> {
+    const col = await this.getCollection();
+    const res = await col.updateMany(
+      { userId, deletedAt: { $exists: false } },
+      { $set: { deletedAt: new Date(), updatedAt: new Date() } }
+    );
+    return res.modifiedCount > 0;
+  }
+
   async archive(id: string, userId: UserId): Promise<boolean> {
     const col = await this.getCollection();
     const query = ObjectId.isValid(id) ? { _id: new ObjectId(id), userId } : { id, userId };

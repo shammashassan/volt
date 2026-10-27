@@ -108,7 +108,7 @@ export default function TermsPage() {
                 5. Termination
               </h2>
               <p>
-                You may delete your account and personal data at any time through the Account Settings portal. We reserve the right to suspend or restrict access to any account that violates acceptable use policies or compromises system stability.
+                You may delete your account and personal data at any time through the Settings portal. We reserve the right to suspend or restrict access to any account that violates acceptable use policies or compromises system stability.
               </p>
             </section>
           </div>

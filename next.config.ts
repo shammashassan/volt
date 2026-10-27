@@ -4,6 +4,20 @@ const nextConfig: NextConfig = {
   // Enable component caching as in Dime project
   cacheComponents: true,
   partialPrefetching: true,
+  async redirects() {
+    return [
+      {
+        source: '/explore',
+        destination: '/dashboard',
+        permanent: true,
+      },
+      {
+        source: '/account',
+        destination: '/settings',
+        permanent: true,
+      },
+    ];
+  },
   images: {
     remotePatterns: [
       {

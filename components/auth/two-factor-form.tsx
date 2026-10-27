@@ -34,7 +34,7 @@ export function TwoFactorForm() {
         if (resError) {
           setError(resError?.message || "Invalid backup code")
         } else if (data) {
-          window.location.href = "/explore"
+          window.location.href = "/dashboard"
         }
       } else {
         const { data, error: resError } = await authClient.twoFactor.verifyTotp({
@@ -44,7 +44,7 @@ export function TwoFactorForm() {
         if (resError) {
           setError(resError?.message || "Invalid two-factor code")
         } else if (data) {
-          window.location.href = "/explore"
+          window.location.href = "/dashboard"
         }
       }
     } catch (err: unknown) {

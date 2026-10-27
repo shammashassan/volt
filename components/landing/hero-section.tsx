@@ -198,7 +198,7 @@ export function HeroSection({ startReveal = false }: { startReveal?: boolean }) 
 
           <div className="mt-4 flex flex-wrap items-center justify-center gap-4">
             <Link
-              href="/explore"
+              href="/dashboard"
               className="group hero-btn opacity-0 inline-flex h-14 items-center justify-center gap-2 rounded-full border border-transparent bg-primary px-10 text-base font-semibold text-primary-foreground shadow-lg shadow-primary/20 transition-[transform,shadow,background-color] hover:scale-105 active:scale-95"
             >
               Open Workspace

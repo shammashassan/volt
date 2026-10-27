@@ -16,7 +16,7 @@ import {
 import { WorkspaceBento } from "@/components/dashboard/workspace-bento"
 
 export const metadata: Metadata = {
-  title: "Explore",
+  title: "Dashboard",
   description: "Workspace overview, recently added resources, and knowledge activity.",
 }
 
@@ -70,7 +70,7 @@ async function WorkspaceDashboardBody({
 }) {
   "use cache"
   cacheLife("minutes")
-  cacheTag(`explore-body-${userId}`)
+  cacheTag(`dashboard-body-${userId}`)
 
   const [
     stats,
@@ -121,7 +121,7 @@ async function WorkspaceDashboardBody({
   )
 }
 
-export default async function ExplorePage() {
+export default async function DashboardPage() {
   let user: { id: string; name?: string | null }
   try {
     user = await getSessionUser()

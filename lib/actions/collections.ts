@@ -61,10 +61,10 @@ export async function addCollectionAction(
     const result = await db.collection("collections").insertOne(collection);
     revalidatePath("/categories");
     revalidatePath("/resources");
-    revalidatePath("/explore");
+    revalidatePath("/dashboard");
     updateTag("collections");
     updateTag(`collections-${user.id}`);
-    updateTag(`explore-body-${user.id}`);
+    updateTag(`dashboard-body-${user.id}`);
     updateTag(`dashboard-stats-${user.id}`);
     return { success: true, id: result.insertedId.toString() };
   } catch (error) {
@@ -154,10 +154,10 @@ export async function updateCollectionAction(idOrSlug: string, data: Record<stri
 
     revalidatePath("/categories");
     revalidatePath("/resources");
-    revalidatePath("/explore");
+    revalidatePath("/dashboard");
     updateTag("collections");
     updateTag(`collections-${user.id}`);
-    updateTag(`explore-body-${user.id}`);
+    updateTag(`dashboard-body-${user.id}`);
     updateTag(`dashboard-stats-${user.id}`);
     return { success: true };
   } catch (error) {
@@ -196,10 +196,10 @@ export async function deleteCollectionAction(idOrSlug: string) {
     await db.collection("collections").deleteOne({ _id: collectionDoc._id });
     revalidatePath("/categories");
     revalidatePath("/resources");
-    revalidatePath("/explore");
+    revalidatePath("/dashboard");
     updateTag("collections");
     updateTag(`collections-${user.id}`);
-    updateTag(`explore-body-${user.id}`);
+    updateTag(`dashboard-body-${user.id}`);
     updateTag(`dashboard-stats-${user.id}`);
     return { success: true };
   } catch (error) {
