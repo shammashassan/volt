@@ -5,7 +5,9 @@ export default function manifest(): MetadataRoute.Manifest {
     name: 'Volt',
     short_name: 'Volt',
     description: 'Volt v2.0 - The personal knowledge operating system. Save, organize, and link resources, notes, categories, people, and media watchlists.',
-    start_url: '/',
+    id: '/',
+    start_url: '/explore',
+    scope: '/',
     display: 'standalone',
     background_color: '#09090b',
     theme_color: '#09090b',
@@ -29,6 +31,22 @@ export default function manifest(): MetadataRoute.Manifest {
         src: '/android-chrome-512x512.png',
         sizes: '512x512',
         type: 'image/png',
+      },
+    ],
+    shortcuts: [
+      {
+        name: 'Explore',
+        short_name: 'Explore',
+        description: 'Open the Volt explore feed',
+        url: '/explore',
+        icons: [{ src: '/android-chrome-192x192.png', sizes: '192x192' }],
+      },
+      {
+        name: 'Quick Save',
+        short_name: 'Quick Save',
+        description: 'Quickly save a resource to Volt',
+        url: '/quick-save',
+        icons: [{ src: '/android-chrome-192x192.png', sizes: '192x192' }],
       },
     ],
     share_target: {

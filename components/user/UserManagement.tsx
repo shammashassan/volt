@@ -6,8 +6,8 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
   UserPlus,
-  CheckCircle2,
-  UsersIcon
+  UsersIcon,
+  Ban,
 } from "lucide-react"
 import { toast } from "@/components/ui/toast"
 import { authClient } from "@/lib/auth-client"
@@ -31,7 +31,6 @@ export interface UserData {
   name: string
   email: string
   role: string
-  isApproved: boolean
   banned?: boolean
 }
 
@@ -55,29 +54,8 @@ export function UserManagement({ initialUsers }: { initialUsers: UserData[] }) {
     setUsers(initialUsers)
   }, [initialUsers])
 
-  const pendingUsers = users.filter((u) => !u.isApproved && !(u as any).approved)
-  const activeUsers = users.filter((u) => u.isApproved || (u as any).approved)
-
-  const handleApprove = async (userId: string) => {
-    startTransition(async () => {
-      const promise = authClient.admin.updateUser({
-        userId,
-        data: { isApproved: true, approved: true }
-      }).then(({ error }) => {
-        if (error) {
-          throw new Error(error.message || "Failed to approve user");
-        }
-        setUsers(users.map(u => u.id === userId ? { ...u, isApproved: true, approved: true } : u));
-        router.refresh();
-      });
-
-      toast.promise(promise, {
-        loading: "Approving user...",
-        success: "User approved successfully",
-        error: (err: any) => err?.message || "Failed to approve user",
-      });
-    });
-  }
+  const activeUsers = users.filter((u) => !u.banned)
+  const bannedUsers = users.filter((u) => !!u.banned)
 
   const handleSetRole = async (userId: string, role: string) => {
     if (role !== "user" && role !== "admin") return;
@@ -165,7 +143,7 @@ export function UserManagement({ initialUsers }: { initialUsers: UserData[] }) {
               </div>
             </div>
             <p className="text-lg text-muted-foreground/80 max-w-2xl font-medium">
-              Manage user roles, approvals, and account statuses.
+              Manage user roles, bans, and account permissions.
             </p>
           </div>
           <Button onClick={() => setIsCreateModalOpen(true)}>
@@ -187,11 +165,11 @@ export function UserManagement({ initialUsers }: { initialUsers: UserData[] }) {
                   {activeUsers.length}
                 </Badge>
               </TabsTrigger>
-              <TabsTrigger value="pending">
-                <CheckCircle2 />
-                Signup Requests
-                <Badge variant={pendingUsers.length > 0 ? "secondary" : "outline"} size="sm">
-                  {pendingUsers.length}
+              <TabsTrigger value="banned">
+                <Ban />
+                Banned Users
+                <Badge variant={bannedUsers.length > 0 ? "destructive" : "outline"} size="sm">
+                  {bannedUsers.length}
                 </Badge>
               </TabsTrigger>
             </TabsList>
@@ -199,7 +177,6 @@ export function UserManagement({ initialUsers }: { initialUsers: UserData[] }) {
             <TabsContent value="active">
               <UserTable
                 users={activeUsers}
-                onApprove={handleApprove}
                 onSetRole={handleSetRole}
                 onBan={handleBan}
                 onDelete={handleDelete}
@@ -207,11 +184,10 @@ export function UserManagement({ initialUsers }: { initialUsers: UserData[] }) {
               />
             </TabsContent>
 
-            <TabsContent value="pending">
-              {pendingUsers.length > 0 ? (
+            <TabsContent value="banned">
+              {bannedUsers.length > 0 ? (
                 <UserTable
-                  users={pendingUsers}
-                  onApprove={handleApprove}
+                  users={bannedUsers}
                   onSetRole={handleSetRole}
                   onBan={handleBan}
                   onDelete={handleDelete}
@@ -219,9 +195,9 @@ export function UserManagement({ initialUsers }: { initialUsers: UserData[] }) {
                 />
               ) : (
                 <div className="flex flex-col items-center justify-center py-20 text-center">
-                  <CheckCircle2 className="size-12 text-muted-foreground/20 mb-4" />
-                  <p className="text-xl font-semibold text-muted-foreground">No pending requests</p>
-                  <p className="text-sm text-muted-foreground/60 mt-1">All signup requests have been processed.</p>
+                  <Ban className="size-12 text-muted-foreground/20 mb-4" />
+                  <p className="text-xl font-semibold text-muted-foreground">No banned users</p>
+                  <p className="text-sm text-muted-foreground/60 mt-1">There are currently no suspended or banned accounts.</p>
                 </div>
               )}
             </TabsContent>

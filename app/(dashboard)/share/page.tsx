@@ -1,7 +1,6 @@
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { Suspense } from "react";
 import { getCategoriesAction } from "@/lib/actions/categories";
 import { fetchUrlMetadata } from "@/lib/services/metadata.service";
 import { ShareClient } from "@/components/share/share-client";
@@ -12,24 +11,11 @@ export const metadata: Metadata = {
   description: "Share and save web links directly to your Volt workspace.",
 };
 
-function ShareSkeleton() {
-  return (
-    <div className="flex flex-1 items-center justify-center p-6 min-h-[500px]">
-      <div className="w-full max-w-md p-6 border rounded-2xl bg-card/50 backdrop-blur-xs flex flex-col gap-4 animate-pulse">
-        <div className="h-6 w-32 bg-muted rounded" />
-        <div className="h-4 w-48 bg-muted rounded" />
-        <div className="h-24 bg-muted rounded-xl" />
-        <div className="h-10 bg-muted rounded" />
-      </div>
-    </div>
-  );
-}
-
 interface SharePageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
-async function ShareContentWrapper({ searchParams }: SharePageProps) {
+export default async function SharePage({ searchParams }: SharePageProps) {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
@@ -48,6 +34,10 @@ async function ShareContentWrapper({ searchParams }: SharePageProps) {
   const matchUrl = urlParam.match(urlRegex) || textParam.match(urlRegex);
   if (matchUrl) {
     extractedUrl = matchUrl[0];
+  } else if (urlParam && urlParam.startsWith("http")) {
+    extractedUrl = urlParam;
+  } else if (textParam && textParam.startsWith("http")) {
+    extractedUrl = textParam;
   }
 
   let initialMetadata = null;
@@ -72,13 +62,5 @@ async function ShareContentWrapper({ searchParams }: SharePageProps) {
         initialMetadata={initialMetadata}
       />
     </div>
-  );
-}
-
-export default function SharePage({ searchParams }: SharePageProps) {
-  return (
-    <Suspense fallback={<ShareSkeleton />}>
-      <ShareContentWrapper searchParams={searchParams} />
-    </Suspense>
   );
 }

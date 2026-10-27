@@ -52,10 +52,6 @@ export const auth = betterAuth({
   },
 
   user: {
-    additionalFields: {
-      isApproved: { type: "boolean", defaultValue: false, required: false },
-      approved: { type: "boolean", defaultValue: false, required: false },
-    },
     deleteUser: { enabled: true },
     changeEmail: { enabled: true },
   },
@@ -100,6 +96,8 @@ export const auth = betterAuth({
       defaultRole: "user",
       adminRoles: ["admin"],
       impersonationSessionDuration: 60 * 60,
+      bannedUserMessage: (user) =>
+        `Your account has been suspended${user.banReason ? `: ${user.banReason}` : ""}. Please contact support if you believe this is an error.`,
       ac,
       roles,
     }),
@@ -142,15 +140,6 @@ export const auth = betterAuth({
   databaseHooks: {
     user: {
       create: {
-        before: async (user) => {
-          return {
-            data: {
-              ...user,
-              isApproved: false,
-              approved: false,
-            },
-          }
-        },
         after: async (user) => {
           try {
             const admins = await db.collection("user").find({
@@ -160,9 +149,9 @@ export const auth = betterAuth({
               const notifications = admins.map((admin) => ({
                 userId: (admin._id ? admin._id.toString() : admin.id) as string,
                 title: "New User Registration",
-                message: `${user.name || user.email || "A new user"} has registered and is pending approval.`,
+                message: `${user.name || user.email || "A new user"} has registered and joined Volt.`,
                 type: "system",
-                link: "/users?tab=pending",
+                link: "/users",
                 createdAt: new Date(),
                 updatedAt: new Date(),
               }))

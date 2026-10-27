@@ -45,20 +45,18 @@ interface UserData {
   name: string
   email: string
   role: string
-  isApproved: boolean
   banned?: boolean
 }
 
 interface UserTableProps {
   users: UserData[]
-  onApprove: (id: string) => Promise<void> | void
   onSetRole: (id: string, role: string) => Promise<void> | void
   onBan: (id: string, isBanned: boolean) => Promise<void> | void
   onDelete: (id: string) => Promise<void> | void
   currentUserId?: string
 }
 
-export function UserTable({ users, onApprove, onSetRole, onBan, onDelete, currentUserId }: UserTableProps) {
+export function UserTable({ users, onSetRole, onBan, onDelete, currentUserId }: UserTableProps) {
   return (
     <div className="rounded-xl border border-border/50 bg-card overflow-hidden shadow-xs">
       <div className="overflow-x-auto">
@@ -112,19 +110,13 @@ export function UserTable({ users, onApprove, onSetRole, onBan, onDelete, curren
                   </TableCell>
                   <TableCell>
                     <div className="flex flex-wrap gap-1.5">
-                      {!user.isApproved && (
-                        <Badge variant="warning" className="text-xs">
-                          Pending
-                        </Badge>
-                      )}
-                      {user.isApproved && (
-                        <Badge variant="success" className="text-xs">
-                          Approved
-                        </Badge>
-                      )}
-                      {user.banned && (
+                      {user.banned ? (
                         <Badge variant="destructive" className="text-xs">
                           Banned
+                        </Badge>
+                      ) : (
+                        <Badge variant="outline" className="text-xs text-emerald-600 dark:text-emerald-400 border-emerald-500/30 bg-emerald-500/10">
+                          Active
                         </Badge>
                       )}
                     </div>
@@ -143,18 +135,6 @@ export function UserTable({ users, onApprove, onSetRole, onBan, onDelete, curren
                         <DropdownMenuContent align="end" className="w-48">
                           <DropdownMenuGroup>
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            {!user.isApproved && (
-                              <DropdownMenuItem
-                                onClick={() => onApprove(user.id)}
-                                className="text-emerald-500 focus:text-emerald-500"
-                              >
-                                <CheckCircle2 className="size-4" />
-                                <span>Approve User</span>
-                              </DropdownMenuItem>
-                            )}
-                          </DropdownMenuGroup>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuGroup>
                             <DropdownMenuItem
                               onClick={() => onSetRole(user.id, user.role === "admin" ? "user" : "admin")}
                             >

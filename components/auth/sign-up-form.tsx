@@ -36,10 +36,6 @@ export function SignUpForm() {
     const params = new URLSearchParams(window.location.search)
     const error = params.get("error")
     if (error) {
-      if (error === "PENDING_APPROVAL" || error === "unable_to_create_session") {
-        router.push("/pending-approval")
-        return
-      }
       if (error === "account_not_linked") {
         toast.error("This email is already registered. Please sign in instead.")
       } else if (error === "access_denied") {
@@ -66,14 +62,14 @@ export function SignUpForm() {
         name: name.trim(),
         password,
         username: username.trim() || undefined,
-        callbackURL: "/pending-approval",
+        callbackURL: "/explore",
       })
 
       if (res.error) {
         throw new Error(res.error.message || "Failed to create account")
       }
 
-      router.push("/pending-approval")
+      router.push("/explore")
       router.refresh()
       return res.data
     })().finally(() => {
@@ -83,7 +79,7 @@ export function SignUpForm() {
     try {
       await toast.promise(signUpPromise, {
         loading: "Creating your account...",
-        success: "Account created successfully. Redirecting for approval...",
+        success: "Account created successfully! Welcome to Volt.",
         error: (err: unknown) =>
           typeof err === "string" ? err : (err as { message?: string })?.message || "An error occurred during sign-up",
       })
@@ -98,7 +94,7 @@ export function SignUpForm() {
     const googlePromise = (async () => {
       await authClient.signIn.social({
         provider: "google",
-        callbackURL: "/pending-approval",
+        callbackURL: "/explore",
         errorCallbackURL: "/sign-up",
       })
     })().finally(() => {
@@ -138,12 +134,6 @@ export function SignUpForm() {
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
-          <Alert className="border-amber-500/50 bg-amber-500/10 text-amber-600 dark:text-amber-400">
-            <AlertDescription>
-              Accounts require administrator approval before access is granted.
-            </AlertDescription>
-          </Alert>
-
           <form onSubmit={handleSignUp} className="flex flex-col gap-4">
             <FieldGroup className="flex flex-col gap-4">
               <Field>

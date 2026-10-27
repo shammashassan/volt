@@ -47,7 +47,6 @@ export function CreateUserDialog({ open, onOpenChange, onSuccess }: CreateUserDi
       name,
       password,
       role,
-      data: { isApproved: true }
     }).then(({ error }) => {
       if (error) {
         throw new Error(error.message || "Failed to create user")
@@ -74,7 +73,7 @@ export function CreateUserDialog({ open, onOpenChange, onSuccess }: CreateUserDi
           <DialogHeader>
             <DialogTitle>Create New User</DialogTitle>
             <DialogDescription>
-              Create a new user account directly. They will be automatically approved.
+              Create a new user account directly in the workspace.
             </DialogDescription>
           </DialogHeader>
           <FieldGroup className="py-4">

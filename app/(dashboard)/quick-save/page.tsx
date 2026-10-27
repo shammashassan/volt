@@ -1,12 +1,10 @@
 import * as React from "react"
-import { Suspense } from "react"
 import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 import type { Metadata } from "next"
 import { auth } from "@/lib/auth"
 import { getCategories } from "@/lib/queries/categories"
 import { fetchUrlMetadata } from "@/lib/services/metadata.service"
-import { Skeleton } from "@/components/ui/skeleton"
 import { QuickSaveContent } from "@/components/dashboard/quick-save-content";
 
 export const metadata: Metadata = {
@@ -18,23 +16,7 @@ interface PageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }
 
-function QuickSaveSkeleton() {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-background/95 p-4 md:p-8">
-      <div className="w-full max-w-[420px] rounded-2xl border border-border/80 bg-card/60 p-6 shadow-2xl backdrop-blur-xl">
-        <div className="space-y-4">
-          <Skeleton className="h-6 w-32" />
-          <Skeleton className="h-10 w-full rounded-lg" />
-          <Skeleton className="h-10 w-full rounded-lg" />
-          <Skeleton className="h-24 w-full rounded-lg" />
-          <Skeleton className="h-10 w-full rounded-lg" />
-        </div>
-      </div>
-    </div>
-  )
-}
-
-async function QuickSaveContentWrapper({ searchParams }: PageProps) {
+export default async function QuickSavePage({ searchParams }: PageProps) {
   const session = await auth.api.getSession({
     headers: await headers()
   })
@@ -87,13 +69,5 @@ async function QuickSaveContentWrapper({ searchParams }: PageProps) {
         />
       </div>
     </div>
-  )
-}
-
-export default function QuickSavePage(props: PageProps) {
-  return (
-    <Suspense fallback={<QuickSaveSkeleton />}>
-      <QuickSaveContentWrapper {...props} />
-    </Suspense>
   )
 }

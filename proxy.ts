@@ -39,8 +39,7 @@ export async function proxy(request: NextRequest) {
         pathname === "/" ||
         pathname === "/sign-in" ||
         pathname === "/sign-up" ||
-        pathname === "/login" ||
-        pathname === "/pending-approval";
+        pathname === "/login";
 
     if (!session) {
         // Fallback check: if the cookie cache is empty/expired, check if the session cookie itself exists
@@ -59,20 +58,11 @@ export async function proxy(request: NextRequest) {
     }
 
     // Session exists, handle redirects
-    const user = session.user as { isApproved?: boolean; approved?: boolean; role?: string };
-    const isApproved = user.isApproved || user.approved;
+    const user = session.user as { role?: string };
     const role = user.role;
 
-    if (!isApproved && role !== "admin") {
-        if (pathname !== "/pending-approval" && !pathname.startsWith("/api/auth")) {
-            return NextResponse.redirect(new URL("/pending-approval", request.url));
-        }
-        return NextResponse.next();
-    }
-
-    // Approved user visiting auth/approval pages should be routed directly to dashboard
+    // Authenticated user visiting auth pages should be routed directly to dashboard
     if (
-        pathname === "/pending-approval" ||
         pathname === "/login" ||
         pathname === "/sign-in" ||
         pathname === "/sign-up"

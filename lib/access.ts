@@ -11,8 +11,6 @@ export const ac = createAccessControl({
     "impersonate",
     "delete",
     "set-password",
-    "approve",
-    "reject",
   ],
   session: ["list", "revoke"],
 })
@@ -29,8 +27,6 @@ export const roles = {
       "impersonate",
       "delete",
       "set-password",
-      "approve",
-      "reject",
     ],
     session: ["list", "revoke"],
   }),

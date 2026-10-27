@@ -4,11 +4,11 @@ import { SiteFooter } from "@/components/layout/site-footer"
 import { SiteHeader } from "@/components/layout/site-header"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { NotificationsProvider } from "@/components/notifications/notifications-provider"
-import { requireApprovedUser } from "@/lib/auth-utils"
+import { requireAuth } from "@/lib/auth-utils"
 import { NuqsAdapter } from "nuqs/adapters/next/app"
 
 async function AuthGuard() {
-  await requireApprovedUser()
+  await requireAuth()
   return null
 }
 

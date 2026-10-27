@@ -77,30 +77,30 @@ function HeaderBreadcrumb({ initialCategories }: { initialCategories?: Category[
 
 export function SiteHeader({ initialCategories }: SiteHeaderProps) {
   return (
-    <header className="sticky top-0 z-50 flex h-(--header-height) shrink-0 items-center gap-2 border-b bg-background/80 backdrop-blur-md transition-all ease-linear">
-      <div className="flex w-full items-center justify-between gap-2 px-4 lg:gap-4 lg:px-6">
-        <div className="flex items-center gap-2">
-          <SidebarTrigger className="-ml-1" />
-          <Separator
-            orientation="vertical"
-            className="mx-2 hidden lg:block"
-          />
-          <Breadcrumb className="hidden md:block">
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink render={<Link href="/" className="flex items-center gap-2 text-muted-foreground/60 transition-colors hover:text-foreground" />}>
-                  <Home className="size-4" />
-                  Volt
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <React.Suspense fallback={null}>
-                <HeaderBreadcrumb initialCategories={initialCategories} />
-              </React.Suspense>
-            </BreadcrumbList>
-          </Breadcrumb>
-        </div>
+    <header className="sticky top-0 z-50 flex h-(--header-height) shrink-0 items-center border-b bg-background/80 backdrop-blur-md transition-all ease-linear">
+      <div className="flex h-full w-(--header-height) shrink-0 items-center justify-center">
+        <SidebarTrigger />
+      </div>
+      <Separator
+        orientation="vertical"
+        className="h-full"
+      />
+      <div className="flex h-full flex-1 items-center justify-between gap-2 px-4 lg:gap-4 lg:px-6">
+        <Breadcrumb className="hidden md:block">
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink render={<Link href="/" className="flex items-center gap-2 text-muted-foreground/60 transition-colors hover:text-foreground" />}>
+                <Home className="size-4" />
+                Volt
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <React.Suspense fallback={null}>
+              <HeaderBreadcrumb initialCategories={initialCategories} />
+            </React.Suspense>
+          </BreadcrumbList>
+        </Breadcrumb>
 
-        <div className="flex items-center gap-2 sm:gap-4">
+        <div className="ml-auto flex items-center gap-2 sm:gap-4">
           <SearchCommand />
           <NotificationMenu />
           <ModeToggle />

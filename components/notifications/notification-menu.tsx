@@ -80,7 +80,7 @@ export function EmptyMuted({ onRefresh }: { onRefresh?: () => void }) {
           <BellIcon />
         </EmptyMedia>
         <EmptyTitle>No Notifications</EmptyTitle>
-        <EmptyDescription className="max-w-[200px] text-pretty">
+        <EmptyDescription className="max-w-50 text-pretty">
           You&apos;re all caught up. New notifications will appear here.
         </EmptyDescription>
       </EmptyHeader>
@@ -153,11 +153,11 @@ export function NotificationMenu() {
       >
         {unreadCount > 0 ? (
           <BellDot
-            className="size-4 [&_circle]:fill-primary [&_circle]:stroke-primary"
+            className="[&_circle]:fill-primary [&_circle]:stroke-primary"
             aria-hidden="true"
           />
         ) : (
-          <BellIcon className="size-4" aria-hidden="true" />
+          <BellIcon aria-hidden="true" />
         )}
       </DropdownMenuTrigger>
 
@@ -182,7 +182,7 @@ export function NotificationMenu() {
         {!hasNotifications ? (
           <EmptyMuted onRefresh={fetchNotifications} />
         ) : (
-          <ScrollArea className="h-[300px]">
+          <ScrollArea className="h-75">
             <DropdownMenuGroup className="py-1 pr-3">
               {notifications.slice(0, 5).map((notification) => {
                 const isReminder = notification.type === "reminder.due";
@@ -207,46 +207,46 @@ export function NotificationMenu() {
                         />
                       }
                     >
-                        <Item size="xs" className="w-full p-2">
-                          <NotificationIcon
-                            type={notification.type}
-                            image={notification.image}
-                            title={notification.title}
-                          />
+                      <Item size="xs" className="w-full p-2">
+                        <NotificationIcon
+                          type={notification.type}
+                          image={notification.image}
+                          title={notification.title}
+                        />
 
-                          <ItemContent className="gap-0.5">
-                            <ItemTitle className={cn(!notification.readAt ? "font-semibold text-foreground" : "font-medium text-muted-foreground/80 group-focus/dropdown-menu-item:text-muted-foreground/80!")}>
-                              {notification.title}
-                            </ItemTitle>
-                            <ItemDescription
-                              className={cn(
-                                "leading-normal",
-                                !notification.readAt
-                                  ? "text-muted-foreground group-focus/dropdown-menu-item:text-muted-foreground!"
-                                  : "text-muted-foreground/60 group-focus/dropdown-menu-item:text-muted-foreground/60!"
-                              )}
-                            >
-                              {notification.message}
-                            </ItemDescription>
-                            <span
-                              className={cn(
-                                "text-[10px] mt-1 block leading-none",
-                                !notification.readAt
-                                  ? "text-muted-foreground/60 group-focus/dropdown-menu-item:text-muted-foreground/60!"
-                                  : "text-muted-foreground/40 group-focus/dropdown-menu-item:text-muted-foreground/40!"
-                              )}
-                            >
-                              {formatRelativeTime(notification.createdAt)}
-                            </span>
-                          </ItemContent>
+                        <ItemContent className="gap-0.5">
+                          <ItemTitle className={cn(!notification.readAt ? "font-semibold text-foreground" : "font-medium text-muted-foreground/80 group-focus/dropdown-menu-item:text-muted-foreground/80!")}>
+                            {notification.title}
+                          </ItemTitle>
+                          <ItemDescription
+                            className={cn(
+                              "leading-normal",
+                              !notification.readAt
+                                ? "text-muted-foreground group-focus/dropdown-menu-item:text-muted-foreground!"
+                                : "text-muted-foreground/60 group-focus/dropdown-menu-item:text-muted-foreground/60!"
+                            )}
+                          >
+                            {notification.message}
+                          </ItemDescription>
+                          <span
+                            className={cn(
+                              "text-[10px] mt-1 block leading-none",
+                              !notification.readAt
+                                ? "text-muted-foreground/60 group-focus/dropdown-menu-item:text-muted-foreground/60!"
+                                : "text-muted-foreground/40 group-focus/dropdown-menu-item:text-muted-foreground/40!"
+                            )}
+                          >
+                            {formatRelativeTime(notification.createdAt)}
+                          </span>
+                        </ItemContent>
 
-                          {!notification.readAt && (
-                            <div className="absolute right-2 top-1/2 -translate-y-1/2">
-                              <span className="sr-only">Unread</span>
-                              <Dot />
-                            </div>
-                          )}
-                        </Item>
+                        {!notification.readAt && (
+                          <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                            <span className="sr-only">Unread</span>
+                            <Dot />
+                          </div>
+                        )}
+                      </Item>
                     </DropdownMenuItem>
                   );
                 }

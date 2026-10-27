@@ -42,12 +42,12 @@ export function LoginForm({
           email,
           password,
           name,
-          callbackURL: "/pending-approval",
+          callbackURL,
         })
         if (error) {
           throw new Error(error.message || "Signup failed")
         }
-        router.push("/pending-approval")
+        router.push(callbackURL)
         router.refresh()
         return data
       })()
@@ -55,7 +55,7 @@ export function LoginForm({
       try {
         await toast.promise(promise, {
           loading: "Creating account...",
-          success: "Signup successful! Please wait for admin approval.",
+          success: "Signup successful! Welcome to Volt.",
           error: (err: unknown) =>
             typeof err === "string" ? err : (err as { message?: string })?.message || "Signup failed",
         })
@@ -72,22 +72,15 @@ export function LoginForm({
         if (error) {
           throw new Error(error.message || "Login failed")
         }
-        const user = data?.user as { isApproved?: boolean; role?: string }
-        if (!user?.isApproved && user?.role !== "admin") {
-          router.push("/pending-approval")
-          return { isPending: true }
-        } else {
-          router.push(callbackURL)
-          router.refresh()
-          return { isPending: false }
-        }
+        router.push(callbackURL)
+        router.refresh()
+        return data
       })()
 
       try {
         await toast.promise(promise, {
           loading: "Signing in...",
-          success: (res: { isPending: boolean }) =>
-            res.isPending ? "Your account is pending approval." : "Login successful",
+          success: "Login successful",
           error: (err: unknown) =>
             typeof err === "string" ? err : (err as { message?: string })?.message || "Login failed",
         })

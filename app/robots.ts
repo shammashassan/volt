@@ -12,7 +12,6 @@ export default function robots(): MetadataRoute.Robots {
           '/login',
           '/sign-in',
           '/sign-up',
-          '/pending-approval',
           '/account',
           '/categories',
           '/commands',

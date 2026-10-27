@@ -15,7 +15,8 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Field, FieldLabel, FieldGroup } from "@/components/ui/field"
-import { Eye, EyeOff, Loader2, Key, Mail } from "lucide-react"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Eye, EyeOff, Loader2, Key, Mail, AlertCircle } from "lucide-react"
 import { toast } from "@/components/ui/toast"
 
 export function SignInForm() {
@@ -26,6 +27,7 @@ export function SignInForm() {
   const [magicLinkEmail, setMagicLinkEmail] = useState("")
   const [showMagicForm, setShowMagicForm] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [bannedError, setBannedError] = useState<string | null>(null)
 
   // Passkey Conditional UI / Autofill Mediation
   useEffect(() => {
@@ -52,11 +54,9 @@ export function SignInForm() {
     const params = new URLSearchParams(window.location.search)
     const error = params.get("error")
     if (error) {
-      if (error === "PENDING_APPROVAL" || error === "unable_to_create_session") {
-        router.push("/pending-approval")
-        return
-      }
-      if (error === "account_not_linked") {
+      if (error === "BANNED_USER" || error.toLowerCase().includes("banned")) {
+        setBannedError("Your account has been suspended by an administrator. Please contact support if you believe this is an error.")
+      } else if (error === "account_not_linked") {
         toast.error(
           "This email is already associated with another login method. Please sign in with your password."
         )
@@ -86,26 +86,27 @@ export function SignInForm() {
     return fallback
   }
 
-  const isPendingApprovalError = (err: unknown, message = getAuthErrorMessage(err)) => {
+  const isBannedError = (err: unknown, message = getAuthErrorMessage(err)) => {
     const authError =
       err && typeof err === "object"
         ? (err as { error?: { code?: unknown }; code?: unknown; message?: unknown })
         : null
 
     return (
-      message.includes("PENDING_APPROVAL") ||
-      authError?.error?.code === "PENDING_APPROVAL" ||
-      authError?.code === "PENDING_APPROVAL" ||
-      authError?.message === "PENDING_APPROVAL"
+      message.toLowerCase().includes("banned") ||
+      message.toLowerCase().includes("suspended") ||
+      authError?.error?.code === "BANNED_USER" ||
+      authError?.code === "BANNED_USER" ||
+      authError?.message === "BANNED_USER"
     )
   }
 
   const handleToastError = (err: unknown, fallback?: string) => {
     const errMsg = getAuthErrorMessage(err, fallback)
 
-    if (isPendingApprovalError(err, errMsg)) {
-      router.push("/pending-approval")
-      return "Your account is pending administrator approval."
+    if (isBannedError(err, errMsg)) {
+      setBannedError(errMsg)
+      return errMsg
     }
 
     return errMsg
@@ -114,6 +115,7 @@ export function SignInForm() {
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
+    setBannedError(null)
 
     const trimmedIdentifier = identifier.trim()
     const isEmail = trimmedIdentifier.includes("@")
@@ -139,17 +141,10 @@ export function SignInForm() {
       }
 
       if (res.data) {
-        const user = res.data.user as { isApproved?: boolean; approved?: boolean; role?: string }
-        if (!user?.isApproved && !user?.approved && user?.role !== "admin") {
-          router.push("/pending-approval")
-          return { isPending: true }
-        } else {
-          router.push("/explore")
-          router.refresh()
-          return { isPending: false }
-        }
+        router.push("/explore")
+        router.refresh()
       }
-      return { isPending: false }
+      return res.data
     })().finally(() => {
       setLoading(false)
     })
@@ -157,15 +152,14 @@ export function SignInForm() {
     try {
       await toast.promise(signInPromise, {
         loading: "Signing in...",
-        success: (data: { isPending: boolean }) =>
-          data?.isPending
-            ? "Your account is pending administrator approval."
-            : "Signed in successfully",
+        success: "Signed in successfully",
         error: (err: unknown) => handleToastError(err, "Failed to sign in"),
       })
     } catch (err: unknown) {
       const msg = handleToastError(err, "Failed to sign in")
-      toast.error(msg)
+      if (!isBannedError(err, msg)) {
+        toast.error(msg)
+      }
     }
   }
 
@@ -267,6 +261,24 @@ export function SignInForm() {
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
+          {bannedError && (
+            <Alert variant="destructive" className="border-destructive/40 bg-destructive/10 text-destructive">
+              <AlertCircle className="size-4" />
+              <div className="flex flex-col gap-1">
+                <span className="font-semibold text-xs tracking-wide uppercase">Account Suspended</span>
+                <AlertDescription className="text-xs text-destructive/90 leading-relaxed">
+                  {bannedError}{" "}
+                  <a
+                    href="mailto:support@volt.app"
+                    className="underline font-semibold hover:text-foreground inline-block mt-1"
+                  >
+                    Contact Support
+                  </a>
+                </AlertDescription>
+              </div>
+            </Alert>
+          )}
+
           {showMagicForm ? (
             <form onSubmit={handleMagicLinkSignIn} className="flex flex-col gap-4">
               <FieldGroup className="flex flex-col gap-4">
