@@ -16,13 +16,13 @@ export async function initDatabase() {
       console.log("Initializing database indexes...")
 
       await Promise.allSettled([
-        // Resources indexes
+        // Resources indexes (ESR-aligned)
         db.collection("resources").createIndex({ userId: 1, createdAt: -1 }),
-        db.collection("resources").createIndex({ userId: 1, favorite: 1 }),
+        db.collection("resources").createIndex({ userId: 1, favorite: 1, order: 1, createdAt: -1 }),
         db.collection("resources").createIndex({ userId: 1, recentlyViewedAt: -1 }),
         db.collection("resources").createIndex({ userId: 1, useCount: -1, recentlyUsedAt: -1 }),
         db.collection("resources").createIndex({ userId: 1, order: 1, createdAt: -1 }),
-        db.collection("resources").createIndex({ userId: 1, categoryId: 1 }),
+        db.collection("resources").createIndex({ userId: 1, categoryId: 1, order: 1, createdAt: -1 }),
         db.collection("resources").createIndex({ userId: 1, category: 1 }),
         db.collection("resources").createIndex({ userId: 1, projectIds: 1 }),
         db.collection("resources").createIndex({ userId: 1, personIds: 1 }),
@@ -34,6 +34,10 @@ export async function initDatabase() {
           whySaved: "text",
           notes: "text",
         }),
+
+        // Search index collection
+        db.collection("search_index").createIndex({ title: "text", description: "text" }),
+        db.collection("search_index").createIndex({ userId: 1, entityId: 1 }),
 
         // Notes indexes
         db.collection("notes").createIndex({ userId: 1, pinned: -1, updatedAt: -1 }),

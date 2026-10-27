@@ -67,6 +67,8 @@ export async function addCategoryAction(
     revalidatePath("/explore");
     revalidatePath("/categories");
     revalidatePath("/resources");
+    updateTag("categories");
+    updateTag(`categories-${user.id}`);
     updateTag(`explore-body-${user.id}`);
     updateTag(`dashboard-stats-${user.id}`);
     return { success: true, id: result.insertedId.toString() };
@@ -158,6 +160,8 @@ export async function updateCategoryAction(idOrSlug: string, data: Record<string
     revalidatePath("/explore");
     revalidatePath("/categories");
     revalidatePath("/resources");
+    updateTag("categories");
+    updateTag(`categories-${user.id}`);
     updateTag(`explore-body-${user.id}`);
     updateTag(`dashboard-stats-${user.id}`);
     return { success: true };
@@ -201,6 +205,8 @@ export async function deleteCategoryAction(idOrSlug: string) {
     revalidatePath("/explore");
     revalidatePath("/categories");
     revalidatePath("/resources");
+    updateTag("categories");
+    updateTag(`categories-${user.id}`);
     updateTag(`explore-body-${user.id}`);
     updateTag(`dashboard-stats-${user.id}`);
     return { success: true };

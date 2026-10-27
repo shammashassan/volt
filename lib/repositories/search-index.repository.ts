@@ -5,8 +5,6 @@ import { UserId } from '@/types/shared';
 export class SearchIndexRepository {
   private async getCollection() {
     const db = await getDb();
-    // Ensure index exists on indexing content
-    await db.collection('search_index').createIndex({ title: 'text', description: 'text' });
     return db.collection<SearchIndexEntry>('search_index');
   }
 

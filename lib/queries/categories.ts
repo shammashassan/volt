@@ -2,8 +2,13 @@ import { getDb, serialize } from "@/lib/db";
 import { Category } from "@/types";
 import { ObjectId } from "mongodb";
 import { cache } from "react";
+import { cacheLife, cacheTag } from "next/cache";
 
 export const getCategories = cache(async (userId: string): Promise<Category[]> => {
+  "use cache";
+  cacheTag("categories", `categories-${userId}`);
+  cacheLife("hours");
+
   const db = await getDb();
   const categories = await db.collection("categories").find({ userId }).sort({ order: 1, name: 1 }).toArray();
   return serialize(categories.map(c => ({
@@ -22,6 +27,10 @@ export const getCategories = cache(async (userId: string): Promise<Category[]> =
 });
 
 export const getCategoriesWithCounts = cache(async (userId: string) => {
+  "use cache";
+  cacheTag("categories", `categories-${userId}`, "resources", `resources-${userId}`);
+  cacheLife("minutes");
+
   const db = await getDb();
   const [categories, counts] = await Promise.all([
     getCategories(userId),

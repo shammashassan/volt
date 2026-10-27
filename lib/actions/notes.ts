@@ -43,6 +43,8 @@ export async function addNoteAction(data: {
     });
 
     revalidatePath("/notes");
+    updateTag("notes");
+    updateTag(`notes-${user.id}`);
     updateTag(`explore-body-${user.id}`);
     updateTag(`dashboard-stats-${user.id}`);
     return { success: true, id: result.insertedId.toString() };
@@ -77,6 +79,8 @@ export async function updateNoteAction(id: string, data: Record<string, unknown>
     }
 
     revalidatePath("/notes");
+    updateTag("notes");
+    updateTag(`notes-${user.id}`);
     updateTag(`explore-body-${user.id}`);
     updateTag(`dashboard-stats-${user.id}`);
     return { success: true };
@@ -99,6 +103,8 @@ export async function deleteNoteAction(id: string) {
     await searchIndexRepo.remove(id);
 
     revalidatePath("/notes");
+    updateTag("notes");
+    updateTag(`notes-${user.id}`);
     updateTag(`explore-body-${user.id}`);
     updateTag(`dashboard-stats-${user.id}`);
     return { success: true };

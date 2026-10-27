@@ -40,6 +40,8 @@ export async function addPersonAction(data: {
     });
 
     revalidatePath("/people");
+    updateTag("people");
+    updateTag(`people-${user.id}`);
     updateTag(`explore-body-${user.id}`);
     updateTag(`dashboard-stats-${user.id}`);
     return { success: true, id: result.insertedId.toString() };
@@ -74,6 +76,8 @@ export async function updatePersonAction(id: string, data: Record<string, unknow
     }
 
     revalidatePath("/people");
+    updateTag("people");
+    updateTag(`people-${user.id}`);
     updateTag(`explore-body-${user.id}`);
     updateTag(`dashboard-stats-${user.id}`);
     return { success: true };
@@ -96,6 +100,8 @@ export async function deletePersonAction(id: string) {
     await searchIndexRepo.remove(id);
 
     revalidatePath("/people");
+    updateTag("people");
+    updateTag(`people-${user.id}`);
     updateTag(`explore-body-${user.id}`);
     updateTag(`dashboard-stats-${user.id}`);
     return { success: true };

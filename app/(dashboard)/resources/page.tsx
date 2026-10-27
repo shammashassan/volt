@@ -3,9 +3,7 @@ import { getCategories } from "@/lib/queries/categories";
 import { getProjects } from "@/lib/queries/projects";
 import { getPeople } from "@/lib/queries/people";
 import { ResourcesContent } from "@/components/resources/resources-content";
-import { auth } from "@/lib/auth"
-import { headers } from "next/headers"
-import { redirect } from "next/navigation"
+import { requireAuth } from "@/lib/auth-utils";
 import { Resource, Category, Project, Person } from "@/types"
 import type { Metadata } from "next"
 
@@ -15,13 +13,8 @@ export const metadata: Metadata = {
 }
 
 export default async function ResourcesPage() {
-  const session = await auth.api.getSession({
-    headers: await headers()
-  })
-  if (!session) {
-    redirect("/login")
-  }
-  const userId = session.user.id
+  const session = await requireAuth();
+  const userId = session.user.id;
 
   const [resources, categories, projects, people] = await Promise.all([
     getResources(userId),

@@ -4,13 +4,21 @@ import { auth } from "./auth"
 import { cache } from "react"
 
 /**
+ * Cached session retriever for the current request.
+ * Deduplicates Better Auth session lookups across layout, page, and components.
+ */
+export const getCachedSession = cache(async () => {
+  return await auth.api.getSession({
+    headers: await headers(),
+  })
+})
+
+/**
  * Returns the current authenticated session user, caching within the request.
  * Throws an Error if unauthorized.
  */
 export const getSessionUser = cache(async () => {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  })
+  const session = await getCachedSession()
   if (!session) {
     throw new Error("Unauthorized")
   }
@@ -40,11 +48,11 @@ export async function checkAdminUser() {
 /**
  * Page & Layout Guard: Redirects unauthenticated visitors to /sign-in.
  */
-export async function requireAuth() {
-  const session = await auth.api.getSession({ headers: await headers() })
+export const requireAuth = cache(async () => {
+  const session = await getCachedSession()
   if (!session) redirect("/sign-in")
   return session
-}
+})
 
 /**
  * Page & Layout Guard: Ensures user is authenticated.

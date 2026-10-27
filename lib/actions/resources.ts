@@ -101,6 +101,8 @@ export async function addResourceAction(
 
     revalidatePath("/explore");
     revalidatePath("/resources");
+    updateTag("resources");
+    updateTag(`resources-${user.id}`);
     updateTag(`explore-body-${user.id}`);
     updateTag(`dashboard-stats-${user.id}`);
     return { success: true, id: result.insertedId.toString() };
@@ -154,6 +156,8 @@ export async function updateResourceAction(idOrLink: string, data: Record<string
 
     revalidatePath("/explore");
     revalidatePath("/resources");
+    updateTag("resources");
+    updateTag(`resources-${user.id}`);
     updateTag(`explore-body-${user.id}`);
     updateTag(`dashboard-stats-${user.id}`);
     return { success: true };
@@ -191,6 +195,8 @@ export async function deleteResourceAction(idOrLink: string) {
 
     revalidatePath("/explore");
     revalidatePath("/resources");
+    updateTag("resources");
+    updateTag(`resources-${user.id}`);
     updateTag(`explore-body-${user.id}`);
     updateTag(`dashboard-stats-${user.id}`);
     return { success: true };
@@ -209,6 +215,8 @@ export async function trackResourceViewAction(id: string) {
       { _id: new ObjectId(id), userId: user.id },
       { $set: { recentlyViewedAt: new Date() } }
     );
+    updateTag("resources");
+    updateTag(`resources-${user.id}`);
     updateTag(`explore-body-${user.id}`);
     return { success: true };
   } catch (error) {
@@ -229,6 +237,8 @@ export async function useResourceAction(id: string) {
         $inc: { useCount: 1 } 
       }
     );
+    updateTag("resources");
+    updateTag(`resources-${user.id}`);
     updateTag(`explore-body-${user.id}`);
     return { success: true };
   } catch (error) {

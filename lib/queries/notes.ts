@@ -2,8 +2,13 @@ import { getDb, serialize, mapNoteDoc } from "@/lib/db";
 import { Note } from "@/types";
 import { cache } from "react";
 import { ObjectId } from "mongodb";
+import { cacheLife, cacheTag } from "next/cache";
 
 export const getNotes = cache(async (userId: string): Promise<Note[]> => {
+  "use cache";
+  cacheTag("notes", `notes-${userId}`);
+  cacheLife("minutes");
+
   const db = await getDb();
   const notes = await db.collection("notes").find({ userId }).sort({ pinned: -1, updatedAt: -1 }).toArray();
   return serialize(notes.map(mapNoteDoc)) as unknown as Note[];

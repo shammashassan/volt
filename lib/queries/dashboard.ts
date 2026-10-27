@@ -1,7 +1,12 @@
 import { getDb, serialize } from "@/lib/db";
 import { cache } from "react";
+import { cacheLife, cacheTag } from "next/cache";
 
 export const getStats = cache(async (userId: string) => {
+  "use cache";
+  cacheTag("dashboard-stats", `dashboard-stats-${userId}`);
+  cacheLife("minutes");
+
   const db = await getDb();
   const [resources, categories, notes, projects, people] = await Promise.all([
     db.collection("resources").countDocuments({ userId }),
@@ -10,7 +15,7 @@ export const getStats = cache(async (userId: string) => {
     db.collection("projects").countDocuments({ userId }),
     db.collection("people").countDocuments({ userId })
   ]);
-  const latestResource = await db.collection("resources").find({ userId }).sort({ createdAt: -1 }).limit(1).toArray();
+  const latestResource = await db.collection("resources").find({ userId }, { projection: { title: 1, name: 1 } }).sort({ createdAt: -1 }).limit(1).toArray();
   return serialize({
     resources,
     categories,
@@ -24,6 +29,10 @@ export const getStats = cache(async (userId: string) => {
 });
 
 export const getFavorites = cache(async (userId: string) => {
+  "use cache";
+  cacheTag("dashboard-favorites", `dashboard-favorites-${userId}`, "resources", "notes");
+  cacheLife("minutes");
+
   const db = await getDb();
   const resources = await db.collection("resources").find({ userId, favorite: true }).limit(6).toArray();
   const notes = await db.collection("notes").find({ userId, pinned: true }).limit(6).toArray();

@@ -2,14 +2,23 @@ import { getDb, serialize, mapResourceDoc } from "@/lib/db";
 import { Resource } from "@/types";
 import { cache } from "react";
 import { ObjectId } from "mongodb";
+import { cacheLife, cacheTag } from "next/cache";
 
 export const getResources = cache(async (userId: string): Promise<Resource[]> => {
+  "use cache";
+  cacheTag("resources", `resources-${userId}`);
+  cacheLife("minutes");
+
   const db = await getDb();
   const resources = await db.collection("resources").find({ userId }).sort({ order: 1, createdAt: -1 }).toArray();
   return serialize(resources.map(mapResourceDoc)) as unknown as Resource[];
 });
 
 export const getResourcesByCategoryId = cache(async (categoryId: string, userId: string): Promise<Resource[]> => {
+  "use cache";
+  cacheTag("resources", `resources-${userId}`);
+  cacheLife("minutes");
+
   const db = await getDb();
   const query = {
     userId,

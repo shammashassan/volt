@@ -62,6 +62,7 @@ export async function addCollectionAction(
     revalidatePath("/categories");
     revalidatePath("/resources");
     revalidatePath("/explore");
+    updateTag("collections");
     updateTag(`collections-${user.id}`);
     updateTag(`explore-body-${user.id}`);
     updateTag(`dashboard-stats-${user.id}`);
@@ -154,6 +155,7 @@ export async function updateCollectionAction(idOrSlug: string, data: Record<stri
     revalidatePath("/categories");
     revalidatePath("/resources");
     revalidatePath("/explore");
+    updateTag("collections");
     updateTag(`collections-${user.id}`);
     updateTag(`explore-body-${user.id}`);
     updateTag(`dashboard-stats-${user.id}`);
@@ -195,6 +197,7 @@ export async function deleteCollectionAction(idOrSlug: string) {
     revalidatePath("/categories");
     revalidatePath("/resources");
     revalidatePath("/explore");
+    updateTag("collections");
     updateTag(`collections-${user.id}`);
     updateTag(`explore-body-${user.id}`);
     updateTag(`dashboard-stats-${user.id}`);

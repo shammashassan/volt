@@ -12,8 +12,8 @@ export async function getNotificationsAction() {
   try {
     const user = await getSessionUser();
 
-    // 1. Check & trigger any pending episode/movie/reminder alerts for this user
-    await syncUserAlerts(user.id).catch((err) => {
+    // 1. Trigger any pending alerts in background without blocking response
+    void syncUserAlerts(user.id).catch((err) => {
       console.error("[NotificationsAction] syncUserAlerts error:", err);
     });
 
@@ -39,7 +39,6 @@ export async function markNotificationReadAction(id: string) {
     updateTag(`notifications-${user.id}`);
     updateTag(`explore-body-${user.id}`);
     revalidatePath('/notifications');
-    revalidatePath('/explore');
     return { success: true, data: success };
   } catch (err) {
     return { success: false, error: getErrorMessage(err) };
@@ -55,7 +54,6 @@ export async function markAllNotificationsReadAction() {
     updateTag(`notifications-${user.id}`);
     updateTag(`explore-body-${user.id}`);
     revalidatePath('/notifications');
-    revalidatePath('/explore');
     return { success: true, data: success };
   } catch (err) {
     return { success: false, error: getErrorMessage(err) };
@@ -71,7 +69,6 @@ export async function archiveNotificationAction(id: string) {
     updateTag(`notifications-${user.id}`);
     updateTag(`explore-body-${user.id}`);
     revalidatePath('/notifications');
-    revalidatePath('/explore');
     return { success: true, data: success };
   } catch (err) {
     return { success: false, error: getErrorMessage(err) };

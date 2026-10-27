@@ -2,8 +2,13 @@ import { getDb, serialize } from "@/lib/db";
 import { Person } from "@/types";
 import { cache } from "react";
 import { ObjectId } from "mongodb";
+import { cacheLife, cacheTag } from "next/cache";
 
 export const getPeople = cache(async (userId: string): Promise<Person[]> => {
+  "use cache";
+  cacheTag("people", `people-${userId}`);
+  cacheLife("minutes");
+
   const db = await getDb();
   const people = await db.collection("people").find({ userId }).sort({ name: 1 }).toArray();
   return serialize(people.map(p => ({

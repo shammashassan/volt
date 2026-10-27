@@ -2,8 +2,13 @@ import { getDb, serialize } from "@/lib/db";
 import { Project } from "@/types";
 import { cache } from "react";
 import { ObjectId } from "mongodb";
+import { cacheLife, cacheTag } from "next/cache";
 
 export const getProjects = cache(async (userId: string): Promise<Project[]> => {
+  "use cache";
+  cacheTag("projects", `projects-${userId}`);
+  cacheLife("minutes");
+
   const db = await getDb();
   const projects = await db.collection("projects").find({ userId }).sort({ updatedAt: -1 }).toArray();
   return serialize(projects.map(p => ({
