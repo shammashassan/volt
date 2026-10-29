@@ -15,7 +15,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "@/components/ui/dialog"
+} from "@/components/shared/responsive-dialog"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import {
@@ -48,8 +48,8 @@ interface ProjectsContentProps {
   initialProjects: Project[]
 }
 
-const STATUS_CONFIG: Record<ProjectStatus, { label: string; variant: "secondary" | "outline" | "destructive" | "primary" | "success" | "warning" | "info" }> = {
-  active: { label: "Active", variant: "primary" },
+const STATUS_CONFIG: Record<ProjectStatus, { label: string; variant: "secondary" | "outline" | "destructive" | "default" }> = {
+  active: { label: "Active", variant: "default" },
   completed: { label: "Completed", variant: "secondary" },
   paused: { label: "Paused", variant: "outline" }
 }
@@ -65,6 +65,12 @@ export function ProjectsContent({ initialProjects }: ProjectsContentProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [newProjectParam, setNewProjectParam] = useQueryState("new", parseAsBoolean)
 
+  // Form states
+  const [formName, setFormName] = useState("")
+  const [formDescription, setFormDescription] = useState("")
+  const [formUrl, setFormUrl] = useState("")
+  const [formStatus, setFormStatus] = useState<ProjectStatus>("active")
+
   React.useEffect(() => {
     if (newProjectParam) {
       setEditingProject(null)
@@ -76,11 +82,6 @@ export function ProjectsContent({ initialProjects }: ProjectsContentProps) {
     }
   }, [newProjectParam])
 
-  // Form states
-  const [formName, setFormName] = useState("")
-  const [formDescription, setFormDescription] = useState("")
-  const [formUrl, setFormUrl] = useState("")
-  const [formStatus, setFormStatus] = useState<ProjectStatus>("active")
 
   const router = useRouter()
 
@@ -146,7 +147,10 @@ export function ProjectsContent({ initialProjects }: ProjectsContentProps) {
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!formName.trim()) {
-      toast.error("Project name is required")
+      toast.add({
+        title: "Project name is required",
+        type: "error",
+      })
       return
     }
 

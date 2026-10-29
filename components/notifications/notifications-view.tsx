@@ -153,15 +153,12 @@ export function NotificationsContent({
     }
   }, [contextNotifications]);
 
-  const allNotifications =
-    hasSynced || contextNotifications.length > 0
+  const allNotifications = useMemo(() => {
+    return hasSynced || contextNotifications.length > 0
       ? contextNotifications
       : initialNotifications || [];
+  }, [hasSynced, contextNotifications, initialNotifications]);
 
-  const unreadItems = useMemo(
-    () => allNotifications.filter((n) => !n.readAt),
-    [allNotifications]
-  );
   const readItems = useMemo(
     () => allNotifications.filter((n) => !!n.readAt),
     [allNotifications]
@@ -466,7 +463,7 @@ export function NotificationsContent({
                 All
                 <Badge
                   variant="secondary"
-                  size="xs"
+                 
                   className="rounded-full px-1.5 min-w-4 font-bold"
                 >
                   {allNotifications.length}
@@ -479,7 +476,7 @@ export function NotificationsContent({
                 Unread
                 <Badge
                   variant="secondary"
-                  size="xs"
+                 
                   className="rounded-full px-1.5 min-w-4 font-bold"
                 >
                   {unreadCount}
@@ -492,7 +489,7 @@ export function NotificationsContent({
                 Read
                 <Badge
                   variant="secondary"
-                  size="xs"
+                 
                   className="rounded-full px-1.5 min-w-4 font-bold"
                 >
                   {readItems.length}

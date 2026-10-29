@@ -1,8 +1,16 @@
 "use client"
 
 import * as React from "react"
-import { CodeBlock } from "@/components/ui/code-block"
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
+import {
+  CodeBlock,
+  CodeBlockHeader,
+  CodeBlockTitle,
+  CodeBlockContent,
+  CodeBlockActions,
+  CodeBlockCopyButton,
+} from "@/components/ui/code-block"
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
+import { Separator } from "@/components/ui/separator"
 import { Badge } from "@/components/ui/badge"
 import { Terminal, Zap, Layers, Sparkles, ShieldCheck, SquareTerminal, Database } from "lucide-react"
 
@@ -87,6 +95,15 @@ const commandGroups = [
         description: "Add beautiful animated components from Magic UI.",
         code: "npx magicui-cli add marquee",
         language: "bash"
+      },
+      {
+        name: "Shadcn Lint",
+        description: "Agent-first design system and Tailwind token linter.",
+        tabs: [
+          { label: "Install", value: "install", code: "npm install -D @shadcn/lint", language: "bash" },
+          { label: "Prompt", value: "prompt", code: "Read https://github.com/shadcn-ui/lint/blob/main/SETUP.md\nand set up @shadcn/lint in this project.", language: "markdown" },
+          { label: "Run", value: "run", code: "npx eslint .", language: "bash" }
+        ]
       }
     ]
   },
@@ -142,6 +159,74 @@ const commandGroups = [
   }
 ]
 
+type CommandItem = {
+  name: string
+  description: string
+  tabs?: { label: string; value: string; code: string; language?: string }[]
+  code?: string
+  language?: string
+}
+
+function CommandSnippet({ cmd }: { cmd: CommandItem }) {
+  const [activeTab, setActiveTab] = React.useState(cmd.tabs?.[0]?.value ?? "")
+  const activeCommand =
+    cmd.tabs?.find((t) => t.value === activeTab) ??
+    cmd.tabs?.[0] ?? {
+      code: cmd.code ?? "",
+      language: cmd.language ?? "bash",
+    }
+
+  if (cmd.tabs && cmd.tabs.length > 0) {
+    return (
+      <CodeBlock>
+        <CodeBlockHeader>
+          <ToggleGroup
+            value={[activeTab]}
+            onValueChange={(val) => {
+              if (val[0]) setActiveTab(val[0])
+            }}
+          >
+            {cmd.tabs.map((tab) => (
+              <ToggleGroupItem key={tab.value} value={tab.value}>
+                {tab.label}
+              </ToggleGroupItem>
+            ))}
+          </ToggleGroup>
+          <CodeBlockActions>
+            <CodeBlockCopyButton value={activeCommand.code} />
+          </CodeBlockActions>
+        </CodeBlockHeader>
+        <Separator />
+        <CodeBlockContent>
+          <pre className="m-0 p-0 font-mono text-sm font-normal text-muted-foreground whitespace-pre-wrap">
+            {activeCommand.code}
+          </pre>
+        </CodeBlockContent>
+      </CodeBlock>
+    )
+  }
+
+  return (
+    <CodeBlock>
+      <CodeBlockHeader>
+        <CodeBlockTitle>
+          <Terminal />
+          Terminal
+        </CodeBlockTitle>
+        <CodeBlockActions>
+          <CodeBlockCopyButton value={cmd.code || ""} />
+        </CodeBlockActions>
+      </CodeBlockHeader>
+      <Separator />
+      <CodeBlockContent>
+        <pre className="m-0 p-0 font-mono text-sm font-normal text-muted-foreground whitespace-pre-wrap">
+          {cmd.code || ""}
+        </pre>
+      </CodeBlockContent>
+    </CodeBlock>
+  )
+}
+
 export function CommandsContent() {
   return (
     <div className="flex flex-1 flex-col gap-6 pb-12 @container/main">
@@ -194,40 +279,7 @@ export function CommandsContent() {
                           {cmd.description}
                         </p>
                       </div>
-                      {cmd.tabs && cmd.tabs.length > 0 ? (
-                        <div className="rounded-xl border border-border/50 overflow-hidden shadow-xs group-hover:border-primary/20 transition-all bg-muted/20">
-                          <Tabs defaultValue={cmd.tabs[0].value} className="w-full">
-                            <div className="flex items-center justify-between border-b border-border/40 bg-muted/40 px-2 py-1">
-                              <TabsList className="h-8 bg-transparent border-0 gap-1 p-0">
-                                {cmd.tabs.map((tab) => (
-                                  <TabsTrigger
-                                    key={tab.value}
-                                    value={tab.value}
-                                    className="h-6 px-2.5 text-[11px] uppercase tracking-wider font-bold rounded-md"
-                                  >
-                                    {tab.label}
-                                  </TabsTrigger>
-                                ))}
-                              </TabsList>
-                            </div>
-                            {cmd.tabs.map((tab) => (
-                              <TabsContent key={tab.value} value={tab.value} className="m-0 focus-visible:outline-none">
-                                <CodeBlock
-                                  code={tab.code}
-                                  language={tab.language || cmd.language || "bash"}
-                                  className="border-0 rounded-none shadow-none bg-transparent"
-                                />
-                              </TabsContent>
-                            ))}
-                          </Tabs>
-                        </div>
-                      ) : (
-                        <CodeBlock
-                          code={cmd.code || ""}
-                          language={cmd.language || "bash"}
-                          className="shadow-xs border-border/30 group-hover:border-primary/20 transition-all"
-                        />
-                      )}
+                      <CommandSnippet cmd={cmd} />
                     </div>
                   ))}
                 </div>

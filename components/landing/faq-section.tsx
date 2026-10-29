@@ -109,7 +109,7 @@ export function FaqSection({ startReveal = false }: { startReveal?: boolean }) {
           Frequently Asked Questions
         </h2>
         <p className="faq-subtitle-reveal opacity-0 mx-auto max-w-2xl text-lg text-muted-foreground">
-          Everything you need to know about Volt's architecture, philosophy, and features.
+          Everything you need to know about Volt&apos;s architecture, philosophy, and features.
         </p>
       </div>
 

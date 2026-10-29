@@ -33,10 +33,10 @@ interface TagsContentProps {
   people: Person[]
 }
 
-const TYPE_CONFIG: Record<PersonType, { label: string; variant: "secondary" | "outline" | "destructive" | "primary" | "success" | "warning" | "info" }> = {
-  developer: { label: "Developer", variant: "primary" },
+const TYPE_CONFIG: Record<PersonType, { label: string; variant: "secondary" | "outline" | "destructive" | "default" }> = {
+  developer: { label: "Developer", variant: "default" },
   designer: { label: "Designer", variant: "secondary" },
-  founder: { label: "Founder", variant: "info" },
+  founder: { label: "Founder", variant: "secondary" },
   creator: { label: "Creator", variant: "outline" },
   company: { label: "Company", variant: "outline" }
 }
@@ -349,7 +349,7 @@ export function TagsContent({ resources, notes, people }: TagsContentProps) {
 
               {/* Mobile Select dropdown */}
               <div className="md:hidden w-full mb-4">
-                <Select value={activeTab} onValueChange={setActiveTab}>
+                <Select value={activeTab} onValueChange={(val) => { if (val) setActiveTab(val) }}>
                   <SelectTrigger className="w-full h-10 font-medium">
                     <SelectValue />
                   </SelectTrigger>
@@ -458,7 +458,7 @@ export function TagsContent({ resources, notes, people }: TagsContentProps) {
                   ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
                       {filteredEntities.people.map((person) => {
-                        const typeConfig = TYPE_CONFIG[person.type] || { label: "Developer", variant: "primary" as const }
+                        const typeConfig = TYPE_CONFIG[person.type] || { label: "Developer", variant: "default" as const }
                         const id = person._id?.toString() || person.id || ""
                         return (
                           <Card

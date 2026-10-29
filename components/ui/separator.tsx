@@ -1,18 +1,13 @@
 "use client"
 
-import * as React from "react"
 import { Separator as SeparatorPrimitive } from "@base-ui/react/separator"
-
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 function Separator({
   className,
   orientation = "horizontal",
-  decorative: _decorative,
   ...props
-}: SeparatorPrimitive.Props & {
-  decorative?: boolean
-}) {
+}: SeparatorPrimitive.Props) {
   return (
     <SeparatorPrimitive
       data-slot="separator"

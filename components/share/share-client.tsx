@@ -251,7 +251,10 @@ export function ShareClient({
     if (e) e.preventDefault();
     const targetUrl = manualUrl.trim();
     if (!targetUrl) {
-      toast.error("Please enter a URL to save");
+      toast.add({
+        title: "Please enter a URL to save",
+        type: "error",
+      });
       return;
     }
     await executeSave(targetUrl, manualMeta);
@@ -577,7 +580,7 @@ export function ShareClient({
                       <FieldLabel htmlFor="category" className="text-xs font-semibold text-muted-foreground">
                         Category
                       </FieldLabel>
-                      <Select value={categoryId} onValueChange={setCategoryId}>
+                      <Select value={categoryId} onValueChange={(val) => { if (val) setCategoryId(val) }}>
                         <SelectTrigger id="category" className="h-8 text-xs w-full bg-background/50">
                           <SelectValue placeholder="Uncategorized" />
                         </SelectTrigger>

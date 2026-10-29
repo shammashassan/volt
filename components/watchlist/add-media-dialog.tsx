@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import {
+  Command,
   CommandDialog,
   CommandInput,
   CommandList,
@@ -81,7 +82,8 @@ export function AddMediaDialog({ open, onOpenChange, onSelect }: AddMediaDialogP
 
   return (
     <CommandDialog open={open} onOpenChange={onOpenChange}>
-      <CommandInput
+      <Command className="size-full" shouldFilter={false}>
+        <CommandInput
         placeholder="Search movies, series, anime..."
         value={query}
         onValueChange={handleQueryChange}
@@ -151,6 +153,7 @@ export function AddMediaDialog({ open, onOpenChange, onSelect }: AddMediaDialogP
           </CommandGroup>
         )}
       </CommandList>
+      </Command>
     </CommandDialog>
   );
 }

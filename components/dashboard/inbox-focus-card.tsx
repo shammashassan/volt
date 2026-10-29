@@ -25,7 +25,7 @@ export function InboxFocusCard({
             <Target className="size-3 text-primary" />
           </div>
           <span className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground/60">
-            today's focus
+            today&apos;s focus
           </span>
         </div>
       </CardHeader>

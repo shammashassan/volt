@@ -32,7 +32,7 @@ export function DashboardMobileTabs({
       <div className="flex items-center justify-between gap-4">
         {/* Dropdown Select for Mobile Screen Tab Filtering */}
         <div className="flex-1 max-w-[240px]">
-          <Select value={activeTab} onValueChange={setActiveTab}>
+          <Select value={activeTab} onValueChange={(val) => { if (val) setActiveTab(val) }}>
             <SelectTrigger className="w-full h-10 font-medium">
               <SelectValue />
             </SelectTrigger>

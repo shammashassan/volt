@@ -149,7 +149,10 @@ export function MediaWatchlistClient({ initialItems }: MediaWatchlistClientProps
       (i) => i.source === result.source && i.externalId === result.externalId
     );
     if (isDuplicate) {
-      toast.info("Already in your watchlist.");
+      toast.add({
+        title: "Already in your watchlist.",
+        type: "info",
+      });
       return;
     }
 
@@ -323,7 +326,7 @@ export function MediaWatchlistClient({ initialItems }: MediaWatchlistClientProps
                 >
                   <Sparkles className="size-3.5 text-primary shrink-0" />
                   <span>Active</span>
-                  <Badge variant="secondary" size="xs" className="rounded-full px-1.5 min-w-4 font-bold">
+                  <Badge variant="secondary" className="rounded-full px-1.5 min-w-4 font-bold">
                     {tabCounts.active}
                   </Badge>
                 </TabsTrigger>
@@ -334,7 +337,7 @@ export function MediaWatchlistClient({ initialItems }: MediaWatchlistClientProps
                 >
                   <Play className="size-3.5 text-blue-500 fill-blue-500/20 shrink-0" />
                   <span>Watching</span>
-                  <Badge variant="secondary" size="xs" className="rounded-full px-1.5 min-w-4 font-bold">
+                  <Badge variant="secondary" className="rounded-full px-1.5 min-w-4 font-bold">
                     {tabCounts.watching}
                   </Badge>
                 </TabsTrigger>
@@ -345,7 +348,7 @@ export function MediaWatchlistClient({ initialItems }: MediaWatchlistClientProps
                 >
                   <Clock className="size-3.5 text-amber-500 shrink-0" />
                   <span>Planned</span>
-                  <Badge variant="secondary" size="xs" className="rounded-full px-1.5 min-w-4 font-bold">
+                  <Badge variant="secondary" className="rounded-full px-1.5 min-w-4 font-bold">
                     {tabCounts.planned}
                   </Badge>
                 </TabsTrigger>
@@ -356,7 +359,7 @@ export function MediaWatchlistClient({ initialItems }: MediaWatchlistClientProps
                 >
                   <CheckCircle2 className="size-3.5 text-emerald-500 shrink-0" />
                   <span>Completed</span>
-                  <Badge variant="secondary" size="xs" className="rounded-full px-1.5 min-w-4 font-bold">
+                  <Badge variant="secondary" className="rounded-full px-1.5 min-w-4 font-bold">
                     {tabCounts.completed}
                   </Badge>
                 </TabsTrigger>
@@ -367,7 +370,7 @@ export function MediaWatchlistClient({ initialItems }: MediaWatchlistClientProps
                 >
                   <XCircle className="size-3.5 text-muted-foreground shrink-0" />
                   <span>Dropped</span>
-                  <Badge variant="secondary" size="xs" className="rounded-full px-1.5 min-w-4 font-bold">
+                  <Badge variant="secondary" className="rounded-full px-1.5 min-w-4 font-bold">
                     {tabCounts.dropped}
                   </Badge>
                 </TabsTrigger>
@@ -378,7 +381,7 @@ export function MediaWatchlistClient({ initialItems }: MediaWatchlistClientProps
                 >
                   <Layers className="size-3.5 text-muted-foreground shrink-0" />
                   <span>All</span>
-                  <Badge variant="secondary" size="xs" className="rounded-full px-1.5 min-w-4 font-bold">
+                  <Badge variant="secondary" className="rounded-full px-1.5 min-w-4 font-bold">
                     {tabCounts.all}
                   </Badge>
                 </TabsTrigger>

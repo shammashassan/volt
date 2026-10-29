@@ -3,24 +3,24 @@
 import * as React from "react"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
+  Dialog as UIDialog,
+  DialogClose as UIDialogClose,
+  DialogContent as UIDialogContent,
+  DialogDescription as UIDialogDescription,
+  DialogFooter as UIDialogFooter,
+  DialogHeader as UIDialogHeader,
+  DialogTitle as UIDialogTitle,
+  DialogTrigger as UIDialogTrigger,
 } from "@/components/ui/dialog"
 import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
+  Drawer as UIDrawer,
+  DrawerClose as UIDrawerClose,
+  DrawerContent as UIDrawerContent,
+  DrawerDescription as UIDrawerDescription,
+  DrawerFooter as UIDrawerFooter,
+  DrawerHeader as UIDrawerHeader,
+  DrawerTitle as UIDrawerTitle,
+  DrawerTrigger as UIDrawerTrigger,
 } from "@/components/ui/drawer"
 import { cn } from "@/lib/utils"
 
@@ -36,23 +36,27 @@ export function ResponsiveDialog({
   children,
   open,
   onOpenChange,
+  showSwipeHandle = true,
+  ...props
 }: {
   children?: React.ReactNode
   open?: boolean
-  onOpenChange?: (open: boolean) => void
+  onOpenChange?: (open: boolean, details?: any) => void
+  showSwipeHandle?: boolean
+  [key: string]: any
 }) {
   const isMobile = useMediaQuery("(max-width: 767px)")
 
   return (
     <ResponsiveDialogContext.Provider value={{ isMobile }}>
       {isMobile ? (
-        <Drawer open={open} onOpenChange={onOpenChange}>
+        <UIDrawer open={open} onOpenChange={onOpenChange} showSwipeHandle={showSwipeHandle} {...props}>
           {children}
-        </Drawer>
+        </UIDrawer>
       ) : (
-        <Dialog open={open} onOpenChange={onOpenChange}>
+        <UIDialog open={open} onOpenChange={onOpenChange} {...props}>
           {children}
-        </Dialog>
+        </UIDialog>
       )}
     </ResponsiveDialogContext.Provider>
   )
@@ -61,64 +65,82 @@ export function ResponsiveDialog({
 export function ResponsiveDialogTrigger({
   className,
   children,
+  render,
   ...props
-}: React.ComponentProps<"button">) {
+}: any) {
   const { isMobile } = useResponsiveDialog()
   return isMobile ? (
-    <DrawerTrigger className={className} {...props}>
+    <UIDrawerTrigger className={className} render={render} {...props}>
       {children}
-    </DrawerTrigger>
+    </UIDrawerTrigger>
   ) : (
-    <DialogTrigger className={className} {...props}>
+    <UIDialogTrigger className={className} render={render} {...props}>
       {children}
-    </DialogTrigger>
+    </UIDialogTrigger>
   )
 }
 
 export function ResponsiveDialogClose({
   className,
   children,
+  render,
   ...props
-}: React.ComponentProps<"button">) {
+}: any) {
   const { isMobile } = useResponsiveDialog()
   return isMobile ? (
-    <DrawerClose className={className} {...props}>
+    <UIDrawerClose className={className} render={render} {...props}>
       {children}
-    </DrawerClose>
+    </UIDrawerClose>
   ) : (
-    <DialogClose className={className} {...props}>
+    <UIDialogClose className={className} render={render} {...props}>
       {children}
-    </DialogClose>
+    </UIDialogClose>
   )
 }
 
 export function ResponsiveDialogContent({
   className,
   children,
-}: {
-  className?: string
-  children?: React.ReactNode
-  showCloseButton?: boolean
-}) {
+  ...props
+}: any) {
   const { isMobile } = useResponsiveDialog()
 
   if (isMobile) {
+    const isP0 = className?.includes("p-0")
+    // Filter out desktop max-width/max-height classes
+    const cleanClassName = className
+      ? className
+          .replace(/\boverflow-y-auto\b/g, "")
+          .replace(/\boverflow-auto\b/g, "")
+          .replace(/\bmax-h-[^\s]+\b/g, "")
+          .replace(/\bsm:max-w-[^\s]+\b/g, "")
+          .replace(/\bmax-w-[^\s]+\b/g, "")
+      : ""
+
     return (
-      <DrawerContent
+      <UIDrawerContent
         className={cn(
-          "px-4 pb-6 max-h-[85dvh] flex flex-col outline-none",
-          className
+          "max-h-[88dvh] overflow-hidden flex flex-col",
+          cleanClassName
         )}
+        {...props}
       >
-        {children}
-      </DrawerContent>
+        <div
+          className={cn(
+            "flex-1 min-h-0 overflow-y-auto no-scrollbar overscroll-contain",
+            isP0 ? "p-0" : "px-4 pb-6 pt-1"
+          )}
+        >
+          {children}
+        </div>
+      </UIDrawerContent>
     )
   }
 
   return (
-    <DialogContent className={className}>
+    <UIDialogContent className={className} {...props}>
       {children}
-    </DialogContent>
+    </UIDialogContent>
   )
 }
 
@@ -126,16 +148,16 @@ export function ResponsiveDialogHeader({
   className,
   children,
   ...props
-}: React.ComponentProps<"div">) {
+}: any) {
   const { isMobile } = useResponsiveDialog()
   return isMobile ? (
-    <DrawerHeader className={cn("text-left px-0 pt-2", className)} {...props}>
+    <UIDrawerHeader className={cn("text-left px-0 pt-1 pb-3", className)} {...props}>
       {children}
-    </DrawerHeader>
+    </UIDrawerHeader>
   ) : (
-    <DialogHeader className={className} {...props}>
+    <UIDialogHeader className={className} {...props}>
       {children}
-    </DialogHeader>
+    </UIDialogHeader>
   )
 }
 
@@ -143,16 +165,16 @@ export function ResponsiveDialogTitle({
   className,
   children,
   ...props
-}: React.ComponentProps<"h2">) {
+}: any) {
   const { isMobile } = useResponsiveDialog()
   return isMobile ? (
-    <DrawerTitle className={className} {...props}>
+    <UIDrawerTitle className={className} {...props}>
       {children}
-    </DrawerTitle>
+    </UIDrawerTitle>
   ) : (
-    <DialogTitle className={className} {...props}>
+    <UIDialogTitle className={className} {...props}>
       {children}
-    </DialogTitle>
+    </UIDialogTitle>
   )
 }
 
@@ -160,16 +182,16 @@ export function ResponsiveDialogDescription({
   className,
   children,
   ...props
-}: React.ComponentProps<"p">) {
+}: any) {
   const { isMobile } = useResponsiveDialog()
   return isMobile ? (
-    <DrawerDescription className={className} {...props}>
+    <UIDrawerDescription className={className} {...props}>
       {children}
-    </DrawerDescription>
+    </UIDrawerDescription>
   ) : (
-    <DialogDescription className={className} {...props}>
+    <UIDialogDescription className={className} {...props}>
       {children}
-    </DialogDescription>
+    </UIDialogDescription>
   )
 }
 
@@ -189,16 +211,16 @@ export function ResponsiveDialogFooter({
   className,
   children,
   ...props
-}: React.ComponentProps<"div">) {
+}: any) {
   const { isMobile } = useResponsiveDialog()
   return isMobile ? (
-    <DrawerFooter className={cn("px-0 pt-3 mt-auto", className)} {...props}>
+    <UIDrawerFooter className={cn("px-0 pt-3 mt-auto", className)} {...props}>
       {children}
-    </DrawerFooter>
+    </UIDrawerFooter>
   ) : (
-    <DialogFooter className={className} {...props}>
+    <UIDialogFooter className={className} {...props}>
       {children}
-    </DialogFooter>
+    </UIDialogFooter>
   )
 }
 
@@ -251,6 +273,14 @@ export function ResponsiveModal({
 }
 
 export {
+  ResponsiveDialog as Dialog,
+  ResponsiveDialogTrigger as DialogTrigger,
+  ResponsiveDialogContent as DialogContent,
+  ResponsiveDialogHeader as DialogHeader,
+  ResponsiveDialogTitle as DialogTitle,
+  ResponsiveDialogDescription as DialogDescription,
+  ResponsiveDialogFooter as DialogFooter,
+  ResponsiveDialogClose as DialogClose,
   ResponsiveDialogClose as ResponsiveModalClose,
   ResponsiveDialogFooter as ResponsiveModalFooter,
   ResponsiveDialogHeader as ResponsiveModalHeader,

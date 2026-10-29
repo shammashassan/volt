@@ -26,7 +26,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
+} from "@/components/shared/responsive-dialog"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -267,7 +267,10 @@ export function SettingsContent() {
         setBackupCodes(data.backupCodes)
       }
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : "Failed to begin 2FA enrollment")
+      toast.add({
+        title: err instanceof Error ? err.message : "Failed to begin 2FA enrollment",
+        type: "error",
+      })
     } finally {
       setIsEnrolling2FA(false)
     }
@@ -278,25 +281,35 @@ export function SettingsContent() {
     setIsEnrolling2FA(true)
 
     try {
-      const { data, error } = await authClient.twoFactor.verifyTotp({
-        code: totpCode.trim(),
-      })
+      await toast.promise(
+        (async () => {
+          const { data, error } = await authClient.twoFactor.verifyTotp({
+            code: totpCode.trim(),
+          })
 
-      if (error) {
-        throw new Error(error.message || "Invalid verification code")
-      }
+          if (error) {
+            throw new Error(error.message || "Invalid verification code")
+          }
 
-      if (data) {
-        toast.success("Two-Factor Authentication is now enabled!")
-        setShowEnable2FA(false)
-        setTotpURI("")
-        setTotpCode("")
-        setEnable2FAPassword("")
-        setShowBackupCodes(true)
-        router.refresh()
-      }
-    } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : "Failed to verify 2FA code")
+          if (data) {
+            setShowEnable2FA(false)
+            setTotpURI("")
+            setTotpCode("")
+            setEnable2FAPassword("")
+            setShowBackupCodes(true)
+            router.refresh()
+          }
+          return data
+        })(),
+        {
+          loading: "Verifying 2FA code...",
+          success: "Two-Factor Authentication is now enabled!",
+          error: (err: unknown) =>
+            err instanceof Error ? err.message : "Failed to verify 2FA code",
+        }
+      )
+    } catch {
+      // Handled by toast.promise
     } finally {
       setIsEnrolling2FA(false)
     }
@@ -307,20 +320,29 @@ export function SettingsContent() {
     setIsEnrolling2FA(true)
 
     try {
-      const { error } = await authClient.twoFactor.disable({
-        password: disable2FAPassword,
-      })
+      await toast.promise(
+        (async () => {
+          const { error } = await authClient.twoFactor.disable({
+            password: disable2FAPassword,
+          })
 
-      if (error) {
-        throw new Error(error.message || "Failed to disable two-factor authentication")
-      }
+          if (error) {
+            throw new Error(error.message || "Failed to disable two-factor authentication")
+          }
 
-      toast.success("Two-Factor Authentication disabled")
-      setShowDisable2FA(false)
-      setDisable2FAPassword("")
-      router.refresh()
-    } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : "Failed to disable 2FA")
+          setShowDisable2FA(false)
+          setDisable2FAPassword("")
+          router.refresh()
+        })(),
+        {
+          loading: "Disabling 2FA...",
+          success: "Two-Factor Authentication disabled",
+          error: (err: unknown) =>
+            err instanceof Error ? err.message : "Failed to disable 2FA",
+        }
+      )
+    } catch {
+      // Handled by toast.promise
     } finally {
       setIsEnrolling2FA(false)
     }
@@ -332,20 +354,29 @@ export function SettingsContent() {
     setIsAddingPasskey(true)
 
     try {
-      const { error } = await authClient.passkey.addPasskey({
-        name: passkeyName.trim() || `${user?.name || "Volt"}'s Passkey`,
-      })
+      await toast.promise(
+        (async () => {
+          const { error } = await authClient.passkey.addPasskey({
+            name: passkeyName.trim() || `${user?.name || "Volt"}'s Passkey`,
+          })
 
-      if (error) {
-        throw new Error(error.message || "Failed to register passkey")
-      }
+          if (error) {
+            throw new Error(error.message || "Failed to register passkey")
+          }
 
-      toast.success("Passkey registered successfully!")
-      setShowAddPasskey(false)
-      setPasskeyName("")
-      await fetchSecurityData()
-    } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : "Failed to register passkey")
+          setShowAddPasskey(false)
+          setPasskeyName("")
+          await fetchSecurityData()
+        })(),
+        {
+          loading: "Registering passkey...",
+          success: "Passkey registered successfully!",
+          error: (err: unknown) =>
+            err instanceof Error ? err.message : "Failed to register passkey",
+        }
+      )
+    } catch {
+      // Handled by toast.promise
     } finally {
       setIsAddingPasskey(false)
     }
@@ -353,41 +384,68 @@ export function SettingsContent() {
 
   const handleDeletePasskey = async (id: string) => {
     try {
-      const { error } = await authClient.passkey.deletePasskey({ id })
-      if (error) {
-        throw new Error(error.message || "Failed to remove passkey")
-      }
-      toast.success("Passkey deleted")
-      await fetchSecurityData()
-    } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : "Failed to remove passkey")
+      await toast.promise(
+        (async () => {
+          const { error } = await authClient.passkey.deletePasskey({ id })
+          if (error) {
+            throw new Error(error.message || "Failed to remove passkey")
+          }
+          await fetchSecurityData()
+        })(),
+        {
+          loading: "Removing passkey...",
+          success: "Passkey deleted",
+          error: (err: unknown) =>
+            err instanceof Error ? err.message : "Failed to remove passkey",
+        }
+      )
+    } catch {
+      // Handled by toast.promise
     }
   }
 
   // Session Handlers
   const handleRevokeSession = async (token: string) => {
     try {
-      const { error } = await authClient.revokeSession({ token })
-      if (error) {
-        throw new Error(error.message || "Failed to revoke session")
-      }
-      toast.success("Session revoked")
-      await fetchSecurityData()
-    } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : "Failed to revoke session")
+      await toast.promise(
+        (async () => {
+          const { error } = await authClient.revokeSession({ token })
+          if (error) {
+            throw new Error(error.message || "Failed to revoke session")
+          }
+          await fetchSecurityData()
+        })(),
+        {
+          loading: "Revoking session...",
+          success: "Session revoked",
+          error: (err: unknown) =>
+            err instanceof Error ? err.message : "Failed to revoke session",
+        }
+      )
+    } catch {
+      // Handled by toast.promise
     }
   }
 
   const handleRevokeOtherSessions = async () => {
     try {
-      const { error } = await authClient.revokeOtherSessions()
-      if (error) {
-        throw new Error(error.message || "Failed to revoke other sessions")
-      }
-      toast.success("All other sessions revoked successfully")
-      await fetchSecurityData()
-    } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : "Failed to revoke other sessions")
+      await toast.promise(
+        (async () => {
+          const { error } = await authClient.revokeOtherSessions()
+          if (error) {
+            throw new Error(error.message || "Failed to revoke other sessions")
+          }
+          await fetchSecurityData()
+        })(),
+        {
+          loading: "Revoking other sessions...",
+          success: "All other sessions revoked successfully",
+          error: (err: unknown) =>
+            err instanceof Error ? err.message : "Failed to revoke other sessions",
+        }
+      )
+    } catch {
+      // Handled by toast.promise
     }
   }
 
@@ -518,7 +576,7 @@ export function SettingsContent() {
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
                           <CardTitle className="text-lg">Two-Factor Authentication (2FA)</CardTitle>
-                          <Badge variant={is2FAEnabled ? "primary" : "secondary"}>
+                          <Badge variant={is2FAEnabled ? "default" : "secondary"}>
                             {is2FAEnabled ? "ACTIVE" : "DISABLED"}
                           </Badge>
                         </div>
@@ -713,7 +771,7 @@ export function SettingsContent() {
                                       {s.userAgent || "Unknown Browser / Client"}
                                     </p>
                                     {isCurrent && (
-                                      <Badge variant="primary" className="text-[10px] px-1.5 py-0">
+                                      <Badge variant="default" className="text-[10px] px-1.5 py-0">
                                         CURRENT
                                       </Badge>
                                     )}
@@ -935,7 +993,10 @@ export function SettingsContent() {
               className="gap-1.5"
               onClick={() => {
                 void navigator.clipboard.writeText(backupCodes.join("\n"))
-                toast.success("Backup codes copied to clipboard!")
+                toast.add({
+                  title: "Backup codes copied to clipboard!",
+                  type: "success",
+                })
               }}
             >
               <Copy className="size-4" />

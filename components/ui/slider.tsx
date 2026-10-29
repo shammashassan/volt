@@ -1,9 +1,5 @@
-"use client"
-
-import * as React from "react"
 import { Slider as SliderPrimitive } from "@base-ui/react/slider"
-
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 function Slider({
   className,
@@ -11,26 +7,13 @@ function Slider({
   value,
   min = 0,
   max = 100,
-  onValueCommit,
-  onValueCommitted,
   ...props
-}: Omit<SliderPrimitive.Root.Props, "onValueCommitted"> & {
-  onValueCommit?: (value: any) => void
-  onValueCommitted?: SliderPrimitive.Root.Props["onValueCommitted"]
-}) {
+}: SliderPrimitive.Root.Props) {
   const _values = Array.isArray(value)
     ? value
     : Array.isArray(defaultValue)
       ? defaultValue
       : [min, max]
-
-  const handleValueCommitted = React.useCallback(
-    (val: any, eventDetails: any) => {
-      onValueCommitted?.(val, eventDetails)
-      onValueCommit?.(val)
-    },
-    [onValueCommitted, onValueCommit]
-  )
 
   return (
     <SliderPrimitive.Root
@@ -41,7 +24,6 @@ function Slider({
       min={min}
       max={max}
       thumbAlignment="edge"
-      onValueCommitted={handleValueCommitted}
       {...props}
     >
       <SliderPrimitive.Control className="relative flex w-full touch-none items-center select-none data-disabled:opacity-50 data-vertical:h-full data-vertical:min-h-40 data-vertical:w-auto data-vertical:flex-col">

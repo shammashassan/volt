@@ -18,7 +18,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "@/components/ui/dialog"
+} from "@/components/shared/responsive-dialog"
 import { CategoryFormFields } from "@/components/categories/category-form"
 import { CollectionFormFields } from "@/components/collections/collection-form"
 import {
@@ -315,14 +315,14 @@ export function CategoriesContent({
               <TabsTrigger value="categories">
                 <Layers />
                 Categories
-                <Badge variant="secondary" size="sm">
+                <Badge variant="secondary">
                   {categories.length}
                 </Badge>
               </TabsTrigger>
               <TabsTrigger value="collections">
                 <FolderHeart />
                 Collections
-                <Badge variant="secondary" size="sm">
+                <Badge variant="secondary">
                   {collections.length}
                 </Badge>
               </TabsTrigger>

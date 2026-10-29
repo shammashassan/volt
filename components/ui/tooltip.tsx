@@ -1,20 +1,16 @@
 "use client"
 
 import { Tooltip as TooltipPrimitive } from "@base-ui/react/tooltip"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 function TooltipProvider({
   delay = 0,
-  delayDuration,
   ...props
-}: Omit<TooltipPrimitive.Provider.Props, "delay"> & {
-  delay?: number
-  delayDuration?: number
-}) {
+}: TooltipPrimitive.Provider.Props) {
   return (
     <TooltipPrimitive.Provider
       data-slot="tooltip-provider"
-      delay={delayDuration ?? delay}
+      delay={delay}
       {...props}
     />
   )

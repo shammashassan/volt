@@ -20,17 +20,17 @@ interface PersonContentProps {
   notes: Note[]
 }
 
-const TYPE_CONFIG: Record<PersonType, { label: string; variant: "secondary" | "outline" | "destructive" | "primary" | "success" | "warning" | "info" }> = {
-  developer: { label: "Developer", variant: "primary" },
+const TYPE_CONFIG: Record<PersonType, { label: string; variant: "secondary" | "outline" | "destructive" | "default" }> = {
+  developer: { label: "Developer", variant: "default" },
   designer: { label: "Designer", variant: "secondary" },
-  founder: { label: "Founder", variant: "info" },
+  founder: { label: "Founder", variant: "secondary" },
   creator: { label: "Creator", variant: "outline" },
   company: { label: "Company", variant: "outline" }
 }
 
 export function PersonContent({ person, resources, notes }: PersonContentProps) {
   const router = useRouter()
-  const typeConfig = TYPE_CONFIG[person.type] || { label: "Developer", variant: "primary" as const }
+  const typeConfig = TYPE_CONFIG[person.type] || { label: "Developer", variant: "default" as const }
   const [activeTab, setActiveTab] = useState("resources")
 
   return (
@@ -109,7 +109,7 @@ export function PersonContent({ person, resources, notes }: PersonContentProps) 
         <div className="max-w-7xl flex flex-col gap-6">
           {/* Mobile Select dropdown */}
           <div className="md:hidden w-full mb-4">
-            <Select value={activeTab} onValueChange={setActiveTab}>
+            <Select value={activeTab} onValueChange={(val) => { if (val) setActiveTab(val) }}>
               <SelectTrigger className="w-full h-10 font-medium">
                 <SelectValue />
               </SelectTrigger>

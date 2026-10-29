@@ -2,8 +2,8 @@ import * as React from "react"
 import { mergeProps } from "@base-ui/react/merge-props"
 import { useRender } from "@base-ui/react/use-render"
 import { cva, type VariantProps } from "class-variance-authority"
+import { cn } from "cn"
 
-import { cn } from "@/lib/utils"
 import { Separator } from "@/components/ui/separator"
 
 function ItemGroup({ className, ...props }: React.ComponentProps<"div">) {
@@ -65,16 +65,18 @@ function Item({
 }: useRender.ComponentProps<"div"> & VariantProps<typeof itemVariants>) {
   return useRender({
     defaultTagName: "div",
-    render,
     props: mergeProps<"div">(
       {
-        "data-slot": "item",
-        "data-variant": variant,
-        "data-size": size,
         className: cn(itemVariants({ variant, size, className })),
-      } as React.ComponentProps<"div">,
+      },
       props
     ),
+    render,
+    state: {
+      slot: "item",
+      variant,
+      size,
+    },
   })
 }
 

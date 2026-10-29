@@ -206,7 +206,6 @@ export function QuickSaveCard() {
                     </form>
 
                     <PopoverContent
-                        anchor={formRef}
                         align="start"
                         side="top"
                         sideOffset={6}

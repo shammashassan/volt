@@ -2,195 +2,13 @@
 
 import * as React from "react"
 import { Toast as ToastPrimitive } from "@base-ui/react/toast"
-import type {
-  ToastObject,
-  ToastManagerAddOptions,
-  ToastManagerUpdateOptions,
-  ToastManagerEvent,
-} from "@base-ui/react/toast"
-import {
-  CircleCheckIcon,
-  InfoIcon,
-  TriangleAlertIcon,
-  OctagonXIcon,
-  Loader2Icon,
-  XIcon,
-} from "lucide-react"
+import { cn } from "cn"
 
-import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import { XIcon, CircleCheckIcon, InfoIcon, TriangleAlertIcon, OctagonXIcon, Loader2Icon } from "lucide-react"
 
-// -----------------------------------------------------------------------------
-// 1. Core Manager Initialization
-// -----------------------------------------------------------------------------
-const baseToast = ToastPrimitive.createToastManager()
+const toast = ToastPrimitive.createToastManager()
 
-// -----------------------------------------------------------------------------
-// 2. Types & Interfaces
-// -----------------------------------------------------------------------------
-export type ToastOptions = Partial<ToastObject<any>> & {
-  id?: string
-  description?: React.ReactNode
-}
-
-export interface ToastPromiseOptions<T = any> {
-  loading: React.ReactNode | ToastManagerUpdateOptions<any>
-  success:
-    | React.ReactNode
-    | ToastManagerUpdateOptions<any>
-    | ((data: T) => React.ReactNode | ToastManagerUpdateOptions<any>)
-  error:
-    | React.ReactNode
-    | ToastManagerUpdateOptions<any>
-    | ((err: any) => React.ReactNode | ToastManagerUpdateOptions<any>)
-  description?: React.ReactNode
-}
-
-export interface ToastFn {
-  (message: React.ReactNode, options?: ToastOptions): string
-  success: (message: React.ReactNode, options?: ToastOptions) => string
-  error: (message: React.ReactNode, options?: ToastOptions) => string
-  info: (message: React.ReactNode, options?: ToastOptions) => string
-  warning: (message: React.ReactNode, options?: ToastOptions) => string
-  loading: (message: React.ReactNode, options?: ToastOptions) => string
-  promise: <T>(
-    promiseOrFn: Promise<T> | (() => Promise<T>),
-    options: ToastPromiseOptions<T>
-  ) => Promise<T>
-  dismiss: (id?: string) => void
-  close: (id?: string) => void
-  update: <T extends object = any>(
-    id: string,
-    options:
-      | ToastManagerUpdateOptions<T>
-      | ((prevToast: ToastObject<T>) => ToastManagerUpdateOptions<T>)
-  ) => void
-  add: <T extends object = any>(options: ToastManagerAddOptions<T>) => string
-  ' subscribe': (listener: (data: ToastManagerEvent) => void) => () => void
-}
-
-// -----------------------------------------------------------------------------
-// 3. Argument & Option Resolution Helpers
-// -----------------------------------------------------------------------------
-function parseToastArgs(
-  message: React.ReactNode,
-  options?: ToastOptions
-): ToastManagerAddOptions<any> {
-  if (options?.description) {
-    return {
-      title: message,
-      ...options,
-    }
-  }
-  return {
-    description: message,
-    ...options,
-  }
-}
-
-function resolvePromiseValue<Value>(
-  opt:
-    | React.ReactNode
-    | ToastManagerUpdateOptions<any>
-    | ((arg: Value) => React.ReactNode | ToastManagerUpdateOptions<any>),
-  arg?: Value
-): ToastManagerUpdateOptions<any> {
-  const val = typeof opt === "function" ? (opt as any)(arg) : opt
-  if (
-    typeof val === "string" ||
-    typeof val === "number" ||
-    React.isValidElement(val)
-  ) {
-    return { description: val }
-  }
-  return val || {}
-}
-
-// -----------------------------------------------------------------------------
-// 4. Augmented Toast Callable Object
-// -----------------------------------------------------------------------------
-function toastCallable(message: React.ReactNode, options?: ToastOptions): string {
-  return baseToast.add(parseToastArgs(message, options))
-}
-
-export const toast: ToastFn = Object.assign(toastCallable, baseToast, {
-  success: (message: React.ReactNode, options?: ToastOptions): string =>
-    baseToast.add({
-      ...parseToastArgs(message, options),
-      type: "success",
-    }),
-
-  error: (message: React.ReactNode, options?: ToastOptions): string =>
-    baseToast.add({
-      ...parseToastArgs(message, options),
-      type: "error",
-    }),
-
-  info: (message: React.ReactNode, options?: ToastOptions): string =>
-    baseToast.add({
-      ...parseToastArgs(message, options),
-      type: "info",
-    }),
-
-  warning: (message: React.ReactNode, options?: ToastOptions): string =>
-    baseToast.add({
-      ...parseToastArgs(message, options),
-      type: "warning",
-    }),
-
-  loading: (message: React.ReactNode, options?: ToastOptions): string =>
-    baseToast.add({
-      ...parseToastArgs(message, options),
-      type: "loading",
-      timeout: options?.timeout ?? 0,
-    }),
-
-  promise: <T,>(
-    promiseOrFn: Promise<T> | (() => Promise<T>),
-    options: ToastPromiseOptions<T>
-  ): Promise<T> => {
-    const promise = typeof promiseOrFn === "function" ? promiseOrFn() : promiseOrFn
-
-    return baseToast.promise<T>(promise, {
-      loading: resolvePromiseValue(options?.loading),
-      success: (result: T) => {
-        const resolved = resolvePromiseValue(options?.success, result)
-        if (options?.description && !resolved.description) {
-          resolved.description = options.description
-        }
-        return resolved
-      },
-      error: (err: any) => {
-        const resolved = resolvePromiseValue(options?.error, err)
-        if (options?.description && !resolved.description) {
-          resolved.description = options.description
-        }
-        return resolved
-      },
-    })
-  },
-
-  dismiss: (id?: string): void => {
-    baseToast.close(id)
-  },
-
-  close: (id?: string): void => {
-    baseToast.close(id)
-  },
-
-  update: <T extends object = any>(
-    id: string,
-    options:
-      | ToastManagerUpdateOptions<T>
-      | ((prevToast: ToastObject<T>) => ToastManagerUpdateOptions<T>)
-  ): void => {
-    baseToast.update(id, options)
-  },
-})
-
-// -----------------------------------------------------------------------------
-// 5. Primitive Wrappers & UI Layout (Base Nova Style)
-// -----------------------------------------------------------------------------
 function ToastProvider({ ...props }: ToastPrimitive.Provider.Props) {
   return <ToastPrimitive.Provider {...props} />
 }
@@ -307,7 +125,9 @@ function ToastClose({
       )}
       {...props}
     >
-      {children ?? <XIcon className="size-4" aria-hidden="true" />}
+      {children ?? (
+        <XIcon aria-hidden="true" />
+      )}
     </ToastPrimitive.Close>
   )
 }
@@ -316,27 +136,32 @@ function ToastIcon({ type }: { type: string | undefined }) {
   let icon: React.ReactNode = null
 
   if (type === "success") {
-    icon = <CircleCheckIcon className="size-4 text-green-500" aria-hidden="true" />
+    icon = (
+      <CircleCheckIcon aria-hidden="true" />
+    )
   }
 
   if (type === "info") {
-    icon = <InfoIcon className="size-4 text-blue-500" aria-hidden="true" />
+    icon = (
+      <InfoIcon aria-hidden="true" />
+    )
   }
 
   if (type === "warning") {
-    icon = <TriangleAlertIcon className="size-4 text-yellow-500" aria-hidden="true" />
+    icon = (
+      <TriangleAlertIcon aria-hidden="true" />
+    )
   }
 
   if (type === "error") {
-    icon = <OctagonXIcon className="size-4 text-destructive" aria-hidden="true" />
+    icon = (
+      <OctagonXIcon className="text-destructive" aria-hidden="true" />
+    )
   }
 
   if (type === "loading") {
     icon = (
-      <Loader2Icon
-        className="size-4 animate-spin text-muted-foreground"
-        aria-hidden="true"
-      />
+      <Loader2Icon className="animate-spin" aria-hidden="true" />
     )
   }
 
@@ -389,9 +214,6 @@ function Toaster({
   )
 }
 
-// -----------------------------------------------------------------------------
-// 6. Exports
-// -----------------------------------------------------------------------------
 const createToastManager = ToastPrimitive.createToastManager
 const useToastManager = ToastPrimitive.useToastManager
 
@@ -402,12 +224,11 @@ export {
   ToastClose,
   ToastContent,
   ToastDescription,
-  ToastIcon,
-  ToastList,
   ToastPortal,
   ToastProvider,
   ToastTitle,
   ToastViewport,
   createToastManager,
+  toast,
   useToastManager,
 }

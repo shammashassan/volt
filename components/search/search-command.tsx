@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import {
+  Command,
   CommandDialog,
   CommandGroup,
   CommandInput,
@@ -215,8 +216,9 @@ export function SearchCommand() {
         <Kbd className="hidden sm:inline-flex">⌘</Kbd>
       </Button>
 
-      <CommandDialog open={open} onOpenChange={setOpen} shouldFilter={false}>
-        <CommandInput
+      <CommandDialog open={open} onOpenChange={setOpen}>
+        <Command className="size-full" shouldFilter={false}>
+          <CommandInput
           placeholder="Type to search resources, notes, projects, people…"
           value={searchQuery}
           onValueChange={setSearchQuery}
@@ -389,6 +391,7 @@ export function SearchCommand() {
             </CommandGroup>
           )}
         </CommandList>
+        </Command>
       </CommandDialog>
     </>
   )

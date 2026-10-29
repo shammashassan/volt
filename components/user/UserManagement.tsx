@@ -161,14 +161,14 @@ export function UserManagement({ initialUsers }: { initialUsers: UserData[] }) {
               <TabsTrigger value="active">
                 <UsersIcon />
                 Active Users
-                <Badge variant="secondary" size="sm">
+                <Badge variant="secondary">
                   {activeUsers.length}
                 </Badge>
               </TabsTrigger>
               <TabsTrigger value="banned">
                 <Ban />
                 Banned Users
-                <Badge variant={bannedUsers.length > 0 ? "destructive" : "outline"} size="sm">
+                <Badge variant={bannedUsers.length > 0 ? "destructive" : "outline"}>
                   {bannedUsers.length}
                 </Badge>
               </TabsTrigger>

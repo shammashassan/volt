@@ -198,9 +198,11 @@ export function NotificationMenu() {
                           onClick={(e) => {
                             if (!notification.readAt) {
                               e.preventDefault();
-                              isReminder && notification.reminderId
-                                ? handleCompleteReminderClick(notification._id as string, notification.reminderId)
-                                : handleNotificationClick(notification._id as string);
+                              if (isReminder && notification.reminderId) {
+                                handleCompleteReminderClick(notification._id as string, notification.reminderId);
+                              } else {
+                                handleNotificationClick(notification._id as string);
+                              }
                             }
                             // already read → navigate naturally
                           }}

@@ -1037,9 +1037,9 @@ export function GraphView({ data }: { data: GraphData }) {
             <span className="text-[11px] text-muted-foreground font-medium uppercase tracking-wider hidden sm:inline">
               Filters:
             </span>
-            <TooltipProvider delayDuration={150}>
+            <TooltipProvider delay={150}>
               <ToggleGroup
-                type="multiple"
+                multiple={true}
                 value={Object.keys(filters).filter((k) => filters[k])}
                 onValueChange={(values) => {
                   stateRef.current.alpha = 0.4 // Reheat simulation
@@ -1054,7 +1054,7 @@ export function GraphView({ data }: { data: GraphData }) {
                 }}
                 variant="outline"
                 size="sm"
-                spacing={1}
+                
                 className="bg-background/40 p-0.5 rounded-lg border gap-1"
               >
                 {Object.keys(filters).map((type) => {

@@ -15,7 +15,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "@/components/ui/dialog"
+} from "@/components/shared/responsive-dialog"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import {
@@ -45,10 +45,10 @@ interface PeopleContentProps {
   initialPeople: Person[]
 }
 
-const TYPE_CONFIG: Record<PersonType, { label: string; variant: "secondary" | "outline" | "destructive" | "primary" | "success" | "warning" | "info" }> = {
-  developer: { label: "Developer", variant: "primary" },
+const TYPE_CONFIG: Record<PersonType, { label: string; variant: "secondary" | "outline" | "destructive" | "default" }> = {
+  developer: { label: "Developer", variant: "default" },
   designer: { label: "Designer", variant: "secondary" },
-  founder: { label: "Founder", variant: "info" },
+  founder: { label: "Founder", variant: "secondary" },
   creator: { label: "Creator", variant: "outline" },
   company: { label: "Company", variant: "outline" }
 }
@@ -64,6 +64,13 @@ export function PeopleContent({ initialPeople }: PeopleContentProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [newPersonParam, setNewPersonParam] = useQueryState("new", parseAsBoolean)
 
+  // Form states
+  const [formName, setFormName] = useState("")
+  const [formType, setFormType] = useState<PersonType>("developer")
+  const [formLinks, setFormLinks] = useState("")
+  const [formNotes, setFormNotes] = useState("")
+  const [formTags, setFormTags] = useState("")
+
   React.useEffect(() => {
     if (newPersonParam) {
       setEditingPerson(null)
@@ -76,12 +83,6 @@ export function PeopleContent({ initialPeople }: PeopleContentProps) {
     }
   }, [newPersonParam])
 
-  // Form states
-  const [formName, setFormName] = useState("")
-  const [formType, setFormType] = useState<PersonType>("developer")
-  const [formLinks, setFormLinks] = useState("")
-  const [formNotes, setFormNotes] = useState("")
-  const [formTags, setFormTags] = useState("")
 
   const router = useRouter()
 
@@ -149,7 +150,10 @@ export function PeopleContent({ initialPeople }: PeopleContentProps) {
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!formName.trim()) {
-      toast.error("Name is required")
+      toast.add({
+        title: "Name is required",
+        type: "error",
+      })
       return
     }
 

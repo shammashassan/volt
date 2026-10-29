@@ -57,13 +57,20 @@ export function SignInForm() {
       if (error === "BANNED_USER" || error.toLowerCase().includes("banned")) {
         setBannedError("Your account has been suspended by an administrator. Please contact support if you believe this is an error.")
       } else if (error === "account_not_linked") {
-        toast.error(
-          "This email is already associated with another login method. Please sign in with your password."
-        )
+        toast.add({
+          title: "This email is already associated with another login method. Please sign in with your password.",
+          type: "error",
+        })
       } else if (error === "access_denied") {
-        toast.error("Google sign-in was cancelled.")
+        toast.add({
+          title: "Google sign-in was cancelled.",
+          type: "error",
+        })
       } else {
-        toast.error(`Authentication error: ${error.replace(/_/g, " ")}`)
+        toast.add({
+          title: `Authentication error: ${error.replace(/_/g, " ")}`,
+          type: "error",
+        })
       }
       window.history.replaceState({}, "", window.location.pathname)
     }
@@ -157,9 +164,7 @@ export function SignInForm() {
       })
     } catch (err: unknown) {
       const msg = handleToastError(err, "Failed to sign in")
-      if (!isBannedError(err, msg)) {
-        toast.error(msg)
-      }
+      isBannedError(err, msg)
     }
   }
 
@@ -186,8 +191,8 @@ export function SignInForm() {
         success: "A magic sign-in link has been sent to your email",
         error: (err: unknown) => handleToastError(err, "Failed to send magic link"),
       })
-    } catch (err: unknown) {
-      toast.error(handleToastError(err, "Failed to send magic link"))
+    } catch {
+      // Handled by toast.promise
     }
   }
 
@@ -215,8 +220,8 @@ export function SignInForm() {
         success: "Signed in with passkey",
         error: (err: unknown) => handleToastError(err, "No passkey was selected or available"),
       })
-    } catch (err: unknown) {
-      toast.error(handleToastError(err, "No passkey was selected or available"))
+    } catch {
+      // Handled by toast.promise
     }
   }
 
@@ -238,8 +243,8 @@ export function SignInForm() {
         success: "Redirecting to Google...",
         error: (err: unknown) => handleToastError(err, "Failed to continue with Google"),
       })
-    } catch (err: unknown) {
-      toast.error(handleToastError(err, "Failed to continue with Google"))
+    } catch {
+      // Handled by toast.promise
     }
   }
 

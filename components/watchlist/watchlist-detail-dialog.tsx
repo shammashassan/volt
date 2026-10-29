@@ -7,7 +7,7 @@ import {
   DialogContent,
   DialogTitle,
   DialogDescription,
-} from "@/components/ui/dialog";
+} from "@/components/shared/responsive-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Film, Calendar, Tv, Clock, Star, Tag } from "lucide-react";

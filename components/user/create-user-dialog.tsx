@@ -10,7 +10,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
+} from "@/components/shared/responsive-dialog"
 import { Input } from "@/components/ui/input"
 import {
   Select,

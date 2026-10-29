@@ -90,7 +90,7 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
+} from "@/components/shared/responsive-dialog"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -447,7 +447,10 @@ export function ResourcesContent({
   const handleSave = async (data: any) => {
     const resId = selectedResource?._id?.toString() || selectedResource?.id
     if (!isCreating && !resId) {
-      toast.error("No resource selected")
+      toast.add({
+      title: "No resource selected",
+      type: "error",
+    })
       return
     }
 

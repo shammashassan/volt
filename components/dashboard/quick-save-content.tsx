@@ -155,7 +155,10 @@ export function QuickSaveContent({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!url.trim()) {
-      toast.error("URL is required")
+      toast.add({
+        title: "URL is required",
+        type: "error",
+      })
       return
     }
 
@@ -330,7 +333,7 @@ export function QuickSaveContent({
         <div className="grid grid-cols-2 gap-3">
           <Field>
             <FieldLabel htmlFor="category">Category</FieldLabel>
-            <Select value={categoryId} onValueChange={setCategoryId} disabled={isLoading}>
+            <Select value={categoryId} onValueChange={(val) => { if (val) setCategoryId(val) }} disabled={isLoading}>
               <SelectTrigger id="category">
                 <SelectValue placeholder="Select Category" />
               </SelectTrigger>

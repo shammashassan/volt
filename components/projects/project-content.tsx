@@ -18,15 +18,15 @@ interface ProjectContentProps {
   notes: Note[]
 }
 
-const STATUS_CONFIG: Record<ProjectStatus, { label: string; variant: "secondary" | "outline" | "destructive" | "primary" | "success" | "warning" | "info" }> = {
-  active: { label: "Active", variant: "primary" },
+const STATUS_CONFIG: Record<ProjectStatus, { label: string; variant: "secondary" | "outline" | "destructive" | "default" }> = {
+  active: { label: "Active", variant: "default" },
   completed: { label: "Completed", variant: "secondary" },
   paused: { label: "Paused", variant: "outline" }
 }
 
 export function ProjectContent({ project, resources, notes }: ProjectContentProps) {
   const router = useRouter()
-  const status = STATUS_CONFIG[project.status] || { label: "Active", variant: "primary" as const }
+  const status = STATUS_CONFIG[project.status] || { label: "Active", variant: "default" as const }
   const [activeTab, setActiveTab] = React.useState("resources")
 
   return (
@@ -93,7 +93,7 @@ export function ProjectContent({ project, resources, notes }: ProjectContentProp
         <div className="max-w-7xl flex flex-col gap-6">
           {/* Mobile Select dropdown */}
           <div className="md:hidden w-full mb-4">
-            <Select value={activeTab} onValueChange={setActiveTab}>
+            <Select value={activeTab} onValueChange={(val) => { if (val) setActiveTab(val) }}>
               <SelectTrigger className="w-full h-10 font-medium">
                 <SelectValue />
               </SelectTrigger>

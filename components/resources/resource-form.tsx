@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/select"
 import { Toggle } from "@/components/ui/toggle"
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field"
-import { DialogFooter } from "@/components/ui/dialog"
+import { DialogFooter } from "@/components/shared/responsive-dialog"
 import {
   Combobox,
   ComboboxChip,
@@ -94,11 +94,17 @@ export function ResourceForm({
     e.preventDefault()
 
     if (!name.trim()) {
-      toast.error("Resource Name is required")
+      toast.add({
+      title: "Resource Name is required",
+      type: "error",
+    })
       return
     }
     if (!link.trim()) {
-      toast.error("Link URL is required")
+      toast.add({
+      title: "Link URL is required",
+      type: "error",
+    })
       return
     }
 

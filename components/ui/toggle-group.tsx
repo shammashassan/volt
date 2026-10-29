@@ -4,7 +4,7 @@ import * as React from "react"
 import { Toggle as TogglePrimitive } from "@base-ui/react/toggle"
 import { ToggleGroup as ToggleGroupPrimitive } from "@base-ui/react/toggle-group"
 import { type VariantProps } from "class-variance-authority"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 import { toggleVariants } from "@/components/ui/toggle"
 
@@ -27,48 +27,12 @@ function ToggleGroup({
   spacing = 2,
   orientation = "horizontal",
   children,
-  type,
-  multiple: multipleProp,
-  value,
-  defaultValue,
-  onValueChange,
   ...props
-}: Omit<ToggleGroupPrimitive.Props, "multiple" | "value" | "defaultValue" | "onValueChange"> &
+}: ToggleGroupPrimitive.Props &
   VariantProps<typeof toggleVariants> & {
     spacing?: number
     orientation?: "horizontal" | "vertical"
-    type?: "single" | "multiple"
-    multiple?: boolean
-    value?: any
-    defaultValue?: any
-    onValueChange?: (value: any) => void
   }) {
-  const multiple = multipleProp ?? (type === "multiple")
-
-  const adaptedValue = React.useMemo(() => {
-    if (value === undefined) return undefined
-    if (Array.isArray(value)) return value
-    return value ? [value] : []
-  }, [value])
-
-  const adaptedDefaultValue = React.useMemo(() => {
-    if (defaultValue === undefined) return undefined
-    if (Array.isArray(defaultValue)) return defaultValue
-    return defaultValue ? [defaultValue] : []
-  }, [defaultValue])
-
-  const handleValueChange = React.useCallback(
-    (values: any[], eventDetails: any) => {
-      if (!onValueChange) return
-      if (multiple) {
-        onValueChange(values)
-      } else {
-        onValueChange(values[0] ?? "")
-      }
-    },
-    [multiple, onValueChange]
-  )
-
   return (
     <ToggleGroupPrimitive
       data-slot="toggle-group"
@@ -76,10 +40,6 @@ function ToggleGroup({
       data-size={size}
       data-spacing={spacing}
       data-orientation={orientation}
-      multiple={multiple}
-      value={adaptedValue}
-      defaultValue={adaptedDefaultValue}
-      onValueChange={handleValueChange}
       style={{ "--gap": spacing } as React.CSSProperties}
       className={cn(
         "group/toggle-group flex w-fit flex-row items-center gap-[--spacing(var(--gap))] rounded-lg data-[size=sm]:rounded-[min(var(--radius-md),10px)] data-vertical:flex-col data-vertical:items-stretch",

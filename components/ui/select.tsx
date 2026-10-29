@@ -2,28 +2,10 @@
 
 import * as React from "react"
 import { Select as SelectPrimitive } from "@base-ui/react/select"
-import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from "lucide-react"
+import { cn } from "cn"
+import { ChevronDownIcon, CheckIcon, ChevronUpIcon } from "lucide-react"
 
-import { cn } from "@/lib/utils"
-
-function Select<Value = string, Multiple extends boolean | undefined = false>({
-  onValueChange,
-  ...props
-}: Omit<SelectPrimitive.Root.Props<Value, Multiple>, "onValueChange"> & {
-  onValueChange?: ((value: any, eventDetails?: any) => void) | undefined
-}) {
-  return (
-    <SelectPrimitive.Root
-      data-slot="select"
-      onValueChange={(val: any, details: any) => {
-        if (val !== null && onValueChange) {
-          onValueChange(val, details)
-        }
-      }}
-      {...props}
-    />
-  )
-}
+const Select = SelectPrimitive.Root
 
 function SelectGroup({ className, ...props }: SelectPrimitive.Group.Props) {
   return (
@@ -81,18 +63,12 @@ function SelectContent({
   align = "center",
   alignOffset = 0,
   alignItemWithTrigger = true,
-  position,
   ...props
 }: SelectPrimitive.Popup.Props &
   Pick<
     SelectPrimitive.Positioner.Props,
     "align" | "alignOffset" | "side" | "sideOffset" | "alignItemWithTrigger"
-  > & {
-    position?: "popper" | "item-aligned"
-  }) {
-  const effectiveAlignWithTrigger =
-    position === "popper" ? false : alignItemWithTrigger
-
+  >) {
   return (
     <SelectPrimitive.Portal>
       <SelectPrimitive.Positioner
@@ -100,16 +76,13 @@ function SelectContent({
         sideOffset={sideOffset}
         align={align}
         alignOffset={alignOffset}
-        alignItemWithTrigger={effectiveAlignWithTrigger}
+        alignItemWithTrigger={alignItemWithTrigger}
         className="isolate z-50"
       >
         <SelectPrimitive.Popup
           data-slot="select-content"
-          data-align-trigger={effectiveAlignWithTrigger}
-          className={cn(
-            "relative isolate z-50 max-h-(--available-height) w-(--anchor-width) min-w-36 origin-(--transform-origin) overflow-x-hidden overflow-y-auto rounded-lg bg-popover text-popover-foreground shadow-md ring-1 ring-foreground/10 duration-100 data-[align-trigger=true]:animate-none data-[side=bottom]:slide-in-from-top-2 data-[side=inline-end]:slide-in-from-left-2 data-[side=inline-start]:slide-in-from-right-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
-            className
-          )}
+          data-align-trigger={alignItemWithTrigger}
+          className={cn("relative isolate z-50 max-h-(--available-height) w-(--anchor-width) min-w-36 origin-(--transform-origin) overflow-x-hidden overflow-y-auto rounded-lg bg-popover text-popover-foreground shadow-md ring-1 ring-foreground/10 duration-100 data-[align-trigger=true]:animate-none data-[side=bottom]:slide-in-from-top-2 data-[side=inline-end]:slide-in-from-left-2 data-[side=inline-start]:slide-in-from-right-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95", className )}
           {...props}
         >
           <SelectScrollUpButton />
@@ -188,7 +161,8 @@ function SelectScrollUpButton({
       )}
       {...props}
     >
-      <ChevronUpIcon />
+      <ChevronUpIcon
+      />
     </SelectPrimitive.ScrollUpArrow>
   )
 }
@@ -206,7 +180,8 @@ function SelectScrollDownButton({
       )}
       {...props}
     >
-      <ChevronDownIcon />
+      <ChevronDownIcon
+      />
     </SelectPrimitive.ScrollDownArrow>
   )
 }

@@ -280,7 +280,7 @@ export function NotesContent({
     const text = formContent
 
     // Find the full start and end lines that cover the selection
-    let lineStart = text.lastIndexOf("\n", start - 1) + 1
+    const lineStart = text.lastIndexOf("\n", start - 1) + 1
     let lineEnd = text.indexOf("\n", end)
     if (lineEnd === -1) lineEnd = text.length
 
@@ -450,12 +450,6 @@ export function NotesContent({
     }
   }, [urlNoteId, notes, selectedNote])
 
-  useEffect(() => {
-    if (searchParams.get("new") === "true") {
-      handleOpenCreate()
-    }
-  }, [searchParams])
-
   const handleOpenCreate = () => {
     setSelectedNote(null)
     setIsCreating(true)
@@ -470,6 +464,13 @@ export function NotesContent({
     setFormRelatedPeople([])
     setMobileDetailOpen(true)
   }
+
+  useEffect(() => {
+    if (searchParams.get("new") === "true") {
+      handleOpenCreate()
+    }
+  }, [searchParams])
+
 
   // Go back to list on mobile; cancel edit/create on desktop
   const handleBack = () => {
@@ -486,7 +487,10 @@ export function NotesContent({
 
   const handleSave = React.useCallback(async () => {
     if (!formTitle.trim()) {
-      toast.error("Note title is required")
+      toast.add({
+        title: "Note title is required",
+        type: "error",
+      })
       return
     }
     setIsSaving(true)
@@ -819,7 +823,7 @@ export function NotesContent({
           <ScrollArea>
             <div className="flex gap-1.5 sm:gap-2 pb-2">
               <Badge
-                variant={selectedTag === null ? "primary" : "outline"}
+                variant={selectedTag === null ? "default" : "outline"}
                 className="cursor-pointer select-none rounded-full text-xs font-medium h-6 px-3 shrink-0"
                 onClick={() => setSelectedTag(null)}
               >
@@ -828,7 +832,7 @@ export function NotesContent({
               {allTags.map((tag) => (
                 <Badge
                   key={tag}
-                  variant={selectedTag === tag ? "primary" : "outline"}
+                  variant={selectedTag === tag ? "default" : "outline"}
                   className="cursor-pointer select-none rounded-full text-xs font-medium h-6 px-3 shrink-0"
                   onClick={() => setSelectedTag(tag)}
                 >
@@ -1092,10 +1096,9 @@ export function NotesContent({
             <div className="flex items-center gap-1 sm:gap-2 shrink-0">
               {/* Write/Preview toggle — icon-only on mobile */}
               <ToggleGroup
-                type="single"
                 variant="outline"
-                value={editorMode}
-                onValueChange={(v) => { if (v) setEditorMode(v as "write" | "preview") }}
+                value={[editorMode]}
+                onValueChange={(v) => { if (v[0]) setEditorMode(v[0] as "write" | "preview") }}
               >
                 <ToggleGroupItem value="write">
                   <PenBox aria-hidden="true" />
@@ -1695,7 +1698,7 @@ export function NotesContent({
   if (isMobile === null) return null
 
   return (
-    <TooltipProvider delayDuration={300}>
+    <TooltipProvider delay={300}>
       {isMobile ? (
         // ── MOBILE layout (< 768 px) — single-column slide stack ──
         <div className="h-[calc(100dvh-var(--header-height))] border-t border-border overflow-hidden relative">
