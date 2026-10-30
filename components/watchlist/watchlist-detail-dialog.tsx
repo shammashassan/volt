@@ -62,6 +62,12 @@ export function WatchlistDetailDialog({
   onUpdateRating,
   onDelete,
 }: WatchlistDetailDialogProps) {
+  const [localRating, setLocalRating] = React.useState<number | null>(item.rating ?? null);
+
+  React.useEffect(() => {
+    setLocalRating(item.rating ?? null);
+  }, [item.rating]);
+
   const meta = item.metadata;
   const activeStatus = WATCHLIST_STATUS_LABELS[item.status];
   const typeLabel = WATCHLIST_TYPE_LABELS[item.type];
@@ -76,12 +82,12 @@ export function WatchlistDetailDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md overflow-y-auto max-h-[85dvh] no-scrollbar overscroll-contain">
+      <DialogContent bleed className="sm:max-w-md overflow-y-auto max-h-[85dvh] no-scrollbar overscroll-contain">
         <DialogTitle className="sr-only">{meta?.title || "Media Details"}</DialogTitle>
         <DialogDescription className="sr-only">Detailed overview, release dates, and streaming information for {meta?.title || "this media"}.</DialogDescription>
 
         {/* Bleed header */}
-        <div className="-mx-4 -mt-1 sm:-mt-4 w-[calc(100%+2rem)] relative overflow-hidden shrink-0">
+        <div className="relative w-full overflow-hidden shrink-0">
           {meta?.posterUrl && (
             <div
               className="absolute inset-0 scale-110"
@@ -132,7 +138,7 @@ export function WatchlistDetailDialog({
         </div>
 
         {/* Body content */}
-        <div className="pt-2 pb-2 space-y-4">
+        <div className="px-4 sm:px-5 pt-3 pb-6 space-y-4">
           {/* Status selector */}
           {onUpdateStatus ? (
             <div className="space-y-1.5">
@@ -177,13 +183,16 @@ export function WatchlistDetailDialog({
                   <span className="text-xs font-semibold text-foreground">Score</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  {item.rating ? (
+                  {localRating !== null ? (
                     <>
-                      <span className="text-xs font-bold text-primary tabular-nums">{item.rating} / 10</span>
+                      <span className="text-xs font-bold text-primary tabular-nums">{localRating} / 10</span>
                       <Button
                         variant="ghost"
                         size="xs"
-                        onClick={() => onUpdateRating(item._id!, null)}
+                        onClick={() => {
+                          setLocalRating(null);
+                          onUpdateRating(item._id!, null);
+                        }}
                       >
                         Clear
                       </Button>
@@ -196,11 +205,18 @@ export function WatchlistDetailDialog({
               <div className="px-1 pt-1 pb-1">
                 <Slider
                   aria-label="Rating slider"
-                  value={[item.rating || 5]}
+                  value={[localRating || 5]}
                   min={1}
                   max={10}
                   step={1}
-                  onValueCommitted={(val) => onUpdateRating(item._id!, Array.isArray(val) ? val[0] : val)}
+                  onValueChange={(val) => {
+                    const num = Array.isArray(val) ? val[0] : val;
+                    setLocalRating(num);
+                  }}
+                  onValueCommitted={(val) => {
+                    const num = Array.isArray(val) ? val[0] : val;
+                    onUpdateRating(item._id!, num);
+                  }}
                 />
               </div>
             </div>

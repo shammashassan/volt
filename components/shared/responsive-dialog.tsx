@@ -101,12 +101,13 @@ export function ResponsiveDialogClose({
 export function ResponsiveDialogContent({
   className,
   children,
+  bleed = false,
   ...props
 }: any) {
   const { isMobile } = useResponsiveDialog()
 
   if (isMobile) {
-    const isP0 = className?.includes("p-0")
+    const isP0 = bleed || className?.includes("p-0")
     // Filter out desktop max-width/max-height and width classes so mobile drawer remains full width
     const cleanClassName = className
       ? className
@@ -136,7 +137,13 @@ export function ResponsiveDialogContent({
   }
 
   return (
-    <UIDialogContent className={className} {...props}>
+    <UIDialogContent
+      className={cn(
+        bleed && "p-0 gap-0 overflow-hidden",
+        className
+      )}
+      {...props}
+    >
       {children}
     </UIDialogContent>
   )
@@ -234,6 +241,7 @@ export interface ResponsiveModalProps {
   className?: string
   contentClassName?: string
   showCloseButton?: boolean
+  bleed?: boolean
 }
 
 export function ResponsiveModal({
@@ -247,11 +255,13 @@ export function ResponsiveModal({
   className,
   contentClassName,
   showCloseButton = true,
+  bleed = false,
 }: ResponsiveModalProps) {
   return (
     <ResponsiveDialog open={open} onOpenChange={onOpenChange}>
       {trigger && <ResponsiveDialogTrigger>{trigger}</ResponsiveDialogTrigger>}
       <ResponsiveDialogContent
+        bleed={bleed}
         showCloseButton={showCloseButton}
         className={cn(className, contentClassName)}
       >

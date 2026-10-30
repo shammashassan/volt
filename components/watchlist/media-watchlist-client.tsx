@@ -308,8 +308,8 @@ export function MediaWatchlistClient({ initialItems }: MediaWatchlistClientProps
       {/* Controls Section: Status Tabs & Filter Toolbar */}
       <section className="px-4 lg:px-6">
         <div className="flex flex-col gap-4 max-w-7xl">
-          {/* Mobile Status Dropdown (< sm) */}
-          <div className="sm:hidden w-full">
+          {/* Mobile Status Dropdown (< md) */}
+          <div className="md:hidden w-full">
             <Select
               value={activeStatus}
               onValueChange={(val) => setStatusFilter(val === "active" ? null : (val as string))}
@@ -328,8 +328,8 @@ export function MediaWatchlistClient({ initialItems }: MediaWatchlistClientProps
             </Select>
           </div>
 
-          {/* Desktop/Tablet Status Tabs (>= sm) */}
-          <div className="hidden sm:block w-full">
+          {/* Desktop/Tablet Status Tabs (>= md) */}
+          <div className="hidden md:block w-full overflow-x-auto no-scrollbar">
             <Tabs
               value={activeStatus}
               onValueChange={(val) => setStatusFilter(val === "active" ? null : (val as string))}
@@ -337,7 +337,7 @@ export function MediaWatchlistClient({ initialItems }: MediaWatchlistClientProps
             >
               <TabsList
                 ref={tabsContainerRef}
-                className="overflow-x-auto no-scrollbar"
+                className="inline-flex w-max min-w-0"
               >
                 <TabsTrigger value="active">
                   <Sparkles className="size-3.5" />

@@ -99,17 +99,9 @@ export function WatchlistCard({ item, onUpdateStatus, onUpdateRating, onDelete }
               {item.metadata?.title || "Unknown Media"}
             </h4>
 
-            <div className="flex items-center justify-between gap-1.5 pt-0.5 text-[11px] font-medium text-white/90">
-              <span className="truncate flex items-center gap-1.5 min-w-0">
-                <span className="shrink-0">{activeStatus.icon}</span>
-                <span className="truncate">{activeStatus.label}</span>
-              </span>
-              {item.rating && (
-                <span className="flex items-center gap-1 shrink-0 font-bold text-amber-400">
-                  <Star className="size-3 fill-current" />
-                  <span>{item.rating}</span>
-                </span>
-              )}
+            <div className="flex items-center gap-1.5 pt-0.5 text-[11px] font-medium text-white/90">
+              <span className="shrink-0">{activeStatus.icon}</span>
+              <span className="truncate">{activeStatus.label}</span>
             </div>
           </div>
         </div>

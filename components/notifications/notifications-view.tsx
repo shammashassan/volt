@@ -14,7 +14,12 @@ import {
   ItemActions,
 } from "@/components/ui/item";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupButton,
+} from "@/components/ui/input-group";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Select,
@@ -475,28 +480,30 @@ export function NotificationsContent({
           {/* Filter and Search Bar */}
           <div className="flex items-center gap-2 flex-1 sm:max-w-md ml-auto">
             {/* Search Box */}
-            <div className="relative flex-1">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
-              <Input
+            <InputGroup className="flex-1">
+              <InputGroupAddon align="inline-start">
+                <Search className="size-4 text-muted-foreground pointer-events-none" />
+              </InputGroupAddon>
+              <InputGroupInput
                 value={searchValue}
                 onChange={(e) => setSearchValue(e.target.value)}
                 placeholder="Search notifications..."
-                className="h-8"
               />
               {searchValue && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSearchValue("");
-                    setQ(null);
-                  }}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                >
-                  <X className="size-3.5" />
-                  <span className="sr-only">Clear search</span>
-                </button>
+                <InputGroupAddon align="inline-end">
+                  <InputGroupButton
+                    size="icon-xs"
+                    onClick={() => {
+                      setSearchValue("");
+                      setQ(null);
+                    }}
+                    aria-label="Clear search"
+                  >
+                    <X className="size-3.5" />
+                  </InputGroupButton>
+                </InputGroupAddon>
               )}
-            </div>
+            </InputGroup>
 
             {/* Type Category Filter */}
             <Select
