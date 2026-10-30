@@ -381,7 +381,7 @@ const ResourceCardComponent = function ResourceCardComponent<
 
   const content = (
     <Card className="relative h-full overflow-hidden">
-      <div className="relative aspect-video w-full overflow-hidden bg-muted/30 will-change-transform">
+      <div className="-mt-(--card-spacing) relative aspect-video w-full overflow-hidden bg-muted/30 will-change-transform">
         {(isLoading || !hasBeenVisible) && (
           <Skeleton className="absolute inset-0 z-40" />
         )}

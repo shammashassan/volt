@@ -525,8 +525,8 @@ export function SettingsContent() {
                 {/* PROFILE DETAILS */}
                 <TabsContent value="profile">
                   <div className="space-y-6">
-                    <Card>
-                      <form onSubmit={handleUpdateProfile}>
+                    <form onSubmit={handleUpdateProfile}>
+                      <Card>
                         <CardHeader>
                           <div className="flex items-center justify-between">
                             <div>
@@ -567,8 +567,8 @@ export function SettingsContent() {
                             Save Changes
                           </Button>
                         </CardFooter>
-                      </form>
-                    </Card>
+                      </Card>
+                    </form>
                   </div>
                 </TabsContent>
 
@@ -682,8 +682,8 @@ export function SettingsContent() {
                     </Card>
 
                     {/* Update Password Card */}
-                    <Card>
-                      <form onSubmit={handleUpdatePassword}>
+                    <form onSubmit={handleUpdatePassword}>
+                      <Card>
                         <CardHeader>
                           <CardTitle>Change Password</CardTitle>
                           <CardDescription>Update your existing account password and revoke other open sessions.</CardDescription>
@@ -725,8 +725,8 @@ export function SettingsContent() {
                             Update Password
                           </Button>
                         </CardFooter>
-                      </form>
-                    </Card>
+                      </Card>
+                    </form>
 
                     {/* Active Sessions Card */}
                     <Card>
