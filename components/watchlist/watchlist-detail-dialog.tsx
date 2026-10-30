@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { WatchlistItem } from "@/types/watchlist";
+import { WatchlistItem, WatchlistStatus } from "@/types/watchlist";
 import {
   Dialog,
   DialogContent,
@@ -9,6 +9,8 @@ import {
   DialogDescription,
 } from "@/components/shared/responsive-dialog";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Slider } from "@/components/ui/slider";
 import { Separator } from "@/components/ui/separator";
 import { Film, Calendar, Tv, Clock, Star, Tag } from "lucide-react";
 import { WATCHLIST_STATUS_LABELS, WATCHLIST_TYPE_LABELS } from "@/lib/constants/watchlist";
@@ -18,6 +20,9 @@ interface WatchlistDetailDialogProps {
   item: WatchlistItem;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onUpdateStatus?: (id: string, status: WatchlistStatus) => void;
+  onUpdateRating?: (id: string, rating: number | null) => void;
+  onDelete?: (id: string) => void;
 }
 
 function formatDate(dateStr?: string): string | null {
@@ -49,7 +54,14 @@ function DetailRow({ icon, label, value }: DetailRowProps) {
   );
 }
 
-export function WatchlistDetailDialog({ item, open, onOpenChange }: WatchlistDetailDialogProps) {
+export function WatchlistDetailDialog({
+  item,
+  open,
+  onOpenChange,
+  onUpdateStatus,
+  onUpdateRating,
+  onDelete,
+}: WatchlistDetailDialogProps) {
   const meta = item.metadata;
   const activeStatus = WATCHLIST_STATUS_LABELS[item.status];
   const typeLabel = WATCHLIST_TYPE_LABELS[item.type];
@@ -120,9 +132,33 @@ export function WatchlistDetailDialog({ item, open, onOpenChange }: WatchlistDet
         </div>
 
         {/* Body content */}
-        <div className="pt-2 pb-2 space-y-3.5">
-          {/* Status + Rating cards */}
-          <div className="grid grid-cols-2 gap-2.5">
+        <div className="pt-2 pb-2 space-y-4">
+          {/* Status selector */}
+          {onUpdateStatus ? (
+            <div className="space-y-1.5">
+              <span className="text-[10px] uppercase tracking-widest font-semibold text-muted-foreground/60">
+                Watch Status
+              </span>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+                {(Object.keys(WATCHLIST_STATUS_LABELS) as WatchlistStatus[]).map((statusKey) => {
+                  const option = WATCHLIST_STATUS_LABELS[statusKey];
+                  const isSelected = item.status === statusKey;
+                  return (
+                    <Button
+                      key={statusKey}
+                      variant={isSelected ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => onUpdateStatus(item._id!, statusKey)}
+                      className="w-full"
+                    >
+                      <span className="mr-1">{option.icon}</span>
+                      <span>{option.label}</span>
+                    </Button>
+                  );
+                })}
+              </div>
+            </div>
+          ) : (
             <div className="flex flex-col gap-1 rounded-xl bg-muted/50 border border-border/40 px-3.5 py-2.5">
               <span className="text-[9px] uppercase tracking-widest font-semibold text-muted-foreground/60">Status</span>
               <span className="text-xs sm:text-sm font-semibold text-foreground flex items-center gap-1.5 mt-0.5 truncate">
@@ -130,6 +166,45 @@ export function WatchlistDetailDialog({ item, open, onOpenChange }: WatchlistDet
                 <span className="truncate">{activeStatus.label}</span>
               </span>
             </div>
+          )}
+
+          {/* Rating selector */}
+          {onUpdateRating ? (
+            <div className="space-y-2 rounded-xl bg-muted/40 border border-border/40 p-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1.5">
+                  <Star className="size-3.5 fill-primary text-primary" />
+                  <span className="text-xs font-semibold text-foreground">Score</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  {item.rating ? (
+                    <>
+                      <span className="text-xs font-bold text-primary tabular-nums">{item.rating} / 10</span>
+                      <Button
+                        variant="ghost"
+                        size="xs"
+                        onClick={() => onUpdateRating(item._id!, null)}
+                      >
+                        Clear
+                      </Button>
+                    </>
+                  ) : (
+                    <span className="text-xs text-muted-foreground/50 italic">Unrated</span>
+                  )}
+                </div>
+              </div>
+              <div className="px-1 pt-1 pb-1">
+                <Slider
+                  aria-label="Rating slider"
+                  value={[item.rating || 5]}
+                  min={1}
+                  max={10}
+                  step={1}
+                  onValueCommitted={(val) => onUpdateRating(item._id!, Array.isArray(val) ? val[0] : val)}
+                />
+              </div>
+            </div>
+          ) : (
             <div className="flex flex-col gap-1 rounded-xl bg-muted/50 border border-border/40 px-3.5 py-2.5">
               <span className="text-[9px] uppercase tracking-widest font-semibold text-muted-foreground/60">Rating</span>
               <span className="mt-0.5">
@@ -144,7 +219,7 @@ export function WatchlistDetailDialog({ item, open, onOpenChange }: WatchlistDet
                 )}
               </span>
             </div>
-          </div>
+          )}
 
           {/* Runtime */}
           {isMovie && meta?.runtime && (

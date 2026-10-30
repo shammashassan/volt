@@ -316,74 +316,44 @@ export function MediaWatchlistClient({ initialItems }: MediaWatchlistClientProps
           >
             <TabsList
               ref={tabsContainerRef}
-              className="w-full sm:w-fit max-w-full flex flex-nowrap items-center justify-start overflow-x-auto no-scrollbar scroll-smooth"
+              className="overflow-x-auto no-scrollbar"
             >
-                <TabsTrigger
-                  value="active"
-                  className="h-8 scroll-m-2"
-                >
-                  <Sparkles className="size-3.5 text-primary shrink-0" />
-                  <span>Active</span>
-                  <Badge variant="secondary" className="min-w-4">
-                    {tabCounts.active}
-                  </Badge>
-                </TabsTrigger>
+              <TabsTrigger value="active">
+                <Sparkles className="size-3.5" />
+                <span>Active</span>
+                <span className="text-xs text-muted-foreground/70 font-mono ml-0.5">({tabCounts.active})</span>
+              </TabsTrigger>
 
-                <TabsTrigger
-                  value="watching"
-                  className="h-8 scroll-m-2"
-                >
-                  <Play className="size-3.5 text-blue-500 fill-blue-500/20 shrink-0" />
-                  <span>Watching</span>
-                  <Badge variant="secondary" className="min-w-4">
-                    {tabCounts.watching}
-                  </Badge>
-                </TabsTrigger>
+              <TabsTrigger value="watching">
+                <Play className="size-3.5" />
+                <span>Watching</span>
+                <span className="text-xs text-muted-foreground/70 font-mono ml-0.5">({tabCounts.watching})</span>
+              </TabsTrigger>
 
-                <TabsTrigger
-                  value="planned"
-                  className="h-8 scroll-m-2"
-                >
-                  <Clock className="size-3.5 text-amber-500 shrink-0" />
-                  <span>Planned</span>
-                  <Badge variant="secondary" className="min-w-4">
-                    {tabCounts.planned}
-                  </Badge>
-                </TabsTrigger>
+              <TabsTrigger value="planned">
+                <Clock className="size-3.5" />
+                <span>Planned</span>
+                <span className="text-xs text-muted-foreground/70 font-mono ml-0.5">({tabCounts.planned})</span>
+              </TabsTrigger>
 
-                <TabsTrigger
-                  value="completed"
-                  className="h-8 scroll-m-2"
-                >
-                  <CheckCircle2 className="size-3.5 text-emerald-500 shrink-0" />
-                  <span>Completed</span>
-                  <Badge variant="secondary" className="min-w-4">
-                    {tabCounts.completed}
-                  </Badge>
-                </TabsTrigger>
+              <TabsTrigger value="completed">
+                <CheckCircle2 className="size-3.5" />
+                <span>Completed</span>
+                <span className="text-xs text-muted-foreground/70 font-mono ml-0.5">({tabCounts.completed})</span>
+              </TabsTrigger>
 
-                <TabsTrigger
-                  value="dropped"
-                  className="h-8 scroll-m-2"
-                >
-                  <XCircle className="size-3.5 text-muted-foreground shrink-0" />
-                  <span>Dropped</span>
-                  <Badge variant="secondary" className="min-w-4">
-                    {tabCounts.dropped}
-                  </Badge>
-                </TabsTrigger>
+              <TabsTrigger value="dropped">
+                <XCircle className="size-3.5" />
+                <span>Dropped</span>
+                <span className="text-xs text-muted-foreground/70 font-mono ml-0.5">({tabCounts.dropped})</span>
+              </TabsTrigger>
 
-                <TabsTrigger
-                  value="all"
-                  className="h-8 scroll-m-2"
-                >
-                  <Layers className="size-3.5 text-muted-foreground shrink-0" />
-                  <span>All</span>
-                  <Badge variant="secondary" className="min-w-4">
-                    {tabCounts.all}
-                  </Badge>
-                </TabsTrigger>
-              </TabsList>
+              <TabsTrigger value="all">
+                <Layers className="size-3.5" />
+                <span>All</span>
+                <span className="text-xs text-muted-foreground/70 font-mono ml-0.5">({tabCounts.all})</span>
+              </TabsTrigger>
+            </TabsList>
           </Tabs>
 
           {/* Search & Sub-filters Toolbar */}

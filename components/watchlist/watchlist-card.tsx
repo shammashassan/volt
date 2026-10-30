@@ -1,15 +1,10 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import { WatchlistItem, WatchlistStatus } from "@/types/watchlist";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Slider } from "@/components/ui/slider";
-import { Film, Trash2, Check, Info, Star } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Film, Trash2, Star, Eye } from "lucide-react";
 import { WATCHLIST_STATUS_LABELS } from "@/lib/constants/watchlist";
 import { WatchlistDetailDialog } from "./watchlist-detail-dialog";
 import {
@@ -33,62 +28,14 @@ interface WatchlistCardProps {
 export function WatchlistCard({ item, onUpdateStatus, onUpdateRating, onDelete }: WatchlistCardProps) {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [detailOpen, setDetailOpen] = useState(false);
-  const [statusPopoverOpen, setStatusPopoverOpen] = useState(false);
-  const [ratingPopoverOpen, setRatingPopoverOpen] = useState(false);
-  const [tempRating, setTempRating] = useState<number | null>(item.rating ?? null);
-  const [isHovered, setIsHovered] = useState(false);
-
-  // Sync tempRating when item.rating changes externally (optimistic update revert etc.)
-  useEffect(() => {
-    setTempRating(item.rating ?? null);
-  }, [item.rating]);
-
-  // Stable outside-click handler — always registered, checks isHovered inside
-  const handleOutsideClick = useCallback((e: MouseEvent) => {
-    if (!isHovered) return;
-    const target = e.target as HTMLElement;
-    if (
-      target.closest('[role="dialog"]') ||
-      target.closest('[data-slot*="popover"]') ||
-      target.closest('[data-slot*="portal"]') ||
-      target.closest('[data-vaul-drawer]')
-    ) return;
-    const cardEl = document.getElementById(`watchlist-card-${item._id}`);
-    if (cardEl && !cardEl.contains(target)) {
-      setIsHovered(false);
-      setStatusPopoverOpen(false);
-      setRatingPopoverOpen(false);
-    }
-  }, [isHovered, item._id]);
-
-  useEffect(() => {
-    document.addEventListener("click", handleOutsideClick);
-    return () => document.removeEventListener("click", handleOutsideClick);
-  }, [handleOutsideClick]);
-
   const activeStatus = WATCHLIST_STATUS_LABELS[item.status];
 
   return (
     <>
       <Card
         id={`watchlist-card-${item._id}`}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => {
-          setIsHovered(false);
-          setStatusPopoverOpen(false);
-          setRatingPopoverOpen(false);
-        }}
-        onClick={(e) => {
-          if (!isHovered) {
-            setIsHovered(true);
-            e.preventDefault();
-            e.stopPropagation();
-          }
-        }}
-        className={cn(
-          "group relative overflow-hidden aspect-2/3 w-full",
-          isHovered && "scale-[1.03] -translate-y-1"
-        )}
+        onClick={() => setDetailOpen(true)}
+        className="group relative overflow-hidden aspect-2/3 w-full"
       >
         {/* Poster */}
         <div className="absolute inset-0 overflow-hidden rounded-xl">
@@ -98,10 +45,7 @@ export function WatchlistCard({ item, onUpdateStatus, onUpdateRating, onDelete }
               alt={item.metadata.title}
               fill
               sizes="(max-width: 640px) 33vw, (max-width: 1024px) 20vw, 14vw"
-              className={cn(
-                "object-cover transition-transform duration-300 ease-out",
-                isHovered && "scale-[1.05]"
-              )}
+              className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
               loading="lazy"
             />
           ) : (
@@ -114,13 +58,8 @@ export function WatchlistCard({ item, onUpdateStatus, onUpdateRating, onDelete }
           )}
         </div>
 
-        {/* Resting badges — status icon + rating, hidden on hover */}
-        <div
-          className={cn(
-            "absolute bottom-2 left-2 right-2 flex items-center justify-between transition-opacity duration-150",
-            isHovered ? "opacity-0 pointer-events-none" : "opacity-100"
-          )}
-        >
+        {/* Resting badges — status icon + rating pill */}
+        <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between transition-opacity duration-200 group-hover:opacity-0 pointer-events-none">
           <div
             className="h-7 w-7 rounded-full flex items-center justify-center bg-background/85 dark:bg-background/60 backdrop-blur-sm border border-border/30 shadow-sm"
             title={activeStatus.label}
@@ -128,163 +67,48 @@ export function WatchlistCard({ item, onUpdateStatus, onUpdateRating, onDelete }
             <span className="text-sm font-bold leading-none">{activeStatus.icon}</span>
           </div>
           {item.rating && (
-            <div
-              className="h-7 px-2.5 rounded-full flex items-center justify-center text-xs font-bold bg-background/85 dark:bg-background/60 backdrop-blur-sm border border-border/30 shadow-sm"
-            >
-              {item.rating}
+            <div className="h-7 px-2.5 rounded-full flex items-center justify-center text-xs font-bold bg-background/85 dark:bg-background/60 backdrop-blur-sm border border-border/30 shadow-sm text-foreground">
+              <Star className="size-3 fill-primary text-primary mr-1" />
+              <span>{item.rating}</span>
             </div>
           )}
         </div>
 
         {/* Hover overlay — gradient from bottom */}
-        <div
-          className={cn(
-            "absolute inset-0 rounded-xl flex flex-col justify-end transition-opacity duration-200 z-10",
-            isHovered ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
-          )}
-        >
+        <div className="absolute inset-0 rounded-xl flex flex-col justify-end opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
           {/* Top action buttons */}
-          <div className="absolute top-0 inset-x-0 flex items-center justify-between p-2">
+          <div className="absolute top-0 inset-x-0 flex items-center justify-end p-2 z-20">
             <button
-              onClick={(e) => { e.stopPropagation(); setDetailOpen(true); }}
-              aria-label="View details"
-              className="p-1.5 rounded-lg text-white/80 hover:text-white hover:bg-white/20 active:bg-white/30 transition-colors backdrop-blur-sm bg-black/30 border border-white/10"
-            >
-              <Info className="h-3.5 w-3.5" />
-            </button>
-            <button
-              onClick={(e) => { e.stopPropagation(); setDeleteOpen(true); }}
+              onClick={(e) => {
+                e.stopPropagation();
+                setDeleteOpen(true);
+              }}
               aria-label="Delete media item"
-              className="p-1.5 rounded-lg text-white/80 hover:text-white hover:bg-red-500/40 active:bg-red-500/60 transition-colors backdrop-blur-sm bg-black/30 border border-white/10"
+              className="p-1.5 rounded-lg text-white/80 hover:text-white hover:bg-destructive/60 active:bg-destructive/80 transition-colors backdrop-blur-sm bg-black/40 border border-white/10"
             >
               <Trash2 className="h-3.5 w-3.5" />
             </button>
           </div>
 
           {/* Gradient scrim */}
-          <div className="absolute inset-x-0 bottom-0 h-[70%] bg-gradient-to-t from-black/95 via-black/60 to-transparent rounded-b-xl pointer-events-none" />
+          <div className="absolute inset-x-0 bottom-0 h-[75%] bg-gradient-to-t from-black/95 via-black/60 to-transparent rounded-b-xl pointer-events-none" />
 
           {/* Bottom content */}
-          <div className="relative z-10 p-3 space-y-2">
-            {/* Title */}
-            <h4 className="font-bold text-[11px] leading-snug line-clamp-2 text-white drop-shadow-md">
+          <div className="relative z-10 p-3 space-y-1.5">
+            <h4 className="font-bold text-xs leading-snug line-clamp-2 text-white drop-shadow-md">
               {item.metadata?.title || "Unknown Media"}
             </h4>
 
-            {/* Status chip */}
-            <Popover open={statusPopoverOpen} onOpenChange={setStatusPopoverOpen}>
-              <PopoverTrigger
-                render={
-                  <Button
-                    variant="secondary"
-                    size="xs"
-                    className="w-full"
-                    aria-label="Change status"
-                  />
-                }
-              >
-                <span className="text-xs leading-none shrink-0">{activeStatus.icon}</span>
-                <span className="truncate">{activeStatus.label}</span>
-              </PopoverTrigger>
-              <PopoverContent className="w-36" align="start">
-                {(Object.keys(WATCHLIST_STATUS_LABELS) as WatchlistStatus[]).map((statusKey) => {
-                  const option = WATCHLIST_STATUS_LABELS[statusKey];
-                  const isSelected = item.status === statusKey;
-                  return (
-                    <button
-                      key={statusKey}
-                      onClick={() => {
-                        onUpdateStatus(item._id!, statusKey);
-                        setStatusPopoverOpen(false);
-                      }}
-                      className={cn(
-                        "w-full text-left text-xs px-2.5 py-1.5 rounded-sm flex items-center justify-between hover:bg-accent hover:text-accent-foreground transition-colors",
-                        isSelected && "font-semibold text-primary bg-accent/30"
-                      )}
-                    >
-                      <span className="flex items-center gap-2">
-                        <span className="text-[13px]">{option.icon}</span>
-                        {option.label}
-                      </span>
-                      {isSelected && <Check className="h-3 w-3" />}
-                    </button>
-                  );
-                })}
-              </PopoverContent>
-            </Popover>
-
-            {/* Rating chip — clean icon + score or Rate */}
-            <Popover
-              open={ratingPopoverOpen}
-              onOpenChange={(open) => {
-                setRatingPopoverOpen(open);
-                if (open) setTempRating(item.rating ?? null);
-              }}
-            >
-              <PopoverTrigger
-                render={
-                  <Button
-                    variant="secondary"
-                    size="xs"
-                    className="w-full"
-                    aria-label="Change rating"
-                  />
-                }
-              >
-                <Star className={cn("size-3 shrink-0", item.rating ? "fill-primary text-primary" : "text-muted-foreground")} />
-                <span className="tabular-nums">
-                  {item.rating ? `${item.rating} / 10` : "Rate"}
-                </span>
-              </PopoverTrigger>
-              <PopoverContent className="w-56" align="end">
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-semibold text-muted-foreground">Rating</span>
-                    <span className="text-xs font-bold text-primary">
-                      {tempRating !== null ? `${tempRating}/10` : "Unrated"}
-                    </span>
-                  </div>
-                  <div className="px-1">
-                    <Slider
-                      aria-label="Rating slider"
-                      value={[tempRating || 5]}
-                      min={1}
-                      max={10}
-                      step={1}
-                      onValueChange={(val) => setTempRating(Array.isArray(val) ? val[0] : val)}
-                      onValueCommitted={(val) => onUpdateRating(item._id!, Array.isArray(val) ? val[0] : val)}
-                    />
-                    <span
-                      aria-hidden="true"
-                      className="mt-2.5 flex w-full items-center justify-between gap-1 px-0.5 font-medium text-muted-foreground/60 text-[9px] select-none"
-                    >
-                      {[...Array(10)].map((_, idx) => {
-                        const i = idx + 1;
-                        const skipInterval = 2;
-                        return (
-                          <span className="flex w-0 flex-col items-center justify-center gap-1" key={String(i)}>
-                            <span className={cn("h-1 w-px bg-muted-foreground/45", i % skipInterval !== 0 && "h-0.5 bg-muted-foreground/30")} />
-                            <span className={cn(i % skipInterval !== 0 && "opacity-0")}>{i}</span>
-                          </span>
-                        );
-                      })}
-                    </span>
-                  </div>
-                  {item.rating && (
-                    <button
-                      onClick={() => {
-                        onUpdateRating(item._id!, null);
-                        setTempRating(null);
-                        setRatingPopoverOpen(false);
-                      }}
-                      className="w-full text-center text-xs py-1 border border-dashed rounded-md hover:bg-destructive hover:text-destructive-foreground transition-colors"
-                    >
-                      Clear Rating
-                    </button>
-                  )}
-                </div>
-              </PopoverContent>
-            </Popover>
+            <div className="flex items-center justify-between pt-1">
+              <div className="flex items-center gap-1.5 text-[11px] font-semibold text-white/90">
+                <span>{activeStatus.icon}</span>
+                <span>{activeStatus.label}</span>
+              </div>
+              <div className="flex items-center gap-1 text-[11px] text-white/80 font-medium">
+                <Eye className="size-3" />
+                <span>Details</span>
+              </div>
+            </div>
           </div>
         </div>
       </Card>
@@ -313,11 +137,14 @@ export function WatchlistCard({ item, onUpdateStatus, onUpdateRating, onDelete }
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Detail Dialog / Drawer */}
+      {/* Detail Dialog (PC) / Drawer (Mobile) */}
       <WatchlistDetailDialog
         item={item}
         open={detailOpen}
         onOpenChange={setDetailOpen}
+        onUpdateStatus={onUpdateStatus}
+        onUpdateRating={onUpdateRating}
+        onDelete={onDelete}
       />
     </>
   );

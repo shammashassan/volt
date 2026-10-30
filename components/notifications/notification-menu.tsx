@@ -217,7 +217,9 @@ export function NotificationMenu() {
 
                         <ItemContent>
                           <ItemTitle>
-                            {notification.title}
+                            <span className={cn(notification.readAt && "text-muted-foreground")}>
+                              {notification.title}
+                            </span>
                           </ItemTitle>
                           <ItemDescription>
                             {notification.message}
@@ -260,7 +262,9 @@ export function NotificationMenu() {
 
                       <ItemContent>
                         <ItemTitle>
-                          {notification.title}
+                          <span className={cn(notification.readAt && "text-muted-foreground")}>
+                            {notification.title}
+                          </span>
                         </ItemTitle>
                         <ItemDescription>
                           {notification.message}
