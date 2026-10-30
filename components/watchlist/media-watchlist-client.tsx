@@ -308,53 +308,75 @@ export function MediaWatchlistClient({ initialItems }: MediaWatchlistClientProps
       {/* Controls Section: Status Tabs & Filter Toolbar */}
       <section className="px-4 lg:px-6">
         <div className="flex flex-col gap-4 max-w-7xl">
-          {/* Status Tabs Navigation */}
-          <Tabs
-            value={activeStatus}
-            onValueChange={(val) => setStatusFilter(val === "active" ? null : (val as string))}
-            className="w-full"
-          >
-            <TabsList
-              ref={tabsContainerRef}
-              className="overflow-x-auto no-scrollbar"
+          {/* Mobile Status Dropdown (< sm) */}
+          <div className="sm:hidden w-full">
+            <Select
+              value={activeStatus}
+              onValueChange={(val) => setStatusFilter(val === "active" ? null : (val as string))}
             >
-              <TabsTrigger value="active">
-                <Sparkles className="size-3.5" />
-                <span>Active</span>
-                <span className="text-xs text-muted-foreground/70 font-mono ml-0.5">({tabCounts.active})</span>
-              </TabsTrigger>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Filter by status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="active">Active ({tabCounts.active})</SelectItem>
+                <SelectItem value="watching">Watching ({tabCounts.watching})</SelectItem>
+                <SelectItem value="planned">Planned ({tabCounts.planned})</SelectItem>
+                <SelectItem value="completed">Completed ({tabCounts.completed})</SelectItem>
+                <SelectItem value="dropped">Dropped ({tabCounts.dropped})</SelectItem>
+                <SelectItem value="all">All Media ({tabCounts.all})</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
-              <TabsTrigger value="watching">
-                <Play className="size-3.5" />
-                <span>Watching</span>
-                <span className="text-xs text-muted-foreground/70 font-mono ml-0.5">({tabCounts.watching})</span>
-              </TabsTrigger>
+          {/* Desktop/Tablet Status Tabs (>= sm) */}
+          <div className="hidden sm:block w-full">
+            <Tabs
+              value={activeStatus}
+              onValueChange={(val) => setStatusFilter(val === "active" ? null : (val as string))}
+              className="w-full"
+            >
+              <TabsList
+                ref={tabsContainerRef}
+                className="overflow-x-auto no-scrollbar"
+              >
+                <TabsTrigger value="active">
+                  <Sparkles className="size-3.5" />
+                  <span>Active</span>
+                  <span className="text-xs text-muted-foreground/70 font-mono ml-0.5">({tabCounts.active})</span>
+                </TabsTrigger>
 
-              <TabsTrigger value="planned">
-                <Clock className="size-3.5" />
-                <span>Planned</span>
-                <span className="text-xs text-muted-foreground/70 font-mono ml-0.5">({tabCounts.planned})</span>
-              </TabsTrigger>
+                <TabsTrigger value="watching">
+                  <Play className="size-3.5" />
+                  <span>Watching</span>
+                  <span className="text-xs text-muted-foreground/70 font-mono ml-0.5">({tabCounts.watching})</span>
+                </TabsTrigger>
 
-              <TabsTrigger value="completed">
-                <CheckCircle2 className="size-3.5" />
-                <span>Completed</span>
-                <span className="text-xs text-muted-foreground/70 font-mono ml-0.5">({tabCounts.completed})</span>
-              </TabsTrigger>
+                <TabsTrigger value="planned">
+                  <Clock className="size-3.5" />
+                  <span>Planned</span>
+                  <span className="text-xs text-muted-foreground/70 font-mono ml-0.5">({tabCounts.planned})</span>
+                </TabsTrigger>
 
-              <TabsTrigger value="dropped">
-                <XCircle className="size-3.5" />
-                <span>Dropped</span>
-                <span className="text-xs text-muted-foreground/70 font-mono ml-0.5">({tabCounts.dropped})</span>
-              </TabsTrigger>
+                <TabsTrigger value="completed">
+                  <CheckCircle2 className="size-3.5" />
+                  <span>Completed</span>
+                  <span className="text-xs text-muted-foreground/70 font-mono ml-0.5">({tabCounts.completed})</span>
+                </TabsTrigger>
 
-              <TabsTrigger value="all">
-                <Layers className="size-3.5" />
-                <span>All</span>
-                <span className="text-xs text-muted-foreground/70 font-mono ml-0.5">({tabCounts.all})</span>
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
+                <TabsTrigger value="dropped">
+                  <XCircle className="size-3.5" />
+                  <span>Dropped</span>
+                  <span className="text-xs text-muted-foreground/70 font-mono ml-0.5">({tabCounts.dropped})</span>
+                </TabsTrigger>
+
+                <TabsTrigger value="all">
+                  <Layers className="size-3.5" />
+                  <span>All</span>
+                  <span className="text-xs text-muted-foreground/70 font-mono ml-0.5">({tabCounts.all})</span>
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </div>
 
           {/* Search & Sub-filters Toolbar */}
           <div className="p-3 sm:p-4 border border-border/40 bg-card/30 backdrop-blur-sm rounded-2xl flex flex-col gap-3 sm:flex-row sm:items-center">

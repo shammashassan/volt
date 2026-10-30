@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Image from "next/image";
 import { WatchlistItem, WatchlistStatus } from "@/types/watchlist";
 import { Card } from "@/components/ui/card";
-import { Film, Trash2, Star, Eye } from "lucide-react";
+import { Film, Trash2, Star } from "lucide-react";
 import { WATCHLIST_STATUS_LABELS } from "@/lib/constants/watchlist";
 import { WatchlistDetailDialog } from "./watchlist-detail-dialog";
 import {
@@ -99,15 +99,17 @@ export function WatchlistCard({ item, onUpdateStatus, onUpdateRating, onDelete }
               {item.metadata?.title || "Unknown Media"}
             </h4>
 
-            <div className="flex items-center justify-between pt-1">
-              <div className="flex items-center gap-1.5 text-[11px] font-semibold text-white/90">
-                <span>{activeStatus.icon}</span>
-                <span>{activeStatus.label}</span>
-              </div>
-              <div className="flex items-center gap-1 text-[11px] text-white/80 font-medium">
-                <Eye className="size-3" />
-                <span>Details</span>
-              </div>
+            <div className="flex items-center justify-between gap-1.5 pt-0.5 text-[11px] font-medium text-white/90">
+              <span className="truncate flex items-center gap-1.5 min-w-0">
+                <span className="shrink-0">{activeStatus.icon}</span>
+                <span className="truncate">{activeStatus.label}</span>
+              </span>
+              {item.rating && (
+                <span className="flex items-center gap-1 shrink-0 font-bold text-amber-400">
+                  <Star className="size-3 fill-current" />
+                  <span>{item.rating}</span>
+                </span>
+              )}
             </div>
           </div>
         </div>
