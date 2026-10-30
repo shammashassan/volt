@@ -297,17 +297,19 @@ export function ShareClient({
   };
 
   return (
-    <Card className="w-full max-w-lg shadow-xl border-border/40 bg-card/30 backdrop-blur-md relative overflow-hidden">
+    <Card className="w-full max-w-lg relative overflow-hidden">
       {/* Decorative gradient flare */}
       <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-2xl -mr-8 -mt-8 pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-32 h-32 bg-primary/5 rounded-full blur-2xl -ml-8 -mb-8 pointer-events-none" />
 
       <CardHeader className="text-center">
-        <CardTitle className="text-2xl font-black tracking-tight flex items-center justify-center gap-2">
-          <Link2 className="size-6 text-primary" />
-          <span>Quick Capture</span>
+        <CardTitle className="flex items-center justify-center">
+          <span className="text-2xl font-black tracking-tight flex items-center gap-2">
+            <Link2 className="size-6 text-primary" />
+            <span>Quick Capture</span>
+          </span>
         </CardTitle>
-        <CardDescription className="text-xs">
+        <CardDescription>
           Volt PWA Mobile Quick Save Gateway
         </CardDescription>
       </CardHeader>
@@ -326,7 +328,7 @@ export function ShareClient({
               <form onSubmit={handleManualSave} className="space-y-3">
                 <FieldGroup>
                   <Field>
-                    <FieldLabel htmlFor="manual-url" className="text-xs font-semibold text-muted-foreground">
+                    <FieldLabel htmlFor="manual-url" >
                       Paste or Type URL
                     </FieldLabel>
                     <InputGroup>
@@ -514,7 +516,7 @@ export function ShareClient({
                 <FieldGroup>
                   {/* Title */}
                   <Field>
-                    <FieldLabel htmlFor="title" className="text-xs font-semibold text-muted-foreground">
+                    <FieldLabel htmlFor="title" >
                       Title
                     </FieldLabel>
                     <Input
@@ -522,14 +524,14 @@ export function ShareClient({
                       value={title}
                       onChange={(e) => setTitle(e.target.value)}
                       placeholder="Enter resource title..."
-                      className="h-8 text-xs bg-background/50 border-input"
+                      className="h-8"
                       required
                     />
                   </Field>
 
                   {/* URL */}
                   <Field>
-                    <FieldLabel htmlFor="url" className="text-xs font-semibold text-muted-foreground">
+                    <FieldLabel htmlFor="url" >
                       URL Link
                     </FieldLabel>
                     <InputGroup>
@@ -554,7 +556,7 @@ export function ShareClient({
                           setResourceType(detectResourceType(newUrl));
                         }}
                         placeholder="https://example.com"
-                        className="h-8 text-xs bg-background/50 border-input"
+                        className="h-8"
                         required
                       />
                     </InputGroup>
@@ -562,7 +564,7 @@ export function ShareClient({
 
                   {/* Description */}
                   <Field>
-                    <FieldLabel htmlFor="description" className="text-xs font-semibold text-muted-foreground">
+                    <FieldLabel htmlFor="description" >
                       Description
                     </FieldLabel>
                     <Textarea
@@ -570,30 +572,30 @@ export function ShareClient({
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
                       placeholder="Enter resource description..."
-                      className="min-h-[56px] text-xs bg-background/50 border-input resize-y"
+                      className="min-h-14 resize-y"
                     />
                   </Field>
 
                   <div className="grid grid-cols-2 gap-3">
                     {/* Category Dropdown */}
                     <Field>
-                      <FieldLabel htmlFor="category" className="text-xs font-semibold text-muted-foreground">
+                      <FieldLabel htmlFor="category" >
                         Category
                       </FieldLabel>
                       <Select value={categoryId} onValueChange={(val) => { if (val) setCategoryId(val) }}>
-                        <SelectTrigger id="category" className="h-8 text-xs w-full bg-background/50">
+                        <SelectTrigger id="category" className="h-8 w-full">
                           <SelectValue placeholder="Uncategorized" />
                         </SelectTrigger>
-                        <SelectContent className="bg-popover border shadow-md">
+                        <SelectContent >
                           <SelectGroup>
-                            <SelectItem value="none" className="text-xs">
+                            <SelectItem value="none" >
                               Uncategorized
                             </SelectItem>
                             {categories.map((cat) => (
                               <SelectItem
                                 key={cat.slug || String(cat._id)}
                                 value={cat.slug || String(cat._id)}
-                                className="text-xs"
+                                
                               >
                                 {cat.name}
                               </SelectItem>
@@ -605,40 +607,40 @@ export function ShareClient({
 
                     {/* Type Dropdown */}
                     <Field>
-                      <FieldLabel htmlFor="type" className="text-xs font-semibold text-muted-foreground">
+                      <FieldLabel htmlFor="type" >
                         Type
                       </FieldLabel>
                       <Select value={resourceType} onValueChange={(val) => setResourceType(val as ResourceType)}>
-                        <SelectTrigger id="type" className="h-8 text-xs w-full bg-background/50">
+                        <SelectTrigger id="type" className="h-8 w-full">
                           <SelectValue placeholder="Website" />
                         </SelectTrigger>
-                        <SelectContent className="bg-popover border shadow-md">
+                        <SelectContent >
                           <SelectGroup>
-                            <SelectItem value="website" className="text-xs">
+                            <SelectItem value="website" >
                               Website
                             </SelectItem>
-                            <SelectItem value="youtube" className="text-xs">
+                            <SelectItem value="youtube" >
                               YouTube
                             </SelectItem>
-                            <SelectItem value="github" className="text-xs">
+                            <SelectItem value="github" >
                               GitHub
                             </SelectItem>
-                            <SelectItem value="linkedin" className="text-xs">
+                            <SelectItem value="linkedin" >
                               LinkedIn
                             </SelectItem>
-                            <SelectItem value="instagram" className="text-xs">
+                            <SelectItem value="instagram" >
                               Instagram
                             </SelectItem>
-                            <SelectItem value="facebook" className="text-xs">
+                            <SelectItem value="facebook" >
                               Facebook
                             </SelectItem>
-                            <SelectItem value="reddit" className="text-xs">
+                            <SelectItem value="reddit" >
                               Reddit
                             </SelectItem>
-                            <SelectItem value="article" className="text-xs">
+                            <SelectItem value="article" >
                               Article
                             </SelectItem>
-                            <SelectItem value="tool" className="text-xs">
+                            <SelectItem value="tool" >
                               Tool
                             </SelectItem>
                           </SelectGroup>
@@ -653,7 +655,7 @@ export function ShareClient({
                     <div className="flex items-center justify-between p-2 rounded-lg border bg-background/25 border-border/40 h-8 self-end col-span-2 sm:col-span-1">
                       <div className="flex items-center gap-2">
                         <Star className={`size-4 ${favorite ? "fill-amber-400 text-amber-400" : "text-muted-foreground"}`} />
-                        <Label htmlFor="favorite" className="text-xs font-medium cursor-pointer">
+                        <Label htmlFor="favorite" className="cursor-pointer">
                           Favorite
                         </Label>
                       </div>
@@ -668,7 +670,7 @@ export function ShareClient({
                     type="button"
                     variant="ghost"
                     size="sm"
-                    className="flex-1 text-xs cursor-pointer"
+                    className="flex-1 cursor-pointer"
                     onClick={() => router.push("/resources")}
                   >
                     Keep in Inbox
@@ -676,7 +678,7 @@ export function ShareClient({
                   <Button
                     type="submit"
                     size="sm"
-                    className="flex-1 text-xs cursor-pointer gap-1.5"
+                    className="flex-1 cursor-pointer"
                     disabled={isUpdating}
                   >
                     {isUpdating ? (
