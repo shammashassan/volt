@@ -279,7 +279,7 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
               <h1 className="text-3xl font-black tracking-tight md:text-4xl bg-clip-text text-transparent bg-linear-to-r from-foreground to-foreground/60">
                 Reminders
               </h1>
-              <Badge variant="outline" className="rounded-full">
+              <Badge variant="outline">
                 {pending.length} Pending
               </Badge>
             </div>
@@ -336,10 +336,11 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
                   </div>
                 </div>
 
-                <CollapsibleContent className="space-y-3 pt-3 border-t border-border/40 mt-1">
+                <CollapsibleContent className="mt-1">
+                  <div className="space-y-3 pt-3 border-t border-border/40">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="flex flex-col gap-1.5">
-                      <Label className="text-xs font-semibold text-muted-foreground lowercase">link project</Label>
+                      <Label>link project</Label>
                       <Combobox
                         items={projects}
                         value={selectedProject}
@@ -362,7 +363,7 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
                     </div>
 
                     <div className="flex flex-col gap-1.5">
-                      <Label className="text-xs font-semibold text-muted-foreground lowercase">link note</Label>
+                      <Label>link note</Label>
                       <Combobox
                         items={notes}
                         value={selectedNote}
@@ -384,13 +385,14 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
                       </Combobox>
                     </div>
                   </div>
+                </div>
                 </CollapsibleContent>
               </form>
             </Collapsible>
 
             <Card>
               <Tabs defaultValue="pending">
-                <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3">
+                <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between">
                   <CardTitle>Tasks</CardTitle>
                   <div className="flex flex-wrap items-center gap-2 sm:gap-4">
                     <Toggle
@@ -421,7 +423,7 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
                     </TabsList>
                   </div>
                 </CardHeader>
-                <CardContent className="p-5 pt-0">
+                <CardContent>
                   <TabsContent value="pending" className="mt-0">
                     {pending.length === 0 ? (
                       <p className="text-sm text-muted-foreground py-8 text-center">
@@ -429,7 +431,7 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
                       </p>
                     ) : (
                       <ScrollArea className="max-h-[500px] w-full **:data-[slot=scroll-area-viewport]:max-h-[500px]">
-                        <ItemGroup className="gap-2.5 pr-3.5 pb-4">
+                        <ItemGroup>
                           <AnimatePresence initial={false}>
                             {getSortedPending().map((r) => (
                               <motion.div
@@ -461,8 +463,8 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
                                     {getPriorityIcon(r.priority)}
                                   </ItemMedia>
                                   <ItemContent className="min-w-0">
-                                    <ItemTitle className={cn("font-semibold block w-full wrap-break-word whitespace-normal line-clamp-none transition-all duration-300", (checkingIds[r._id as string] || r.status === "completed") && "line-through text-muted-foreground/60")}>{r.title}</ItemTitle>
-                                    <ItemDescription className="flex flex-wrap items-center gap-x-2.5 gap-y-1 mt-0.5 w-full min-w-0">
+                                    <ItemTitle className="block w-full wrap-break-word whitespace-normal"><span className={(checkingIds[r._id as string] || r.status === "completed") ? "line-through text-muted-foreground/60" : ""}>{r.title}</span></ItemTitle>
+                                    <ItemDescription className="flex flex-wrap items-center mt-0.5 w-full min-w-0">
                                       <span className="text-xs text-muted-foreground flex items-center gap-1 shrink-0 whitespace-nowrap">
                                         <Calendar className="size-3" />
                                         {new Date(r.triggerAt).toLocaleString([], {
@@ -514,7 +516,7 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
                       </p>
                     ) : (
                       <ScrollArea className="max-h-[500px] w-full **:data-[slot=scroll-area-viewport]:max-h-[500px]">
-                        <ItemGroup className="gap-2.5 opacity-80 pr-3.5 pb-4">
+                        <ItemGroup>
                           <AnimatePresence initial={false}>
                             {getSortedCompleted().map((r) => (
                               <motion.div
@@ -546,8 +548,8 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
                                     {getPriorityIcon(r.priority)}
                                   </ItemMedia>
                                   <ItemContent className="min-w-0">
-                                    <ItemTitle className={cn("block w-full wrap-break-word whitespace-normal line-clamp-none transition-all duration-300", (uncheckingIds[r._id as string] || r.status === "pending") ? "font-semibold text-foreground" : "line-through text-muted-foreground")}>{r.title}</ItemTitle>
-                                    <ItemDescription className="flex flex-wrap items-center gap-x-2.5 gap-y-1 mt-0.5 w-full min-w-0">
+                                    <ItemTitle className="block w-full wrap-break-word whitespace-normal"><span className={(uncheckingIds[r._id as string] || r.status === "pending") ? "" : "line-through text-muted-foreground"}>{r.title}</span></ItemTitle>
+                                    <ItemDescription className="flex flex-wrap items-center mt-0.5 w-full min-w-0">
                                       <span className="text-xs text-muted-foreground/50 flex items-center gap-1 line-through shrink-0 whitespace-nowrap">
                                         <Calendar className="size-3" />
                                         {new Date(r.triggerAt).toLocaleString([], {
@@ -600,9 +602,11 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
           <div className="min-w-0 w-full">
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Calendar className="size-4 text-primary" />
-                  Today&apos;s Timeline
+                <CardTitle>
+                  <span className="flex items-center gap-2">
+                    <Calendar className="size-4 text-primary" />
+                    Today&apos;s Timeline
+                  </span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -622,20 +626,12 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
                               minute: "2-digit",
                             })}
                           </TimelineDate>
-                          <TimelineTitle
-                            className={
-                              item.status === "completed"
-                                ? "line-through text-muted-foreground"
-                                : ""
-                            }
-                          >
-                            {item.title}
+                          <TimelineTitle>
+                            <span className={item.status === "completed" ? "line-through text-muted-foreground" : ""}>
+                              {item.title}
+                            </span>
                           </TimelineTitle>
-                          <TimelineIndicator
-                            className={
-                              item.status === "completed" ? "border-primary bg-primary" : ""
-                            }
-                          />
+                          <TimelineIndicator />
                         </TimelineHeader>
                         {item.priority && (
                           <TimelineContent>
