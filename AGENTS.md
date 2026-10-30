@@ -10,12 +10,18 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 ## Design System & Linter Rules (@shadcn/lint)
 
+### CRITICAL RULE: `components/ui/*` IS STRICTLY READ-ONLY
+- **NEVER modify, edit, or add props/variants/code to files in `components/ui/*`.**
+- Treat all files inside `components/ui/` as pristine, immutable primitives.
+- Do NOT add convenience props (e.g. `title`, `icon`) to `components/ui/*`.
+- If custom variants, header wrappers, or specialized behavior are needed, build them as wrappers in feature folders (e.g., `components/dashboard/`, `components/shared/`), NEVER by altering `@/components/ui/*`.
+
 After making any UI changes, run `npm run lint` and verify your changes adhere to `@shadcn/lint` rules:
 
 1. **`shadcn/no-restyle`**:
    - Design system components (`@/components/ui/*` like `<Button>`, `<Card>`, `<Badge>`, etc.) own their internal appearance (color, shape, padding, typography).
    - Do NOT pass arbitrary colors (`bg-*`, `text-*`), padding (`p-*`), or shapes (`rounded-*`) to components via `className`.
-   - Use built-in component variants (`variant="..."`, `size="..."`). If a new variant is genuinely required by design specs, define it inside the component definition file in `components/ui/`.
+   - Use built-in component variants (`variant="..."`, `size="..."`). Do NOT add custom variants or edit the component definition files.
    - Use `className` on components only for layout positioning (`mt-*`, `w-full`, layout margins, or parent container `gap-*`).
 
 2. **`shadcn/no-raw-colors`**:

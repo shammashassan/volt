@@ -61,13 +61,13 @@ export function WatchlistCard({ item, onUpdateStatus, onUpdateRating, onDelete }
         {/* Resting badges — status icon + rating pill */}
         <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between transition-opacity duration-200 group-hover:opacity-0 pointer-events-none">
           <div
-            className="h-7 w-7 rounded-full flex items-center justify-center bg-background/85 dark:bg-background/60 backdrop-blur-sm border border-border/30 shadow-sm"
+            className="h-7 w-7 rounded-lg flex items-center justify-center bg-black/40 border border-white/10 backdrop-blur-sm text-white"
             title={activeStatus.label}
           >
             <span className="text-sm font-bold leading-none">{activeStatus.icon}</span>
           </div>
           {item.rating && (
-            <div className="h-7 px-2.5 rounded-full flex items-center justify-center text-xs font-bold bg-background/85 dark:bg-background/60 backdrop-blur-sm border border-border/30 shadow-sm text-foreground">
+            <div className="h-7 px-2 rounded-lg flex items-center justify-center text-xs font-semibold text-white bg-black/40 border border-white/10 backdrop-blur-sm">
               <Star className="size-3 fill-primary text-primary mr-1" />
               <span>{item.rating}</span>
             </div>
