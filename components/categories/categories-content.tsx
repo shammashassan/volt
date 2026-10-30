@@ -406,8 +406,8 @@ export function CategoriesContent({
           <AlertDialog open={!!categoryToDelete} onOpenChange={(open) => !open && setCategoryToDelete(null)}>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogMedia className="bg-destructive/10 text-destructive">
-                  <Trash2 />
+                <AlertDialogMedia>
+                  <Trash2 className="text-destructive" />
                 </AlertDialogMedia>
                 <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                 <AlertDialogDescription>
@@ -434,8 +434,8 @@ export function CategoriesContent({
           <AlertDialog open={!!collectionToDelete} onOpenChange={(open) => !open && setCollectionToDelete(null)}>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogMedia className="bg-destructive/10 text-destructive">
-                  <Trash2 />
+                <AlertDialogMedia>
+                  <Trash2 className="text-destructive" />
                 </AlertDialogMedia>
                 <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                 <AlertDialogDescription>

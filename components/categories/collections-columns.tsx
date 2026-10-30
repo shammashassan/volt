@@ -73,7 +73,7 @@ export const collectionsColumns = (
         <DropdownMenu>
           <DropdownMenuTrigger
             render={
-              <Button variant="ghost" size="icon-sm" className="size-8 p-0">
+              <Button variant="ghost" size="icon-sm">
                 <span className="sr-only">Open menu</span>
                 <MoreHorizontal className="size-4" />
               </Button>
@@ -90,7 +90,7 @@ export const collectionsColumns = (
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem
-                className="text-destructive focus:text-destructive"
+                variant="destructive"
                 onClick={() => onDelete(collectionId)}
               >
                 <Trash className="size-4" />

@@ -86,7 +86,7 @@ export function DataTable<TData, TValue>({
               variant="ghost"
               size="sm"
               onClick={() => table.resetColumnFilters()}
-              className="h-9 px-2.5"
+              
             >
               Reset
               <X data-icon="inline-end" className="size-3.5" />
@@ -100,11 +100,11 @@ export function DataTable<TData, TValue>({
       <div className="rounded-xl border border-border/60 bg-card overflow-hidden shadow-xs">
         <div className="overflow-x-auto">
           <Table>
-            <TableHeader className="bg-muted/40">
+            <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => (
-                    <TableHead key={header.id} className="h-10 text-xs font-semibold">
+                    <TableHead key={header.id} className="h-10">
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -122,10 +122,9 @@ export function DataTable<TData, TValue>({
                   <TableRow
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
-                    className="hover:bg-muted/30 transition-colors"
                   >
                     {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id} className="py-3">
+                      <TableCell key={cell.id}>
                         {flexRender(
                           cell.column.columnDef.cell,
                           cell.getContext()
@@ -140,7 +139,7 @@ export function DataTable<TData, TValue>({
                     colSpan={columns.length}
                     className="h-44 text-center"
                   >
-                    <Empty className="py-8 border-0">
+                    <Empty>
                       <EmptyHeader>
                         <EmptyMedia variant="icon">
                           <FolderSearch className="size-4" />
