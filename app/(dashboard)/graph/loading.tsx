@@ -24,18 +24,18 @@ export default function GraphLoading() {
       {/* Main content skeleton mirroring the actual top-bar filter Graph layout */}
       <section className="px-4 lg:px-6 flex flex-col gap-4 flex-1 h-[calc(100vh-var(--header-height)-10rem)] overflow-hidden">
         <div className="p-3 border border-border/40 bg-card/30 backdrop-blur-xs rounded-2xl flex flex-col gap-3 md:flex-row md:items-center">
-          <Skeleton className="h-9 flex-1 rounded-lg" />
+          <Skeleton className="h-9 flex-1" />
           <div className="flex items-center gap-1.5">
             {Array.from({ length: 5 }).map((_, i) => (
-              <Skeleton key={i} className="size-7 rounded-md animate-pulse" />
+              <Skeleton key={i} className="size-7" />
             ))}
           </div>
         </div>
 
         <div className="w-full flex-1 rounded-2xl border border-border/40 bg-card/20 backdrop-blur-xs relative overflow-hidden flex items-center justify-center min-h-[400px]">
           <div className="flex flex-col items-center gap-3">
-            <Skeleton className="size-16 rounded-full" />
-            <Skeleton className="h-4 w-40 rounded" />
+            <Skeleton className="size-16" />
+            <Skeleton className="h-4 w-40" />
           </div>
         </div>
       </section>

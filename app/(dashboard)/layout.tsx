@@ -28,7 +28,7 @@ export default function DashboardLayout({
             <SiteHeader />
             <div className="flex flex-1">
               <AppSidebar variant="inset" collapsible="icon" />
-              <SidebarInset className="bg-background overflow-hidden">
+              <SidebarInset className="overflow-hidden">
                 <div className="flex flex-1 flex-col pt-0">
                   {children}
                 </div>

@@ -121,7 +121,6 @@ export default function TermsPage() {
               render={<Link href="/" />}
               nativeButton={false}
               variant="outline"
-              className="rounded-full px-6 cursor-pointer"
             >
               Back to Home
             </Button>

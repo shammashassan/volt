@@ -1,10 +1,10 @@
 "use client"
 
 import { Card, CardHeader, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Star, ExternalLink, BookmarkPlus } from "lucide-react"
+import { Star, BookmarkPlus, ExternalLink } from "lucide-react"
 import { Resource } from "@/types"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { Button } from "@/components/ui/button"
 import Link from "next/link"
 
 interface FavoritesListCardProps {
@@ -15,9 +15,10 @@ export function FavoritesListCard({ resources }: FavoritesListCardProps) {
     return (
         <Card
             id="favorites"
-            className="flex h-full flex-col border-border/50 bg-card/60 p-5 shadow-sm backdrop-blur-sm"
+            size="sm"
+            className="flex h-full flex-col"
         >
-            <CardHeader className="flex flex-row items-center gap-0 p-0 pb-4">
+            <CardHeader className="flex flex-row items-center">
                 <div className="flex items-center gap-2 flex-1">
                     <div className="flex size-5 items-center justify-center rounded bg-purple-500/10">
                         <Star className="size-3 fill-purple-500/30 text-purple-500" />
@@ -33,7 +34,7 @@ export function FavoritesListCard({ resources }: FavoritesListCardProps) {
                 )}
             </CardHeader>
 
-            <CardContent className="flex flex-1 flex-col p-0">
+            <CardContent className="flex flex-1 flex-col">
                 {resources.length > 0 ? (
                     <ScrollArea className="h-[200px] w-full">
                         <div className="flex flex-col gap-1.5 pr-3">
@@ -75,8 +76,8 @@ export function FavoritesListCard({ resources }: FavoritesListCardProps) {
                         </div>
                         <Button
                             variant="ghost"
-                            size="sm"
-                            className="h-6 text-[10px] px-2 mt-0.5"
+                            size="xs"
+                            className="mt-0.5"
                             render={<Link href="/resources" />}
                             nativeButton={false}
                         >

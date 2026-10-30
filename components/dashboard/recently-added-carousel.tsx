@@ -1,12 +1,17 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
-import { type CarouselApi, Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel"
-import { Button } from "@/components/ui/button"
-import { Clock, ArrowRight, PackagePlus, ChevronLeft, ChevronRight } from "lucide-react"
-import Link from "next/link"
-import { ResourceCard } from "@/components/resources/resource-card"
+import { useState } from "react"
 import { Resource } from "@/types"
+import { ResourceCard } from "@/components/resources/resource-card"
+import { Button } from "@/components/ui/button"
+import {
+    Carousel,
+    CarouselContent,
+    CarouselItem,
+    type CarouselApi,
+} from "@/components/ui/carousel"
+import { ChevronLeft, ChevronRight, Sparkles, ArrowRight, PackagePlus } from "lucide-react"
+import Link from "next/link"
 
 interface RecentlyAddedCarouselProps {
     resources: Resource[]
@@ -14,53 +19,56 @@ interface RecentlyAddedCarouselProps {
 
 export function RecentlyAddedCarousel({ resources }: RecentlyAddedCarouselProps) {
     const [api, setApi] = useState<CarouselApi>()
-    const [canPrev, setCanPrev] = useState(false)
-    const [canNext, setCanNext] = useState(false)
+    const [canScrollPrev, setCanScrollPrev] = useState(false)
+    const [canScrollNext, setCanScrollNext] = useState(false)
 
-    const updateButtons = useCallback(() => {
-        if (!api) return
-        setCanPrev(api.canScrollPrev())
-        setCanNext(api.canScrollNext())
-    }, [api])
+    // Track scroll possibility
+    const onSelect = (carouselApi: CarouselApi) => {
+        if (!carouselApi) return
+        setCanScrollPrev(carouselApi.canScrollPrev())
+        setCanScrollNext(carouselApi.canScrollNext())
+    }
 
-    useEffect(() => {
-        if (!api) return
-        updateButtons()
-        api.on("select", updateButtons)
-        api.on("reInit", updateButtons)
-        return () => { api.off("select", updateButtons) }
-    }, [api, updateButtons])
+    const scrollPrev = () => api?.scrollPrev()
+    const scrollNext = () => api?.scrollNext()
 
     return (
         <div className="flex flex-col gap-3">
-            {/* Section header */}
-            <div className="flex items-center justify-between px-0.5">
+            {/* Header with Title and Controls */}
+            <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                     <div className="flex size-5 items-center justify-center rounded bg-primary/10">
-                        <Clock className="size-3 text-primary" />
+                        <Sparkles className="size-3 text-primary" />
                     </div>
                     <span className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground/60">
                         recently added
                     </span>
-                </div>
-                <div className="flex items-center gap-1">
                     {resources.length > 0 && (
+                        <span className="font-mono text-[10px] text-muted-foreground/50 tabular-nums">
+                            {resources.length}
+                        </span>
+                    )}
+                </div>
+
+                {/* Navigation Buttons + View all link */}
+                <div className="flex items-center gap-1.5">
+                    {resources.length > 2 && (
                         <>
                             <Button
-                                variant="ghost"
-                                size="icon"
-                                className="size-6"
-                                onClick={() => api?.scrollPrev()}
-                                disabled={!canPrev}
+                                variant="outline"
+                                size="icon-xs"
+                                onClick={scrollPrev}
+                                disabled={!canScrollPrev}
+                                aria-label="Previous slide"
                             >
                                 <ChevronLeft className="size-3.5" />
                             </Button>
                             <Button
-                                variant="ghost"
-                                size="icon"
-                                className="size-6"
-                                onClick={() => api?.scrollNext()}
-                                disabled={!canNext}
+                                variant="outline"
+                                size="icon-xs"
+                                onClick={scrollNext}
+                                disabled={!canScrollNext}
+                                aria-label="Next slide"
                             >
                                 <ChevronRight className="size-3.5" />
                             </Button>
@@ -68,8 +76,7 @@ export function RecentlyAddedCarousel({ resources }: RecentlyAddedCarouselProps)
                     )}
                     <Button
                         variant="ghost"
-                        size="sm"
-                        className="h-6 gap-1 px-2 text-[10px] font-medium text-muted-foreground/60 hover:text-foreground"
+                        size="xs"
                         render={<Link href="/resources" />}
                         nativeButton={false}
                     >
@@ -93,7 +100,7 @@ export function RecentlyAddedCarousel({ resources }: RecentlyAddedCarouselProps)
                     <Button
                         variant="outline"
                         size="sm"
-                        className="h-7 text-xs mt-0.5"
+                        className="mt-0.5"
                         render={<Link href="/resources/new" />}
                         nativeButton={false}
                     >
@@ -104,13 +111,13 @@ export function RecentlyAddedCarousel({ resources }: RecentlyAddedCarouselProps)
                 <Carousel
                     setApi={setApi}
                     opts={{ align: "start", loop: false }}
-                    className="w-full [&_[data-slot=carousel-content]]:py-3 [&_[data-slot=carousel-content]]:-my-3 [&_[data-slot=carousel-content]]:px-2 [&_[data-slot=carousel-content]]:-mx-2"
+                    className="w-full"
                 >
-                    <CarouselContent className="-ml-3">
+                    <CarouselContent>
                         {resources.map((resource, index) => (
                             <CarouselItem
                                 key={resource.id || resource._id?.toString()}
-                                className="pl-3 basis-full sm:basis-1/2"
+                                className="basis-full sm:basis-1/2"
                             >
                                 <ResourceCard
                                     resource={resource}

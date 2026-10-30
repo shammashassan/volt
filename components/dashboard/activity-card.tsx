@@ -52,9 +52,9 @@ export function ActivityCard({ recentlyViewed, recommended, spotlight }: Activit
         : ""
 
     return (
-        <Card className="flex h-full flex-col border-border/50 bg-card/60 p-5 shadow-sm backdrop-blur-sm">
-            <Tabs value={tab} onValueChange={setTab} className="flex flex-1 flex-col gap-0">
-                <CardHeader className="p-0 pb-4">
+        <Card size="sm" className="flex h-full flex-col">
+            <Tabs value={tab} onValueChange={setTab} className="flex flex-1 flex-col">
+                <CardHeader>
                     <div className="flex items-center justify-between">
                         {/* Section label */}
                         <div className="flex items-center gap-2">
@@ -66,22 +66,22 @@ export function ActivityCard({ recentlyViewed, recommended, spotlight }: Activit
                             </span>
                         </div>
                         {/* Tab switcher */}
-                        <TabsList className="h-7 gap-0.5 bg-muted/50 p-0.5">
-                            <TabsTrigger value="recent" className="h-6 gap-1 px-2 text-[10px]">
-                                <Clock className="size-2.5" />
+                        <TabsList>
+                            <TabsTrigger value="recent">
+                                <Clock />
                                 Recent
                             </TabsTrigger>
-                            <TabsTrigger value="discover" className="h-6 gap-1 px-2 text-[10px]">
-                                <Sparkles className="size-2.5" />
+                            <TabsTrigger value="discover">
+                                <Sparkles />
                                 Discover
                             </TabsTrigger>
                         </TabsList>
                     </div>
                 </CardHeader>
 
-                <CardContent className="flex-1 p-0">
+                <CardContent className="flex-1">
                     {/* Recent tab */}
-                    <TabsContent value="recent" className="mt-0 data-[state=active]:flex flex-col gap-2">
+                    <TabsContent value="recent">
                         <ScrollArea className="h-[190px] w-full">
                             <div className="flex flex-col gap-1.5 pr-3">
                                 {recentlyViewed.length > 0 ? (
@@ -101,8 +101,7 @@ export function ActivityCard({ recentlyViewed, recommended, spotlight }: Activit
                                         </div>
                                         <Button
                                             variant="ghost"
-                                            size="sm"
-                                            className="h-6 text-[10px] px-2"
+                                            size="xs"
                                             render={<Link href="/resources" />}
                                             nativeButton={false}
                                         >
@@ -115,7 +114,7 @@ export function ActivityCard({ recentlyViewed, recommended, spotlight }: Activit
                     </TabsContent>
 
                     {/* Discover tab */}
-                    <TabsContent value="discover" className="mt-0 data-[state=active]:flex flex-col gap-2">
+                    <TabsContent value="discover">
                         <ScrollArea className="h-[190px] w-full">
                             <div className="flex flex-col gap-1.5 pr-3">
                                 {/* Spotlight */}
@@ -151,7 +150,7 @@ export function ActivityCard({ recentlyViewed, recommended, spotlight }: Activit
                                         {(spotlight.tags || []).length > 0 && (
                                             <div className="flex flex-wrap gap-1">
                                                 {(spotlight.tags || []).slice(0, 3).map((t: string) => (
-                                                    <Badge key={t} variant="secondary" className="text-[9px] px-1.5 py-0 lowercase bg-background/50 border border-amber-500/10">
+                                                    <Badge key={t} variant="secondary">
                                                         #{t}
                                                     </Badge>
                                                 ))}

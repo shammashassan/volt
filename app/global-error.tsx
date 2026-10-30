@@ -35,7 +35,7 @@ export default function GlobalError({
             )}
           </div>
           <div className="flex items-center gap-3 mt-3">
-            <Button onClick={reset} variant="default" size="sm" className="gap-2">
+            <Button onClick={reset} variant="default" size="sm">
               <RotateCcw className="size-4" />
               Reload Application
             </Button>

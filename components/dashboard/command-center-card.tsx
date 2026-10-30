@@ -11,7 +11,7 @@ export function CommandCenterCard() {
   }
 
   return (
-    <Card className="h-full flex flex-col gap-5 border-border/50 bg-card/60 p-5 shadow-sm backdrop-blur-sm">
+    <Card size="sm" className="h-full flex flex-col justify-between">
       {/* Search trigger */}
       <button
         type="button"
@@ -40,7 +40,6 @@ export function CommandCenterCard() {
         <Button
           variant="outline"
           size="sm"
-          className="h-7 gap-1.5 px-2.5 text-xs font-medium"
           render={<Link href="/resources?new=true" />}
           nativeButton={false}
         >
@@ -50,7 +49,6 @@ export function CommandCenterCard() {
         <Button
           variant="outline"
           size="sm"
-          className="h-7 gap-1.5 px-2.5 text-xs font-medium"
           render={<Link href="/categories?new=category" />}
           nativeButton={false}
         >
@@ -60,7 +58,6 @@ export function CommandCenterCard() {
         <Button
           variant="outline"
           size="sm"
-          className="h-7 gap-1.5 px-2.5 text-xs font-medium"
           onClick={() => { window.location.hash = "#favorites" }}
         >
           <Star data-icon="inline-start" />
@@ -69,7 +66,6 @@ export function CommandCenterCard() {
         <Button
           variant="outline"
           size="sm"
-          className="h-7 gap-1.5 px-2.5 text-xs font-medium"
           render={<Link href="/categories" />}
           nativeButton={false}
         >

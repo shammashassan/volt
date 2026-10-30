@@ -55,8 +55,8 @@ export function WatchlistUpcomingCard() {
   }, []);
 
   return (
-    <Card className="h-full flex flex-col border-border/50 bg-card/60 shadow-sm backdrop-blur-sm gap-2.5">
-      <CardHeader className="flex flex-row items-center gap-0 p-4 pb-2.5 shrink-0">
+    <Card size="sm" className="h-full flex flex-col">
+      <CardHeader className="flex flex-row items-center shrink-0">
         <div className="flex items-center gap-2 flex-1">
           <div className="flex size-5 items-center justify-center rounded bg-amber-500/10">
             <Film className="size-3 text-amber-500" />
@@ -76,7 +76,7 @@ export function WatchlistUpcomingCard() {
       </CardHeader>
 
       {/* min-h-0 lets ScrollArea grow correctly inside a flex-col parent */}
-      <CardContent className="flex flex-1 flex-col min-h-0 px-4 pb-0 pt-0">
+      <CardContent className="flex flex-1 flex-col min-h-0">
         {!loaded ? (
           <div className="flex flex-col gap-1.5">
             {[1, 2, 3].map(i => (

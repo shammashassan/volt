@@ -100,9 +100,9 @@ export function QuickSaveCard() {
     const domain = getDomainFromUrl(url)
 
     return (
-        <Card className="flex flex-col border-border/50 bg-card/60 p-5 shadow-sm backdrop-blur-sm">
+        <Card size="sm" className="flex flex-col">
             {/* Header */}
-            <CardHeader className="flex flex-row items-center gap-0 p-0 pb-4">
+            <CardHeader className="flex flex-row items-center">
                 <div className="flex items-center gap-2 flex-1">
                     <div className="flex size-5 items-center justify-center rounded bg-muted/60">
                         <PlusCircle className="size-3 text-muted-foreground" />
@@ -114,20 +114,13 @@ export function QuickSaveCard() {
 
                 {/* Tips — (i) hover card */}
                 <HoverCard>
-                    <HoverCardTrigger
-                        delay={200}
-                        closeDelay={100}
-                        render={
-                            <button
-                                type="button"
-                                className="flex size-5 items-center justify-center rounded-full text-muted-foreground/30 transition-colors hover:text-muted-foreground/70"
-                            >
-                                <Info className="size-3.5" />
-                                <span className="sr-only">Tips</span>
-                            </button>
-                        }
-                    />
-                    <HoverCardContent align="end" sideOffset={6} className="w-56 p-3">
+                    <HoverCardTrigger delay={200} closeDelay={100}>
+                        <span className="flex size-5 items-center justify-center rounded-full text-muted-foreground/30 transition-colors hover:text-muted-foreground/70 cursor-pointer">
+                            <Info className="size-3.5" />
+                            <span className="sr-only">Tips</span>
+                        </span>
+                    </HoverCardTrigger>
+                    <HoverCardContent align="end" sideOffset={6} className="w-56">
                         <div className="flex flex-col gap-2">
                             <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground/60">
                                 Quick Save Tips
@@ -153,7 +146,7 @@ export function QuickSaveCard() {
             </CardHeader>
 
             {/* Body */}
-            <CardContent className="flex flex-1 flex-col justify-center p-0">
+            <CardContent className="flex flex-1 flex-col justify-center">
                 <Popover open={showPreview} onOpenChange={setShowPreview}>
                     <form
                         ref={formRef}

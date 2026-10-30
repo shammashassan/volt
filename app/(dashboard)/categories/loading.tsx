@@ -8,10 +8,10 @@ export default function CategoriesLoading() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between max-w-7xl">
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-4">
-              <Skeleton className="h-12 w-12 rounded-xl" />
+              <Skeleton className="h-12 w-12" />
               <div className="flex items-center gap-2">
                 <Skeleton className="h-9 w-48 md:h-10" />
-                <Skeleton className="h-6 w-20 rounded-full" />
+                <Skeleton className="h-6 w-20" />
               </div>
             </div>
             <Skeleton className="h-5 w-80 max-w-full mt-2" />
@@ -24,8 +24,8 @@ export default function CategoriesLoading() {
       <section className="px-4 lg:px-6">
         <div className="max-w-7xl flex flex-col gap-4">
           <div className="flex items-center justify-between gap-4 py-4">
-            <Skeleton className="h-10 w-full max-w-sm rounded-md" />
-            <Skeleton className="h-10 w-[120px] rounded-md" />
+            <Skeleton className="h-10 w-full max-w-sm" />
+            <Skeleton className="h-10 w-[120px]" />
           </div>
           <div className="rounded-md border border-border/40">
             <div className="h-10 border-b border-border/40 bg-muted/40 flex items-center px-4">

@@ -237,7 +237,7 @@ export function QuickSaveContent({
           }}
           size="sm"
           variant="outline"
-          className="mt-2 text-xs font-bold uppercase tracking-wider cursor-pointer"
+          className="mt-2 cursor-pointer"
         >
           Save Another Link
         </Button>
@@ -325,7 +325,7 @@ export function QuickSaveContent({
             }}
             placeholder={isFetchingMetadata ? "Fetching description…" : "Resource description (auto-populated)"}
             disabled={isLoading}
-            className="min-h-[56px] text-xs resize-y"
+            className="min-h-[56px] resize-y"
           />
         </Field>
 
@@ -385,7 +385,7 @@ export function QuickSaveContent({
                 type="button"
                 variant="ghost"
                 size="sm"
-                className="w-full flex items-center justify-center gap-1 text-xs tracking-wider cursor-pointer text-muted-foreground hover:text-foreground"
+                className="w-full cursor-pointer"
               />
             }
           >
@@ -401,7 +401,8 @@ export function QuickSaveContent({
               </>
             )}
           </CollapsibleTrigger>
-          <CollapsibleContent className="space-y-3 pt-3 animate-in fade-in-0 slide-in-from-top-1 duration-200">
+          <CollapsibleContent>
+            <div className="space-y-3 pt-3">
             {/* Tags Input */}
             <Field>
               <FieldLabel htmlFor="tags">
@@ -431,7 +432,7 @@ export function QuickSaveContent({
                 onChange={(e) => setWhySaved(e.target.value)}
                 placeholder="Quick summary of what caught your eye..."
                 disabled={isLoading}
-                className="min-h-[50px] text-xs resize-y"
+                className="min-h-[50px] resize-y"
               />
             </Field>
 
@@ -446,9 +447,10 @@ export function QuickSaveContent({
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="Any additional thoughts or details..."
                 disabled={isLoading}
-                className="min-h-[50px] text-xs resize-y"
+                className="min-h-[50px] resize-y"
               />
             </Field>
+            </div>
           </CollapsibleContent>
         </Collapsible>
       </FieldGroup>

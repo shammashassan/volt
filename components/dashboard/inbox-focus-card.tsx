@@ -18,8 +18,8 @@ export function InboxFocusCard({
   inboxCount
 }: InboxFocusProps) {
   return (
-    <Card className="h-full flex flex-col border-border/50 bg-card/60 shadow-sm backdrop-blur-sm gap-2.5">
-      <CardHeader className="flex flex-row items-center gap-0 p-4 pb-2.5">
+    <Card size="sm" className="h-full flex flex-col">
+      <CardHeader className="flex flex-row items-center">
         <div className="flex items-center gap-2 flex-1">
           <div className="flex size-5 items-center justify-center rounded bg-primary/10">
             <Target className="size-3 text-primary" />
@@ -29,7 +29,8 @@ export function InboxFocusCard({
           </span>
         </div>
       </CardHeader>
-      <CardContent className="grid grid-cols-2 gap-2.5 px-4 pb-0">
+      <CardContent>
+        <div className="grid grid-cols-2 gap-2.5">
         <Link
           href="/reminders"
           className="flex items-center gap-2.5 p-2 rounded-lg border border-border/60 bg-muted/20 hover:bg-accent/50 transition-colors"
@@ -70,6 +71,7 @@ export function InboxFocusCard({
             <span className="text-[10px] text-muted-foreground uppercase tracking-wider truncate">Uncategorized</span>
           </div>
         </Link>
+        </div>
       </CardContent>
     </Card>
   );

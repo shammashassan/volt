@@ -45,7 +45,7 @@ export function StatsCard({ resourcesCount, categoriesCount, favoritesCount, inb
     ]
 
     return (
-        <Card className="flex h-full flex-col border-border/50 bg-card/60 p-5 shadow-sm backdrop-blur-sm">
+        <Card size="sm" className="flex h-full flex-col">
             {/* Card heading */}
             <div className="flex items-center gap-2 mb-4">
                 <div className="flex size-5 items-center justify-center rounded bg-blue-500/10">
@@ -77,7 +77,7 @@ export function StatsCard({ resourcesCount, categoriesCount, favoritesCount, inb
 
             {/* Health & Status — pinned to bottom via mt-auto */}
             <div className="mt-auto flex flex-col gap-2.5 pt-4">
-                <Separator className="bg-border/40" />
+                <Separator />
 
                 {inboxCount > 0 ? (
                     <Link

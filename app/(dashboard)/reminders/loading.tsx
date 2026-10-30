@@ -8,10 +8,10 @@ export default function RemindersLoading() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between max-w-7xl">
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-4">
-              <Skeleton className="h-12 w-12 rounded-xl" />
+              <Skeleton className="h-12 w-12" />
               <div className="flex items-center gap-2">
                 <Skeleton className="h-9 w-48 md:h-10" />
-                <Skeleton className="h-6 w-20 rounded-full" />
+                <Skeleton className="h-6 w-20" />
               </div>
             </div>
             <Skeleton className="h-5 w-80 max-w-full mt-2" />
@@ -23,11 +23,11 @@ export default function RemindersLoading() {
       <section className="px-4 lg:px-6">
         <div className="max-w-7xl grid gap-6 md:grid-cols-3">
           <div className="md:col-span-2 space-y-4">
-            <Skeleton className="h-10 w-full rounded-lg" />
-            <Skeleton className="h-[400px] w-full rounded-2xl" />
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-[400px] w-full" />
           </div>
           <div>
-            <Skeleton className="h-[400px] w-full rounded-2xl" />
+            <Skeleton className="h-[400px] w-full" />
           </div>
         </div>
       </section>

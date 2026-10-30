@@ -8,10 +8,10 @@ export default function ProjectsLoading() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between max-w-7xl">
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-4">
-              <Skeleton className="h-12 w-12 rounded-xl" />
+              <Skeleton className="h-12 w-12" />
               <div className="flex items-center gap-2">
                 <Skeleton className="h-10 w-40" />
-                <Skeleton className="h-6 w-16 rounded-full" />
+                <Skeleton className="h-6 w-16" />
               </div>
             </div>
             <Skeleton className="h-6 w-96 max-w-full" />
@@ -34,7 +34,7 @@ export default function ProjectsLoading() {
               <div key={i} className="border border-border/20 rounded-xl p-6 flex flex-col gap-4 bg-card/30 backdrop-blur-xs">
                 <div className="flex items-start justify-between gap-3">
                   <Skeleton className="h-6 w-32" />
-                  <Skeleton className="h-5 w-16 rounded-full" />
+                  <Skeleton className="h-5 w-16" />
                 </div>
                 <Skeleton className="h-4 w-full" />
                 <Skeleton className="h-4 w-3/4" />

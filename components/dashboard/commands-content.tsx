@@ -241,7 +241,7 @@ export function CommandsContent() {
                 <h1 className="text-3xl font-black tracking-tight md:text-4xl bg-clip-text text-transparent bg-linear-to-r from-foreground to-foreground/60">
                   CLI Commands
                 </h1>
-                <Badge variant="outline" className="h-6 rounded-full border-primary/20 bg-primary/5 text-primary text-[10px] uppercase font-bold tracking-widest px-2.5">
+                <Badge variant="secondary">
                   {commandGroups.length} Groups
                 </Badge>
               </div>

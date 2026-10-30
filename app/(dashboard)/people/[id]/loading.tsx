@@ -8,20 +8,20 @@ export default function PersonDetailLoading() {
         <div className="flex flex-col gap-4 max-w-7xl">
           <div className="flex flex-col gap-3">
             {/* Back button */}
-            <Skeleton className="-ml-2 h-8 w-28 rounded-lg bg-muted/30" />
+            <Skeleton className="-ml-2 h-8 w-28" />
             <div className="flex items-center gap-3">
               {/* Icon skeleton */}
-              <Skeleton className="h-12 w-12 rounded-xl bg-muted/30 shrink-0" />
+              <Skeleton className="h-12 w-12 shrink-0" />
               {/* Name & Badge skeleton */}
               <div className="flex items-center gap-2">
-                <Skeleton className="h-9 w-48 bg-muted/30 rounded-lg" />
-                <Skeleton className="h-6 w-20 rounded-full bg-muted/30" />
+                <Skeleton className="h-9 w-48" />
+                <Skeleton className="h-6 w-20" />
               </div>
             </div>
             {/* Notes/description skeleton */}
             <div className="space-y-2 mt-2 max-w-2xl">
-              <Skeleton className="h-5 w-full bg-muted/30 rounded-md" />
-              <Skeleton className="h-5 w-2/3 bg-muted/30 rounded-md" />
+              <Skeleton className="h-5 w-full" />
+              <Skeleton className="h-5 w-2/3" />
             </div>
           </div>
         </div>
@@ -32,8 +32,8 @@ export default function PersonDetailLoading() {
         <div className="max-w-7xl flex flex-col gap-6">
           {/* Tabs header */}
           <div className="flex gap-2 max-w-[320px]">
-            <Skeleton className="h-10 w-1/2 bg-muted/30 rounded-lg" />
-            <Skeleton className="h-10 w-1/2 bg-muted/30 rounded-lg" />
+            <Skeleton className="h-10 w-1/2" />
+            <Skeleton className="h-10 w-1/2" />
           </div>
 
           {/* Grid skeleton */}
@@ -41,13 +41,13 @@ export default function PersonDetailLoading() {
             {[1, 2, 3, 4, 5, 6].map((i) => (
               <div key={i} className="border border-border/40 bg-card/30 rounded-xl p-5 flex flex-col gap-3 h-44">
                 <div className="space-y-2">
-                  <Skeleton className="h-5 w-2/3 bg-muted/30 rounded-md" />
-                  <Skeleton className="h-4 w-full bg-muted/30 rounded-md" />
-                  <Skeleton className="h-4 w-4/5 bg-muted/30 rounded-md" />
+                  <Skeleton className="h-5 w-2/3" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-4/5" />
                 </div>
                 <div className="mt-auto pt-3 border-t border-border/20 flex items-center justify-between">
-                  <Skeleton className="h-4 w-20 bg-muted/30 rounded" />
-                  <Skeleton className="h-4 w-12 bg-muted/30 rounded" />
+                  <Skeleton className="h-4 w-20" />
+                  <Skeleton className="h-4 w-12" />
                 </div>
               </div>
             ))}

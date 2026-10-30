@@ -1018,14 +1018,13 @@ export function GraphView({ data }: { data: GraphData }) {
         <div className="p-3 border border-border/40 bg-card/30 backdrop-blur-xs rounded-2xl flex flex-col gap-3 md:flex-row md:items-center">
           {/* Search Input */}
           <div className="relative flex-1">
-            <InputGroup className="bg-background/80 backdrop-blur-md shadow-sm h-9">
+            <InputGroup className="h-9">
               <InputGroupAddon align="inline-start">
                 <Search className="size-4 text-muted-foreground" />
               </InputGroupAddon>
               <InputGroupInput
                 type="text"
                 placeholder="Search nodes by title…"
-                className="text-xs"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -1054,8 +1053,6 @@ export function GraphView({ data }: { data: GraphData }) {
                 }}
                 variant="outline"
                 size="sm"
-                
-                className="bg-background/40 p-0.5 rounded-lg border gap-1"
               >
                 {Object.keys(filters).map((type) => {
                   const Icon = TYPE_ICONS[type as keyof typeof TYPE_ICONS] || FileText
@@ -1071,18 +1068,13 @@ export function GraphView({ data }: { data: GraphData }) {
                         render={
                           <ToggleGroupItem
                             value={type}
-                            className={cn(
-                              "size-7 p-0 flex items-center justify-center transition-all rounded-md cursor-pointer shrink-0",
-                              isSelected
-                                ? "bg-primary/10 text-primary border-primary/20 hover:bg-primary/15 hover:text-primary"
-                                : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                            )}
+                            className="cursor-pointer shrink-0"
                           />
                         }
                       >
                         <Icon className="size-3.5" style={{ color: color }} />
                       </TooltipTrigger>
-                      <TooltipContent side="bottom" className="text-xs">
+                      <TooltipContent side="bottom">
                         {typeConfig.label} ({activeCount} nodes)
                       </TooltipContent>
                     </Tooltip>
@@ -1094,7 +1086,7 @@ export function GraphView({ data }: { data: GraphData }) {
             <Button
               variant="ghost"
               size="xs"
-              className="text-[10px] text-muted-foreground h-7 px-2 hover:bg-muted/50 rounded-md cursor-pointer shrink-0"
+              className="shrink-0 cursor-pointer"
               onClick={() => {
                 stateRef.current.alpha = 0.4 // Reheat simulation
                 const allOn = Object.values(filters).some((v) => !v)
@@ -1117,24 +1109,24 @@ export function GraphView({ data }: { data: GraphData }) {
                   <Button
                     variant="outline"
                     size="xs"
-                    className="h-7 px-2 hover:bg-muted/50 rounded-md cursor-pointer shrink-0 gap-1.5 font-semibold text-xs"
+                    className="shrink-0 cursor-pointer"
                   />
                 }
               >
                 <SlidersHorizontal className="size-3.5" />
                 <span className="hidden sm:inline">Options</span>
               </PopoverTrigger>
-              <PopoverContent align="end" className="w-56 p-2 flex flex-col gap-1 bg-popover/95 backdrop-blur-md shadow-md border z-50">
-                <PopoverHeader className="pb-1 border-b">
-                  <PopoverTitle className="text-xs font-bold text-foreground">Canvas Settings</PopoverTitle>
-                  <PopoverDescription className="text-[10px] text-muted-foreground">Adjust display modes</PopoverDescription>
+              <PopoverContent align="end" className="w-56 z-50">
+                <PopoverHeader>
+                  <PopoverTitle>Canvas Settings</PopoverTitle>
+                  <PopoverDescription>Adjust display modes</PopoverDescription>
                 </PopoverHeader>
                 
                 <div className="flex flex-col gap-1 mt-1">
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="justify-start gap-2 h-8 text-xs font-medium cursor-pointer"
+                    className="justify-start cursor-pointer"
                     onClick={toggleFullscreen}
                   >
                     {isFullscreen ? (
@@ -1153,7 +1145,7 @@ export function GraphView({ data }: { data: GraphData }) {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="justify-start gap-2 h-8 text-xs font-medium cursor-pointer"
+                    className="justify-start cursor-pointer"
                     onClick={centerGraph}
                   >
                     <Maximize2 className="size-3.5 text-muted-foreground" />
@@ -1163,7 +1155,7 @@ export function GraphView({ data }: { data: GraphData }) {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="justify-start gap-2 h-8 text-xs font-medium cursor-pointer"
+                    className="justify-start cursor-pointer"
                     onClick={() => {
                       const state = stateRef.current
                       state.nodes.forEach((n, i) => {
@@ -1213,8 +1205,7 @@ export function GraphView({ data }: { data: GraphData }) {
           <div className="flex flex-col rounded-lg border bg-background/80 backdrop-blur-md p-1 shadow-sm gap-1">
             <Button
               variant="ghost"
-              size="icon"
-              className="size-8"
+              size="icon-sm"
               onClick={() => zoom("in")}
               title="Zoom In"
             >
@@ -1222,8 +1213,7 @@ export function GraphView({ data }: { data: GraphData }) {
             </Button>
             <Button
               variant="ghost"
-              size="icon"
-              className="size-8"
+              size="icon-sm"
               onClick={() => zoom("out")}
               title="Zoom Out"
             >
@@ -1231,8 +1221,7 @@ export function GraphView({ data }: { data: GraphData }) {
             </Button>
             <Button
               variant="ghost"
-              size="icon"
-              className="size-8"
+              size="icon-sm"
               onClick={centerGraph}
               title="Center View"
             >
@@ -1240,8 +1229,7 @@ export function GraphView({ data }: { data: GraphData }) {
             </Button>
             <Button
               variant="ghost"
-              size="icon"
-              className="size-8"
+              size="icon-sm"
               onClick={() => {
                 // Re-spiral positions
                 const state = stateRef.current
@@ -1271,15 +1259,14 @@ export function GraphView({ data }: { data: GraphData }) {
               closeDelay={100}
               render={
                 <Button
-                  variant="ghost"
-                  size="icon"
-                  className="size-8 rounded-lg border bg-background/80 backdrop-blur-md shadow-sm text-muted-foreground hover:text-foreground"
+                  variant="outline"
+                  size="icon-sm"
                 >
                   <HelpCircle className="size-4" />
                 </Button>
               }
             />
-            <HoverCardContent side="top" align="start" className="w-72 p-3 bg-popover/90 backdrop-blur-sm shadow-md border pointer-events-none">
+            <HoverCardContent side="top" align="start" className="w-72">
               <div className="flex flex-col gap-2 text-xs">
                 <h4 className="font-bold text-foreground">Graph Guide & Controls</h4>
                 <div className="flex flex-col gap-1.5 text-muted-foreground">

@@ -6,10 +6,10 @@ export default function QuickSaveLoading() {
       <div className="w-full max-w-[420px] rounded-2xl border border-border/80 bg-card/60 p-6 shadow-2xl backdrop-blur-xl">
         <div className="space-y-4">
           <Skeleton className="h-6 w-32" />
-          <Skeleton className="h-10 w-full rounded-lg" />
-          <Skeleton className="h-10 w-full rounded-lg" />
-          <Skeleton className="h-24 w-full rounded-lg" />
-          <Skeleton className="h-10 w-full rounded-lg" />
+          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-24 w-full" />
+          <Skeleton className="h-10 w-full" />
         </div>
       </div>
     </div>

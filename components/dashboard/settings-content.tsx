@@ -501,357 +501,367 @@ export function SettingsContent() {
             value={activeTab}
             onValueChange={setActiveTab}
             orientation="vertical"
-            className="flex flex-col lg:flex-row gap-6 items-start w-full"
+            className="w-full"
           >
-            {/* Navigation Tabs List */}
-            <TabsList>
-              <TabsTrigger value="profile">
-                <User />
-                Profile Details
-              </TabsTrigger>
-              <TabsTrigger value="security">
-                <Lock />
-                Security & Access
-              </TabsTrigger>
-              <TabsTrigger value="danger" className="text-destructive">
-                <ShieldAlert />
-                Danger Zone
-              </TabsTrigger>
-            </TabsList>
+            <div className="flex flex-col lg:flex-row gap-6 items-start w-full">
+              {/* Navigation Tabs List */}
+              <TabsList>
+                <TabsTrigger value="profile">
+                  <User />
+                  Profile Details
+                </TabsTrigger>
+                <TabsTrigger value="security">
+                  <Lock />
+                  Security & Access
+                </TabsTrigger>
+                <TabsTrigger value="danger">
+                  <ShieldAlert />
+                  Danger Zone
+                </TabsTrigger>
+              </TabsList>
 
-            {/* Tabs Contents Panel */}
-            <div className="flex-1 w-full space-y-6">
-              {/* PROFILE DETAILS */}
-              <TabsContent value="profile" className="outline-none space-y-6">
-                <Card className="border border-border/40 shadow-xl bg-card/60 backdrop-blur-xl">
-                  <form onSubmit={handleUpdateProfile}>
-                    <CardHeader className="pb-4">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <CardTitle>Public Profile</CardTitle>
-                          <CardDescription>Update your personal information and verified email address.</CardDescription>
-                        </div>
-                        <Badge variant="secondary" className="font-mono text-xs uppercase">
-                          {user?.role || "user"}
-                        </Badge>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="space-y-4 pt-2 pb-6">
-                      <div className="grid gap-2">
-                        <Label htmlFor="name" className="text-sm font-medium">Full Name</Label>
-                        <Input
-                          id="name"
-                          value={profileData.name}
-                          onChange={(e) => setProfileData({ ...profileData, name: e.target.value })}
-                          placeholder="Your Name"
-                        />
-                      </div>
-                      <div className="grid gap-2">
-                        <Label htmlFor="email" className="text-sm font-medium">Email Address</Label>
-                        <Input
-                          id="email"
-                          type="email"
-                          value={profileData.email}
-                          onChange={(e) => setProfileData({ ...profileData, email: e.target.value })}
-                          placeholder="your@email.com"
-                        />
-                      </div>
-                    </CardContent>
-                    <CardFooter className="px-6 py-4 flex justify-end border-t border-border/40">
-                      <Button type="submit" disabled={isUpdatingProfile || !isProfileDirty}>
-                        {isUpdatingProfile && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        Save Changes
-                      </Button>
-                    </CardFooter>
-                  </form>
-                </Card>
-              </TabsContent>
+              {/* Tabs Contents Panel */}
+              <div className="flex-1 w-full space-y-6">
+                {/* PROFILE DETAILS */}
+                <TabsContent value="profile">
+                  <div className="space-y-6">
+                    <Card>
+                      <form onSubmit={handleUpdateProfile}>
+                        <CardHeader>
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <CardTitle>Public Profile</CardTitle>
+                              <CardDescription>Update your personal information and verified email address.</CardDescription>
+                            </div>
+                            <Badge variant="secondary">
+                              {user?.role || "user"}
+                            </Badge>
+                          </div>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="space-y-4">
+                            <div className="grid gap-2">
+                              <Label htmlFor="name">Full Name</Label>
+                              <Input
+                                id="name"
+                                value={profileData.name}
+                                onChange={(e) => setProfileData({ ...profileData, name: e.target.value })}
+                                placeholder="Your Name"
+                              />
+                            </div>
+                            <div className="grid gap-2">
+                              <Label htmlFor="email">Email Address</Label>
+                              <Input
+                                id="email"
+                                type="email"
+                                value={profileData.email}
+                                onChange={(e) => setProfileData({ ...profileData, email: e.target.value })}
+                                placeholder="your@email.com"
+                              />
+                            </div>
+                          </div>
+                        </CardContent>
+                        <CardFooter className="flex justify-end">
+                          <Button type="submit" disabled={isUpdatingProfile || !isProfileDirty}>
+                            {isUpdatingProfile && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            Save Changes
+                          </Button>
+                        </CardFooter>
+                      </form>
+                    </Card>
+                  </div>
+                </TabsContent>
 
-              {/* SECURITY & LOGIN */}
-              <TabsContent value="security" className="outline-none space-y-6">
-                {/* Two-Factor Authentication Card */}
-                <Card className="border border-border/40 shadow-xl bg-card/60 backdrop-blur-xl">
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                          <CardTitle className="text-lg">Two-Factor Authentication (2FA)</CardTitle>
-                          <Badge variant={is2FAEnabled ? "default" : "secondary"}>
-                            {is2FAEnabled ? "ACTIVE" : "DISABLED"}
-                          </Badge>
+                {/* SECURITY & LOGIN */}
+                <TabsContent value="security">
+                  <div className="space-y-6">
+                    {/* Two-Factor Authentication Card */}
+                    <Card>
+                      <CardHeader>
+                        <div className="flex items-center justify-between">
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-2">
+                              <CardTitle>Two-Factor Authentication (2FA)</CardTitle>
+                              <Badge variant={is2FAEnabled ? "default" : "secondary"}>
+                                {is2FAEnabled ? "ACTIVE" : "DISABLED"}
+                              </Badge>
+                            </div>
+                            <CardDescription>
+                              Protect your account by requiring an authenticator code on login.
+                            </CardDescription>
+                          </div>
+                          {is2FAEnabled ? (
+                            <div className="flex items-center gap-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setShowDisable2FA(true)}
+                              >
+                                Disable 2FA
+                              </Button>
+                            </div>
+                          ) : (
+                            <Button
+                              variant="default"
+                              size="sm"
+                              onClick={() => {
+                                setTotpURI("")
+                                setTotpCode("")
+                                setEnable2FAPassword("")
+                                setShowEnable2FA(true)
+                              }}
+                            >
+                              Enable 2FA
+                            </Button>
+                          )}
                         </div>
-                        <CardDescription>
-                          Protect your account by requiring an authenticator code on login.
-                        </CardDescription>
-                      </div>
-                      {is2FAEnabled ? (
-                        <div className="flex items-center gap-2">
+                      </CardHeader>
+                    </Card>
+
+                    {/* Passkeys Card */}
+                    <Card>
+                      <CardHeader>
+                        <div className="flex items-center justify-between">
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-2">
+                              <CardTitle>Passkeys</CardTitle>
+                              <Badge variant="secondary">
+                                {passkeys.length} REGISTERED
+                              </Badge>
+                            </div>
+                            <CardDescription>
+                              Sign in securely with biometric verification or security keys without entering passwords.
+                            </CardDescription>
+                          </div>
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => setShowDisable2FA(true)}
+                            onClick={() => setShowAddPasskey(true)}
                           >
-                            Disable 2FA
+                            <Plus className="size-4" />
+                            Add Passkey
                           </Button>
                         </div>
-                      ) : (
-                        <Button
-                          variant="default"
-                          size="sm"
-                          onClick={() => {
-                            setTotpURI("")
-                            setTotpCode("")
-                            setEnable2FAPassword("")
-                            setShowEnable2FA(true)
-                          }}
-                        >
-                          Enable 2FA
-                        </Button>
-                      )}
-                    </div>
-                  </CardHeader>
-                </Card>
-
-                {/* Passkeys Card */}
-                <Card className="border border-border/40 shadow-xl bg-card/60 backdrop-blur-xl">
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                          <CardTitle className="text-lg">Passkeys</CardTitle>
-                          <Badge variant="secondary" className="font-mono text-xs">
-                            {passkeys.length} REGISTERED
-                          </Badge>
-                        </div>
-                        <CardDescription>
-                          Sign in securely with biometric verification or security keys without entering passwords.
-                        </CardDescription>
-                      </div>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="gap-1.5"
-                        onClick={() => setShowAddPasskey(true)}
-                      >
-                        <Plus className="size-4" />
-                        Add Passkey
-                      </Button>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    {securityLoading ? (
-                      <div className="flex justify-center py-4">
-                        <Loader2 className="size-5 animate-spin text-muted-foreground" />
-                      </div>
-                    ) : passkeys.length === 0 ? (
-                      <p className="text-sm text-muted-foreground py-2">
-                        No passkeys registered yet. Add a passkey to enable biometric login.
-                      </p>
-                    ) : (
-                      <div className="divide-y divide-border/40 rounded-xl border border-border/40 overflow-hidden">
-                        {passkeys.map((pk) => (
-                          <div key={pk.id} className="flex items-center justify-between p-3.5 bg-background/40">
-                            <div className="flex items-center gap-3">
-                              <Key className="size-4 text-primary" />
-                              <div>
-                                <p className="text-sm font-semibold">{pk.name || "Unnamed Passkey"}</p>
-                                <p className="text-xs text-muted-foreground font-mono">
-                                  ID: {pk.id.slice(0, 12)}...
-                                </p>
-                              </div>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-3">
+                          {securityLoading ? (
+                            <div className="flex justify-center py-4">
+                              <Loader2 className="size-5 animate-spin text-muted-foreground" />
                             </div>
-                            <Button
-                              variant="ghost"
-                              size="icon-sm"
-                              className="text-muted-foreground hover:text-destructive"
-                              onClick={() => handleDeletePasskey(pk.id)}
-                            >
-                              <Trash2 className="size-4" />
-                            </Button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-
-                {/* Update Password Card */}
-                <Card className="border border-border/40 shadow-xl bg-card/60 backdrop-blur-xl">
-                  <form onSubmit={handleUpdatePassword}>
-                    <CardHeader className="pb-4">
-                      <CardTitle className="text-lg">Change Password</CardTitle>
-                      <CardDescription>Update your existing account password and revoke other open sessions.</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4 pt-2 pb-6">
-                      <div className="grid gap-2">
-                        <Label htmlFor="currentPassword">Current Password</Label>
-                        <Input
-                          id="currentPassword"
-                          type="password"
-                          value={passwordData.currentPassword}
-                          onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
-                        />
-                      </div>
-                      <div className="grid gap-2">
-                        <Label htmlFor="newPassword">New Password</Label>
-                        <Input
-                          id="newPassword"
-                          type="password"
-                          value={passwordData.newPassword}
-                          onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
-                        />
-                      </div>
-                      <div className="grid gap-2">
-                        <Label htmlFor="confirmPassword">Confirm New Password</Label>
-                        <Input
-                          id="confirmPassword"
-                          type="password"
-                          value={passwordData.confirmPassword}
-                          onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
-                        />
-                      </div>
-                    </CardContent>
-                    <CardFooter className="px-6 py-4 flex justify-end border-t border-border/40">
-                      <Button type="submit" disabled={isUpdatingPassword || !isPasswordValid}>
-                        {isUpdatingPassword && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        Update Password
-                      </Button>
-                    </CardFooter>
-                  </form>
-                </Card>
-
-                {/* Active Sessions Card */}
-                <Card className="border border-border/40 shadow-xl bg-card/60 backdrop-blur-xl">
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                          <CardTitle className="text-lg">Active Sessions</CardTitle>
-                          <Badge variant="secondary" className="font-mono text-xs">
-                            {sessions.length} ACTIVE
-                          </Badge>
+                          ) : passkeys.length === 0 ? (
+                            <p className="text-sm text-muted-foreground py-2">
+                              No passkeys registered yet. Add a passkey to enable biometric login.
+                            </p>
+                          ) : (
+                            <div className="divide-y divide-border/40 rounded-xl border border-border/40 overflow-hidden">
+                              {passkeys.map((pk) => (
+                                <div key={pk.id} className="flex items-center justify-between p-3.5 bg-background/40">
+                                  <div className="flex items-center gap-3">
+                                    <Key className="size-4 text-primary" />
+                                    <div>
+                                      <p className="text-sm font-semibold">{pk.name || "Unnamed Passkey"}</p>
+                                      <p className="text-xs text-muted-foreground font-mono">
+                                        ID: {pk.id.slice(0, 12)}...
+                                      </p>
+                                    </div>
+                                  </div>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon-sm"
+                                    onClick={() => handleDeletePasskey(pk.id)}
+                                  >
+                                    <Trash2 className="size-4" />
+                                  </Button>
+                                </div>
+                              ))}
+                            </div>
+                          )}
                         </div>
-                        <CardDescription>
-                          Review and revoke devices that currently hold active authentication tokens.
-                        </CardDescription>
-                      </div>
-                      {sessions.length > 1 && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="gap-1.5"
-                          onClick={handleRevokeOtherSessions}
-                        >
-                          <LogOut className="size-4" />
-                          Revoke Other Sessions
-                        </Button>
-                      )}
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    {securityLoading ? (
-                      <div className="flex justify-center py-4">
-                        <Loader2 className="size-5 animate-spin text-muted-foreground" />
-                      </div>
-                    ) : (
-                      <div className="divide-y divide-border/40 rounded-xl border border-border/40 overflow-hidden">
-                        {sessions.map((s) => {
-                          const isCurrent = s.token === session.session.token
-                          return (
-                            <div key={s.id} className="flex items-center justify-between p-3.5 bg-background/40">
-                              <div className="flex items-center gap-3">
-                                {s.userAgent?.toLowerCase().includes("mobile") ? (
-                                  <Smartphone className="size-5 text-primary" />
-                                ) : (
-                                  <Laptop className="size-5 text-primary" />
-                                )}
-                                <div>
-                                  <div className="flex items-center gap-2">
-                                    <p className="text-sm font-semibold truncate max-w-xs md:max-w-md">
-                                      {s.userAgent || "Unknown Browser / Client"}
-                                    </p>
-                                    {isCurrent && (
-                                      <Badge variant="default" className="text-[10px] px-1.5 py-0">
-                                        CURRENT
-                                      </Badge>
+                      </CardContent>
+                    </Card>
+
+                    {/* Update Password Card */}
+                    <Card>
+                      <form onSubmit={handleUpdatePassword}>
+                        <CardHeader>
+                          <CardTitle>Change Password</CardTitle>
+                          <CardDescription>Update your existing account password and revoke other open sessions.</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="space-y-4">
+                            <div className="grid gap-2">
+                              <Label htmlFor="currentPassword">Current Password</Label>
+                              <Input
+                                id="currentPassword"
+                                type="password"
+                                value={passwordData.currentPassword}
+                                onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
+                              />
+                            </div>
+                            <div className="grid gap-2">
+                              <Label htmlFor="newPassword">New Password</Label>
+                              <Input
+                                id="newPassword"
+                                type="password"
+                                value={passwordData.newPassword}
+                                onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+                              />
+                            </div>
+                            <div className="grid gap-2">
+                              <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                              <Input
+                                id="confirmPassword"
+                                type="password"
+                                value={passwordData.confirmPassword}
+                                onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
+                              />
+                            </div>
+                          </div>
+                        </CardContent>
+                        <CardFooter className="flex justify-end">
+                          <Button type="submit" disabled={isUpdatingPassword || !isPasswordValid}>
+                            {isUpdatingPassword && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            Update Password
+                          </Button>
+                        </CardFooter>
+                      </form>
+                    </Card>
+
+                    {/* Active Sessions Card */}
+                    <Card>
+                      <CardHeader>
+                        <div className="flex items-center justify-between">
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-2">
+                              <CardTitle>Active Sessions</CardTitle>
+                              <Badge variant="secondary">
+                                {sessions.length} ACTIVE
+                              </Badge>
+                            </div>
+                            <CardDescription>
+                              Review and revoke devices that currently hold active authentication tokens.
+                            </CardDescription>
+                          </div>
+                          {sessions.length > 1 && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={handleRevokeOtherSessions}
+                            >
+                              <LogOut className="size-4" />
+                              Revoke Other Sessions
+                            </Button>
+                          )}
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-3">
+                          {securityLoading ? (
+                            <div className="flex justify-center py-4">
+                              <Loader2 className="size-5 animate-spin text-muted-foreground" />
+                            </div>
+                          ) : (
+                            <div className="divide-y divide-border/40 rounded-xl border border-border/40 overflow-hidden">
+                              {sessions.map((s) => {
+                                const isCurrent = s.token === session.session.token
+                                return (
+                                  <div key={s.id} className="flex items-center justify-between p-3.5 bg-background/40">
+                                    <div className="flex items-center gap-3">
+                                      {s.userAgent?.toLowerCase().includes("mobile") ? (
+                                        <Smartphone className="size-5 text-primary" />
+                                      ) : (
+                                        <Laptop className="size-5 text-primary" />
+                                      )}
+                                      <div>
+                                        <div className="flex items-center gap-2">
+                                          <p className="text-sm font-semibold truncate max-w-xs md:max-w-md">
+                                            {s.userAgent || "Unknown Browser / Client"}
+                                          </p>
+                                          {isCurrent && (
+                                            <Badge variant="default">
+                                              CURRENT
+                                            </Badge>
+                                          )}
+                                        </div>
+                                        <p className="text-xs text-muted-foreground font-mono">
+                                          IP: {s.ipAddress || "Localhost / Proxy"} • Started:{" "}
+                                          {new Date(s.createdAt).toLocaleDateString()}
+                                        </p>
+                                      </div>
+                                    </div>
+                                    {!isCurrent && (
+                                      <Button
+                                        variant="destructive"
+                                        size="sm"
+                                        onClick={() => handleRevokeSession(s.token)}
+                                      >
+                                        Revoke
+                                      </Button>
                                     )}
                                   </div>
-                                  <p className="text-xs text-muted-foreground font-mono">
-                                    IP: {s.ipAddress || "Localhost / Proxy"} • Started:{" "}
-                                    {new Date(s.createdAt).toLocaleDateString()}
-                                  </p>
-                                </div>
-                              </div>
-                              {!isCurrent && (
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="text-xs text-destructive hover:bg-destructive/10"
-                                  onClick={() => handleRevokeSession(s.token)}
-                                >
-                                  Revoke
-                                </Button>
-                              )}
+                                )
+                              })}
                             </div>
-                          )
-                        })}
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </TabsContent>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </TabsContent>
 
-              {/* DANGER ZONE */}
-              <TabsContent value="danger" className="outline-none">
-                <Card className="border border-destructive/30 shadow-xl bg-destructive/5 backdrop-blur-xl">
-                  <CardHeader className="pb-4">
-                    <CardTitle className="text-destructive">Delete Account</CardTitle>
-                    <CardDescription>
-                      Once deleted, your account and associated records cannot be recovered.
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="pb-6">
-                    <div className="flex items-start gap-4 p-4 rounded-lg bg-destructive/10 text-destructive text-sm font-semibold">
-                      <ShieldAlert className="size-5 shrink-0" />
-                      <p>Deleting your account is permanent and will remove all access to your resources, collections, and configurations.</p>
-                    </div>
-                  </CardContent>
-                  <CardFooter className="px-6 py-4 flex justify-end border-t border-destructive/20">
-                    <AlertDialog>
-                      <AlertDialogTrigger
-                        render={
-                          <Button variant="destructive" className="min-w-35 cursor-pointer" />
-                        }
-                      >
-                        <Trash2 className="mr-2 h-4 w-4" />
-                        Delete Account
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogMedia className="bg-destructive/10 text-destructive">
-                            <ShieldAlert />
-                          </AlertDialogMedia>
-                          <AlertDialogTitle>Final Confirmation</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Are you absolutely sure you want to delete your account? This action is irreversible.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction
-                            variant="destructive"
-                            onClick={handleDeleteAccount}
-                            disabled={isDeleting}
-                          >
-                            {isDeleting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                            Delete Permanently
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </CardFooter>
-                </Card>
-              </TabsContent>
+                {/* DANGER ZONE */}
+                <TabsContent value="danger">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Delete Account</CardTitle>
+                      <CardDescription>
+                        Once deleted, your account and associated records cannot be recovered.
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex items-start gap-4 p-4 rounded-lg bg-destructive/10 text-destructive text-sm font-semibold">
+                        <ShieldAlert className="size-5 shrink-0" />
+                        <p>Deleting your account is permanent and will remove all access to your resources, collections, and configurations.</p>
+                      </div>
+                    </CardContent>
+                    <CardFooter className="flex justify-end">
+                      <AlertDialog>
+                        <AlertDialogTrigger
+                          render={
+                            <Button variant="destructive" className="min-w-35 cursor-pointer" />
+                          }
+                        >
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          Delete Account
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogMedia>
+                              <ShieldAlert className="text-destructive" />
+                            </AlertDialogMedia>
+                            <AlertDialogTitle>Final Confirmation</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Are you absolutely sure you want to delete your account? This action is irreversible.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              variant="destructive"
+                              onClick={handleDeleteAccount}
+                              disabled={isDeleting}
+                            >
+                              {isDeleting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                              Delete Permanently
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </CardFooter>
+                  </Card>
+                </TabsContent>
+              </div>
             </div>
           </Tabs>
         </div>
@@ -915,7 +925,7 @@ export function SettingsContent() {
                       maxLength={6}
                       required
                       autoFocus
-                      className="text-center font-mono text-lg tracking-wider"
+                      className="text-center"
                     />
                   </Field>
                 </FieldGroup>
@@ -970,9 +980,11 @@ export function SettingsContent() {
       <Dialog open={showBackupCodes} onOpenChange={setShowBackupCodes}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-foreground">
-              <CheckCircle2 className="size-5 text-emerald-500 shrink-0" />
-              <span>2FA Active: Save Your Backup Codes</span>
+            <DialogTitle>
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="size-5 text-emerald-500 shrink-0" />
+                <span>2FA Active: Save Your Backup Codes</span>
+              </div>
             </DialogTitle>
             <DialogDescription>
               Save these one-time recovery codes in a secure password manager. If you lose your authenticator device, each code can be used once to access your account.
@@ -990,7 +1002,6 @@ export function SettingsContent() {
               type="button"
               variant="outline"
               size="sm"
-              className="gap-1.5"
               onClick={() => {
                 void navigator.clipboard.writeText(backupCodes.join("\n"))
                 toast.add({

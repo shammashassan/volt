@@ -9,19 +9,19 @@ export default function ResourcesLoading() {
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-4">
               {/* Icon skeleton */}
-              <Skeleton className="h-12 w-12 rounded-xl" />
+              <Skeleton className="h-12 w-12" />
               <div className="flex items-center gap-2">
                 {/* Title skeleton */}
                 <Skeleton className="h-9 w-48 md:h-10" />
                 {/* Badge skeleton */}
-                <Skeleton className="h-6 w-20 rounded-full" />
+                <Skeleton className="h-6 w-20" />
               </div>
             </div>
             {/* Description skeleton */}
             <Skeleton className="h-5 w-96 max-w-full mt-2" />
           </div>
           {/* Button skeleton */}
-          <Skeleton className="h-8 w-full sm:w-32 rounded-lg shrink-0" />
+          <Skeleton className="h-8 w-full sm:w-32 shrink-0" />
         </div>
       </section>
 
@@ -30,15 +30,15 @@ export default function ResourcesLoading() {
         <div className="p-4 border border-border/40 bg-card/30 backdrop-blur-sm rounded-2xl flex flex-col gap-4 lg:flex-row lg:items-center max-w-7xl">
           <div className="relative flex-1">
             {/* Search input skeleton */}
-            <Skeleton className="h-10 w-full rounded-md" />
+            <Skeleton className="h-10 w-full" />
           </div>
           <div className="flex flex-wrap gap-3 items-center">
             {/* Select dropdown skeletons */}
-            <Skeleton className="h-10 w-[140px] rounded-md" />
-            <Skeleton className="h-10 w-[140px] rounded-md" />
-            <Skeleton className="h-10 w-[160px] rounded-md" />
+            <Skeleton className="h-10 w-[140px]" />
+            <Skeleton className="h-10 w-[140px]" />
+            <Skeleton className="h-10 w-[160px]" />
             {/* Star toggle skeleton */}
-            <Skeleton className="h-10 w-[90px] rounded-md" />
+            <Skeleton className="h-10 w-[90px]" />
           </div>
         </div>
       </section>
@@ -49,7 +49,7 @@ export default function ResourcesLoading() {
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="border border-border/40 bg-card/60 rounded-xl overflow-hidden flex flex-col">
               {/* Image preview skeleton */}
-              <Skeleton className="aspect-video w-full rounded-none" />
+              <Skeleton className="aspect-video w-full" />
               {/* Content area */}
               <div className="px-4 py-3 flex flex-col gap-2">
                 <Skeleton className="h-5 w-2/3" />

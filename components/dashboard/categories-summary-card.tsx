@@ -20,7 +20,7 @@ interface CategoriesSummaryCardProps {
 export function CategoriesSummaryCard({ categories = [] }: CategoriesSummaryCardProps) {
     if (categories.length === 0) {
         return (
-            <Card size="sm" className="h-full flex flex-col border-border/50 bg-card/60 shadow-sm backdrop-blur-sm">
+            <Card size="sm" className="h-full flex flex-col">
                 <CardHeader className="flex flex-row items-center justify-between">
                     <div className="flex items-center gap-2">
                         <div className="flex size-5 items-center justify-center rounded bg-amber-500/10">
@@ -58,9 +58,9 @@ export function CategoriesSummaryCard({ categories = [] }: CategoriesSummaryCard
         .slice(0, 10)
 
     return (
-        <Card size="sm" className="h-full flex flex-col gap-0 border-border/50 bg-card/60 shadow-sm backdrop-blur-sm">
+        <Card size="sm" className="h-full flex flex-col">
             {/* Header */}
-            <CardHeader className="flex flex-row items-center justify-between pb-3">
+            <CardHeader className="flex flex-row items-center justify-between">
                 <div className="flex items-center gap-2">
                     <div className="flex size-5 items-center justify-center rounded bg-amber-500/10">
                         <Folders className="size-3 text-amber-500" />
@@ -101,7 +101,6 @@ export function CategoriesSummaryCard({ categories = [] }: CategoriesSummaryCard
                                     </div>
                                     <Progress
                                         value={density}
-                                        className="h-0.5 bg-muted/30 *:data-[slot=progress-indicator]:bg-amber-500/50 group-hover/item:*:data-[slot=progress-indicator]:bg-amber-500 transition-all duration-500"
                                     />
                                 </div>
                             )
