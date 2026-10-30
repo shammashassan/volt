@@ -47,7 +47,8 @@ Examples:
   }
 
   return (
-    <FieldGroup className="py-2">
+    <div className="py-2">
+      <FieldGroup>
       <Field>
         <FieldLabel htmlFor="slug">Collection ID (URL Slug)</FieldLabel>
         <Input
@@ -114,7 +115,6 @@ Examples:
             type="button"
             variant="ghost"
             size="sm"
-            className="h-8 gap-1.5 text-xs text-muted-foreground hover:text-primary"
             onClick={copyPrompt}
             disabled={!name}
           >
@@ -132,5 +132,6 @@ Examples:
         />
       </Field>
     </FieldGroup>
+    </div>
   )
 }
