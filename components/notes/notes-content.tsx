@@ -722,7 +722,7 @@ export function NotesContent({
                   id={`checkbox-${idx}`}
                   checked={isChecked}
                   onCheckedChange={(c) => handleToggleCheckbox(idx, !!c)}
-                  className="size-4 shrink-0 transition-all"
+                  className="shrink-0"
                 />
                 <label
                   htmlFor={`checkbox-${idx}`}
@@ -786,7 +786,7 @@ export function NotesContent({
         <div className="flex items-center gap-2 sm:gap-2.5">
           <BookOpen className="size-4 sm:size-5 text-primary" aria-hidden="true" />
           <span className="text-sm sm:text-base font-semibold">Notes</span>
-          <Badge variant="secondary" className="text-xs tabular-nums h-5 px-2">
+          <Badge variant="secondary"><span className="tabular-nums">
             {filteredNotes.length}
           </Badge>
         </div>
@@ -809,7 +809,7 @@ export function NotesContent({
             placeholder="Search notes…"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="h-9 text-sm"
+            className="h-9"
           />
           <InputGroupAddon align="inline-end">
             <Search className="size-4 text-muted-foreground" aria-hidden="true" />
@@ -824,7 +824,7 @@ export function NotesContent({
             <div className="flex gap-1.5 sm:gap-2 pb-2">
               <Badge
                 variant={selectedTag === null ? "default" : "outline"}
-                className="cursor-pointer select-none rounded-full text-xs font-medium h-6 px-3 shrink-0"
+                className="cursor-pointer select-none shrink-0"
                 onClick={() => setSelectedTag(null)}
               >
                 All
@@ -833,7 +833,7 @@ export function NotesContent({
                 <Badge
                   key={tag}
                   variant={selectedTag === tag ? "default" : "outline"}
-                  className="cursor-pointer select-none rounded-full text-xs font-medium h-6 px-3 shrink-0"
+                  className="cursor-pointer select-none shrink-0"
                   onClick={() => setSelectedTag(tag)}
                 >
                   {tag}
@@ -849,7 +849,7 @@ export function NotesContent({
       <ScrollArea className="flex-1 min-h-0 [&_[data-slot=scroll-area-viewport]>div]:block! [&_[data-slot=scroll-area-viewport]>div]:min-w-0! **:data-[slot=scroll-area-viewport]:overflow-x-hidden">
         <div className="flex flex-col gap-1 p-2 sm:p-3">
           {filteredNotes.length === 0 ? (
-            <Empty className="py-16">
+            <Empty>
               <EmptyHeader>
                 <EmptyMedia variant="icon">
                   <FileText aria-hidden="true" />
@@ -913,13 +913,13 @@ export function NotesContent({
                         <Badge
                           key={tag}
                           variant="secondary"
-                          className="text-xs px-2 h-5 rounded-full font-medium"
+                          
                         >
                           {tag}
                         </Badge>
                       ))}
                       {(note.tags || []).length > 2 && (
-                        <Badge variant="outline" className="text-xs px-2 h-5 rounded-full">
+                        <Badge variant="outline">
                           +{(note.tags || []).length - 2}
                         </Badge>
                       )}
@@ -977,7 +977,7 @@ export function NotesContent({
                           }}
                           aria-label="Delete note"
                         >
-                          <Trash2 className="size-3.5" aria-hidden="true" />
+                          <Trash2 className="size-3.5 text-destructive" aria-hidden="true" />
                         </Button>
                       </div>
 
@@ -997,7 +997,7 @@ export function NotesContent({
       <AlertDialog open={!!noteToDelete} onOpenChange={(open) => { if (!open) setNoteToDelete(null) }}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogMedia className="bg-destructive/10 text-destructive">
+            <AlertDialogMedia>
               <Trash2 aria-hidden="true" />
             </AlertDialogMedia>
             <AlertDialogTitle>Delete note?</AlertDialogTitle>
@@ -1061,7 +1061,7 @@ export function NotesContent({
               </EmptyDescription>
             </EmptyHeader>
             <EmptyContent>
-              <Button onClick={handleOpenCreate} className="gap-2">
+              <Button onClick={handleOpenCreate}>
                 <Plus data-icon="inline-start" aria-hidden="true" />
                 New note
               </Button>
@@ -1159,8 +1159,7 @@ export function NotesContent({
                           <Button
                             type="button"
                             variant="ghost"
-                            size="icon"
-                            className="size-8 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted"
+                            size="icon-sm"
                             onClick={() => insertMarkdown("h1")}
                             aria-label="Heading 1"
                           />
@@ -1177,8 +1176,7 @@ export function NotesContent({
                           <Button
                             type="button"
                             variant="ghost"
-                            size="icon"
-                            className="size-8 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted"
+                            size="icon-sm"
                             onClick={() => insertMarkdown("h2")}
                             aria-label="Heading 2"
                           />
@@ -1195,8 +1193,7 @@ export function NotesContent({
                           <Button
                             type="button"
                             variant="ghost"
-                            size="icon"
-                            className="size-8 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted"
+                            size="icon-sm"
                             onClick={() => insertMarkdown("h3")}
                             aria-label="Heading 3"
                           />
@@ -1215,8 +1212,7 @@ export function NotesContent({
                           <Button
                             type="button"
                             variant="ghost"
-                            size="icon"
-                            className="size-8 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted"
+                            size="icon-sm"
                             onClick={() => insertMarkdown("bullet")}
                             aria-label="Bullet List"
                           />
@@ -1233,8 +1229,7 @@ export function NotesContent({
                           <Button
                             type="button"
                             variant="ghost"
-                            size="icon"
-                            className="size-8 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted"
+                            size="icon-sm"
                             onClick={() => insertMarkdown("checklist")}
                             aria-label="Checklist"
                           />
@@ -1288,7 +1283,7 @@ export function NotesContent({
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
                   <Field>
-                    <FieldLabel className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <FieldLabel>
                       <FileText className="size-3 text-blue-500" /> Resources
                     </FieldLabel>
                     <Combobox
@@ -1328,7 +1323,7 @@ export function NotesContent({
                   </Field>
 
                   <Field>
-                    <FieldLabel className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <FieldLabel>
                       <Folder className="size-3 text-amber-500" /> Projects
                     </FieldLabel>
                     <Combobox
@@ -1368,7 +1363,7 @@ export function NotesContent({
                   </Field>
 
                   <Field>
-                    <FieldLabel className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <FieldLabel>
                       <User className="size-3 text-emerald-500" /> People
                     </FieldLabel>
                     <Combobox
@@ -1495,11 +1490,11 @@ export function NotesContent({
                   />
                 }
               >
-                {isDeleting ? <Spinner className="size-4" /> : <Trash2 className="size-4" />}
+                {isDeleting ? <Spinner className="size-4" /> : <Trash2 className="size-4 text-destructive" />}
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogMedia className="bg-destructive/10 text-destructive">
+                  <AlertDialogMedia>
                     <Trash2 />
                   </AlertDialogMedia>
                   <AlertDialogTitle>Delete this note?</AlertDialogTitle>
@@ -1560,7 +1555,7 @@ export function NotesContent({
                       <Badge
                         key={tag}
                         variant="secondary"
-                        className="rounded-full text-xs h-5 sm:h-6 px-2.5 sm:px-3 font-medium shrink-0 flex items-center gap-1.5"
+                        className="shrink-0 flex items-center"
                       >
                         <Tag className="size-3 text-muted-foreground shrink-0" />
                         {tag}
