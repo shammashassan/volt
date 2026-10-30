@@ -23,6 +23,7 @@ import { useQueryState } from "nuqs";
 import { createWatchlistItemAction, updateWatchlistItemAction, deleteWatchlistItemAction } from "@/lib/actions/watchlist";
 import { Kbd } from "@/components/ui/kbd";
 import { Input } from "@/components/ui/input";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import { Badge } from "@/components/ui/badge";
 import { Toggle } from "@/components/ui/toggle";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -288,8 +289,8 @@ export function MediaWatchlistClient({ initialItems }: MediaWatchlistClientProps
                 <h1 className="text-3xl font-black tracking-tight md:text-4xl bg-clip-text text-transparent bg-linear-to-r from-foreground to-foreground/60">
                   Media Watchlist
                 </h1>
-                <Badge variant="outline" className="h-6 rounded-full border-primary/20 bg-primary/5 text-primary text-[10px] uppercase font-bold tracking-widest px-2.5">
-                  {filteredItems.length} Items
+                <Badge variant="outline">
+                  <span className="text-[10px] uppercase font-bold tracking-widest">{filteredItems.length} Items</span>
                 </Badge>
               </div>
             </div>
@@ -318,70 +319,70 @@ export function MediaWatchlistClient({ initialItems }: MediaWatchlistClientProps
               {/* Scrollable Options/Text inside the tab container */}
               <TabsList
                 ref={tabsContainerRef}
-                className="group-data-horizontal/tabs:h-auto p-0 bg-transparent border-0 rounded-none w-full max-w-full flex flex-nowrap items-center justify-start gap-1 overflow-x-auto no-scrollbar scroll-smooth"
+                className="group-data-horizontal/tabs:h-auto w-full max-w-full flex flex-nowrap items-center justify-start overflow-x-auto no-scrollbar scroll-smooth"
               >
                 <TabsTrigger
                   value="active"
-                  className="h-8 shrink-0 gap-1.5 sm:gap-2 px-2.5 sm:px-3 text-xs font-semibold rounded-lg cursor-pointer transition-all scroll-m-2"
+                  className="h-8 shrink-0 cursor-pointer scroll-m-2"
                 >
                   <Sparkles className="size-3.5 text-primary shrink-0" />
                   <span>Active</span>
-                  <Badge variant="secondary" className="rounded-full px-1.5 min-w-4 font-bold">
+                  <Badge variant="secondary" className="min-w-4">
                     {tabCounts.active}
                   </Badge>
                 </TabsTrigger>
 
                 <TabsTrigger
                   value="watching"
-                  className="h-8 shrink-0 gap-1.5 sm:gap-2 px-2.5 sm:px-3 text-xs font-semibold rounded-lg cursor-pointer transition-all scroll-m-2"
+                  className="h-8 shrink-0 cursor-pointer scroll-m-2"
                 >
                   <Play className="size-3.5 text-blue-500 fill-blue-500/20 shrink-0" />
                   <span>Watching</span>
-                  <Badge variant="secondary" className="rounded-full px-1.5 min-w-4 font-bold">
+                  <Badge variant="secondary" className="min-w-4">
                     {tabCounts.watching}
                   </Badge>
                 </TabsTrigger>
 
                 <TabsTrigger
                   value="planned"
-                  className="h-8 shrink-0 gap-1.5 sm:gap-2 px-2.5 sm:px-3 text-xs font-semibold rounded-lg cursor-pointer transition-all scroll-m-2"
+                  className="h-8 shrink-0 cursor-pointer scroll-m-2"
                 >
                   <Clock className="size-3.5 text-amber-500 shrink-0" />
                   <span>Planned</span>
-                  <Badge variant="secondary" className="rounded-full px-1.5 min-w-4 font-bold">
+                  <Badge variant="secondary" className="min-w-4">
                     {tabCounts.planned}
                   </Badge>
                 </TabsTrigger>
 
                 <TabsTrigger
                   value="completed"
-                  className="h-8 shrink-0 gap-1.5 sm:gap-2 px-2.5 sm:px-3 text-xs font-semibold rounded-lg cursor-pointer transition-all scroll-m-2"
+                  className="h-8 shrink-0 cursor-pointer scroll-m-2"
                 >
                   <CheckCircle2 className="size-3.5 text-emerald-500 shrink-0" />
                   <span>Completed</span>
-                  <Badge variant="secondary" className="rounded-full px-1.5 min-w-4 font-bold">
+                  <Badge variant="secondary" className="min-w-4">
                     {tabCounts.completed}
                   </Badge>
                 </TabsTrigger>
 
                 <TabsTrigger
                   value="dropped"
-                  className="h-8 shrink-0 gap-1.5 sm:gap-2 px-2.5 sm:px-3 text-xs font-semibold rounded-lg cursor-pointer transition-all scroll-m-2"
+                  className="h-8 shrink-0 cursor-pointer scroll-m-2"
                 >
                   <XCircle className="size-3.5 text-muted-foreground shrink-0" />
                   <span>Dropped</span>
-                  <Badge variant="secondary" className="rounded-full px-1.5 min-w-4 font-bold">
+                  <Badge variant="secondary" className="min-w-4">
                     {tabCounts.dropped}
                   </Badge>
                 </TabsTrigger>
 
                 <TabsTrigger
                   value="all"
-                  className="h-8 shrink-0 gap-1.5 sm:gap-2 px-2.5 sm:px-3 text-xs font-semibold rounded-lg cursor-pointer transition-all scroll-m-2"
+                  className="h-8 shrink-0 cursor-pointer scroll-m-2"
                 >
                   <Layers className="size-3.5 text-muted-foreground shrink-0" />
                   <span>All</span>
-                  <Badge variant="secondary" className="rounded-full px-1.5 min-w-4 font-bold">
+                  <Badge variant="secondary" className="min-w-4">
                     {tabCounts.all}
                   </Badge>
                 </TabsTrigger>
@@ -392,15 +393,17 @@ export function MediaWatchlistClient({ initialItems }: MediaWatchlistClientProps
           {/* Search & Sub-filters Toolbar */}
           <div className="p-3 sm:p-4 border border-border/40 bg-card/30 backdrop-blur-sm rounded-2xl flex flex-col gap-3 sm:flex-row sm:items-center">
             {/* Search */}
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
-              <Input
+            <InputGroup className="flex-1">
+              <InputGroupAddon align="inline-start">
+                <Search className="size-4 text-muted-foreground pointer-events-none" />
+              </InputGroupAddon>
+              <InputGroupInput
                 placeholder="Search watchlist..."
                 value={searchValue}
                 onChange={(e) => setSearchValue(e.target.value)}
-                className="pl-9 bg-background/50 border-border/60 h-9"
+                className="h-9"
               />
-            </div>
+            </InputGroup>
 
             <div className="flex flex-wrap gap-2.5 items-center w-full sm:w-auto">
               {/* Type Filter */}
@@ -408,7 +411,7 @@ export function MediaWatchlistClient({ initialItems }: MediaWatchlistClientProps
                 value={typeFilter || "all"}
                 onValueChange={(val) => setTypeFilter(val === "all" ? null : val)}
               >
-                <SelectTrigger className="w-[130px] h-9 bg-background/50 border-border/60">
+                <SelectTrigger className="w-[130px] h-9">
                   <SelectValue placeholder="All Types" />
                 </SelectTrigger>
                 <SelectContent>
@@ -425,7 +428,7 @@ export function MediaWatchlistClient({ initialItems }: MediaWatchlistClientProps
                 onPressedChange={(pressed) => setRatedFilter(pressed || null)}
                 variant="outline"
                 size="sm"
-                className="h-9 px-3 border-border/60 bg-background/50 data-[state=on]:bg-primary/10 data-[state=on]:text-primary"
+                className="h-9"
               >
                 <Star className={`size-3.5 mr-1.5 ${ratedFilter ? "fill-current" : ""}`} />
                 <span>Rated</span>
@@ -440,7 +443,7 @@ export function MediaWatchlistClient({ initialItems }: MediaWatchlistClientProps
         <div className="max-w-7xl">
           {filteredItems.length === 0 ? (
             items.length === 0 ? (
-              <Empty className="py-24 border border-dashed rounded-3xl bg-card/10">
+              <Empty>
                 <EmptyHeader>
                   <EmptyMedia variant="icon">
                     <Film />
@@ -456,7 +459,7 @@ export function MediaWatchlistClient({ initialItems }: MediaWatchlistClientProps
                 </Button>
               </Empty>
             ) : (
-              <Empty className="py-24 border border-dashed rounded-3xl bg-card/10">
+              <Empty>
                 <EmptyHeader>
                   <EmptyMedia variant="icon">
                     <Filter />

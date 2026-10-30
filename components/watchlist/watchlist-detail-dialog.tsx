@@ -64,7 +64,7 @@ export function WatchlistDetailDialog({ item, open, onOpenChange }: WatchlistDet
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[calc(100%-2rem)] max-w-sm sm:max-w-md p-0 overflow-y-auto max-h-[85dvh] no-scrollbar !gap-0 border-border/60 rounded-2xl shadow-2xl bg-card overscroll-contain [&_[data-slot=dialog-close]]:z-50 [&_[data-slot=dialog-close]]:text-white/80 [&_[data-slot=dialog-close]]:hover:text-white [&_[data-slot=dialog-close]]:bg-black/40 [&_[data-slot=dialog-close]]:backdrop-blur-sm [&_[data-slot=dialog-close]]:rounded-full [&_[data-slot=dialog-close]]:top-3 [&_[data-slot=dialog-close]]:right-3">
+      <DialogContent className="w-[calc(100%-2rem)] max-w-sm sm:max-w-md overflow-y-auto max-h-[85dvh] no-scrollbar overscroll-contain">
         <DialogTitle className="sr-only">{meta?.title || "Media Details"}</DialogTitle>
         <DialogDescription className="sr-only">Detailed overview, release dates, and streaming information for {meta?.title || "this media"}.</DialogDescription>
 
@@ -108,11 +108,11 @@ export function WatchlistDetailDialog({ item, open, onOpenChange }: WatchlistDet
                 {meta?.releaseYear && (
                   <span className="text-[11px] text-white/70 font-semibold tabular-nums">{meta.releaseYear}</span>
                 )}
-                <Badge className="text-[9px] uppercase tracking-wide font-bold py-0 px-2 h-5 bg-white/15 hover:bg-white/15 border-white/20 text-white">
-                  {typeLabel}
+                <Badge variant="outline">
+                  <span className="text-[9px] uppercase tracking-wide font-bold">{typeLabel}</span>
                 </Badge>
-                <Badge variant="outline" className="text-[9px] uppercase tracking-wide font-bold py-0 px-2 h-5 border-white/20 text-white/70 bg-transparent">
-                  {item.source === "tmdb" ? "TMDb" : "AniList"}
+                <Badge variant="outline">
+                  <span className="text-[9px] uppercase tracking-wide font-bold">{item.source === "tmdb" ? "TMDb" : "AniList"}</span>
                 </Badge>
               </div>
             </div>
@@ -165,7 +165,7 @@ export function WatchlistDetailDialog({ item, open, onOpenChange }: WatchlistDet
               </span>
               <div className="flex flex-wrap gap-1.5">
                 {meta.genres.map((genre) => (
-                  <Badge key={genre} variant="secondary" className="text-[10px] font-medium py-0.5 px-2.5 h-auto rounded-full">
+                  <Badge key={genre} variant="secondary">
                     {genre}
                   </Badge>
                 ))}
@@ -176,7 +176,7 @@ export function WatchlistDetailDialog({ item, open, onOpenChange }: WatchlistDet
           {/* Dates */}
           {hasDates && (
             <>
-              <Separator className="opacity-40" />
+              <Separator />
               <div className="space-y-3">
                 <span className="text-[9px] uppercase tracking-widest font-semibold text-muted-foreground/50 flex items-center gap-1.5">
                   <Calendar className="h-2.5 w-2.5" /> Dates

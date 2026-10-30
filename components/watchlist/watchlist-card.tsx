@@ -85,8 +85,8 @@ export function WatchlistCard({ item, onUpdateStatus, onUpdateRating, onDelete }
           }
         }}
         className={cn(
-          "group relative overflow-hidden aspect-2/3 w-full border-0 bg-card shadow-md transition-all duration-200 ease-out scale-100 select-none rounded-xl cursor-pointer ring-0",
-          isHovered && "scale-[1.03] -translate-y-1 shadow-xl ring-1 ring-white/10"
+          "group relative overflow-hidden aspect-2/3 w-full cursor-pointer",
+          isHovered && "scale-[1.03] -translate-y-1"
         )}
       >
         {/* Poster */}
@@ -120,20 +120,18 @@ export function WatchlistCard({ item, onUpdateStatus, onUpdateRating, onDelete }
             isHovered ? "opacity-0 pointer-events-none" : "opacity-100"
           )}
         >
-          <Badge
-            variant="secondary"
-            className="h-7 w-7 p-0 rounded-full flex items-center justify-center bg-background/85 dark:bg-background/60 backdrop-blur-sm border border-border/30 shadow-sm"
+          <div
+            className="h-7 w-7 rounded-full flex items-center justify-center bg-background/85 dark:bg-background/60 backdrop-blur-sm border border-border/30 shadow-sm"
             title={activeStatus.label}
           >
             <span className="text-sm font-bold leading-none">{activeStatus.icon}</span>
-          </Badge>
+          </div>
           {item.rating && (
-            <Badge
-              variant="secondary"
+            <div
               className="h-7 px-2.5 rounded-full flex items-center justify-center text-xs font-bold bg-background/85 dark:bg-background/60 backdrop-blur-sm border border-border/30 shadow-sm"
             >
               {item.rating}
-            </Badge>
+            </div>
           )}
         </div>
 
@@ -174,18 +172,17 @@ export function WatchlistCard({ item, onUpdateStatus, onUpdateRating, onDelete }
 
             {/* Status chip */}
             <Popover open={statusPopoverOpen} onOpenChange={setStatusPopoverOpen}>
-              <PopoverTrigger
-                render={
-                  <button
-                    aria-label="Change status"
-                    className="w-full text-[10px] h-7 font-semibold px-2 rounded-lg border border-white/15 bg-white/10 hover:bg-white/20 active:bg-white/25 text-white transition-colors flex items-center justify-center gap-1.5 backdrop-blur-sm cursor-pointer select-none"
-                  >
-                    <span className="text-xs leading-none shrink-0">{activeStatus.icon}</span>
-                    <span className="text-[10px] truncate">{activeStatus.label}</span>
-                  </button>
-                }
-              />
-              <PopoverContent className="w-36 p-1" align="start">
+              <PopoverTrigger className="w-full">
+                <button
+                  type="button"
+                  aria-label="Change status"
+                  className="w-full text-[10px] h-7 font-semibold px-2 rounded-lg border border-white/15 bg-white/10 hover:bg-white/20 active:bg-white/25 text-white transition-colors flex items-center justify-center gap-1.5 backdrop-blur-sm cursor-pointer select-none"
+                >
+                  <span className="text-xs leading-none shrink-0">{activeStatus.icon}</span>
+                  <span className="text-[10px] truncate">{activeStatus.label}</span>
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="w-36" align="start">
                 {(Object.keys(WATCHLIST_STATUS_LABELS) as WatchlistStatus[]).map((statusKey) => {
                   const option = WATCHLIST_STATUS_LABELS[statusKey];
                   const isSelected = item.status === statusKey;
@@ -220,23 +217,22 @@ export function WatchlistCard({ item, onUpdateStatus, onUpdateRating, onDelete }
                 if (open) setTempRating(item.rating ?? null);
               }}
             >
-              <PopoverTrigger
-                render={
-                  <button
-                    aria-label="Change rating"
-                    className={cn(
-                      "w-full text-[10px] h-7 px-2 font-semibold rounded-lg border border-white/15 bg-white/10 hover:bg-white/20 active:bg-white/25 text-white transition-colors flex items-center justify-center gap-1.5 backdrop-blur-sm cursor-pointer",
-                      item.rating && "border-primary/60 bg-primary/20 hover:bg-primary/30"
-                    )}
-                  >
-                    <Star className={cn("h-3 w-3 shrink-0", item.rating ? "fill-primary text-primary" : "text-white/50")} />
-                    <span className={cn("text-[10px] font-semibold tabular-nums", item.rating ? "text-primary font-bold" : "text-white/80")}>
-                      {item.rating ? `${item.rating} / 10` : "Rate"}
-                    </span>
-                  </button>
-                }
-              />
-              <PopoverContent className="w-56 p-3" align="end">
+              <PopoverTrigger className="w-full">
+                <button
+                  type="button"
+                  aria-label="Change rating"
+                  className={cn(
+                    "w-full text-[10px] h-7 px-2 font-semibold rounded-lg border border-white/15 bg-white/10 hover:bg-white/20 active:bg-white/25 text-white transition-colors flex items-center justify-center gap-1.5 backdrop-blur-sm cursor-pointer",
+                    item.rating && "border-primary/60 bg-primary/20 hover:bg-primary/30"
+                  )}
+                >
+                  <Star className={cn("h-3 w-3 shrink-0", item.rating ? "fill-primary text-primary" : "text-white/50")} />
+                  <span className={cn("text-[10px] font-semibold tabular-nums", item.rating ? "text-primary font-bold" : "text-white/80")}>
+                    {item.rating ? `${item.rating} / 10` : "Rate"}
+                  </span>
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="w-56" align="end">
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <span className="text-[11px] font-semibold text-muted-foreground">Rating</span>

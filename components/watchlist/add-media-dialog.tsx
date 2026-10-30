@@ -122,7 +122,7 @@ export function AddMediaDialog({ open, onOpenChange, onSelect }: AddMediaDialogP
                 key={`${item.source}-${item.externalId}`}
                 value={`${item.title} ${item.releaseYear || ""}`}
                 onSelect={() => onSelect(item)}
-                className="cursor-pointer p-2 flex items-center gap-3 hover:bg-accent/40 rounded-md transition-colors"
+                className="cursor-pointer flex items-center"
               >
                 <div className="relative h-12 w-8 bg-muted/40 rounded overflow-hidden shrink-0 flex items-center justify-center">
                   {item.posterUrl ? (
@@ -140,11 +140,11 @@ export function AddMediaDialog({ open, onOpenChange, onSelect }: AddMediaDialogP
                     )}
                   </div>
                   <div className="flex gap-1.5 mt-1">
-                    <Badge variant="outline" className="text-[9px] py-0 px-1 font-semibold uppercase">
-                      {item.type === "movie" ? "Movie" : item.type === "series" ? "Series" : "Anime"}
+                    <Badge variant="outline">
+                      <span className="text-[9px] uppercase font-semibold">{item.type === "movie" ? "Movie" : item.type === "series" ? "Series" : "Anime"}</span>
                     </Badge>
-                    <Badge variant="outline" className="text-[9px] py-0 px-1 font-semibold uppercase tracking-wider bg-accent/20 border-accent-foreground/10 text-muted-foreground">
-                      {item.source === "tmdb" ? "TMDb" : "AniList"}
+                    <Badge variant="outline">
+                      <span className="text-[9px] uppercase font-semibold tracking-wider">{item.source === "tmdb" ? "TMDb" : "AniList"}</span>
                     </Badge>
                   </div>
                 </div>
