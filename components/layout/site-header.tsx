@@ -67,8 +67,8 @@ function HeaderBreadcrumb({ initialCategories }: { initialCategories?: Category[
     <>
       <BreadcrumbSeparator />
       <BreadcrumbItem>
-        <BreadcrumbPage className="text-foreground capitalize">
-          {label}
+        <BreadcrumbPage>
+          <span className="capitalize">{label}</span>
         </BreadcrumbPage>
       </BreadcrumbItem>
     </>
@@ -89,9 +89,11 @@ export function SiteHeader({ initialCategories }: SiteHeaderProps) {
         <Breadcrumb className="hidden md:block">
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbLink render={<Link href="/" className="flex items-center gap-2 text-muted-foreground/60 transition-colors hover:text-foreground" />}>
-                <Home className="size-4" />
-                Volt
+              <BreadcrumbLink render={<Link href="/" />}>
+                <span className="flex items-center gap-2">
+                  <Home className="size-4" />
+                  Volt
+                </span>
               </BreadcrumbLink>
             </BreadcrumbItem>
             <React.Suspense fallback={null}>
