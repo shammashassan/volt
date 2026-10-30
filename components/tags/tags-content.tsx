@@ -195,8 +195,8 @@ export function TagsContent({ resources, notes, people }: TagsContentProps) {
                 <h1 className="text-3xl font-black tracking-tight md:text-4xl bg-clip-text text-transparent bg-linear-to-r from-foreground to-foreground/60">
                   Tags Explorer
                 </h1>
-                <Badge variant="outline" className="h-6 rounded-full border-primary/20 bg-primary/5 text-primary text-[10px] uppercase font-bold tracking-widest px-2.5">
-                  {tagStats.length} <span className="hidden sm:inline ml-1">Unique Tags</span>
+                <Badge variant="outline">
+                  <span className="text-[10px] uppercase font-bold tracking-widest">{tagStats.length} <span className="hidden sm:inline ml-1">Unique Tags</span></span>
                 </Badge>
               </div>
             </div>
@@ -219,7 +219,7 @@ export function TagsContent({ resources, notes, people }: TagsContentProps) {
               value={selectedTags}
               onValueChange={setSelectedTags}
             >
-              <ComboboxChips ref={anchor} className="w-full bg-background/50 border-border/60">
+              <ComboboxChips ref={anchor} className="w-full">
                 <ComboboxValue>
                   {(values) => (
                     <React.Fragment>
@@ -350,7 +350,7 @@ export function TagsContent({ resources, notes, people }: TagsContentProps) {
               {/* Mobile Select dropdown */}
               <div className="md:hidden w-full mb-4">
                 <Select value={activeTab} onValueChange={(val) => { if (val) setActiveTab(val) }}>
-                  <SelectTrigger className="w-full h-10 font-medium">
+                  <SelectTrigger className="w-full h-10">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -363,29 +363,29 @@ export function TagsContent({ resources, notes, people }: TagsContentProps) {
 
               <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                 <TabsList className="hidden md:grid w-full grid-cols-3 max-w-[500px] mb-4">
-                  <TabsTrigger value="resources" className="gap-2">
+                  <TabsTrigger value="resources">
                     Resources
-                    <Badge variant="secondary" className="h-5 px-1.5 min-w-[20px] justify-center">
+                    <Badge variant="secondary" className="min-w-5 justify-center">
                       {filteredEntities.resources.length}
                     </Badge>
                   </TabsTrigger>
-                  <TabsTrigger value="notes" className="gap-2">
+                  <TabsTrigger value="notes">
                     Notes
-                    <Badge variant="secondary" className="h-5 px-1.5 min-w-[20px] justify-center">
+                    <Badge variant="secondary" className="min-w-5 justify-center">
                       {filteredEntities.notes.length}
                     </Badge>
                   </TabsTrigger>
-                  <TabsTrigger value="people" className="gap-2">
+                  <TabsTrigger value="people">
                     People
-                    <Badge variant="secondary" className="h-5 px-1.5 min-w-[20px] justify-center">
+                    <Badge variant="secondary" className="min-w-5 justify-center">
                       {filteredEntities.people.length}
                     </Badge>
                   </TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="resources" className="border rounded-xl bg-card/40 backdrop-blur-sm overflow-hidden outline-none">
+                <TabsContent value="resources" className="overflow-hidden">
                   {filteredEntities.resources.length === 0 ? (
-                    <Empty className="py-20 border-0 bg-transparent rounded-none">
+                    <Empty>
                       <EmptyHeader>
                         <EmptyMedia variant="icon">
                           <LinkIcon />
@@ -405,9 +405,9 @@ export function TagsContent({ resources, notes, people }: TagsContentProps) {
                   )}
                 </TabsContent>
 
-                <TabsContent value="notes" className="border rounded-xl bg-card/40 backdrop-blur-sm overflow-hidden outline-none">
+                <TabsContent value="notes" className="overflow-hidden">
                   {filteredEntities.notes.length === 0 ? (
-                    <Empty className="py-20 border-0 bg-transparent rounded-none">
+                    <Empty>
                       <EmptyHeader>
                         <EmptyMedia variant="icon">
                           <FileText />
@@ -423,12 +423,12 @@ export function TagsContent({ resources, notes, people }: TagsContentProps) {
                       {filteredEntities.notes.map((note) => (
                         <Card
                           key={note.id || note._id?.toString()}
-                          className="cursor-pointer transition-all hover:shadow-lg hover:border-primary/20 bg-card/30 backdrop-blur-xs"
+                          className="cursor-pointer"
                           onClick={() => router.push(`/notes?noteId=${note.id || note._id?.toString()}`)}
                         >
-                          <CardHeader className="pb-2">
-                            <CardTitle className="font-bold text-sm line-clamp-1 text-foreground">
-                              {note.title || "Untitled Note"}
+                          <CardHeader>
+                            <CardTitle>
+                              <span className="line-clamp-1">{note.title || "Untitled Note"}</span>
                             </CardTitle>
                           </CardHeader>
                           <CardContent>
@@ -442,9 +442,9 @@ export function TagsContent({ resources, notes, people }: TagsContentProps) {
                   )}
                 </TabsContent>
 
-                <TabsContent value="people" className="border rounded-xl bg-card/40 backdrop-blur-sm overflow-hidden outline-none">
+                <TabsContent value="people" className="overflow-hidden">
                   {filteredEntities.people.length === 0 ? (
-                    <Empty className="py-20 border-0 bg-transparent rounded-none">
+                    <Empty>
                       <EmptyHeader>
                         <EmptyMedia variant="icon">
                           <User />
@@ -463,16 +463,16 @@ export function TagsContent({ resources, notes, people }: TagsContentProps) {
                         return (
                           <Card
                             key={id}
-                            className="cursor-pointer transition-all hover:shadow-lg hover:border-primary/20 bg-card/30 backdrop-blur-xs"
+                            className="cursor-pointer"
                             onClick={() => router.push(`/people/${id}`)}
                           >
-                            <CardHeader className="pb-2">
+                            <CardHeader>
                               <div className="flex items-start justify-between gap-3">
-                                <CardTitle className="font-bold text-sm line-clamp-1 text-foreground">
-                                  {person.name}
+                                <CardTitle>
+                                  <span className="line-clamp-1">{person.name}</span>
                                 </CardTitle>
-                                <Badge variant={typeConfig.variant} className="text-[8px] uppercase tracking-wider font-bold rounded-full select-none h-4 px-1.5">
-                                  {typeConfig.label}
+                                <Badge variant={typeConfig.variant} className="select-none">
+                                  <span className="text-[8px] uppercase tracking-wider">{typeConfig.label}</span>
                                 </Badge>
                               </div>
                             </CardHeader>
@@ -492,7 +492,7 @@ export function TagsContent({ resources, notes, people }: TagsContentProps) {
               </Tabs>
             </div>
           ) : (
-            <Empty className="py-24">
+            <Empty>
               <EmptyHeader>
                 <EmptyMedia variant="icon">
                   <Tag />
