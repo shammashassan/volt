@@ -60,14 +60,14 @@ export function ResetPasswordForm({ token }: { token: string }) {
   }
 
   return (
-    <Card className="w-full max-w-md border-border/40 bg-background/60 backdrop-blur-xl shadow-2xl">
-      <CardHeader className="space-y-1 text-center">
-        <CardTitle className="text-2xl font-bold tracking-tight">Reset Password</CardTitle>
+    <Card className="w-full max-w-md">
+      <CardHeader className="text-center">
+        <CardTitle>Reset Password</CardTitle>
         <CardDescription>Enter your new password below.</CardDescription>
       </CardHeader>
       <CardContent>
         {success ? (
-          <Alert className="border-emerald-500/50 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+          <Alert>
             <AlertTitle>Password Reset Successful</AlertTitle>
             <AlertDescription>
               Your password has been successfully reset. You can now sign in with your new password.
@@ -123,7 +123,7 @@ export function ResetPasswordForm({ token }: { token: string }) {
           </form>
         )}
       </CardContent>
-      <CardFooter className="flex justify-center border-t border-border/40 pt-4">
+      <CardFooter className="flex justify-center">
         <Link href="/sign-in" className="text-xs text-primary hover:underline underline-offset-4">
           Back to Sign In
         </Link>

@@ -55,9 +55,9 @@ export function TwoFactorForm() {
   }
 
   return (
-    <Card className="w-full max-w-md border-border/40 bg-background/60 backdrop-blur-xl shadow-2xl">
-      <CardHeader className="space-y-1 text-center">
-        <CardTitle className="text-2xl font-bold tracking-tight">Two-Factor Authentication</CardTitle>
+    <Card className="w-full max-w-md">
+      <CardHeader className="text-center">
+        <CardTitle>Two-Factor Authentication</CardTitle>
         <CardDescription>
           {isBackup
             ? "Enter one of your emergency backup codes to access your account"
@@ -86,7 +86,7 @@ export function TwoFactorForm() {
                 required
                 disabled={loading}
                 autoFocus
-                className="text-center font-mono text-lg tracking-wider"
+                className="text-center"
               />
             </Field>
           </FieldGroup>
@@ -99,7 +99,7 @@ export function TwoFactorForm() {
           <Button
             type="button"
             variant="ghost"
-            className="w-full text-xs text-muted-foreground hover:text-foreground"
+            className="w-full"
             onClick={() => {
               setIsBackup(!isBackup)
               setCode("")

@@ -92,10 +92,10 @@ export function LoginForm({
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card className="overflow-hidden p-0 border-none shadow-2xl bg-background/60 backdrop-blur-xl">
-        <CardContent className="grid p-0 md:grid-cols-2">
+      <Card className="overflow-hidden">
+        <CardContent className="grid md:grid-cols-2">
           <form onSubmit={handleSubmit} className="p-6 md:p-12 flex flex-col justify-center">
-            <FieldGroup className="gap-8">
+            <FieldGroup>
               <div className="flex flex-col items-start gap-2 text-left">
                 <h1 className="text-3xl font-bold tracking-tight">
                   {isSignUp ? "Create an account" : "Welcome back"}
@@ -106,7 +106,7 @@ export function LoginForm({
               </div>
               <div className="grid gap-6">
                 {isSignUp && (
-                  <Field className="grid gap-2">
+                  <Field>
                     <FieldLabel htmlFor="name">Full Name</FieldLabel>
                     <Input
                       id="name"
@@ -115,11 +115,11 @@ export function LoginForm({
                       placeholder="John Doe"
                       autoComplete="name"
                       required
-                      className="h-11"
+                     
                     />
                   </Field>
                 )}
-                <Field className="grid gap-2">
+                <Field>
                   <FieldLabel htmlFor="email">Email</FieldLabel>
                   <Input
                     id="email"
@@ -129,10 +129,10 @@ export function LoginForm({
                     autoComplete="email"
                     spellCheck={false}
                     required
-                    className="h-11"
+                   
                   />
                 </Field>
-                <Field className="grid gap-2">
+                <Field>
                   <div className="flex items-center">
                     <FieldLabel htmlFor="password">Password</FieldLabel>
                   </div>
@@ -143,13 +143,13 @@ export function LoginForm({
                       type={showPassword ? "text" : "password"}
                       autoComplete={isSignUp ? "new-password" : "current-password"}
                       required
-                      className="h-11 pr-10"
+                     
                     />
                     <Button
                       type="button"
                       variant="ghost"
                       size="icon"
-                      className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                      className="absolute right-0 top-0 h-full"
                       onClick={() => setShowPassword(!showPassword)}
                       aria-label={showPassword ? "Hide password" : "Show password"}
                     >
@@ -161,7 +161,7 @@ export function LoginForm({
                     </Button>
                   </div>
                 </Field>
-                <Button type="submit" className="h-11 text-base font-medium transition-all hover:scale-[1.02] active:scale-[0.98]" disabled={isLoading}>
+                <Button type="submit" disabled={isLoading}>
                   {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   {isSignUp ? "Sign Up" : "Login"}
                 </Button>

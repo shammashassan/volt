@@ -48,16 +48,16 @@ export function ForgotPasswordForm() {
   }
 
   return (
-    <Card className="w-full max-w-md border-border/40 bg-background/60 backdrop-blur-xl shadow-2xl">
-      <CardHeader className="space-y-1 text-center">
-        <CardTitle className="text-2xl font-bold tracking-tight">Forgot Password</CardTitle>
+    <Card className="w-full max-w-md">
+      <CardHeader className="text-center">
+        <CardTitle>Forgot Password</CardTitle>
         <CardDescription>
           Enter your email address and we will send you a link to reset your password.
         </CardDescription>
       </CardHeader>
       <CardContent>
         {success ? (
-          <Alert className="border-emerald-500/50 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+          <Alert>
             <AlertDescription>
               We have emailed you a password reset link. Please check your inbox (and spam folder).
             </AlertDescription>
@@ -93,7 +93,7 @@ export function ForgotPasswordForm() {
           </form>
         )}
       </CardContent>
-      <CardFooter className="flex justify-center border-t border-border/40 pt-4">
+      <CardFooter className="flex justify-center">
         <Link href="/sign-in" className="text-xs text-primary hover:underline underline-offset-4">
           Back to Sign In
         </Link>

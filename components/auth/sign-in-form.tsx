@@ -255,9 +255,9 @@ export function SignInForm() {
       transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
       className="w-full max-w-md"
     >
-      <Card className="w-full max-w-md border-border/40 bg-background/60 backdrop-blur-xl shadow-2xl">
-        <CardHeader className="flex flex-col gap-1 text-center">
-          <CardTitle className="text-2xl font-bold tracking-tight">Sign in to Volt</CardTitle>
+      <Card className="w-full max-w-md">
+        <CardHeader className="flex flex-col text-center">
+          <CardTitle>Sign in to Volt</CardTitle>
           <CardDescription>
             Don&apos;t have an account?{" "}
             <Link href="/sign-up" className="text-primary font-medium hover:underline">
@@ -265,13 +265,13 @@ export function SignInForm() {
             </Link>
           </CardDescription>
         </CardHeader>
-        <CardContent className="flex flex-col gap-4">
+        <CardContent className="flex flex-col">
           {bannedError && (
-            <Alert variant="destructive" className="border-destructive/40 bg-destructive/10 text-destructive">
+            <Alert variant="destructive">
               <AlertCircle className="size-4" />
               <div className="flex flex-col gap-1">
                 <span className="font-semibold text-xs tracking-wide uppercase">Account Suspended</span>
-                <AlertDescription className="text-xs text-destructive/90 leading-relaxed">
+                <AlertDescription>
                   {bannedError}{" "}
                   <a
                     href="mailto:support@volt.app"
@@ -286,7 +286,7 @@ export function SignInForm() {
 
           {showMagicForm ? (
             <form onSubmit={handleMagicLinkSignIn} className="flex flex-col gap-4">
-              <FieldGroup className="flex flex-col gap-4">
+              <FieldGroup>
                 <Field>
                   <FieldLabel htmlFor="magic-email">Email Address</FieldLabel>
                   <Input
@@ -309,7 +309,7 @@ export function SignInForm() {
               <Button
                 type="button"
                 variant="ghost"
-                className="w-full text-xs text-muted-foreground hover:text-foreground"
+                className="w-full"
                 onClick={() => setShowMagicForm(false)}
                 disabled={loading}
               >
@@ -318,7 +318,7 @@ export function SignInForm() {
             </form>
           ) : (
             <form onSubmit={handleSignIn} className="flex flex-col gap-4">
-              <FieldGroup className="flex flex-col gap-4">
+              <FieldGroup>
                 <Field>
                   <FieldLabel htmlFor="identifier">Email or Username</FieldLabel>
                   <Input
@@ -351,13 +351,12 @@ export function SignInForm() {
                       onChange={(e) => setPassword(e.target.value)}
                       required
                       disabled={loading}
-                      className="pr-10"
                     />
                     <Button
                       type="button"
                       variant="ghost"
                       size="icon-sm"
-                      className="absolute right-1 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                      className="absolute right-1 top-1/2 -translate-y-1/2"
                       onClick={() => setShowPassword((visible) => !visible)}
                       disabled={loading}
                       aria-label={showPassword ? "Hide password" : "Show password"}
@@ -385,7 +384,7 @@ export function SignInForm() {
             <Button
               type="button"
               variant="outline"
-              className="w-full flex items-center justify-center gap-2"
+              className="w-full flex items-center justify-center"
               onClick={handleGoogleSignIn}
               disabled={loading}
             >
@@ -414,7 +413,7 @@ export function SignInForm() {
               <Button
                 type="button"
                 variant="outline"
-                className="text-xs gap-1.5"
+               
                 onClick={handlePasskeySignIn}
                 disabled={loading}
               >
@@ -424,7 +423,7 @@ export function SignInForm() {
               <Button
                 type="button"
                 variant="outline"
-                className="text-xs gap-1.5"
+               
                 onClick={() => setShowMagicForm((prev) => !prev)}
                 disabled={loading}
               >

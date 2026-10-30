@@ -133,9 +133,9 @@ export function SignUpForm() {
       transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
       className="w-full max-w-md"
     >
-      <Card className="w-full max-w-md border-border/40 bg-background/60 backdrop-blur-xl shadow-2xl">
-        <CardHeader className="flex flex-col gap-1 text-center">
-          <CardTitle className="text-2xl font-bold tracking-tight">Create an Account</CardTitle>
+      <Card className="w-full max-w-md">
+        <CardHeader className="flex flex-col text-center">
+          <CardTitle>Create an Account</CardTitle>
           <CardDescription>
             Already have an account?{" "}
             <Link href="/sign-in" className="text-primary font-medium hover:underline">
@@ -143,9 +143,9 @@ export function SignUpForm() {
             </Link>
           </CardDescription>
         </CardHeader>
-        <CardContent className="flex flex-col gap-4">
+        <CardContent className="flex flex-col">
           <form onSubmit={handleSignUp} className="flex flex-col gap-4">
-            <FieldGroup className="flex flex-col gap-4">
+            <FieldGroup>
               <Field>
                 <FieldLabel htmlFor="name">Full Name</FieldLabel>
                 <Input
@@ -195,13 +195,12 @@ export function SignUpForm() {
                     onChange={(e) => setPassword(e.target.value)}
                     required
                     disabled={loading}
-                    className="pr-10"
                   />
                   <Button
                     type="button"
                     variant="ghost"
                     size="icon-sm"
-                    className="absolute right-1 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    className="absolute right-1 top-1/2 -translate-y-1/2"
                     onClick={() => setShowPassword((visible) => !visible)}
                     disabled={loading}
                     aria-label={showPassword ? "Hide password" : "Show password"}
@@ -221,13 +220,12 @@ export function SignUpForm() {
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     required
                     disabled={loading}
-                    className="pr-10"
                   />
                   <Button
                     type="button"
                     variant="ghost"
                     size="icon-sm"
-                    className="absolute right-1 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    className="absolute right-1 top-1/2 -translate-y-1/2"
                     onClick={() => setShowConfirmPassword((visible) => !visible)}
                     disabled={loading}
                     aria-label={showConfirmPassword ? "Hide password" : "Show password"}
@@ -253,7 +251,7 @@ export function SignUpForm() {
           <Button
             type="button"
             variant="outline"
-            className="w-full flex items-center justify-center gap-2"
+            className="w-full flex items-center justify-center"
             onClick={handleGoogleSignUp}
             disabled={loading}
           >

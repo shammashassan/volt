@@ -55,12 +55,12 @@ export function VerifyEmailView({ token }: { token: string }) {
   }, [token])
 
   return (
-    <Card className="w-full max-w-md border-border/40 bg-background/60 backdrop-blur-xl shadow-2xl">
-      <CardHeader className="space-y-1 text-center">
-        <CardTitle className="text-2xl font-bold tracking-tight">Email Verification</CardTitle>
+    <Card className="w-full max-w-md">
+      <CardHeader className="text-center">
+        <CardTitle>Email Verification</CardTitle>
         <CardDescription>We are validating your email address</CardDescription>
       </CardHeader>
-      <CardContent className="flex flex-col items-center justify-center py-6">
+      <CardContent className="flex flex-col items-center justify-center">
         {status === "verifying" && (
           <div className="flex flex-col items-center gap-4">
             <Loader2 className="size-10 animate-spin text-primary" />
@@ -92,7 +92,7 @@ export function VerifyEmailView({ token }: { token: string }) {
           </div>
         )}
       </CardContent>
-      <CardFooter className="flex justify-center border-t border-border/40 pt-4">
+      <CardFooter className="flex justify-center">
         <Link href="/sign-in" className="text-xs text-primary hover:underline underline-offset-4">
           Back to Sign In
         </Link>
