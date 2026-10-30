@@ -933,9 +933,8 @@ export function NotesContent({
                             render={
                               <Button
                                 variant="ghost"
-                                size="icon"
-                                className="size-7 rounded-lg"
-                                onClick={async (e) => {
+                                size="icon-sm"
+                                                                onClick={async (e) => {
                                   e.stopPropagation()
                                   if (!noteId) return
                                   try {
@@ -969,8 +968,7 @@ export function NotesContent({
 
                         <Button
                           variant="ghost"
-                          size="icon"
-                          className="size-7 rounded-lg text-destructive hover:text-destructive hover:bg-destructive/10"
+                          size="icon-sm"
                           onClick={(e) => {
                             e.stopPropagation()
                             if (noteId) setNoteToDelete(noteId)
@@ -1433,8 +1431,7 @@ export function NotesContent({
             <Button
               variant="ghost"
               size="sm"
-              className="h-9 gap-1.5"
-              onClick={() => setIsEditing(true)}
+                            onClick={() => setIsEditing(true)}
             >
               <PenBox data-icon="inline-start" />
               <span className="hidden sm:inline">Edit</span>
@@ -1485,8 +1482,7 @@ export function NotesContent({
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="size-9 text-destructive hover:text-destructive hover:bg-destructive/10"
-                    disabled={isDeleting}
+                                        disabled={isDeleting}
                   />
                 }
               >
