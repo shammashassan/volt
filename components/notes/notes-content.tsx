@@ -787,7 +787,7 @@ export function NotesContent({
           <BookOpen className="size-4 sm:size-5 text-primary" aria-hidden="true" />
           <span className="text-sm sm:text-base font-semibold">Notes</span>
           <Badge variant="secondary"><span className="tabular-nums">
-            {filteredNotes.length}
+            {filteredNotes.length}</span>
           </Badge>
         </div>
         <Tooltip>
