@@ -107,14 +107,12 @@ export function ResponsiveDialogContent({
 
   if (isMobile) {
     const isP0 = className?.includes("p-0")
-    // Filter out desktop max-width/max-height classes
+    // Filter out desktop max-width/max-height and width classes so mobile drawer remains full width
     const cleanClassName = className
       ? className
-          .replace(/\boverflow-y-auto\b/g, "")
-          .replace(/\boverflow-auto\b/g, "")
-          .replace(/\bmax-h-[^\s]+\b/g, "")
-          .replace(/\bsm:max-w-[^\s]+\b/g, "")
-          .replace(/\bmax-w-[^\s]+\b/g, "")
+          .replace(/(?:^|\s)(?:[a-z]+:)?(?:max-|min-)?(?:w|h)-(?:\[[^\]]*\]|[^\s]+)/g, "")
+          .replace(/(?:^|\s)(?:overflow|overscroll)[^\s]*/g, "")
+          .trim()
       : ""
 
     return (

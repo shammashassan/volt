@@ -64,12 +64,12 @@ export function WatchlistDetailDialog({ item, open, onOpenChange }: WatchlistDet
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[calc(100%-2rem)] max-w-sm sm:max-w-md overflow-y-auto max-h-[85dvh] no-scrollbar overscroll-contain">
+      <DialogContent className="sm:max-w-md overflow-y-auto max-h-[85dvh] no-scrollbar overscroll-contain">
         <DialogTitle className="sr-only">{meta?.title || "Media Details"}</DialogTitle>
         <DialogDescription className="sr-only">Detailed overview, release dates, and streaming information for {meta?.title || "this media"}.</DialogDescription>
 
         {/* Bleed header */}
-        <div className="relative overflow-hidden shrink-0">
+        <div className="-mx-4 -mt-1 sm:-mt-4 w-[calc(100%+2rem)] relative overflow-hidden shrink-0">
           {meta?.posterUrl && (
             <div
               className="absolute inset-0 scale-110"
@@ -84,9 +84,9 @@ export function WatchlistDetailDialog({ item, open, onOpenChange }: WatchlistDet
             />
           )}
           {!meta?.posterUrl && <div className="absolute inset-0 bg-muted/40" />}
-          <div className="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-card to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-popover to-transparent" />
 
-          <div className="relative z-10 flex items-end gap-3.5 px-4 sm:px-5 pt-6 pb-4 sm:pb-5">
+          <div className="relative z-10 flex items-end gap-3.5 px-4 sm:px-5 pt-8 pb-4 sm:pb-5">
             {/* Poster thumbnail */}
             <div className="relative shrink-0 h-24 w-16 sm:h-28 sm:w-20 rounded-xl overflow-hidden border border-white/20 shadow-xl shadow-black/60 ring-1 ring-black/20 bg-muted">
               {meta?.posterUrl ? (
@@ -120,7 +120,7 @@ export function WatchlistDetailDialog({ item, open, onOpenChange }: WatchlistDet
         </div>
 
         {/* Body content */}
-        <div className="px-4 sm:px-5 pt-2 pb-5 space-y-3.5">
+        <div className="pt-2 pb-2 space-y-3.5">
           {/* Status + Rating cards */}
           <div className="grid grid-cols-2 gap-2.5">
             <div className="flex flex-col gap-1 rounded-xl bg-muted/50 border border-border/40 px-3.5 py-2.5">

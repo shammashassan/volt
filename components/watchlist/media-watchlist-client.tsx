@@ -314,13 +314,10 @@ export function MediaWatchlistClient({ initialItems }: MediaWatchlistClientProps
             onValueChange={(val) => setStatusFilter(val === "active" ? null : (val as string))}
             className="w-full"
           >
-            {/* Stationary Tab Container: border, background & shape remain fixed */}
-            <div className="w-full sm:w-fit max-w-full p-1 bg-muted/60 border border-border/40 rounded-xl overflow-hidden">
-              {/* Scrollable Options/Text inside the tab container */}
-              <TabsList
-                ref={tabsContainerRef}
-                className="group-data-horizontal/tabs:h-auto w-full max-w-full flex flex-nowrap items-center justify-start overflow-x-auto no-scrollbar scroll-smooth"
-              >
+            <TabsList
+              ref={tabsContainerRef}
+              className="w-full sm:w-fit max-w-full flex flex-nowrap items-center justify-start overflow-x-auto no-scrollbar scroll-smooth"
+            >
                 <TabsTrigger
                   value="active"
                   className="h-8 scroll-m-2"
@@ -387,7 +384,6 @@ export function MediaWatchlistClient({ initialItems }: MediaWatchlistClientProps
                   </Badge>
                 </TabsTrigger>
               </TabsList>
-            </div>
           </Tabs>
 
           {/* Search & Sub-filters Toolbar */}
