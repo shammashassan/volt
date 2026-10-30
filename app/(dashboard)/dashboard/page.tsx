@@ -88,7 +88,7 @@ async function WorkspaceDashboardBody({
   ] = await Promise.all([
     getStats(userId),
     getFavorites(userId),
-    getRecentlyViewed(userId, 3),
+    getRecentlyViewed(userId, 6),
     getRecentlyAdded(userId, 10),
     getCategoriesWithCounts(userId),
     getInboxCount(userId),

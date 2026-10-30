@@ -1,6 +1,6 @@
 "use client"
 
-import { Card, CardHeader, CardContent } from "@/components/ui/card"
+import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Star, BookmarkPlus, ExternalLink } from "lucide-react"
 import { Resource } from "@/types"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -18,19 +18,19 @@ export function FavoritesListCard({ resources }: FavoritesListCardProps) {
             size="sm"
             className="flex h-full flex-col"
         >
-            <CardHeader className="flex flex-row items-center">
-                <div className="flex items-center gap-2 flex-1">
-                    <div className="flex size-5 items-center justify-center rounded bg-purple-500/10">
-                        <Star className="size-3 fill-purple-500/30 text-purple-500" />
-                    </div>
-                    <span className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground/60">
-                        favorites &amp; pinned
+            <CardHeader>
+                <CardTitle>
+                    <span className="flex items-center gap-2">
+                        <Star className="size-4 fill-purple-500/30 text-purple-500" />
+                        <span className="text-muted-foreground">Favorites &amp; Pinned</span>
                     </span>
-                </div>
+                </CardTitle>
                 {resources.length > 0 && (
-                    <span className="font-mono text-[10px] text-muted-foreground/50 tabular-nums">
-                        {resources.length}
-                    </span>
+                    <CardAction>
+                        <span className="font-mono text-xs text-muted-foreground/60 tabular-nums">
+                            {resources.length}
+                        </span>
+                    </CardAction>
                 )}
             </CardHeader>
 

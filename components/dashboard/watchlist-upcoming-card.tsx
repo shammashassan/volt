@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Card, CardAction, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Film, Calendar, Telescope } from 'lucide-react';
 import Link from 'next/link';
@@ -56,22 +56,22 @@ export function WatchlistUpcomingCard() {
 
   return (
     <Card size="sm" className="h-full flex flex-col">
-      <CardHeader className="flex flex-row items-center shrink-0">
-        <div className="flex items-center gap-2 flex-1">
-          <div className="flex size-5 items-center justify-center rounded bg-amber-500/10">
-            <Film className="size-3 text-amber-500" />
-          </div>
-          <span className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground/60">
-            upcoming releases
+      <CardHeader>
+        <CardTitle>
+          <span className="flex items-center gap-2">
+            <Film className="size-4 text-amber-500" />
+            <span className="text-muted-foreground">Upcoming Releases</span>
           </span>
-        </div>
+        </CardTitle>
         {items.length > 0 && (
-          <Link
-            href="/media-watchlist"
-            className="text-[10px] text-primary/70 hover:text-primary hover:underline shrink-0"
-          >
-            View all →
-          </Link>
+          <CardAction>
+            <Link
+              href="/media-watchlist"
+              className="text-xs text-primary/70 hover:text-primary hover:underline"
+            >
+              View all →
+            </Link>
+          </CardAction>
         )}
       </CardHeader>
 
@@ -87,14 +87,14 @@ export function WatchlistUpcomingCard() {
             ))}
           </div>
         ) : items.length === 0 ? (
-          <div className="flex flex-1 items-center justify-center gap-3.5 rounded-lg border border-dashed border-border/40 bg-muted/10 p-4">
+          <div className="flex flex-1 flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-border/40 bg-muted/10 p-3 text-center">
             <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-amber-500/10">
               <Telescope className="size-4 shrink-0 text-amber-500/70" />
             </div>
-            <div className="flex flex-col min-w-0">
+            <div className="flex flex-col items-center gap-0.5">
               <p className="text-xs font-medium text-foreground">Nothing on the horizon</p>
               <p className="text-[10px] text-muted-foreground/60 leading-normal">No planned releases coming up.</p>
-              <Link href="/media-watchlist" className="text-[10px] text-primary hover:underline mt-1">
+              <Link href="/media-watchlist" className="text-[10px] text-primary hover:underline mt-0.5">
                 Add to watchlist →
               </Link>
             </div>

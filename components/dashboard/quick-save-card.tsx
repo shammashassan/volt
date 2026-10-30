@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useRef } from "react"
-import { Card, CardHeader, CardContent } from "@/components/ui/card"
+import { Card, CardAction, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupButton } from "@/components/ui/input-group"
 import { Separator } from "@/components/ui/separator"
 import {
@@ -102,47 +102,46 @@ export function QuickSaveCard() {
     return (
         <Card size="sm" className="flex flex-col">
             {/* Header */}
-            <CardHeader className="flex flex-row items-center">
-                <div className="flex items-center gap-2 flex-1">
-                    <div className="flex size-5 items-center justify-center rounded bg-muted/60">
-                        <PlusCircle className="size-3 text-muted-foreground" />
-                    </div>
-                    <span className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground/60">
-                        quick save
+            <CardHeader>
+                <CardTitle>
+                    <span className="flex items-center gap-2">
+                        <PlusCircle className="size-4 text-muted-foreground" />
+                        <span className="text-muted-foreground">Quick Save</span>
                     </span>
-                </div>
-
-                {/* Tips — (i) hover card */}
-                <HoverCard>
-                    <HoverCardTrigger delay={200} closeDelay={100}>
-                        <span className="flex size-5 items-center justify-center rounded-full text-muted-foreground/30 transition-colors hover:text-muted-foreground/70 cursor-pointer">
-                            <Info className="size-3.5" />
-                            <span className="sr-only">Tips</span>
-                        </span>
-                    </HoverCardTrigger>
-                    <HoverCardContent align="end" sideOffset={6} className="w-56">
-                        <div className="flex flex-col gap-2">
-                            <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground/60">
-                                Quick Save Tips
-                            </p>
-                            <Separator />
-                            <ul className="flex flex-col gap-1.5 list-none">
-                                <li className="flex items-start gap-1.5 text-[11px] text-muted-foreground leading-relaxed">
-                                    <span className="mt-0.5 text-primary/60">·</span>
-                                    Paste any URL — title and description are fetched automatically.
-                                </li>
-                                <li className="flex items-start gap-1.5 text-[11px] text-muted-foreground leading-relaxed">
-                                    <span className="mt-0.5 text-primary/60">·</span>
-                                    Works with docs, articles, repos, tools, and more.
-                                </li>
-                                <li className="flex items-start gap-1.5 text-[11px] text-muted-foreground leading-relaxed">
-                                    <span className="mt-0.5 text-primary/60">·</span>
-                                    Resources land in your inbox until categorized.
-                                </li>
-                            </ul>
-                        </div>
-                    </HoverCardContent>
-                </HoverCard>
+                </CardTitle>
+                <CardAction>
+                    {/* Tips — (i) hover card */}
+                    <HoverCard>
+                        <HoverCardTrigger delay={200} closeDelay={100}>
+                            <span className="flex size-5 items-center justify-center rounded-full text-muted-foreground/40 transition-colors hover:text-muted-foreground cursor-pointer">
+                                <Info className="size-3.5" />
+                                <span className="sr-only">Tips</span>
+                            </span>
+                        </HoverCardTrigger>
+                        <HoverCardContent align="end" sideOffset={6} className="w-56">
+                            <div className="flex flex-col gap-2">
+                                <p className="text-xs font-semibold text-foreground">
+                                    Quick Save Tips
+                                </p>
+                                <Separator />
+                                <ul className="flex flex-col gap-1.5 list-none">
+                                    <li className="flex items-start gap-1.5 text-[11px] text-muted-foreground leading-relaxed">
+                                        <span className="mt-0.5 text-primary/60">·</span>
+                                        Paste any URL — title and description are fetched automatically.
+                                    </li>
+                                    <li className="flex items-start gap-1.5 text-[11px] text-muted-foreground leading-relaxed">
+                                        <span className="mt-0.5 text-primary/60">·</span>
+                                        Works with docs, articles, repos, tools, and more.
+                                    </li>
+                                    <li className="flex items-start gap-1.5 text-[11px] text-muted-foreground leading-relaxed">
+                                        <span className="mt-0.5 text-primary/60">·</span>
+                                        Resources land in your inbox until categorized.
+                                    </li>
+                                </ul>
+                            </div>
+                        </HoverCardContent>
+                    </HoverCard>
+                </CardAction>
             </CardHeader>
 
             {/* Body */}

@@ -162,7 +162,7 @@ export function WorkspaceBento({
                 <div className="workspace-card lg:col-span-2 order-7 lg:order-0">
                     <RecentlyAddedCarousel resources={recentlyAdded} />
                 </div>
-                <div className="workspace-card lg:col-span-1 order-9 lg:order-0">
+                <div className="workspace-card lg:col-span-1 order-9 lg:order-0 flex flex-col h-[340px] lg:h-0 lg:min-h-full">
                     <CategoriesSummaryCard categories={categories} />
                 </div>
 

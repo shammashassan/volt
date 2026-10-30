@@ -4,6 +4,7 @@ import * as React from "react"
 import {
   Command,
   CommandDialog,
+  CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandItem,
@@ -33,7 +34,8 @@ import { trackResourceViewAction } from "@/lib/actions"
 import { searchAction } from "@/lib/actions/search"
 import { Category, Resource, Note, Project, Person } from "@/types"
 import { Button } from "@/components/ui/button"
-import { Kbd } from "@/components/ui/kbd"
+import { Kbd, KbdGroup } from "@/components/ui/kbd"
+import { Badge } from "@/components/ui/badge"
 import { RESOURCE_TYPES } from "@/components/resources/resource-types"
 
 const typeItems = RESOURCE_TYPES.map(t => ({
@@ -59,7 +61,14 @@ export function SearchCommand() {
     categories: []
   })
   const [isLoading, setIsLoading] = React.useState(false)
+  const [mounted, setMounted] = React.useState(false)
   const router = useRouter()
+
+  React.useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  const isMac = mounted && typeof navigator !== "undefined" && /(Mac|iPhone|iPod|iPad)/i.test(navigator.userAgent)
 
 
   React.useEffect(() => {
@@ -204,194 +213,201 @@ export function SearchCommand() {
 
   return (
     <>
+      {/* Mobile search trigger */}
       <Button
         variant="outline"
-        size="sm"
+        size="icon"
         onClick={() => setOpen(true)}
-        className="size-9 sm:size-auto sm:w-64 sm:justify-start"
+        className="sm:hidden"
+        aria-label="Search anything"
       >
-        <SearchIcon data-icon="inline-start" aria-hidden="true" />
-        <span className="hidden sm:inline-block flex-1 text-left font-medium">
-          Search anything…
+        <SearchIcon aria-hidden="true" />
+      </Button>
+
+      {/* Desktop search trigger */}
+      <Button
+        variant="outline"
+        onClick={() => setOpen(true)}
+        className="hidden sm:inline-flex sm:w-64 md:w-80 justify-between"
+      >
+        <span className="flex items-center gap-2">
+          <SearchIcon data-icon="inline-start" className="text-muted-foreground" aria-hidden="true" />
+          <span className="font-normal text-muted-foreground">
+            Search anything…
+          </span>
         </span>
-        <Kbd className="hidden sm:inline-flex">⌘</Kbd>
+        <KbdGroup>
+          <Kbd>{isMac ? "⌘" : "Ctrl"}</Kbd>
+          <Kbd>K</Kbd>
+        </KbdGroup>
       </Button>
 
       <CommandDialog open={open} onOpenChange={setOpen}>
         <Command className="size-full" shouldFilter={false}>
           <CommandInput
-          placeholder="Type to search resources, notes, projects, people…"
-          value={searchQuery}
-          onValueChange={setSearchQuery}
-        />
-        <CommandList>
-          {/* Quick Create Actions */}
-          {filteredQuickCreate.length > 0 && (
-            <CommandGroup heading="Quick Create">
-              {filteredQuickCreate.map(item => (
-                <CommandItem key={item.type} onSelect={() => handleQuickCreate(item.type)}>
-                  <PlusIcon className="mr-2 size-4 text-primary" aria-hidden="true" />
-                  <span>{item.label}</span>
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          )}
-
-          {filteredQuickCreate.length > 0 && filteredQuickActions.length > 0 && <CommandSeparator />}
-
-          {/* Quick Actions / Navigation */}
-          {filteredQuickActions.length > 0 && (
-            <CommandGroup heading="Quick Actions">
-              {filteredQuickActions.map(item => {
-                const Icon = item.icon;
-                return (
-                  <CommandItem key={item.path} onSelect={() => onSelectEntity(item.path)}>
-                    <Icon className="mr-2 size-4" aria-hidden="true" />
+            placeholder="Type to search resources, notes, projects, people…"
+            value={searchQuery}
+            onValueChange={setSearchQuery}
+          />
+          <CommandList>
+            {/* Quick Create Actions */}
+            {filteredQuickCreate.length > 0 && (
+              <CommandGroup heading="Quick Create">
+                {filteredQuickCreate.map(item => (
+                  <CommandItem key={item.type} onSelect={() => handleQuickCreate(item.type)}>
+                    <PlusIcon className="text-primary" aria-hidden="true" />
                     <span>{item.label}</span>
                   </CommandItem>
-                )
-              })}
-            </CommandGroup>
-          )}
+                ))}
+              </CommandGroup>
+            )}
 
-          {filteredQuickActions.length > 0 && filteredTypes.length > 0 && <CommandSeparator />}
+            {filteredQuickCreate.length > 0 && filteredQuickActions.length > 0 && <CommandSeparator />}
 
-          {/* Resource Types */}
-          {filteredTypes.length > 0 && (
-            <CommandGroup heading="Resource Types">
-              {filteredTypes.map(item => {
-                const Icon = item.icon;
-                return (
-                  <CommandItem
-                    key={item.path}
-                    onSelect={() => onSelectEntity(item.path)}
-                    className="flex items-center"
-                  >
-                    <Icon className="mr-2 size-4 text-muted-foreground" aria-hidden="true" />
-                    <span>{item.label}</span>
-                  </CommandItem>
-                )
-              })}
-            </CommandGroup>
-          )}
+            {/* Quick Actions / Navigation */}
+            {filteredQuickActions.length > 0 && (
+              <CommandGroup heading="Quick Actions">
+                {filteredQuickActions.map(item => {
+                  const Icon = item.icon;
+                  return (
+                    <CommandItem key={item.path} onSelect={() => onSelectEntity(item.path)}>
+                      <Icon aria-hidden="true" />
+                      <span>{item.label}</span>
+                    </CommandItem>
+                  )
+                })}
+              </CommandGroup>
+            )}
 
-          {searchQuery.trim() !== "" && hasResults && <CommandSeparator />}
+            {filteredQuickActions.length > 0 && filteredTypes.length > 0 && <CommandSeparator />}
 
-          {isLoading && (
-            <div className="py-6 text-center text-sm text-muted-foreground">
-              Searching…
-            </div>
-          )}
+            {/* Resource Types */}
+            {filteredTypes.length > 0 && (
+              <CommandGroup heading="Resource Types">
+                {filteredTypes.map(item => {
+                  const Icon = item.icon;
+                  return (
+                    <CommandItem
+                      key={item.path}
+                      onSelect={() => onSelectEntity(item.path)}
+                    >
+                      <Icon className="text-muted-foreground" aria-hidden="true" />
+                      <span>{item.label}</span>
+                    </CommandItem>
+                  )
+                })}
+              </CommandGroup>
+            )}
 
-          {!isLoading && !hasAnyMatches && searchQuery.trim() !== "" && (
-            <div className="py-6 text-center text-sm text-muted-foreground">
-              No results found.
-            </div>
-          )}
+            {searchQuery.trim() !== "" && hasResults && <CommandSeparator />}
 
-          {/* Categories */}
-          {searchQuery.trim() !== "" && results.categories.length > 0 && (
-            <CommandGroup heading="Categories">
-              {results.categories.map((category) => {
-                const Icon = (category.icon && ICON_MAP[category.icon as keyof typeof ICON_MAP]) || FolderIcon
-                const catId = category._id?.toString() || category.slug
-                return (
-                  <CommandItem
-                    key={catId}
-                    onSelect={() => onSelectEntity(`/resources?category=${category.slug || catId}`)}
-                    className="flex items-center"
-                  >
-                    <Icon className="size-4 text-muted-foreground/85" aria-hidden="true" />
-                    <span className="font-medium text-foreground">{category.name}</span>
-                  </CommandItem>
-                )
-              })}
-            </CommandGroup>
-          )}
+            {isLoading && (
+              <div className="py-6 text-center text-sm text-muted-foreground">
+                Searching…
+              </div>
+            )}
 
-          {/* Resources */}
-          {searchQuery.trim() !== "" && results.resources.length > 0 && (
-            <CommandGroup heading="Resources">
-              {results.resources.map((resource) => {
-                const resId = resource._id?.toString() || resource.id
-                return (
-                  <CommandItem
-                    key={resId}
-                    onSelect={() => onSelectResource(resource)}
-                    className="flex items-center justify-between"
-                  >
-                    <div className="flex items-center">
-                      <ExternalLinkIcon className="size-4 text-muted-foreground/60" aria-hidden="true" />
-                      <span className="font-medium text-foreground">{resource.title}</span>
-                    </div>
-                    <div className="flex items-center">
-                      <span className="text-[9px] uppercase tracking-wider text-muted-foreground/50 bg-muted px-1.5 py-0.5 rounded">
+            {!isLoading && !hasAnyMatches && searchQuery.trim() !== "" && (
+              <CommandEmpty>No results found.</CommandEmpty>
+            )}
+
+            {/* Categories */}
+            {searchQuery.trim() !== "" && results.categories.length > 0 && (
+              <CommandGroup heading="Categories">
+                {results.categories.map((category) => {
+                  const Icon = (category.icon && ICON_MAP[category.icon as keyof typeof ICON_MAP]) || FolderIcon
+                  const catId = category._id?.toString() || category.slug
+                  return (
+                    <CommandItem
+                      key={catId}
+                      onSelect={() => onSelectEntity(`/resources?category=${category.slug || catId}`)}
+                    >
+                      <Icon className="text-muted-foreground/85" aria-hidden="true" />
+                      <span className="font-medium text-foreground">{category.name}</span>
+                    </CommandItem>
+                  )
+                })}
+              </CommandGroup>
+            )}
+
+            {/* Resources */}
+            {searchQuery.trim() !== "" && results.resources.length > 0 && (
+              <CommandGroup heading="Resources">
+                {results.resources.map((resource) => {
+                  const resId = resource._id?.toString() || resource.id
+                  return (
+                    <CommandItem
+                      key={resId}
+                      onSelect={() => onSelectResource(resource)}
+                      className="justify-between"
+                    >
+                      <div className="flex items-center gap-2">
+                        <ExternalLinkIcon className="text-muted-foreground/60" aria-hidden="true" />
+                        <span className="font-medium text-foreground">{resource.title}</span>
+                      </div>
+                      <Badge variant="secondary">
                         {resource.type || "website"}
-                      </span>
-                    </div>
-                  </CommandItem>
-                )
-              })}
-            </CommandGroup>
-          )}
+                      </Badge>
+                    </CommandItem>
+                  )
+                })}
+              </CommandGroup>
+            )}
 
-          {/* Notes */}
-          {searchQuery.trim() !== "" && results.notes.length > 0 && (
-            <CommandGroup heading="Notes">
-              {results.notes.map((note) => {
-                const noteId = note._id?.toString() || note.id
-                return (
-                  <CommandItem
-                    key={noteId}
-                    onSelect={() => onSelectEntity(`/notes`)} // Notes layout splits in Phase 5
-                    className="flex items-center"
-                  >
-                    <FileTextIcon className="size-4 text-muted-foreground/70" aria-hidden="true" />
-                    <span className="font-medium text-foreground">{note.title}</span>
-                  </CommandItem>
-                )
-              })}
-            </CommandGroup>
-          )}
+            {/* Notes */}
+            {searchQuery.trim() !== "" && results.notes.length > 0 && (
+              <CommandGroup heading="Notes">
+                {results.notes.map((note) => {
+                  const noteId = note._id?.toString() || note.id
+                  return (
+                    <CommandItem
+                      key={noteId}
+                      onSelect={() => onSelectEntity(`/notes`)} // Notes layout splits in Phase 5
+                    >
+                      <FileTextIcon className="text-muted-foreground/70" aria-hidden="true" />
+                      <span className="font-medium text-foreground">{note.title}</span>
+                    </CommandItem>
+                  )
+                })}
+              </CommandGroup>
+            )}
 
-          {/* Projects */}
-          {searchQuery.trim() !== "" && results.projects.length > 0 && (
-            <CommandGroup heading="Projects">
-              {results.projects.map((project) => {
-                const projId = project._id?.toString() || project.id
-                return (
-                  <CommandItem
-                    key={projId}
-                    onSelect={() => onSelectEntity(`/projects/${projId}`)}
-                    className="flex items-center"
-                  >
-                    <BriefcaseIcon className="size-4 text-muted-foreground/70" aria-hidden="true" />
-                    <span className="font-medium text-foreground">{project.name}</span>
-                  </CommandItem>
-                )
-              })}
-            </CommandGroup>
-          )}
+            {/* Projects */}
+            {searchQuery.trim() !== "" && results.projects.length > 0 && (
+              <CommandGroup heading="Projects">
+                {results.projects.map((project) => {
+                  const projId = project._id?.toString() || project.id
+                  return (
+                    <CommandItem
+                      key={projId}
+                      onSelect={() => onSelectEntity(`/projects/${projId}`)}
+                    >
+                      <BriefcaseIcon className="text-muted-foreground/70" aria-hidden="true" />
+                      <span className="font-medium text-foreground">{project.name}</span>
+                    </CommandItem>
+                  )
+                })}
+              </CommandGroup>
+            )}
 
-          {/* People */}
-          {searchQuery.trim() !== "" && results.people.length > 0 && (
-            <CommandGroup heading="People">
-              {results.people.map((person) => {
-                const personId = person._id?.toString() || person.id
-                return (
-                  <CommandItem
-                    key={personId}
-                    onSelect={() => onSelectEntity(`/people/${personId}`)}
-                    className="flex items-center"
-                  >
-                    <UserIcon className="size-4 text-muted-foreground/75" aria-hidden="true" />
-                    <span className="font-medium text-foreground">{person.name}</span>
-                  </CommandItem>
-                )
-              })}
-            </CommandGroup>
-          )}
-        </CommandList>
+            {/* People */}
+            {searchQuery.trim() !== "" && results.people.length > 0 && (
+              <CommandGroup heading="People">
+                {results.people.map((person) => {
+                  const personId = person._id?.toString() || person.id
+                  return (
+                    <CommandItem
+                      key={personId}
+                      onSelect={() => onSelectEntity(`/people/${personId}`)}
+                    >
+                      <UserIcon className="text-muted-foreground/75" aria-hidden="true" />
+                      <span className="font-medium text-foreground">{person.name}</span>
+                    </CommandItem>
+                  )
+                })}
+              </CommandGroup>
+            )}
+          </CommandList>
         </Command>
       </CommandDialog>
     </>

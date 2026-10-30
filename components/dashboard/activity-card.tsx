@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Card, CardHeader, CardContent } from "@/components/ui/card"
+import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -55,17 +55,13 @@ export function ActivityCard({ recentlyViewed, recommended, spotlight }: Activit
         <Card size="sm" className="flex h-full flex-col">
             <Tabs value={tab} onValueChange={setTab} className="flex flex-1 flex-col">
                 <CardHeader>
-                    <div className="flex items-center justify-between">
-                        {/* Section label */}
-                        <div className="flex items-center gap-2">
-                            <div className="flex size-5 items-center justify-center rounded bg-primary/10">
-                                <Clock className="size-3 text-primary" />
-                            </div>
-                            <span className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground/60">
-                                activity
-                            </span>
-                        </div>
-                        {/* Tab switcher */}
+                    <CardTitle>
+                        <span className="flex items-center gap-2">
+                            <Clock className="size-4 text-primary" />
+                            <span className="text-muted-foreground">Activity</span>
+                        </span>
+                    </CardTitle>
+                    <CardAction>
                         <TabsList>
                             <TabsTrigger value="recent">
                                 <Clock />
@@ -76,7 +72,7 @@ export function ActivityCard({ recentlyViewed, recommended, spotlight }: Activit
                                 Discover
                             </TabsTrigger>
                         </TabsList>
-                    </div>
+                    </CardAction>
                 </CardHeader>
 
                 <CardContent className="flex-1">
@@ -85,9 +81,29 @@ export function ActivityCard({ recentlyViewed, recommended, spotlight }: Activit
                         <ScrollArea className="h-[190px] w-full">
                             <div className="flex flex-col gap-1.5 pr-3">
                                 {recentlyViewed.length > 0 ? (
-                                    recentlyViewed.map(res => (
-                                        <ResourceLink key={res.id || res._id?.toString()} resource={res} />
-                                    ))
+                                    <>
+                                        {recentlyViewed.map(res => (
+                                            <ResourceLink key={res.id || res._id?.toString()} resource={res} />
+                                        ))}
+                                        <div className="mt-1 flex items-center justify-between rounded-lg border border-border/40 bg-muted/20 px-3 py-2 text-xs">
+                                            <div className="flex items-center gap-2">
+                                                <span className="relative flex size-1.5">
+                                                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                                                    <span className="relative inline-flex size-1.5 rounded-full bg-emerald-500" />
+                                                </span>
+                                                <span className="font-mono text-[10px] lowercase text-muted-foreground/70">
+                                                    recent session history
+                                                </span>
+                                            </div>
+                                            <Link
+                                                href="/resources"
+                                                className="group/link inline-flex items-center gap-1 font-mono text-[10px] font-medium text-primary hover:underline"
+                                            >
+                                                <span>browse all</span>
+                                                <ArrowUpRight className="size-3 transition-transform group-hover/link:-translate-y-0.5 group-hover/link:translate-x-0.5" />
+                                            </Link>
+                                        </div>
+                                    </>
                                 ) : (
                                     <div className="flex flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-border/40 bg-muted/10 py-8 mt-1">
                                         <div className="flex size-8 items-center justify-center rounded-full bg-primary/10">

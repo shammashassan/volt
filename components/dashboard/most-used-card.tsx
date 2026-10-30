@@ -1,6 +1,6 @@
 "use client"
 
-import { Card, CardHeader, CardContent } from "@/components/ui/card"
+import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { TrendingUp, MousePointerClick } from "lucide-react"
 import { Resource } from "@/types"
@@ -15,19 +15,19 @@ interface MostUsedCardProps {
 export function MostUsedCard({ resources }: MostUsedCardProps) {
     return (
         <Card size="sm" className="flex h-full flex-col">
-            <CardHeader className="flex flex-row items-center">
-                <div className="flex items-center gap-2 flex-1">
-                    <div className="flex size-5 items-center justify-center rounded bg-emerald-500/10">
-                        <TrendingUp className="size-3 text-emerald-500" />
-                    </div>
-                    <span className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground/60">
-                        most used resources
+            <CardHeader>
+                <CardTitle>
+                    <span className="flex items-center gap-2">
+                        <TrendingUp className="size-4 text-emerald-500" />
+                        <span className="text-muted-foreground">Most Used Resources</span>
                     </span>
-                </div>
+                </CardTitle>
                 {resources.length > 0 && (
-                    <span className="font-mono text-[10px] text-muted-foreground/50 tabular-nums">
-                        top {resources.length}
-                    </span>
+                    <CardAction>
+                        <span className="font-mono text-xs text-muted-foreground/60 tabular-nums">
+                            top {resources.length}
+                        </span>
+                    </CardAction>
                 )}
             </CardHeader>
 

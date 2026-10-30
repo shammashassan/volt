@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Resource } from "@/types"
 import { ResourceCard } from "@/components/resources/resource-card"
 import { Button } from "@/components/ui/button"
@@ -22,29 +22,44 @@ export function RecentlyAddedCarousel({ resources }: RecentlyAddedCarouselProps)
     const [canScrollPrev, setCanScrollPrev] = useState(false)
     const [canScrollNext, setCanScrollNext] = useState(false)
 
-    // Track scroll possibility
-    const onSelect = (carouselApi: CarouselApi) => {
-        if (!carouselApi) return
-        setCanScrollPrev(carouselApi.canScrollPrev())
-        setCanScrollNext(carouselApi.canScrollNext())
-    }
+    useEffect(() => {
+        if (!api) return
 
-    const scrollPrev = () => api?.scrollPrev()
-    const scrollNext = () => api?.scrollNext()
+        const updateScroll = () => {
+            setCanScrollPrev(api.canScrollPrev())
+            setCanScrollNext(api.canScrollNext())
+        }
+
+        // Set initial state
+        updateScroll()
+
+        api.on("select", updateScroll)
+        api.on("reInit", updateScroll)
+
+        return () => {
+            api.off("select", updateScroll)
+        }
+    }, [api])
+
+    const scrollPrev = useCallback(() => {
+        api?.scrollPrev()
+    }, [api])
+
+    const scrollNext = useCallback(() => {
+        api?.scrollNext()
+    }, [api])
 
     return (
         <div className="flex flex-col gap-3">
             {/* Header with Title and Controls */}
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                    <div className="flex size-5 items-center justify-center rounded bg-primary/10">
-                        <Sparkles className="size-3 text-primary" />
-                    </div>
-                    <span className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground/60">
-                        recently added
+                    <Sparkles className="size-4 text-primary" />
+                    <span className="font-heading text-sm font-medium text-muted-foreground">
+                        Recently Added
                     </span>
                     {resources.length > 0 && (
-                        <span className="font-mono text-[10px] text-muted-foreground/50 tabular-nums">
+                        <span className="font-mono text-xs text-muted-foreground/60 tabular-nums">
                             {resources.length}
                         </span>
                     )}
@@ -52,7 +67,7 @@ export function RecentlyAddedCarousel({ resources }: RecentlyAddedCarouselProps)
 
                 {/* Navigation Buttons + View all link */}
                 <div className="flex items-center gap-1.5">
-                    {resources.length > 2 && (
+                    {resources.length > 1 && (
                         <>
                             <Button
                                 variant="outline"
@@ -119,10 +134,12 @@ export function RecentlyAddedCarousel({ resources }: RecentlyAddedCarouselProps)
                                 key={resource.id || resource._id?.toString()}
                                 className="basis-full sm:basis-1/2"
                             >
-                                <ResourceCard
-                                    resource={resource}
-                                    priority={index < 2}
-                                />
+                                <div className="p-1">
+                                    <ResourceCard
+                                        resource={resource}
+                                        priority={index < 2}
+                                    />
+                                </div>
                             </CarouselItem>
                         ))}
                     </CarouselContent>

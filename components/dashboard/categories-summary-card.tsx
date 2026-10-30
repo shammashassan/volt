@@ -1,6 +1,6 @@
 "use client"
 
-import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card"
+import { Card, CardAction, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Folders, ArrowRight, FolderOpen } from "lucide-react"
 import Link from "next/link"
@@ -21,15 +21,13 @@ export function CategoriesSummaryCard({ categories = [] }: CategoriesSummaryCard
     if (categories.length === 0) {
         return (
             <Card size="sm" className="h-full flex flex-col">
-                <CardHeader className="flex flex-row items-center justify-between">
-                    <div className="flex items-center gap-2">
-                        <div className="flex size-5 items-center justify-center rounded bg-amber-500/10">
-                            <Folders className="size-3 text-amber-500" />
-                        </div>
-                        <span className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground/60">
-                            categories
+                <CardHeader>
+                    <CardTitle>
+                        <span className="flex items-center gap-2">
+                            <Folders className="size-4 text-amber-500" />
+                            <span className="text-muted-foreground">Categories</span>
                         </span>
-                    </div>
+                    </CardTitle>
                 </CardHeader>
                 <CardContent className="flex flex-1 items-center justify-center">
                     <div className="flex w-full flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-border/40 bg-muted/10 py-6">
@@ -60,23 +58,23 @@ export function CategoriesSummaryCard({ categories = [] }: CategoriesSummaryCard
     return (
         <Card size="sm" className="h-full flex flex-col">
             {/* Header */}
-            <CardHeader className="flex flex-row items-center justify-between">
-                <div className="flex items-center gap-2">
-                    <div className="flex size-5 items-center justify-center rounded bg-amber-500/10">
-                        <Folders className="size-3 text-amber-500" />
-                    </div>
-                    <span className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground/60">
-                        categories
+            <CardHeader>
+                <CardTitle>
+                    <span className="flex items-center gap-2">
+                        <Folders className="size-4 text-amber-500" />
+                        <span className="text-muted-foreground">Categories</span>
                     </span>
-                </div>
-                <span className="font-mono text-[10px] text-muted-foreground/50 tabular-nums">
-                    {categories.length} total
-                </span>
+                </CardTitle>
+                <CardAction>
+                    <span className="font-mono text-xs text-muted-foreground/60 tabular-nums">
+                        {categories.length} total
+                    </span>
+                </CardAction>
             </CardHeader>
 
-            <CardContent className="flex-1">
+            <CardContent className="flex flex-1 flex-col min-h-0">
                 {/* Compact category rows — with ScrollArea, max 10 items */}
-                <ScrollArea className="h-[160px] w-full">
+                <ScrollArea className="h-full w-full">
                     <div className="flex flex-col gap-3 pr-3.5">
                         {topCategories.map(cat => {
                             const title = cat.name || "Untitled"

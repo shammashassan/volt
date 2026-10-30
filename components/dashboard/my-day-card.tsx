@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Card, CardAction, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { CalendarDays, CheckCircle2 } from 'lucide-react';
@@ -40,19 +40,19 @@ export function MyDayCard() {
 
   return (
     <Card size="sm" className="h-full flex flex-col">
-      <CardHeader className="flex flex-row items-center shrink-0">
-        <div className="flex items-center gap-2 flex-1">
-          <div className="flex size-5 items-center justify-center rounded bg-violet-500/10">
-            <CalendarDays className="size-3 text-violet-500" />
-          </div>
-          <span className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground/60">
-            my day
+      <CardHeader>
+        <CardTitle>
+          <span className="flex items-center gap-2">
+            <CalendarDays className="size-4 text-violet-500" />
+            <span className="text-muted-foreground">My Day</span>
           </span>
-        </div>
+        </CardTitle>
         {reminders.length > 0 && (
-          <span className="font-mono text-[10px] text-muted-foreground/50 tabular-nums">
-            {reminders.length} pending
-          </span>
+          <CardAction>
+            <span className="font-mono text-xs text-muted-foreground/60 tabular-nums">
+              {reminders.length} pending
+            </span>
+          </CardAction>
         )}
       </CardHeader>
 
@@ -65,30 +65,45 @@ export function MyDayCard() {
             ))}
           </div>
         ) : reminders.length === 0 ? (
-          <div className="flex flex-1 items-center justify-center gap-3.5 rounded-lg border border-dashed border-border/40 bg-muted/10 p-4">
+          <div className="flex flex-1 flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-border/40 bg-muted/10 p-3 text-center">
             <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-emerald-500/10">
               <CheckCircle2 className="size-4 shrink-0 text-emerald-500" />
             </div>
-            <div className="flex flex-col min-w-0">
-              <p className="text-xs font-medium text-foreground">All clear!</p>
-              <p className="text-[10px] text-muted-foreground/60 leading-normal">No reminders due today.</p>
-              <Link href="/reminders" className="text-[10px] text-primary hover:underline mt-1">
-                Manage reminders →
+            <div className="flex flex-col items-center gap-0.5">
+              <p className="text-xs font-medium text-foreground">All clear for today</p>
+              <Link href="/reminders" className="text-[10px] text-primary hover:underline">
+                View all reminders &rarr;
               </Link>
             </div>
           </div>
         ) : (
-          <ScrollArea className="h-full">
+          <ScrollArea className="h-full w-full">
             <div className="flex flex-col gap-1.5 pr-3">
-              {reminders.map(r => (
-                <div
-                  key={r._id as string}
-                  className="flex items-center gap-2.5 rounded-md border border-border/40 bg-muted/10 px-2.5 py-2"
-                >
-                  <Checkbox onCheckedChange={() => handleChecked(r._id as string)} />
-                  <span className="text-xs font-medium text-foreground truncate">{r.title}</span>
-                </div>
-              ))}
+              {reminders.map(reminder => {
+                const id = String(reminder._id);
+                return (
+                  <div
+                    key={id}
+                    className="group/rem flex items-center gap-2.5 rounded-md border border-border/40 bg-muted/10 p-2 transition-colors hover:bg-muted/30"
+                  >
+                    <Checkbox
+                      id={`rem-${id}`}
+                      onCheckedChange={() => handleChecked(id)}
+                    />
+                    <div className="flex flex-1 flex-col min-w-0">
+                      <label
+                        htmlFor={`rem-${id}`}
+                        className="cursor-pointer truncate text-xs font-medium text-foreground transition-colors group-hover/rem:text-primary"
+                      >
+                        {reminder.title}
+                      </label>
+                      <span className="text-[10px] text-muted-foreground/60">
+                        {new Date(reminder.triggerAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </ScrollArea>
         )}

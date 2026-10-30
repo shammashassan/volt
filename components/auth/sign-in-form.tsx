@@ -375,7 +375,7 @@ export function SignInForm() {
 
           <div className="relative my-1 flex items-center justify-center">
             <span className="absolute w-full border-t border-border/40" />
-            <span className="relative bg-background px-3 text-xs text-muted-foreground uppercase">
+            <span className="relative bg-card px-3 text-xs text-muted-foreground uppercase">
               Or continue with
             </span>
           </div>

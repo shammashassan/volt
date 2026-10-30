@@ -380,8 +380,8 @@ const ResourceCardComponent = function ResourceCardComponent<
   }, [resourceId])
 
   const content = (
-    <Card className="relative h-full overflow-hidden">
-      <div className="-mt-(--card-spacing) relative aspect-video w-full overflow-hidden bg-muted/30 will-change-transform">
+    <Card className="relative overflow-hidden">
+      <div className="-mt-(--card-spacing) relative aspect-video w-full overflow-hidden bg-muted/30 will-change-transform shrink-0">
         {(isLoading || !hasBeenVisible) && (
           <Skeleton className="absolute inset-0 z-40" />
         )}
@@ -415,12 +415,14 @@ const ResourceCardComponent = function ResourceCardComponent<
         />
       </div>
       <CardHeader className="flex flex-col">
-        <CardTitle>
-          <span className="line-clamp-1 text-base font-semibold tracking-tight text-foreground/90 transition-colors group-hover:text-primary">{resource.title}</span>
-        </CardTitle>
-        <p className="line-clamp-2 text-[11px] leading-tight text-muted-foreground/70">
-          {resource.description}
-        </p>
+        <div className="flex flex-col gap-1">
+          <CardTitle>
+            <span className="line-clamp-1 text-base font-semibold tracking-tight text-foreground/90 transition-colors group-hover:text-primary">{resource.title}</span>
+          </CardTitle>
+          <p className="line-clamp-2 text-[11px] leading-tight text-muted-foreground/70">
+            {resource.description}
+          </p>
+        </div>
       </CardHeader>
     </Card>
   )
@@ -433,7 +435,7 @@ const ResourceCardComponent = function ResourceCardComponent<
           handleTrack()
           onClick(e)
         }}
-        className="block group h-full focus-visible:outline-hidden "
+        className="block group focus-visible:outline-hidden"
       >
         {content}
       </div>
@@ -442,7 +444,7 @@ const ResourceCardComponent = function ResourceCardComponent<
 
   if (disableRedirect) {
     return (
-      <div ref={containerRef as any} className="block group h-full focus-visible:outline-hidden">
+      <div ref={containerRef as any} className="block group focus-visible:outline-hidden">
         {content}
       </div>
     )
@@ -453,7 +455,7 @@ const ResourceCardComponent = function ResourceCardComponent<
       ref={containerRef as any}
       {...externalProps}
       onClick={handleTrack}
-      className="block group h-full focus-visible:outline-hidden"
+      className="block group focus-visible:outline-hidden"
     >
       {content}
     </a>
