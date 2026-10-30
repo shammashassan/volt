@@ -242,7 +242,7 @@ function ResourceGrid({
   if (filteredResources.length === 0) {
     return (
       <section className="px-4 lg:px-6">
-        <Empty className="max-w-7xl py-24 border border-dashed rounded-3xl bg-card/10">
+        <Empty className="max-w-7xl">
           <EmptyHeader>
             <EmptyMedia variant="icon">
               <Filter />
@@ -287,7 +287,7 @@ function ResourceGrid({
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {Array.from({ length: Math.min(3, remaining) }).map((_, i) => (
               <div key={i} className="border border-border/40 bg-card/60 rounded-xl overflow-hidden">
-                <Skeleton className="aspect-video w-full rounded-none" />
+                <Skeleton className="aspect-video w-full" />
                 <div className="px-4 py-3 flex flex-col gap-2">
                   <Skeleton className="h-5 w-2/3" />
                   <Skeleton className="h-3 w-full" />
@@ -599,8 +599,8 @@ export function ResourcesContent({
                 <h1 className="text-3xl font-black tracking-tight md:text-4xl bg-clip-text text-transparent bg-linear-to-r from-foreground to-foreground/60">
                   {pageTitle}
                 </h1>
-                <Badge variant="outline" className="h-6 rounded-full border-primary/20 bg-primary/5 text-primary text-[10px] uppercase font-bold tracking-widest px-2.5">
-                  {filteredResources.length} Items
+                <Badge variant="outline">
+                  <span className="text-[10px] uppercase font-bold tracking-widest">{filteredResources.length} Items</span>
                 </Badge>
               </div>
             </div>
@@ -648,7 +648,7 @@ export function ResourcesContent({
               onValueChange={(val) => setFilters({ type: val === "all" ? null : (val as ResourceType) })}
               disabled={isReorderActive}
             >
-              <SelectTrigger className="w-[140px] h-10 bg-background/50 border-border/60">
+              <SelectTrigger className="w-[140px] h-10">
                 <SelectValue placeholder="All Types" />
               </SelectTrigger>
               <SelectContent>
@@ -667,7 +667,7 @@ export function ResourcesContent({
               onValueChange={(val) => setFilters({ category: val === "all" ? null : val })}
               disabled={isReorderActive}
             >
-              <SelectTrigger className="w-[160px] h-10 bg-background/50 border-border/60">
+              <SelectTrigger className="w-[160px] h-10">
                 <SelectValue placeholder="All Categories" />
               </SelectTrigger>
               <SelectContent>
@@ -755,8 +755,8 @@ export function ResourcesContent({
       <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogMedia className="bg-destructive/10 text-destructive">
-              <Trash2 />
+            <AlertDialogMedia>
+              <Trash2 className="text-destructive" />
             </AlertDialogMedia>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
             <AlertDialogDescription>
@@ -802,7 +802,7 @@ export function ResourcesContent({
             <Button
               size="sm"
               onClick={() => setIsReorderActive(false)}
-              className="h-8 rounded-full px-4 text-xs font-bold shadow-xs cursor-pointer"
+              className="cursor-pointer"
             >
               <Check className="size-3.5 mr-1" />
               Done Ordering

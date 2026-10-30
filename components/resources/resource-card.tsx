@@ -380,10 +380,10 @@ const ResourceCardComponent = function ResourceCardComponent<
   }, [resourceId])
 
   const content = (
-    <Card className="relative h-full overflow-hidden p-0 border-border/40 bg-card/60 transition-[border-color,background-color,shadow,transform] duration-300 hover:border-primary/20 hover:bg-card hover:shadow-lg hover:shadow-primary/5 will-change-[transform,shadow]">
+    <Card className="relative h-full overflow-hidden">
       <div className="relative aspect-video w-full overflow-hidden bg-muted/30 will-change-transform">
         {(isLoading || !hasBeenVisible) && (
-          <Skeleton className="absolute inset-0 rounded-none z-40" />
+          <Skeleton className="absolute inset-0 z-40" />
         )}
         {hasBeenVisible && !hasError && (
           <Image
@@ -414,9 +414,9 @@ const ResourceCardComponent = function ResourceCardComponent<
           disableRedirect={disableRedirect}
         />
       </div>
-      <CardHeader className="flex flex-col gap-0.5 px-4 py-3">
-        <CardTitle className="line-clamp-1 text-base font-semibold tracking-tight text-foreground/90 transition-colors group-hover:text-primary">
-          {resource.title}
+      <CardHeader className="flex flex-col">
+        <CardTitle>
+          <span className="line-clamp-1 text-base font-semibold tracking-tight text-foreground/90 transition-colors group-hover:text-primary">{resource.title}</span>
         </CardTitle>
         <p className="line-clamp-2 text-[11px] leading-tight text-muted-foreground/70">
           {resource.description}

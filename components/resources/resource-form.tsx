@@ -138,7 +138,8 @@ export function ResourceForm({
 
   return (
     <form onSubmit={handleSubmit} className="grid gap-6">
-      <FieldGroup className="py-2 flex flex-col gap-5">
+      <div className="py-2">
+        <FieldGroup className="flex flex-col">
         <Field>
           <FieldLabel htmlFor="name">Resource Name</FieldLabel>
           <Input
@@ -147,7 +148,7 @@ export function ResourceForm({
             onChange={(e) => setName(e.target.value)}
             placeholder="e.g. Aceternity UI"
             required
-            className="bg-background/40"
+            
           />
         </Field>
 
@@ -175,7 +176,7 @@ export function ResourceForm({
             onChange={(e) => setLink(e.target.value)}
             placeholder="https://..."
             required
-            className="bg-background/40"
+            
           />
         </Field>
 
@@ -183,7 +184,7 @@ export function ResourceForm({
           <Field>
             <FieldLabel htmlFor="category">Category</FieldLabel>
             <Select value={categoryId} onValueChange={setCategoryId}>
-              <SelectTrigger id="category" className="bg-background/40">
+              <SelectTrigger id="category" >
                 <SelectValue placeholder="Select" />
               </SelectTrigger>
               <SelectContent>
@@ -200,7 +201,7 @@ export function ResourceForm({
           <Field>
             <FieldLabel htmlFor="type">Type</FieldLabel>
             <Select value={type} onValueChange={(v) => setType(v as ResourceType)}>
-              <SelectTrigger id="type" className="bg-background/40">
+              <SelectTrigger id="type" >
                 <SelectValue placeholder="Select Type" />
               </SelectTrigger>
               <SelectContent>
@@ -222,7 +223,7 @@ export function ResourceForm({
               pressed={favorite}
               onPressedChange={setFavorite}
               variant="outline"
-              className="justify-start px-3 gap-2"
+              className="justify-start"
             >
               <Star className={`size-3.5 ${favorite ? "fill-current" : ""}`} />
               <span className="text-xs font-medium">Favorite / Star</span>
@@ -237,7 +238,7 @@ export function ResourceForm({
               type="button"
               variant="ghost"
               size="sm"
-              className="h-8 gap-1.5 text-xs text-muted-foreground hover:text-primary"
+              
               onClick={copyPrompt}
               disabled={!name || !link}
             >
@@ -251,7 +252,7 @@ export function ResourceForm({
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Briefly describe why this resource is useful..."
             required
-            className="min-h-[80px] bg-background/40"
+            className="min-h-[80px]"
           />
         </Field>
 
@@ -263,7 +264,7 @@ export function ResourceForm({
             value={whySaved}
             onChange={(e) => setWhySaved(e.target.value)}
             rows={2}
-            className="bg-background/40"
+            
           />
         </Field>
 
@@ -275,7 +276,7 @@ export function ResourceForm({
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             rows={4}
-            className="bg-background/40 font-mono text-xs"
+            
           />
         </Field>
 
@@ -286,13 +287,13 @@ export function ResourceForm({
             placeholder="react, tailwind, animation, ui"
             value={tags}
             onChange={(e) => setTags(e.target.value)}
-            className="bg-background/40"
+            
           />
         </Field>
 
         <div className="flex flex-col gap-4 border border-border/40 rounded-xl p-4 bg-muted/20">
           <Field>
-            <FieldLabel className="flex items-center gap-1">
+            <FieldLabel className="flex items-center">
               <Folder className="size-3 text-primary" /> Associated Projects
             </FieldLabel>
             <Combobox
@@ -324,7 +325,7 @@ export function ResourceForm({
                   )}
                 </ComboboxValue>
               </ComboboxChips>
-              <ComboboxContent anchor={projectsAnchor} className="z-55 bg-popover border border-border rounded-lg shadow-md max-h-[300px]">
+              <ComboboxContent anchor={projectsAnchor} className="z-55 max-h-[300px]">
                 <ComboboxEmpty>No projects found.</ComboboxEmpty>
                 <ComboboxList>
                   {(item: string) => {
@@ -341,7 +342,7 @@ export function ResourceForm({
           </Field>
 
           <Field>
-            <FieldLabel className="flex items-center gap-1">
+            <FieldLabel className="flex items-center">
               <User className="size-3 text-blue-500" /> Associated People
             </FieldLabel>
             <Combobox
@@ -373,7 +374,7 @@ export function ResourceForm({
                   )}
                 </ComboboxValue>
               </ComboboxChips>
-              <ComboboxContent anchor={peopleAnchor} className="z-55 bg-popover border border-border rounded-lg shadow-md max-h-[300px]">
+              <ComboboxContent anchor={peopleAnchor} className="z-55 max-h-[300px]">
                 <ComboboxEmpty>No people found.</ComboboxEmpty>
                 <ComboboxList>
                   {(item: string) => {
@@ -398,10 +399,11 @@ export function ResourceForm({
             value={order}
             onChange={(e) => setOrder(parseInt(e.target.value) || 0)}
             placeholder="0"
-            className="bg-background/40"
+            
           />
         </Field>
       </FieldGroup>
+      </div>
 
       <DialogFooter className="mt-6 flex flex-row items-center justify-between sm:justify-between">
         {onDelete ? (

@@ -93,8 +93,8 @@ export const columns = (
       const category = row.original.categoryId
       if (!category) return null
       return (
-        <Badge variant={getCategoryVariant(category) as any} className="capitalize text-xs font-semibold">
-          {category}
+        <Badge variant={getCategoryVariant(category) as any}>
+          <span className="capitalize">{category}</span>
         </Badge>
       )
     },
@@ -112,7 +112,7 @@ export const columns = (
       return (
         <div className="flex flex-wrap gap-1 max-w-[200px]">
           {tags.slice(0, 3).map((tag) => (
-            <Badge key={tag} variant="outline" className="text-[10px] px-1.5 py-0">
+            <Badge key={tag} variant="outline">
               #{tag}
             </Badge>
           ))}
@@ -133,7 +133,7 @@ export const columns = (
         <DropdownMenu>
           <DropdownMenuTrigger
             render={
-              <Button variant="ghost" size="icon-sm" className="size-8 p-0">
+              <Button variant="ghost" size="icon-sm">
                 <span className="sr-only">Open menu</span>
                 <MoreHorizontal className="size-4" />
               </Button>
@@ -150,7 +150,7 @@ export const columns = (
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem
-                className="text-destructive focus:text-destructive"
+                variant="destructive"
                 onClick={() => onDelete(resourceId)}
               >
                 <Trash className="size-4" />
