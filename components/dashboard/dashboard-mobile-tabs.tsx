@@ -56,8 +56,7 @@ export function DashboardMobileTabs({
             size="sm"
             render={<Link href="/resources" />}
             nativeButton={false}
-            className="shrink-0"
-          >
+                      >
             All <ArrowRightIcon data-icon="inline-end" className="size-4 ml-1" />
           </Button>
         </div>
@@ -106,7 +105,7 @@ export function DashboardMobileTabs({
                         {res.title}
                       </span>
                     </div>
-                    <Badge variant="secondary" className="shrink-0 ml-2">
+                    <Badge variant="secondary" className="ml-2">
                       <span className="tabular-nums">{res.useCount}</span>
                     </Badge>
                   </a>

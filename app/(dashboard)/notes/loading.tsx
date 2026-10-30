@@ -4,9 +4,9 @@ export default function NotesLoading() {
   return (
     <div className="h-[calc(100dvh-var(--header-height))] border-t border-border overflow-hidden flex animate-pulse">
       {/* Sidebar / List Panel Skeleton */}
-      <div className="w-[28%] border-r border-border flex flex-col h-full bg-muted/10 shrink-0 hidden md:flex">
+      <div className="w-[28%] border-r border-border flex flex-col h-full bg-muted/10 hidden md:flex">
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-4 border-b border-border shrink-0">
+        <div className="flex items-center justify-between px-4 py-4 border-b border-border">
           <div className="flex items-center gap-2.5">
             <Skeleton className="size-5" />
             <Skeleton className="h-5 w-20" />
@@ -15,11 +15,11 @@ export default function NotesLoading() {
           <Skeleton className="size-9" />
         </div>
         {/* Search */}
-        <div className="px-4 py-3 border-b border-border shrink-0">
+        <div className="px-4 py-3 border-b border-border">
           <Skeleton className="h-9 w-full" />
         </div>
         {/* Tag filters */}
-        <div className="px-4 py-3 border-b border-border shrink-0 flex gap-2">
+        <div className="px-4 py-3 border-b border-border flex gap-2">
           <Skeleton className="h-6 w-12" />
           <Skeleton className="h-6 w-16" />
           <Skeleton className="h-6 w-14" />
@@ -49,7 +49,7 @@ export default function NotesLoading() {
       {/* Main / Detail Panel Skeleton */}
       <div className="flex-1 flex flex-col h-full bg-background">
         {/* Toolbar */}
-        <div className="flex items-center justify-between px-5 py-3 border-b border-border shrink-0">
+        <div className="flex items-center justify-between px-5 py-3 border-b border-border">
           <div className="flex items-center gap-2">
             <Skeleton className="size-9 md:hidden" />
             <Skeleton className="h-5 w-32 md:hidden" />
@@ -64,7 +64,7 @@ export default function NotesLoading() {
         <div className="flex-1 p-8 md:p-12 max-w-2xl mx-auto w-full flex flex-col gap-6">
           <div className="flex items-start justify-between gap-4">
             <Skeleton className="h-10 w-[70%]" />
-            <Skeleton className="h-6 w-32 shrink-0 hidden sm:block" />
+            <Skeleton className="h-6 w-32 hidden sm:block" />
           </div>
           {/* Tag row */}
           <div className="flex gap-2">

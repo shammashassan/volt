@@ -295,7 +295,7 @@ export function NotificationsContent({
               <Item
                 key={n._id as string}
                 variant={!n.readAt ? "muted" : "outline"}
-                className="items-start md:items-center justify-between cursor-pointer"
+                className="items-start md:items-center justify-between"
                 render={
                   hasLink ? (
                     <Link

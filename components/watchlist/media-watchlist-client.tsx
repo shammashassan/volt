@@ -323,7 +323,7 @@ export function MediaWatchlistClient({ initialItems }: MediaWatchlistClientProps
               >
                 <TabsTrigger
                   value="active"
-                  className="h-8 shrink-0 cursor-pointer scroll-m-2"
+                  className="h-8 scroll-m-2"
                 >
                   <Sparkles className="size-3.5 text-primary shrink-0" />
                   <span>Active</span>
@@ -334,7 +334,7 @@ export function MediaWatchlistClient({ initialItems }: MediaWatchlistClientProps
 
                 <TabsTrigger
                   value="watching"
-                  className="h-8 shrink-0 cursor-pointer scroll-m-2"
+                  className="h-8 scroll-m-2"
                 >
                   <Play className="size-3.5 text-blue-500 fill-blue-500/20 shrink-0" />
                   <span>Watching</span>
@@ -345,7 +345,7 @@ export function MediaWatchlistClient({ initialItems }: MediaWatchlistClientProps
 
                 <TabsTrigger
                   value="planned"
-                  className="h-8 shrink-0 cursor-pointer scroll-m-2"
+                  className="h-8 scroll-m-2"
                 >
                   <Clock className="size-3.5 text-amber-500 shrink-0" />
                   <span>Planned</span>
@@ -356,7 +356,7 @@ export function MediaWatchlistClient({ initialItems }: MediaWatchlistClientProps
 
                 <TabsTrigger
                   value="completed"
-                  className="h-8 shrink-0 cursor-pointer scroll-m-2"
+                  className="h-8 scroll-m-2"
                 >
                   <CheckCircle2 className="size-3.5 text-emerald-500 shrink-0" />
                   <span>Completed</span>
@@ -367,7 +367,7 @@ export function MediaWatchlistClient({ initialItems }: MediaWatchlistClientProps
 
                 <TabsTrigger
                   value="dropped"
-                  className="h-8 shrink-0 cursor-pointer scroll-m-2"
+                  className="h-8 scroll-m-2"
                 >
                   <XCircle className="size-3.5 text-muted-foreground shrink-0" />
                   <span>Dropped</span>
@@ -378,7 +378,7 @@ export function MediaWatchlistClient({ initialItems }: MediaWatchlistClientProps
 
                 <TabsTrigger
                   value="all"
-                  className="h-8 shrink-0 cursor-pointer scroll-m-2"
+                  className="h-8 scroll-m-2"
                 >
                   <Layers className="size-3.5 text-muted-foreground shrink-0" />
                   <span>All</span>

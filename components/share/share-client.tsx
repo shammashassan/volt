@@ -398,7 +398,7 @@ export function ShareClient({
                 <Button
                   type="submit"
                   disabled={!manualUrl.trim()}
-                  className="w-full cursor-pointer mt-2"
+                  className="w-full mt-2"
                 >
                   <PlusCircle className="size-4 mr-2" />
                   Save to Workspace
@@ -655,7 +655,7 @@ export function ShareClient({
                     <div className="flex items-center justify-between p-2 rounded-lg border bg-background/25 border-border/40 h-8 self-end col-span-2 sm:col-span-1">
                       <div className="flex items-center gap-2">
                         <Star className={`size-4 ${favorite ? "fill-amber-400 text-amber-400" : "text-muted-foreground"}`} />
-                        <Label htmlFor="favorite" className="cursor-pointer">
+                        <Label htmlFor="favorite">
                           Favorite
                         </Label>
                       </div>
@@ -670,7 +670,7 @@ export function ShareClient({
                     type="button"
                     variant="ghost"
                     size="sm"
-                    className="flex-1 cursor-pointer"
+                    className="flex-1"
                     onClick={() => router.push("/resources")}
                   >
                     Keep in Inbox
@@ -678,7 +678,7 @@ export function ShareClient({
                   <Button
                     type="submit"
                     size="sm"
-                    className="flex-1 cursor-pointer"
+                    className="flex-1"
                     disabled={isUpdating}
                   >
                     {isUpdating ? (

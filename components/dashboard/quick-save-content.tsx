@@ -237,7 +237,7 @@ export function QuickSaveContent({
           }}
           size="sm"
           variant="outline"
-          className="mt-2 cursor-pointer"
+          className="mt-2"
         >
           Save Another Link
         </Button>
@@ -385,7 +385,7 @@ export function QuickSaveContent({
                 type="button"
                 variant="ghost"
                 size="sm"
-                className="w-full cursor-pointer"
+                className="w-full"
               />
             }
           >
@@ -455,7 +455,7 @@ export function QuickSaveContent({
         </Collapsible>
       </FieldGroup>
 
-      <Button type="submit" disabled={isLoading} className="cursor-pointer">
+      <Button type="submit" disabled={isLoading} >
         {isLoading ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />

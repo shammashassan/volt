@@ -326,8 +326,7 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
                           type="button"
                           variant="ghost"
                           size="icon"
-                          className="shrink-0"
-                        />
+                                                  />
                       }
                     >
                       {isAdvancedOpen ? <ChevronUp /> : <ChevronDown />}
@@ -491,7 +490,7 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
                                       )}
                                     </ItemDescription>
                                   </ItemContent>
-                                  <ItemActions className="shrink-0">
+                                  <ItemActions>
                                     <Button
                                       onClick={() => handleDelete(r._id as string)}
                                       variant="ghost"
@@ -576,7 +575,7 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
                                       )}
                                     </ItemDescription>
                                   </ItemContent>
-                                  <ItemActions className="shrink-0">
+                                  <ItemActions>
                                     <Button
                                       onClick={() => handleDelete(r._id as string)}
                                       variant="ghost"

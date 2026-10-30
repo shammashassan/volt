@@ -829,7 +829,7 @@ export function SettingsContent() {
                       <AlertDialog>
                         <AlertDialogTrigger
                           render={
-                            <Button variant="destructive" className="min-w-35 cursor-pointer" />
+                            <Button variant="destructive" className="min-w-35" />
                           }
                         >
                           <Trash2 className="mr-2 h-4 w-4" />

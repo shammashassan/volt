@@ -29,7 +29,7 @@ export default function NotificationsLoading() {
           <Skeleton className="h-8 w-64" />
           <div className="flex items-center gap-2 flex-1 sm:max-w-md ml-auto">
             <Skeleton className="h-8 flex-1" />
-            <Skeleton className="h-8 w-[130px] shrink-0" />
+            <Skeleton className="h-8 w-[130px]" />
           </div>
         </div>
       </section>
@@ -47,7 +47,7 @@ export default function NotificationsLoading() {
               className="flex items-center justify-between p-4 rounded-xl border border-border/40 gap-4"
             >
               <div className="flex items-center gap-3.5 flex-1">
-                <Skeleton className="size-10 shrink-0" />
+                <Skeleton className="size-10" />
                 <div className="space-y-2 flex-1">
                   <div className="flex items-center gap-2">
                     <Skeleton className="h-4 w-16" />
@@ -56,7 +56,7 @@ export default function NotificationsLoading() {
                   <Skeleton className="h-3 w-3/4" />
                 </div>
               </div>
-              <div className="flex items-center gap-1.5 shrink-0">
+              <div className="flex items-center gap-1.5">
                 <Skeleton className="h-8 w-16" />
                 <Skeleton className="size-8" />
               </div>

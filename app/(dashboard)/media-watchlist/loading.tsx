@@ -20,7 +20,7 @@ export default function WatchlistLoading() {
             <Skeleton className="h-5 w-72 mt-1" />
           </div>
           {/* Add Media Button placeholder */}
-          <Skeleton className="h-10 w-full sm:w-28 shrink-0" />
+          <Skeleton className="h-10 w-full sm:w-28" />
         </div>
       </section>
 

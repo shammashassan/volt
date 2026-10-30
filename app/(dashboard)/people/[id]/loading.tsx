@@ -11,7 +11,7 @@ export default function PersonDetailLoading() {
             <Skeleton className="-ml-2 h-8 w-28" />
             <div className="flex items-center gap-3">
               {/* Icon skeleton */}
-              <Skeleton className="h-12 w-12 shrink-0" />
+              <Skeleton className="h-12 w-12" />
               {/* Name & Badge skeleton */}
               <div className="flex items-center gap-2">
                 <Skeleton className="h-9 w-48" />

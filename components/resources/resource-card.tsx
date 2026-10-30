@@ -273,7 +273,7 @@ const ResourceCardOverlay = React.memo(function ResourceCardOverlay<
           {onEdit && (
             <button
               onClick={handleEditClick}
-              className="flex h-8 w-8 has-hover:h-7 has-hover:w-7 items-center justify-center rounded-lg bg-background/80 hover:bg-background border border-border/40 backdrop-blur-xs text-muted-foreground hover:text-foreground transition-all shadow-xs cursor-pointer"
+              className="flex h-8 w-8 has-hover:h-7 has-hover:w-7 items-center justify-center rounded-lg bg-background/80 hover:bg-background border border-border/40 backdrop-blur-xs text-muted-foreground hover:text-foreground transition-all shadow-xs "
               title="Edit Resource"
               aria-label="Edit Resource"
             >
@@ -283,7 +283,7 @@ const ResourceCardOverlay = React.memo(function ResourceCardOverlay<
           {onDelete && (
             <button
               onClick={handleDeleteClick}
-              className="flex h-8 w-8 has-hover:h-7 has-hover:w-7 items-center justify-center rounded-lg bg-destructive/80 hover:bg-destructive border border-destructive/20 backdrop-blur-xs text-destructive-foreground transition-all shadow-xs cursor-pointer"
+              className="flex h-8 w-8 has-hover:h-7 has-hover:w-7 items-center justify-center rounded-lg bg-destructive/80 hover:bg-destructive border border-destructive/20 backdrop-blur-xs text-destructive-foreground transition-all shadow-xs "
               title="Delete Resource"
               aria-label="Delete Resource"
             >
@@ -433,7 +433,7 @@ const ResourceCardComponent = function ResourceCardComponent<
           handleTrack()
           onClick(e)
         }}
-        className="block group h-full focus-visible:outline-hidden cursor-pointer"
+        className="block group h-full focus-visible:outline-hidden "
       >
         {content}
       </div>

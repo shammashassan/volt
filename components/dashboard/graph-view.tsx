@@ -1068,7 +1068,7 @@ export function GraphView({ data }: { data: GraphData }) {
                         render={
                           <ToggleGroupItem
                             value={type}
-                            className="cursor-pointer shrink-0"
+                            
                           />
                         }
                       >
@@ -1086,7 +1086,7 @@ export function GraphView({ data }: { data: GraphData }) {
             <Button
               variant="ghost"
               size="xs"
-              className="shrink-0 cursor-pointer"
+              
               onClick={() => {
                 stateRef.current.alpha = 0.4 // Reheat simulation
                 const allOn = Object.values(filters).some((v) => !v)
@@ -1109,7 +1109,7 @@ export function GraphView({ data }: { data: GraphData }) {
                   <Button
                     variant="outline"
                     size="xs"
-                    className="shrink-0 cursor-pointer"
+                    
                   />
                 }
               >
@@ -1126,7 +1126,7 @@ export function GraphView({ data }: { data: GraphData }) {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="justify-start cursor-pointer"
+                    className="justify-start"
                     onClick={toggleFullscreen}
                   >
                     {isFullscreen ? (
@@ -1145,7 +1145,7 @@ export function GraphView({ data }: { data: GraphData }) {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="justify-start cursor-pointer"
+                    className="justify-start"
                     onClick={centerGraph}
                   >
                     <Maximize2 className="size-3.5 text-muted-foreground" />
@@ -1155,7 +1155,7 @@ export function GraphView({ data }: { data: GraphData }) {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="justify-start cursor-pointer"
+                    className="justify-start"
                     onClick={() => {
                       const state = stateRef.current
                       state.nodes.forEach((n, i) => {

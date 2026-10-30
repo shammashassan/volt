@@ -423,7 +423,7 @@ export function TagsContent({ resources, notes, people }: TagsContentProps) {
                       {filteredEntities.notes.map((note) => (
                         <Card
                           key={note.id || note._id?.toString()}
-                          className="cursor-pointer"
+                          
                           onClick={() => router.push(`/notes?noteId=${note.id || note._id?.toString()}`)}
                         >
                           <CardHeader>
@@ -463,7 +463,7 @@ export function TagsContent({ resources, notes, people }: TagsContentProps) {
                         return (
                           <Card
                             key={id}
-                            className="cursor-pointer"
+                            
                             onClick={() => router.push(`/people/${id}`)}
                           >
                             <CardHeader>

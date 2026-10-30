@@ -802,7 +802,6 @@ export function ResourcesContent({
             <Button
               size="sm"
               onClick={() => setIsReorderActive(false)}
-              className="cursor-pointer"
             >
               <Check className="size-3.5 mr-1" />
               Done Ordering

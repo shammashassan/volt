@@ -16,7 +16,7 @@ export default function ProjectsLoading() {
             </div>
             <Skeleton className="h-6 w-96 max-w-full" />
           </div>
-          <Skeleton className="h-10 w-32 shrink-0 hidden sm:block" />
+          <Skeleton className="h-10 w-32 hidden sm:block" />
         </div>
       </section>
 

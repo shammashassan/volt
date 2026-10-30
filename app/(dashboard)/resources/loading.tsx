@@ -21,7 +21,7 @@ export default function ResourcesLoading() {
             <Skeleton className="h-5 w-96 max-w-full mt-2" />
           </div>
           {/* Button skeleton */}
-          <Skeleton className="h-8 w-full sm:w-32 shrink-0" />
+          <Skeleton className="h-8 w-full sm:w-32" />
         </div>
       </section>
 

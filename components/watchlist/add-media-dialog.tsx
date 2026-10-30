@@ -122,7 +122,7 @@ export function AddMediaDialog({ open, onOpenChange, onSelect }: AddMediaDialogP
                 key={`${item.source}-${item.externalId}`}
                 value={`${item.title} ${item.releaseYear || ""}`}
                 onSelect={() => onSelect(item)}
-                className="cursor-pointer flex items-center"
+                className="flex items-center"
               >
                 <div className="relative h-12 w-8 bg-muted/40 rounded overflow-hidden shrink-0 flex items-center justify-center">
                   {item.posterUrl ? (

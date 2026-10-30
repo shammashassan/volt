@@ -186,7 +186,7 @@ export function PersonContent({ person, resources, notes }: PersonContentProps) 
                   {notes.map((note) => (
                     <Card
                       key={note.id || note._id?.toString()}
-                      size="sm" className="cursor-pointer"
+                      size="sm" 
                       onClick={() => router.push(`/notes?noteId=${note.id || note._id?.toString()}`)}
                     >
                       <CardHeader>

@@ -85,7 +85,7 @@ export function WatchlistCard({ item, onUpdateStatus, onUpdateRating, onDelete }
           }
         }}
         className={cn(
-          "group relative overflow-hidden aspect-2/3 w-full cursor-pointer",
+          "group relative overflow-hidden aspect-2/3 w-full",
           isHovered && "scale-[1.03] -translate-y-1"
         )}
       >
@@ -147,14 +147,14 @@ export function WatchlistCard({ item, onUpdateStatus, onUpdateRating, onDelete }
             <button
               onClick={(e) => { e.stopPropagation(); setDetailOpen(true); }}
               aria-label="View details"
-              className="p-1.5 rounded-lg text-white/80 hover:text-white hover:bg-white/20 active:bg-white/30 transition-colors backdrop-blur-sm bg-black/30 border border-white/10 cursor-pointer"
+              className="p-1.5 rounded-lg text-white/80 hover:text-white hover:bg-white/20 active:bg-white/30 transition-colors backdrop-blur-sm bg-black/30 border border-white/10"
             >
               <Info className="h-3.5 w-3.5" />
             </button>
             <button
               onClick={(e) => { e.stopPropagation(); setDeleteOpen(true); }}
               aria-label="Delete media item"
-              className="p-1.5 rounded-lg text-white/80 hover:text-white hover:bg-red-500/40 active:bg-red-500/60 transition-colors backdrop-blur-sm bg-black/30 border border-white/10 cursor-pointer"
+              className="p-1.5 rounded-lg text-white/80 hover:text-white hover:bg-red-500/40 active:bg-red-500/60 transition-colors backdrop-blur-sm bg-black/30 border border-white/10"
             >
               <Trash2 className="h-3.5 w-3.5" />
             </button>
@@ -176,7 +176,7 @@ export function WatchlistCard({ item, onUpdateStatus, onUpdateRating, onDelete }
                 <button
                   type="button"
                   aria-label="Change status"
-                  className="w-full text-[10px] h-7 font-semibold px-2 rounded-lg border border-white/15 bg-white/10 hover:bg-white/20 active:bg-white/25 text-white transition-colors flex items-center justify-center gap-1.5 backdrop-blur-sm cursor-pointer select-none"
+                  className="w-full text-[10px] h-7 font-semibold px-2 rounded-lg border border-white/15 bg-white/10 hover:bg-white/20 active:bg-white/25 text-white transition-colors flex items-center justify-center gap-1.5 backdrop-blur-sm select-none"
                 >
                   <span className="text-xs leading-none shrink-0">{activeStatus.icon}</span>
                   <span className="text-[10px] truncate">{activeStatus.label}</span>
@@ -194,7 +194,7 @@ export function WatchlistCard({ item, onUpdateStatus, onUpdateRating, onDelete }
                         setStatusPopoverOpen(false);
                       }}
                       className={cn(
-                        "w-full text-left text-xs px-2.5 py-1.5 rounded-sm flex items-center justify-between hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer",
+                        "w-full text-left text-xs px-2.5 py-1.5 rounded-sm flex items-center justify-between hover:bg-accent hover:text-accent-foreground transition-colors",
                         isSelected && "font-semibold text-primary bg-accent/30"
                       )}
                     >
@@ -222,7 +222,7 @@ export function WatchlistCard({ item, onUpdateStatus, onUpdateRating, onDelete }
                   type="button"
                   aria-label="Change rating"
                   className={cn(
-                    "w-full text-[10px] h-7 px-2 font-semibold rounded-lg border border-white/15 bg-white/10 hover:bg-white/20 active:bg-white/25 text-white transition-colors flex items-center justify-center gap-1.5 backdrop-blur-sm cursor-pointer",
+                    "w-full text-[10px] h-7 px-2 font-semibold rounded-lg border border-white/15 bg-white/10 hover:bg-white/20 active:bg-white/25 text-white transition-colors flex items-center justify-center gap-1.5 backdrop-blur-sm",
                     item.rating && "border-primary/60 bg-primary/20 hover:bg-primary/30"
                   )}
                 >
@@ -273,7 +273,7 @@ export function WatchlistCard({ item, onUpdateStatus, onUpdateRating, onDelete }
                         setTempRating(null);
                         setRatingPopoverOpen(false);
                       }}
-                      className="w-full text-center text-xs py-1 border border-dashed rounded-md hover:bg-destructive hover:text-destructive-foreground transition-colors cursor-pointer"
+                      className="w-full text-center text-xs py-1 border border-dashed rounded-md hover:bg-destructive hover:text-destructive-foreground transition-colors"
                     >
                       Clear Rating
                     </button>

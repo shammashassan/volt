@@ -286,7 +286,7 @@ export function PeopleContent({ initialPeople }: PeopleContentProps) {
                 return (
                   <Card
                     key={id}
-                    size="sm" className="cursor-pointer group flex flex-col justify-between"
+                    size="sm" className="group flex flex-col justify-between"
                     onClick={() => router.push(`/people/${id}`)}
                   >
                     <CardHeader>

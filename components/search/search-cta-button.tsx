@@ -12,7 +12,6 @@ export function SearchCTAButton() {
     <Button
       onClick={handleClick}
       size="lg"
-      className="cursor-pointer"
     >
       <Search className="mr-2 size-4" />
       Open Command Center

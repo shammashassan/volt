@@ -722,8 +722,7 @@ export function NotesContent({
                   id={`checkbox-${idx}`}
                   checked={isChecked}
                   onCheckedChange={(c) => handleToggleCheckbox(idx, !!c)}
-                  className="shrink-0"
-                />
+                                  />
                 <label
                   htmlFor={`checkbox-${idx}`}
                   className={cn(
@@ -824,7 +823,7 @@ export function NotesContent({
             <div className="flex gap-1.5 sm:gap-2 pb-2">
               <Badge
                 variant={selectedTag === null ? "default" : "outline"}
-                className="cursor-pointer select-none shrink-0"
+                className="select-none"
                 onClick={() => setSelectedTag(null)}
               >
                 All
@@ -833,7 +832,7 @@ export function NotesContent({
                 <Badge
                   key={tag}
                   variant={selectedTag === tag ? "default" : "outline"}
-                  className="cursor-pointer select-none shrink-0"
+                  className="select-none"
                   onClick={() => setSelectedTag(tag)}
                 >
                   {tag}
@@ -1551,7 +1550,7 @@ export function NotesContent({
                       <Badge
                         key={tag}
                         variant="secondary"
-                        className="shrink-0 flex items-center"
+                        className="flex items-center"
                       >
                         <Tag className="size-3 text-muted-foreground shrink-0" />
                         {tag}

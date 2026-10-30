@@ -11,7 +11,7 @@ export default function ProjectDetailLoading() {
             <Skeleton className="-ml-2 h-8 w-32" />
             <div className="flex items-center gap-3">
               {/* Icon skeleton */}
-              <Skeleton className="h-12 w-12 shrink-0" />
+              <Skeleton className="h-12 w-12" />
               {/* Name & Badge skeleton */}
               <div className="flex items-center gap-2">
                 <Skeleton className="h-9 w-48" />
@@ -25,7 +25,7 @@ export default function ProjectDetailLoading() {
             </div>
           </div>
           {/* Actions skeleton */}
-          <div className="flex items-center gap-2 mt-1 md:mt-0 shrink-0">
+          <div className="flex items-center gap-2 mt-1 md:mt-0">
             <Skeleton className="h-8 w-24" />
             <Skeleton className="h-8 w-36" />
           </div>
