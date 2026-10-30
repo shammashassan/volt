@@ -96,7 +96,7 @@ function NotificationIcon({
     );
   }
   return (
-    <ItemMedia className="text-primary mt-0.5">
+    <ItemMedia className="mt-0.5">
       <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-primary/10">
         {TYPE_ICON[type] ?? <Bell className="size-4" />}
       </div>
@@ -342,7 +342,7 @@ export function NotificationsContent({
                     <ItemTitle>{n.title}</ItemTitle>
                     {!n.readAt && <Badge variant="secondary">New</Badge>}
                   </div>
-                  <ItemDescription className="text-xs leading-relaxed mt-0.5">
+                  <ItemDescription className="mt-0.5">
                     {n.message}
                   </ItemDescription>
                   <span className="text-[10px] text-muted-foreground/60 font-medium mt-1 block">
@@ -379,10 +379,7 @@ export function NotificationsContent({
                 <h1 className="text-3xl font-black tracking-tight md:text-4xl bg-clip-text text-transparent bg-linear-to-r from-foreground to-foreground/60">
                   Notifications
                 </h1>
-                <Badge
-                  variant="outline"
-                  className="h-6 rounded-full border-primary/20 bg-primary/5 text-primary text-[10px] uppercase font-bold tracking-widest px-2.5"
-                >
+                <Badge variant="secondary">
                   {unreadCount} Unread
                 </Badge>
               </div>
@@ -398,7 +395,7 @@ export function NotificationsContent({
               onClick={handleMarkAllAsRead}
               variant="outline"
               size="sm"
-              className="w-full sm:w-auto gap-2"
+              className="w-full sm:w-auto"
               disabled={unreadCount === 0}
             >
               <CheckCheck className="size-3.5" />
@@ -408,10 +405,7 @@ export function NotificationsContent({
             <DropdownMenu>
               <DropdownMenuTrigger
                 render={
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="size-8 shrink-0"
+                  <Button variant="outline" size="icon-sm" className="shrink-0"
                     disabled={allNotifications.length === 0}
                   />
                 }
@@ -423,7 +417,7 @@ export function NotificationsContent({
                 <DropdownMenuItem
                   onClick={() => setIsClearReadOpen(true)}
                   disabled={readItems.length === 0}
-                  className="gap-2 whitespace-nowrap"
+                  className="whitespace-nowrap"
                 >
                   <MailCheck className="size-4 shrink-0" />
                   <span className="flex-1">Clear read</span>
@@ -435,7 +429,8 @@ export function NotificationsContent({
                 <DropdownMenuItem
                   onClick={() => setIsClearAllOpen(true)}
                   disabled={allNotifications.length === 0}
-                  className="gap-2 text-destructive focus:text-destructive whitespace-nowrap"
+                  variant="destructive"
+                  className="whitespace-nowrap"
                 >
                   <Trash2 className="size-4 shrink-0" />
                   <span>Clear all</span>
@@ -456,42 +451,21 @@ export function NotificationsContent({
             className="w-full sm:w-auto"
           >
             <TabsList className="grid grid-cols-3 w-full sm:w-auto min-w-[280px]">
-              <TabsTrigger
-                value="all"
-                className="text-xs font-semibold gap-1.5"
-              >
+              <TabsTrigger value="all">
                 All
-                <Badge
-                  variant="secondary"
-                 
-                  className="rounded-full px-1.5 min-w-4 font-bold"
-                >
+                <Badge variant="secondary">
                   {allNotifications.length}
                 </Badge>
               </TabsTrigger>
-              <TabsTrigger
-                value="unread"
-                className="text-xs font-semibold gap-1.5"
-              >
+              <TabsTrigger value="unread">
                 Unread
-                <Badge
-                  variant="secondary"
-                 
-                  className="rounded-full px-1.5 min-w-4 font-bold"
-                >
+                <Badge variant="secondary">
                   {unreadCount}
                 </Badge>
               </TabsTrigger>
-              <TabsTrigger
-                value="read"
-                className="text-xs font-semibold gap-1.5"
-              >
+              <TabsTrigger value="read">
                 Read
-                <Badge
-                  variant="secondary"
-                 
-                  className="rounded-full px-1.5 min-w-4 font-bold"
-                >
+                <Badge variant="secondary">
                   {readItems.length}
                 </Badge>
               </TabsTrigger>
@@ -507,7 +481,7 @@ export function NotificationsContent({
                 value={searchValue}
                 onChange={(e) => setSearchValue(e.target.value)}
                 placeholder="Search notifications..."
-                className="pl-9 pr-8 h-8 text-xs font-medium"
+                className="h-8"
               />
               {searchValue && (
                 <button
@@ -529,7 +503,7 @@ export function NotificationsContent({
               value={typeFilter}
               onValueChange={(val) => setTypeFilter(val as string)}
             >
-              <SelectTrigger className="w-[130px] h-8 text-xs font-medium shrink-0">
+              <SelectTrigger className="w-[130px] h-8 shrink-0">
                 <SelectValue placeholder="All types" />
               </SelectTrigger>
               <SelectContent align="end">
@@ -547,7 +521,7 @@ export function NotificationsContent({
       <section className="px-4 lg:px-6">
         <div className="max-w-7xl">
           {allNotifications.length === 0 ? (
-            <Empty className="py-20 border border-dashed rounded-2xl bg-card/10">
+            <Empty>
               <EmptyHeader>
                 <EmptyMedia variant="icon">
                   <Bell className="size-5" />
@@ -560,7 +534,7 @@ export function NotificationsContent({
               </EmptyHeader>
             </Empty>
           ) : filteredNotifications.length === 0 ? (
-            <Empty className="py-16 border border-dashed rounded-2xl bg-card/10">
+            <Empty>
               <EmptyHeader>
                 <EmptyMedia variant="icon">
                   <Filter className="size-5" />
@@ -577,7 +551,7 @@ export function NotificationsContent({
                     variant="outline"
                     size="sm"
                     onClick={resetFilters}
-                    className="font-medium"
+                   
                   >
                     Reset all filters
                   </Button>
@@ -598,9 +572,7 @@ export function NotificationsContent({
       <AlertDialog open={isClearReadOpen} onOpenChange={setIsClearReadOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogMedia className="bg-destructive/10 text-destructive">
-              <Trash2 />
-            </AlertDialogMedia>
+            <AlertDialogMedia><Trash2 className="text-destructive" /></AlertDialogMedia>
             <AlertDialogTitle>Clear read notifications?</AlertDialogTitle>
             <AlertDialogDescription>
               This will remove all {readItems.length} read notifications from
@@ -626,9 +598,7 @@ export function NotificationsContent({
       <AlertDialog open={isClearAllOpen} onOpenChange={setIsClearAllOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogMedia className="bg-destructive/10 text-destructive">
-              <Trash2 />
-            </AlertDialogMedia>
+            <AlertDialogMedia><Trash2 className="text-destructive" /></AlertDialogMedia>
             <AlertDialogTitle>Clear all notifications?</AlertDialogTitle>
             <AlertDialogDescription>
               This will remove all {allNotifications.length} notifications from

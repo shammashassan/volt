@@ -55,7 +55,7 @@ function NotificationIcon({
     );
   }
   return (
-    <ItemMedia className="text-primary mt-0.5">
+    <ItemMedia className="mt-0.5">
       <div className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-primary/10">
         {TYPE_ICON[type] ?? <AlertTriangle className="size-3.5" />}
       </div>
@@ -74,13 +74,13 @@ function Dot() {
 
 export function EmptyMuted({ onRefresh }: { onRefresh?: () => void }) {
   return (
-    <Empty className="py-8 border-0">
+    <Empty>
       <EmptyHeader>
         <EmptyMedia variant="icon">
           <BellIcon />
         </EmptyMedia>
         <EmptyTitle>No Notifications</EmptyTitle>
-        <EmptyDescription className="max-w-50 text-pretty">
+        <EmptyDescription className="max-w-50">
           You&apos;re all caught up. New notifications will appear here.
         </EmptyDescription>
       </EmptyHeader>
@@ -167,8 +167,7 @@ export function NotificationMenu() {
           <span className="text-sm font-semibold">Notifications</span>
           <Button
             variant="ghost"
-            size="sm"
-            className="h-auto px-0 text-xs text-muted-foreground font-medium hover:text-foreground hover:bg-transparent"
+            size="xs"
             disabled={unreadCount === 0}
             onClick={handleMarkAllAsRead}
           >
@@ -183,7 +182,7 @@ export function NotificationMenu() {
           <EmptyMuted onRefresh={fetchNotifications} />
         ) : (
           <ScrollArea className="h-75">
-            <DropdownMenuGroup className="py-1 pr-3">
+            <DropdownMenuGroup>
               {notifications.slice(0, 5).map((notification) => {
                 const isReminder = notification.type === "reminder.due";
                 const hasLink = !!notification.link;
@@ -209,25 +208,18 @@ export function NotificationMenu() {
                         />
                       }
                     >
-                      <Item size="xs" className="w-full p-2">
+                      <Item size="xs" className="w-full">
                         <NotificationIcon
                           type={notification.type}
                           image={notification.image}
                           title={notification.title}
                         />
 
-                        <ItemContent className="gap-0.5">
-                          <ItemTitle className={cn(!notification.readAt ? "font-semibold text-foreground" : "font-medium text-muted-foreground/80 group-focus/dropdown-menu-item:text-muted-foreground/80!")}>
+                        <ItemContent>
+                          <ItemTitle>
                             {notification.title}
                           </ItemTitle>
-                          <ItemDescription
-                            className={cn(
-                              "leading-normal",
-                              !notification.readAt
-                                ? "text-muted-foreground group-focus/dropdown-menu-item:text-muted-foreground!"
-                                : "text-muted-foreground/60 group-focus/dropdown-menu-item:text-muted-foreground/60!"
-                            )}
-                          >
+                          <ItemDescription>
                             {notification.message}
                           </ItemDescription>
                           <span
@@ -259,25 +251,18 @@ export function NotificationMenu() {
                     key={notification._id as string}
                     onClick={() => handleNotificationClick(notification._id as string)}
                   >
-                    <Item size="xs" className="w-full p-2">
+                    <Item size="xs" className="w-full">
                       <NotificationIcon
                         type={notification.type}
                         image={notification.image}
                         title={notification.title}
                       />
 
-                      <ItemContent className="gap-0.5">
-                        <ItemTitle className={cn(!notification.readAt ? "font-semibold text-foreground" : "font-medium text-muted-foreground/80 group-focus/dropdown-menu-item:text-muted-foreground/80!")}>
+                      <ItemContent>
+                        <ItemTitle>
                           {notification.title}
                         </ItemTitle>
-                        <ItemDescription
-                          className={cn(
-                            "leading-normal",
-                            !notification.readAt
-                              ? "text-muted-foreground group-focus/dropdown-menu-item:text-muted-foreground!"
-                              : "text-muted-foreground/60 group-focus/dropdown-menu-item:text-muted-foreground/60!"
-                          )}
-                        >
+                        <ItemDescription>
                           {notification.message}
                         </ItemDescription>
                         <span
@@ -313,7 +298,7 @@ export function NotificationMenu() {
           <Button
             variant="ghost"
             size="sm"
-            className="w-full text-xs text-muted-foreground font-medium"
+            className="w-full"
             onClick={() => router.push("/notifications")}
           >
             View all notifications
