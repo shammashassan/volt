@@ -206,8 +206,9 @@ export function SearchCommand() {
     <>
       <Button
         variant="outline"
+        size="sm"
         onClick={() => setOpen(true)}
-        className="size-9 p-0 bg-muted/40 text-muted-foreground hover:bg-muted has-data-[icon=inline-start]:pl-0 sm:size-auto sm:h-9 sm:w-64 sm:justify-start sm:px-3 sm:has-data-[icon=inline-start]:pl-2"
+        className="size-9 sm:size-auto sm:w-64 sm:justify-start"
       >
         <SearchIcon data-icon="inline-start" aria-hidden="true" />
         <span className="hidden sm:inline-block flex-1 text-left font-medium">
@@ -264,7 +265,7 @@ export function SearchCommand() {
                   <CommandItem
                     key={item.path}
                     onSelect={() => onSelectEntity(item.path)}
-                    className="flex items-center gap-2"
+                    className="flex items-center"
                   >
                     <Icon className="mr-2 size-4 text-muted-foreground" aria-hidden="true" />
                     <span>{item.label}</span>
@@ -298,7 +299,7 @@ export function SearchCommand() {
                   <CommandItem
                     key={catId}
                     onSelect={() => onSelectEntity(`/resources?category=${category.slug || catId}`)}
-                    className="flex items-center gap-2"
+                    className="flex items-center"
                   >
                     <Icon className="size-4 text-muted-foreground/85" aria-hidden="true" />
                     <span className="font-medium text-foreground">{category.name}</span>
@@ -319,11 +320,11 @@ export function SearchCommand() {
                     onSelect={() => onSelectResource(resource)}
                     className="flex items-center justify-between"
                   >
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center">
                       <ExternalLinkIcon className="size-4 text-muted-foreground/60" aria-hidden="true" />
                       <span className="font-medium text-foreground">{resource.title}</span>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center">
                       <span className="text-[9px] uppercase tracking-wider text-muted-foreground/50 bg-muted px-1.5 py-0.5 rounded">
                         {resource.type || "website"}
                       </span>
@@ -343,7 +344,7 @@ export function SearchCommand() {
                   <CommandItem
                     key={noteId}
                     onSelect={() => onSelectEntity(`/notes`)} // Notes layout splits in Phase 5
-                    className="flex items-center gap-2"
+                    className="flex items-center"
                   >
                     <FileTextIcon className="size-4 text-muted-foreground/70" aria-hidden="true" />
                     <span className="font-medium text-foreground">{note.title}</span>
@@ -362,7 +363,7 @@ export function SearchCommand() {
                   <CommandItem
                     key={projId}
                     onSelect={() => onSelectEntity(`/projects/${projId}`)}
-                    className="flex items-center gap-2"
+                    className="flex items-center"
                   >
                     <BriefcaseIcon className="size-4 text-muted-foreground/70" aria-hidden="true" />
                     <span className="font-medium text-foreground">{project.name}</span>
@@ -381,7 +382,7 @@ export function SearchCommand() {
                   <CommandItem
                     key={personId}
                     onSelect={() => onSelectEntity(`/people/${personId}`)}
-                    className="flex items-center gap-2"
+                    className="flex items-center"
                   >
                     <UserIcon className="size-4 text-muted-foreground/75" aria-hidden="true" />
                     <span className="font-medium text-foreground">{person.name}</span>
