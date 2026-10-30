@@ -61,19 +61,19 @@ export function UserTable({ users, onSetRole, onBan, onDelete, currentUserId }: 
     <div className="rounded-xl border border-border/50 bg-card overflow-hidden shadow-xs">
       <div className="overflow-x-auto">
         <Table>
-          <TableHeader className="bg-muted/40">
+          <TableHeader>
             <TableRow>
-              <TableHead className="w-[280px] h-10 text-xs font-semibold">User</TableHead>
-              <TableHead className="h-10 text-xs font-semibold">Role</TableHead>
-              <TableHead className="h-10 text-xs font-semibold">Status</TableHead>
-              <TableHead className="h-10 text-xs font-semibold text-right">Actions</TableHead>
+              <TableHead className="w-[280px] h-10">User</TableHead>
+              <TableHead className="h-10">Role</TableHead>
+              <TableHead className="h-10">Status</TableHead>
+              <TableHead className="h-10 text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {users.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={4} className="h-44 text-center">
-                  <Empty className="py-8 border-0">
+                  <Empty>
                     <EmptyHeader>
                       <EmptyMedia variant="icon">
                         <Users className="size-4" />
@@ -88,7 +88,7 @@ export function UserTable({ users, onSetRole, onBan, onDelete, currentUserId }: 
               </TableRow>
             ) : (
               users.map((user: UserData) => (
-                <TableRow key={user.id} className="hover:bg-muted/30 transition-colors">
+                <TableRow key={user.id}>
                   <TableCell>
                     <div className="flex flex-col">
                       <span className="font-medium text-foreground">{user.name}</span>
@@ -99,7 +99,7 @@ export function UserTable({ users, onSetRole, onBan, onDelete, currentUserId }: 
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge variant="outline" className="capitalize gap-1 text-xs">
+                    <Badge variant="outline">
                       {user.role === "admin" ? (
                         <ShieldCheck className="size-3 text-primary" />
                       ) : (
@@ -111,11 +111,11 @@ export function UserTable({ users, onSetRole, onBan, onDelete, currentUserId }: 
                   <TableCell>
                     <div className="flex flex-wrap gap-1.5">
                       {user.banned ? (
-                        <Badge variant="destructive" className="text-xs">
+                        <Badge variant="destructive">
                           Banned
                         </Badge>
                       ) : (
-                        <Badge variant="outline" className="text-xs text-emerald-600 dark:text-emerald-400 border-emerald-500/30 bg-emerald-500/10">
+                        <Badge variant="outline">
                           Active
                         </Badge>
                       )}
@@ -126,7 +126,7 @@ export function UserTable({ users, onSetRole, onBan, onDelete, currentUserId }: 
                       <DropdownMenu>
                         <DropdownMenuTrigger
                           render={
-                            <Button variant="ghost" size="icon-sm" className="size-8 p-0">
+                            <Button variant="ghost" size="icon-sm">
                               <span className="sr-only">Open actions menu</span>
                               <MoreHorizontal className="size-4" />
                             </Button>
@@ -147,7 +147,6 @@ export function UserTable({ users, onSetRole, onBan, onDelete, currentUserId }: 
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={() => onBan(user.id, !!user.banned)}
-                              className={user.banned ? "text-emerald-500" : "text-amber-500"}
                             >
                               {user.banned ? <Unlock className="size-4" /> : <Ban className="size-4" />}
                               <span>{user.banned ? "Unban User" : "Ban User"}</span>
@@ -156,8 +155,8 @@ export function UserTable({ users, onSetRole, onBan, onDelete, currentUserId }: 
                           <DropdownMenuSeparator />
                           <DropdownMenuGroup>
                             <DropdownMenuItem
+                              variant="destructive"
                               onClick={() => onDelete(user.id)}
-                              className="text-destructive focus:text-destructive"
                             >
                               <Trash2 className="size-4" />
                               <span>Delete User</span>
@@ -166,8 +165,8 @@ export function UserTable({ users, onSetRole, onBan, onDelete, currentUserId }: 
                         </DropdownMenuContent>
                       </DropdownMenu>
                     ) : (
-                      <Badge variant="outline" className="text-xs font-mono">
-                        You
+                      <Badge variant="outline">
+                        <span className="font-mono">You</span>
                       </Badge>
                     )}
                   </TableCell>

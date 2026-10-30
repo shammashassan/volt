@@ -76,7 +76,8 @@ export function CreateUserDialog({ open, onOpenChange, onSuccess }: CreateUserDi
               Create a new user account directly in the workspace.
             </DialogDescription>
           </DialogHeader>
-          <FieldGroup className="py-4">
+          <div className="py-4">
+            <FieldGroup>
             <Field>
               <FieldLabel htmlFor="name">Full Name</FieldLabel>
               <Input id="name" name="name" placeholder="John Doe" required />
@@ -104,6 +105,7 @@ export function CreateUserDialog({ open, onOpenChange, onSuccess }: CreateUserDi
               </Select>
             </Field>
           </FieldGroup>
+          </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isLoading}>
               Cancel

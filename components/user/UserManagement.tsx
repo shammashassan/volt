@@ -137,8 +137,8 @@ export function UserManagement({ initialUsers }: { initialUsers: UserData[] }) {
                 <h1 className="text-3xl font-black tracking-tight md:text-4xl bg-clip-text text-transparent bg-linear-to-r from-foreground to-foreground/60">
                   User Management
                 </h1>
-                <Badge variant="outline" className="h-6 rounded-full border-primary/20 bg-primary/5 text-primary text-[10px] uppercase font-bold tracking-widest px-2.5">
-                  {users.length} <span className="hidden sm:inline ml-1">Total Users</span>
+                <Badge variant="outline">
+                  <span className="text-[10px] uppercase font-bold tracking-widest">{users.length} <span className="hidden sm:inline ml-1">Total Users</span></span>
                 </Badge>
               </div>
             </div>
@@ -223,12 +223,12 @@ export function UserManagement({ initialUsers }: { initialUsers: UserData[] }) {
               <AlertDialogFooter>
                 <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
                 <AlertDialogAction
+                  variant="destructive"
                   onClick={(e) => {
                     e.preventDefault()
                     confirmDeleteUser()
                   }}
                   disabled={isPending}
-                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                 >
                   {isPending ? "Deleting..." : "Delete User"}
                 </AlertDialogAction>
