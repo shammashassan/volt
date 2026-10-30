@@ -237,7 +237,7 @@ export function PeopleContent({ initialPeople }: PeopleContentProps) {
                 <h1 className="text-3xl font-black tracking-tight md:text-4xl bg-clip-text text-transparent bg-linear-to-r from-foreground to-foreground/60">
                   People
                 </h1>
-                <Badge variant="outline" className="h-6 rounded-full border-primary/20 bg-primary/5 text-primary text-[10px] uppercase font-bold tracking-widest px-2.5">
+                <Badge variant="secondary">
                   {people.length} <span className="hidden sm:inline ml-1">Tracked</span>
                 </Badge>
               </div>
@@ -262,7 +262,7 @@ export function PeopleContent({ initialPeople }: PeopleContentProps) {
               placeholder="Search by name, type, or tags..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="h-9 bg-background/50 border-border/60"
+              className="h-9"
             />
           </div>
 
@@ -274,7 +274,7 @@ export function PeopleContent({ initialPeople }: PeopleContentProps) {
               <p className="text-xs text-muted-foreground/80 max-w-xs leading-relaxed">
                 Start tracking influential minds, team members, or agencies to associate them with saved links and notes.
               </p>
-              <Button onClick={handleOpenCreate} variant="outline" size="sm" className="mt-2 text-xs font-bold">
+              <Button onClick={handleOpenCreate} variant="outline" size="sm" className="mt-2">
                 Track First Person
               </Button>
             </div>
@@ -286,30 +286,30 @@ export function PeopleContent({ initialPeople }: PeopleContentProps) {
                 return (
                   <Card
                     key={id}
-                    className="cursor-pointer group flex flex-col justify-between transition-all hover:shadow-lg hover:border-primary/20 bg-card/30 backdrop-blur-xs"
+                    size="sm" className="cursor-pointer group flex flex-col justify-between"
                     onClick={() => router.push(`/people/${id}`)}
                   >
-                    <CardHeader className="pb-3">
+                    <CardHeader>
                       <div className="flex items-start justify-between gap-3">
-                        <CardTitle className="font-bold text-base lowercase italic line-clamp-1 flex-1 text-foreground group-hover:text-primary transition-colors">
+                        <CardTitle className="flex-1">
                           {person.name}
                         </CardTitle>
-                        <Badge variant={typeConfig.variant} className="text-[9px] uppercase tracking-wider font-bold rounded-full select-none px-2 h-5">
+                        <Badge variant={typeConfig.variant}>
                           {typeConfig.label}
                         </Badge>
                       </div>
                       {person.notes && (
-                        <CardDescription className="line-clamp-2 text-xs leading-relaxed mt-1.5">
+                        <CardDescription className="mt-1.5">
                           {person.notes}
                         </CardDescription>
                       )}
                     </CardHeader>
-                    <CardContent className="pb-3">
+                    <CardContent>
                       {/* Tags */}
                       {person.tags && person.tags.length > 0 && (
                         <div className="flex flex-wrap gap-1 mb-2">
                           {person.tags.slice(0, 3).map((tag) => (
-                            <Badge key={tag} variant="secondary" className="text-[8px] uppercase tracking-widest font-bold h-4">
+                            <Badge key={tag} variant="secondary">
                               {tag}
                             </Badge>
                           ))}
@@ -334,24 +334,18 @@ export function PeopleContent({ initialPeople }: PeopleContentProps) {
                         </div>
                       )}
                     </CardContent>
-                    <CardFooter className="pt-3 border-t border-border/20 flex justify-between items-center text-xs">
+                    <CardFooter className="flex justify-between items-center">
                       <span className="text-muted-foreground/60">
                         Added {new Date(person.createdAt).toLocaleDateString()}
                       </span>
                       <div className="flex items-center gap-1.5">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="size-7 rounded-lg text-muted-foreground hover:text-foreground"
+                        <Button variant="ghost" size="icon-sm"
                           onClick={(e) => handleOpenEdit(person, e)}
                           title="Edit Profile"
                         >
                           <Edit3 className="size-3.5" />
                         </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="size-7 rounded-lg text-muted-foreground hover:text-destructive"
+                        <Button variant="ghost" size="icon-sm"
                           onClick={(e) => handleOpenDelete(id, e)}
                           title="Delete Profile"
                         >
@@ -377,7 +371,7 @@ export function PeopleContent({ initialPeople }: PeopleContentProps) {
                     {editingPerson ? "Modify details of this tracked profile." : "Start tracking a person or agency to reference them inside your repository."}
                   </DialogDescription>
                 </DialogHeader>
-                <FieldGroup className="py-4">
+                <FieldGroup>
                   <Field>
                     <FieldLabel htmlFor="name">Full Name</FieldLabel>
                     <Input
@@ -443,7 +437,7 @@ export function PeopleContent({ initialPeople }: PeopleContentProps) {
                   <Button type="button" variant="outline" size="sm" onClick={() => setIsOpen(false)} disabled={isLoading}>
                     Cancel
                   </Button>
-                  <Button type="submit" size="sm" disabled={isLoading} className="font-bold">
+                  <Button type="submit" size="sm" disabled={isLoading}>
                     {isLoading ? "Saving..." : editingPerson ? "Save Changes" : "Track Person"}
                   </Button>
                 </DialogFooter>
@@ -462,13 +456,13 @@ export function PeopleContent({ initialPeople }: PeopleContentProps) {
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel disabled={isLoading}>Cancel</AlertDialogCancel>
-                <AlertDialogAction
+                <AlertDialogAction variant="destructive"
                   onClick={(e) => {
                     e.preventDefault()
                     confirmDelete()
                   }}
                   disabled={isLoading}
-                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  
                 >
                   {isLoading ? "Deleting..." : "Delete"}
                 </AlertDialogAction>

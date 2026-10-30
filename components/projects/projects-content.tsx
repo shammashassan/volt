@@ -217,7 +217,7 @@ export function ProjectsContent({ initialProjects }: ProjectsContentProps) {
                 <h1 className="text-3xl font-black tracking-tight md:text-4xl bg-clip-text text-transparent bg-linear-to-r from-foreground to-foreground/60">
                   Projects
                 </h1>
-                <Badge variant="outline" className="h-6 rounded-full border-primary/20 bg-primary/5 text-primary text-[10px] uppercase font-bold tracking-widest px-2.5">
+                <Badge variant="secondary">
                   {projects.length} <span className="hidden sm:inline ml-1">Total</span>
                 </Badge>
               </div>
@@ -239,7 +239,7 @@ export function ProjectsContent({ initialProjects }: ProjectsContentProps) {
           {/* Mobile filter using Select */}
           <div className="sm:hidden w-full">
             <Select value={filter} onValueChange={(val) => setFilter(val as "all" | ProjectStatus)}>
-              <SelectTrigger className="w-full h-10 font-medium">
+              <SelectTrigger className="w-full h-10">
                 <SelectValue placeholder="Filter Projects" />
               </SelectTrigger>
               <SelectContent>
@@ -260,7 +260,7 @@ export function ProjectsContent({ initialProjects }: ProjectsContentProps) {
                   <TabsTrigger
                     key={status}
                     value={status}
-                    className="text-xs font-bold uppercase tracking-wider"
+                   
                   >
                     {status} <span className="ml-1 opacity-60 font-medium">({count})</span>
                   </TabsTrigger>
@@ -271,7 +271,7 @@ export function ProjectsContent({ initialProjects }: ProjectsContentProps) {
 
           {/* Project Grid */}
           {filteredProjects.length === 0 ? (
-            <Empty className="py-20 border border-dashed rounded-2xl bg-card/10">
+            <Empty>
               <EmptyHeader>
                 <EmptyMedia variant="icon">
                   <Folder />
@@ -282,7 +282,7 @@ export function ProjectsContent({ initialProjects }: ProjectsContentProps) {
                 </EmptyDescription>
               </EmptyHeader>
               <EmptyContent>
-                <Button onClick={handleOpenCreate} variant="outline" size="sm" className="font-bold">
+                <Button onClick={handleOpenCreate} variant="outline" size="sm">
                   Create First Project
                 </Button>
               </EmptyContent>
@@ -295,20 +295,20 @@ export function ProjectsContent({ initialProjects }: ProjectsContentProps) {
                 return (
                   <Card
                     key={id}
-                    className="cursor-pointer group flex flex-col justify-between transition-all hover:shadow-lg hover:border-primary/20 bg-card/30 backdrop-blur-xs"
+                    size="sm" className="cursor-pointer group flex flex-col justify-between"
                     onClick={() => router.push(`/projects/${id}`)}
                   >
-                    <CardHeader className="pb-3">
+                    <CardHeader>
                       <div className="flex items-start justify-between gap-3">
-                        <CardTitle className="font-bold text-base lowercase italic line-clamp-1 flex-1 text-foreground group-hover:text-primary transition-colors">
+                        <CardTitle className="flex-1">
                           {project.name}
                         </CardTitle>
-                        <Badge variant={status.variant} className="text-[9px] uppercase tracking-wider font-bold rounded-full select-none px-2 h-5">
+                        <Badge variant={status.variant}>
                           {status.label}
                         </Badge>
                       </div>
                       {project.description && (
-                        <CardDescription className="line-clamp-2 text-xs leading-relaxed mt-1.5">
+                        <CardDescription className="mt-1.5">
                           {project.description}
                         </CardDescription>
                       )}
@@ -325,24 +325,18 @@ export function ProjectsContent({ initialProjects }: ProjectsContentProps) {
                         </a>
                       )}
                     </CardHeader>
-                    <CardFooter className="pt-3 border-t border-border/20 flex justify-between items-center text-xs">
+                    <CardFooter className="flex justify-between items-center">
                       <span className="text-muted-foreground/60">
                         Added {new Date(project.createdAt).toLocaleDateString()}
                       </span>
                       <div className="flex items-center gap-1.5">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="size-7 rounded-lg text-muted-foreground hover:text-foreground"
+                        <Button variant="ghost" size="icon-sm"
                           onClick={(e) => handleOpenEdit(project, e)}
                           title="Edit Project"
                         >
                           <Edit3 className="size-3.5" />
                         </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="size-7 rounded-lg text-muted-foreground hover:text-destructive"
+                        <Button variant="ghost" size="icon-sm"
                           onClick={(e) => handleOpenDelete(id, e)}
                           title="Delete Project"
                         >
@@ -369,7 +363,7 @@ export function ProjectsContent({ initialProjects }: ProjectsContentProps) {
                     {editingProject ? "Modify the project details." : "Create a new project workspace to collect resources and notes."}
                   </DialogDescription>
                 </DialogHeader>
-                <FieldGroup className="py-4">
+                <FieldGroup>
                   <Field>
                     <FieldLabel htmlFor="name">Project Name</FieldLabel>
                     <Input
@@ -419,7 +413,7 @@ export function ProjectsContent({ initialProjects }: ProjectsContentProps) {
                   <Button type="button" variant="outline" size="sm" onClick={() => setIsOpen(false)} disabled={isLoading}>
                     Cancel
                   </Button>
-                  <Button type="submit" size="sm" disabled={isLoading} className="font-bold">
+                  <Button type="submit" size="sm" disabled={isLoading}>
                     {isLoading ? "Saving..." : editingProject ? "Save Changes" : "Create Project"}
                   </Button>
                 </DialogFooter>
@@ -431,7 +425,7 @@ export function ProjectsContent({ initialProjects }: ProjectsContentProps) {
           <AlertDialog open={!!projectToDelete} onOpenChange={(open) => !open && setProjectToDelete(null)}>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogMedia className="bg-destructive/10 text-destructive">
+                <AlertDialogMedia>
                   <Trash2 />
                 </AlertDialogMedia>
                 <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>

@@ -39,7 +39,7 @@ export function ProjectContent({ project, resources, notes }: ProjectContentProp
             <Button
               variant="ghost"
               size="sm"
-              className="-ml-2 h-8 text-muted-foreground hover:text-foreground hover:bg-muted/50 gap-1.5 text-xs font-medium transition-colors rounded-lg px-2 self-start"
+              className="-ml-2 self-start"
               onClick={() => router.push("/projects")}
             >
               <ArrowLeft className="size-3.5" />
@@ -54,7 +54,7 @@ export function ProjectContent({ project, resources, notes }: ProjectContentProp
                 <h1 className="text-3xl font-black tracking-tight md:text-4xl bg-clip-text text-transparent bg-linear-to-r from-foreground to-foreground/60 leading-tight">
                   {project.name}
                 </h1>
-                <Badge variant={status.variant} className="text-[10px] uppercase tracking-wider font-bold rounded-full select-none px-2.5 h-6 shrink-0">
+                <Badge variant={status.variant} className="shrink-0">
                   {status.label}
                 </Badge>
               </div>
@@ -94,7 +94,7 @@ export function ProjectContent({ project, resources, notes }: ProjectContentProp
           {/* Mobile Select dropdown */}
           <div className="md:hidden w-full mb-4">
             <Select value={activeTab} onValueChange={(val) => { if (val) setActiveTab(val) }}>
-              <SelectTrigger className="w-full h-10 font-medium">
+              <SelectTrigger className="w-full h-10">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -106,23 +106,23 @@ export function ProjectContent({ project, resources, notes }: ProjectContentProp
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="hidden md:grid w-full grid-cols-2 max-w-[400px] mb-4">
-              <TabsTrigger value="resources" className="gap-2">
+              <TabsTrigger value="resources">
                 Resources
-                <Badge variant="secondary" className="h-5 px-1.5 min-w-[20px] justify-center">
+                <Badge variant="secondary">
                   {resources.length}
                 </Badge>
               </TabsTrigger>
-              <TabsTrigger value="notes" className="gap-2">
+              <TabsTrigger value="notes">
                 Notes
-                <Badge variant="secondary" className="h-5 px-1.5 min-w-[20px] justify-center">
+                <Badge variant="secondary">
                   {notes.length}
                 </Badge>
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="resources" className="border rounded-xl bg-card/40 backdrop-blur-sm overflow-hidden outline-none">
+            <TabsContent value="resources"><div className="border rounded-xl bg-card/40 backdrop-blur-sm overflow-hidden">
               {resources.length === 0 ? (
-                <Empty className="py-20 border-0 bg-transparent rounded-none">
+                <Empty>
                   <EmptyHeader>
                     <EmptyMedia variant="icon">
                       <LinkIcon />
@@ -133,7 +133,7 @@ export function ProjectContent({ project, resources, notes }: ProjectContentProp
                     </EmptyDescription>
                   </EmptyHeader>
                   <EmptyContent>
-                    <Button onClick={() => router.push("/resources")} variant="outline" size="sm" className="font-bold">
+                    <Button onClick={() => router.push("/resources")} variant="outline" size="sm">
                       Browse Resources
                     </Button>
                   </EmptyContent>
@@ -145,11 +145,11 @@ export function ProjectContent({ project, resources, notes }: ProjectContentProp
                   ))}
                 </div>
               )}
-            </TabsContent>
+            </div></TabsContent>
 
-            <TabsContent value="notes" className="border rounded-xl bg-card/40 backdrop-blur-sm overflow-hidden outline-none">
+            <TabsContent value="notes"><div className="border rounded-xl bg-card/40 backdrop-blur-sm overflow-hidden">
               {notes.length === 0 ? (
-                <Empty className="py-20 border-0 bg-transparent rounded-none">
+                <Empty>
                   <EmptyHeader>
                     <EmptyMedia variant="icon">
                       <FileText />
@@ -160,7 +160,7 @@ export function ProjectContent({ project, resources, notes }: ProjectContentProp
                     </EmptyDescription>
                   </EmptyHeader>
                   <EmptyContent>
-                    <Button onClick={() => router.push("/notes")} variant="outline" size="sm" className="font-bold">
+                    <Button onClick={() => router.push("/notes")} variant="outline" size="sm">
                       Go to Notes
                     </Button>
                   </EmptyContent>
@@ -170,11 +170,11 @@ export function ProjectContent({ project, resources, notes }: ProjectContentProp
                   {notes.map((note) => (
                     <Card
                       key={note.id || note._id?.toString()}
-                      className="cursor-pointer transition-all hover:shadow-lg hover:border-primary/20 bg-card/30 backdrop-blur-xs"
+                      size="sm" className="cursor-pointer"
                       onClick={() => router.push(`/notes?noteId=${note.id || note._id?.toString()}`)}
                     >
-                      <CardHeader className="pb-2">
-                        <CardTitle className="font-bold text-sm line-clamp-1 text-foreground">
+                      <CardHeader>
+                        <CardTitle>
                           {note.title || "Untitled Note"}
                         </CardTitle>
                       </CardHeader>
@@ -187,7 +187,7 @@ export function ProjectContent({ project, resources, notes }: ProjectContentProp
                   ))}
                 </div>
               )}
-            </TabsContent>
+            </div></TabsContent>
           </Tabs>
         </div>
       </section>
