@@ -19,7 +19,7 @@ export class SchedulerService {
    */
   public static async schedule(
     urlPath: string,
-    payload: any,
+    payload: unknown,
     executeAt: Date
   ): Promise<string> {
     const destination = this.getDestinationUrl(urlPath);
@@ -71,7 +71,7 @@ export class SchedulerService {
    * @param jobs List of jobs containing path, payload, and execute time
    */
   public static async scheduleMany(
-    jobs: { urlPath: string; payload: any; executeAt: Date }[]
+    jobs: { urlPath: string; payload: unknown; executeAt: Date }[]
   ): Promise<string[]> {
     if (jobs.length === 0) return [];
 

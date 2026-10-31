@@ -13,8 +13,14 @@ export async function searchAction(query: string) {
     const userId = user.id;
     console.log("[server] searchAction authenticated user:", userId);
 
-    const mapId = <T extends object>(arr: (T & { _id?: { toString(): string } })[]): (T & { id: string })[] =>
-    arr.map(item => ({ ...item, id: item._id?.toString() ?? "" })) as (T & { id: string })[];
+    const mapId = <T>(arr: unknown[]): (T & { id: string })[] =>
+      arr.map((item) => {
+        const doc = item as { _id?: { toString(): string }; id?: string };
+        return {
+          ...(doc as T),
+          id: doc._id?.toString() ?? doc.id ?? "",
+        };
+      });
 
     if (!query.trim()) {
       console.log("[server] searchAction returning empty/recents path");
@@ -29,10 +35,10 @@ export async function searchAction(query: string) {
       return {
         success: true,
         data: serialize({
-          resources: mapId<Resource>(resources as any),
-          notes: mapId<Note>(notes as any),
-          projects: mapId<Project>(projects as any),
-          people: mapId<Person>(people as any),
+          resources: mapId<Resource>(resources),
+          notes: mapId<Note>(notes),
+          projects: mapId<Project>(projects),
+          people: mapId<Person>(people),
           categories: [] as Category[]
         })
       };
@@ -109,15 +115,11 @@ export async function searchAction(query: string) {
     return {
       success: true,
       data: serialize({
-        resources: mapId<Resource>(resources as any),
-        notes: mapId<Note>(notes as any),
-        projects: mapId<Project>(projects as any),
-        people: mapId<Person>(people as any),
-        categories: categories.map(cat => ({
-          ...cat,
-          _id: cat._id?.toString() ?? "",
-          id: cat.id || (cat._id?.toString() ?? "")
-        }))
+        resources: mapId<Resource>(resources),
+        notes: mapId<Note>(notes),
+        projects: mapId<Project>(projects),
+        people: mapId<Person>(people),
+        categories: mapId<Category>(categories)
       })
     };
   } catch (error) {

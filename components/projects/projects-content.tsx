@@ -133,7 +133,7 @@ export function ProjectsContent({ initialProjects }: ProjectsContentProps) {
         {
           loading: "Deleting project...",
           success: "Project deleted successfully",
-          error: (err: any) => (err instanceof Error ? err.message : String(err)) || "Failed to delete project",
+          error: (err: unknown) => (err instanceof Error ? err.message : String(err)) || "Failed to delete project",
         }
       )
     } catch {
@@ -188,7 +188,7 @@ export function ProjectsContent({ initialProjects }: ProjectsContentProps) {
         {
           loading: isEditing ? "Updating project..." : "Creating project...",
           success: isEditing ? "Project updated successfully" : "Project created successfully",
-          error: (err: any) => (err instanceof Error ? err.message : String(err)) || (isEditing ? "Failed to update project" : "Failed to create project"),
+          error: (err: unknown) => (err instanceof Error ? err.message : String(err)) || (isEditing ? "Failed to update project" : "Failed to create project"),
         }
       )
     } catch {
@@ -356,7 +356,7 @@ export function ProjectsContent({ initialProjects }: ProjectsContentProps) {
             if (!open && newProjectParam) void setNewProjectParam(null)
           }}>
             <DialogContent className="sm:max-w-[425px] overflow-y-auto max-h-[90vh] no-scrollbar">
-              <form onSubmit={handleSave}>
+              <form onSubmit={handleSave} className="grid gap-4">
                 <DialogHeader>
                   <DialogTitle>{editingProject ? "Edit Project" : "New Project"}</DialogTitle>
                   <DialogDescription>

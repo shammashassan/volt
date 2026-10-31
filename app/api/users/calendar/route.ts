@@ -28,7 +28,8 @@ export async function GET(req: NextRequest) {
         'Content-Disposition': 'attachment; filename="volt-calendar.ics"',
       },
     });
-  } catch (error: any) {
-    return new NextResponse(`Error generating calendar: ${error.message}`, { status: 500 });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "An error occurred";
+    return new NextResponse(`Error generating calendar: ${message}`, { status: 500 });
   }
 }

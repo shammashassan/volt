@@ -3,14 +3,15 @@ import { RemindersContent } from "@/components/reminders/reminders-view";
 import type { Metadata } from "next";
 import { getSessionUser } from "@/lib/auth-utils";
 import { getDb } from "@/lib/db";
-import { ObjectId } from "mongodb";
+import { ObjectId, Filter, Document } from "mongodb";
+import type { Reminder, ReminderAttachment } from "@/types/reminder";
 
 export const metadata: Metadata = {
   title: "Reminders",
   description: "Manage checklists, tasks, and today's dynamic event timeline.",
 };
 
-async function populateAttachments(reminders: any[]) {
+async function populateAttachments(reminders: Reminder[]) {
   const db = await getDb();
   
   const idMap: Record<string, Set<string>> = {
@@ -23,7 +24,7 @@ async function populateAttachments(reminders: any[]) {
 
   reminders.forEach(r => {
     if (r.attachments) {
-      r.attachments.forEach((a: any) => {
+      r.attachments.forEach((a: ReminderAttachment) => {
         if (idMap[a.type] && a.id) {
           idMap[a.type].add(a.id);
         }
@@ -42,7 +43,8 @@ async function populateAttachments(reminders: any[]) {
   // 1. Notes
   const noteIds = Array.from(idMap.note).map(id => ObjectId.isValid(id) ? new ObjectId(id) : id);
   if (noteIds.length > 0) {
-    const notes = await db.collection('notes').find({ _id: { $in: noteIds as any } }, { projection: { title: 1 } }).toArray();
+    const filter = { _id: { $in: noteIds as unknown as ObjectId[] } };
+    const notes = await db.collection('notes').find(filter, { projection: { title: 1 } }).toArray();
     notes.forEach(n => {
       titlesMap.note[n._id.toString()] = n.title;
     });
@@ -51,7 +53,8 @@ async function populateAttachments(reminders: any[]) {
   // 2. Projects
   const projectIds = Array.from(idMap.project).map(id => ObjectId.isValid(id) ? new ObjectId(id) : id);
   if (projectIds.length > 0) {
-    const projects = await db.collection('projects').find({ _id: { $in: projectIds as any } }, { projection: { name: 1, title: 1 } }).toArray();
+    const filter = { _id: { $in: projectIds as unknown as ObjectId[] } };
+    const projects = await db.collection('projects').find(filter, { projection: { name: 1, title: 1 } }).toArray();
     projects.forEach(p => {
       titlesMap.project[p._id.toString()] = p.name || p.title || 'Untitled Project';
     });
@@ -60,7 +63,8 @@ async function populateAttachments(reminders: any[]) {
   // 3. People
   const personIds = Array.from(idMap.person).map(id => ObjectId.isValid(id) ? new ObjectId(id) : id);
   if (personIds.length > 0) {
-    const people = await db.collection('people').find({ _id: { $in: personIds as any } }, { projection: { name: 1 } }).toArray();
+    const filter = { _id: { $in: personIds as unknown as ObjectId[] } };
+    const people = await db.collection('people').find(filter, { projection: { name: 1 } }).toArray();
     people.forEach(p => {
       titlesMap.person[p._id.toString()] = p.name || 'Unnamed Person';
     });
@@ -69,7 +73,8 @@ async function populateAttachments(reminders: any[]) {
   // 4. Resources
   const resourceIds = Array.from(idMap.resource).map(id => ObjectId.isValid(id) ? new ObjectId(id) : id);
   if (resourceIds.length > 0) {
-    const resources = await db.collection('resources').find({ _id: { $in: resourceIds as any } }, { projection: { title: 1 } }).toArray();
+    const filter = { _id: { $in: resourceIds as unknown as ObjectId[] } };
+    const resources = await db.collection('resources').find(filter, { projection: { title: 1 } }).toArray();
     resources.forEach(r => {
       titlesMap.resource[r._id.toString()] = r.title;
     });
@@ -78,7 +83,8 @@ async function populateAttachments(reminders: any[]) {
   // 5. Watchlist
   const watchlistIds = Array.from(idMap.watchlist).map(id => ObjectId.isValid(id) ? new ObjectId(id) : id);
   if (watchlistIds.length > 0) {
-    const watchlist = await db.collection('watchlist').find({ _id: { $in: watchlistIds as any } }, { projection: { 'metadata.title': 1 } }).toArray();
+    const filter = { _id: { $in: watchlistIds as unknown as ObjectId[] } };
+    const watchlist = await db.collection('watchlist').find(filter, { projection: { 'metadata.title': 1 } }).toArray();
     watchlist.forEach(w => {
       titlesMap.watchlist[w._id.toString()] = w.metadata?.title || 'Untitled Watchlist Item';
     });
@@ -86,7 +92,7 @@ async function populateAttachments(reminders: any[]) {
 
   return reminders.map(r => {
     if (r.attachments) {
-      r.attachments = r.attachments.map((a: any) => ({
+      r.attachments = r.attachments.map((a: ReminderAttachment) => ({
         ...a,
         title: titlesMap[a.type][a.id] || `Attached ${a.type}`
       }));

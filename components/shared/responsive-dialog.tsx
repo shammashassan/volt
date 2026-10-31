@@ -22,7 +22,7 @@ import {
   DrawerTitle as UIDrawerTitle,
   DrawerTrigger as UIDrawerTrigger,
 } from "@/components/ui/drawer"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 const ResponsiveDialogContext = React.createContext<{ isMobile: boolean }>({
   isMobile: false,
@@ -41,9 +41,9 @@ export function ResponsiveDialog({
 }: {
   children?: React.ReactNode
   open?: boolean
-  onOpenChange?: (open: boolean, details?: any) => void
+  onOpenChange?: (open: boolean, details?: unknown) => void
   showSwipeHandle?: boolean
-  [key: string]: any
+  [key: string]: unknown
 }) {
   const isMobile = useMediaQuery("(max-width: 767px)")
 
@@ -62,19 +62,30 @@ export function ResponsiveDialog({
   )
 }
 
+type ResponsiveDialogElementProps = {
+  className?: string
+  children?: React.ReactNode
+  bleed?: boolean
+  [key: string]: unknown
+}
+
+type ResponsiveDialogTriggerProps = ResponsiveDialogElementProps & {
+  render?: React.ReactElement | ((props: unknown, state?: unknown) => React.ReactElement)
+}
+
 export function ResponsiveDialogTrigger({
   className,
   children,
   render,
   ...props
-}: any) {
+}: ResponsiveDialogTriggerProps) {
   const { isMobile } = useResponsiveDialog()
   return isMobile ? (
-    <UIDrawerTrigger className={className} render={render} {...props}>
+    <UIDrawerTrigger className={className} render={render as never} {...props}>
       {children}
     </UIDrawerTrigger>
   ) : (
-    <UIDialogTrigger className={className} render={render} {...props}>
+    <UIDialogTrigger className={className} render={render as never} {...props}>
       {children}
     </UIDialogTrigger>
   )
@@ -85,14 +96,14 @@ export function ResponsiveDialogClose({
   children,
   render,
   ...props
-}: any) {
+}: ResponsiveDialogTriggerProps) {
   const { isMobile } = useResponsiveDialog()
   return isMobile ? (
-    <UIDrawerClose className={className} render={render} {...props}>
+    <UIDrawerClose className={className} render={render as never} {...props}>
       {children}
     </UIDrawerClose>
   ) : (
-    <UIDialogClose className={className} render={render} {...props}>
+    <UIDialogClose className={className} render={render as never} {...props}>
       {children}
     </UIDialogClose>
   )
@@ -103,7 +114,7 @@ export function ResponsiveDialogContent({
   children,
   bleed = false,
   ...props
-}: any) {
+}: ResponsiveDialogTriggerProps) {
   const { isMobile } = useResponsiveDialog()
 
   if (isMobile) {
@@ -111,9 +122,9 @@ export function ResponsiveDialogContent({
     // Filter out desktop max-width/max-height and width classes so mobile drawer remains full width
     const cleanClassName = className
       ? className
-          .replace(/(?:^|\s)(?:[a-z]+:)?(?:max-|min-)?(?:w|h)-(?:\[[^\]]*\]|[^\s]+)/g, "")
-          .replace(/(?:^|\s)(?:overflow|overscroll)[^\s]*/g, "")
-          .trim()
+        .replace(/(?:^|\s)(?:[a-z]+:)?(?:max-|min-)?(?:w|h)-(?:\[[^\]]*\]|[^\s]+)/g, "")
+        .replace(/(?:^|\s)(?:overflow|overscroll)[^\s]*/g, "")
+        .trim()
       : ""
 
     return (
@@ -153,7 +164,7 @@ export function ResponsiveDialogHeader({
   className,
   children,
   ...props
-}: any) {
+}: ResponsiveDialogTriggerProps) {
   const { isMobile } = useResponsiveDialog()
   return isMobile ? (
     <UIDrawerHeader className={cn("text-left px-0 pt-1 pb-3", className)} {...props}>
@@ -170,7 +181,7 @@ export function ResponsiveDialogTitle({
   className,
   children,
   ...props
-}: any) {
+}: ResponsiveDialogTriggerProps) {
   const { isMobile } = useResponsiveDialog()
   return isMobile ? (
     <UIDrawerTitle className={className} {...props}>
@@ -187,7 +198,7 @@ export function ResponsiveDialogDescription({
   className,
   children,
   ...props
-}: any) {
+}: ResponsiveDialogTriggerProps) {
   const { isMobile } = useResponsiveDialog()
   return isMobile ? (
     <UIDrawerDescription className={className} {...props}>
@@ -216,7 +227,7 @@ export function ResponsiveDialogFooter({
   className,
   children,
   ...props
-}: any) {
+}: ResponsiveDialogTriggerProps) {
   const { isMobile } = useResponsiveDialog()
   return isMobile ? (
     <UIDrawerFooter className={cn("px-0 pt-3 mt-auto", className)} {...props}>

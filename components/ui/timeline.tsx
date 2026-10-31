@@ -4,7 +4,7 @@ import { mergeProps } from "@base-ui/react/merge-props";
 import { useRender } from "@base-ui/react/use-render";
 import * as React from "react";
 
-import { cn } from "@/lib/utils";
+import { cn } from "cn";
 
 // Types
 type TimelineContextValue = {
@@ -87,7 +87,7 @@ function TimelineContent({
 }
 
 // TimelineDate
-interface TimelineDateProps extends useRender.ComponentProps<"time"> {}
+interface TimelineDateProps extends useRender.ComponentProps<"time"> { }
 
 function TimelineDate({
   className,
@@ -121,7 +121,7 @@ function TimelineHeader({
 }
 
 // TimelineIndicator
-interface TimelineIndicatorProps extends useRender.ComponentProps<"div"> {}
+interface TimelineIndicatorProps extends useRender.ComponentProps<"div"> { }
 
 function TimelineIndicator({
   className,

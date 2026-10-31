@@ -106,7 +106,7 @@ export function CategoriesContent({
         {
           loading: "Deleting category...",
           success: "Category deleted successfully",
-          error: (err: any) => (err instanceof Error ? err.message : String(err)) || "Failed to delete category",
+          error: (err: unknown) => (err instanceof Error ? err.message : String(err)) || "Failed to delete category",
         }
       )
     } catch {
@@ -160,7 +160,7 @@ export function CategoriesContent({
         {
           loading: isEditing ? "Updating category..." : "Adding category...",
           success: isEditing ? "Category updated successfully" : "Category added successfully",
-          error: (err: any) => (err instanceof Error ? err.message : String(err)) || (isEditing ? "Failed to update category" : "Failed to add category"),
+          error: (err: unknown) => (err instanceof Error ? err.message : String(err)) || (isEditing ? "Failed to update category" : "Failed to add category"),
         }
       )
     } catch {
@@ -198,7 +198,7 @@ export function CategoriesContent({
         {
           loading: "Deleting collection...",
           success: "Collection deleted successfully",
-          error: (err: any) => (err instanceof Error ? err.message : String(err)) || "Failed to delete collection",
+          error: (err: unknown) => (err instanceof Error ? err.message : String(err)) || "Failed to delete collection",
         }
       )
     } catch {
@@ -251,7 +251,7 @@ export function CategoriesContent({
         {
           loading: isEditing ? "Updating collection..." : "Adding collection...",
           success: isEditing ? "Collection updated successfully" : "Collection added successfully",
-          error: (err: any) => (err instanceof Error ? err.message : String(err)) || (isEditing ? "Failed to update collection" : "Failed to add collection"),
+          error: (err: unknown) => (err instanceof Error ? err.message : String(err)) || (isEditing ? "Failed to update collection" : "Failed to add collection"),
         }
       )
     } catch {
@@ -350,7 +350,7 @@ export function CategoriesContent({
             setIsCategoryOpen(open)
             if (!open && newParam) void setNewParam(null)
           }}>
-            <DialogContent className="sm:max-w-[425px] overflow-y-auto max-h-[90vh] no-scrollbar">
+            <DialogContent className="sm:max-w-106.25 overflow-y-auto max-h-[90vh] no-scrollbar">
               <form onSubmit={onCategorySubmit}>
                 <DialogHeader>
                   <DialogTitle>{editingCategory ? "Edit Category" : "Add Category"}</DialogTitle>
@@ -379,7 +379,7 @@ export function CategoriesContent({
             setIsCollectionOpen(open)
             if (!open && newParam) void setNewParam(null)
           }}>
-            <DialogContent className="sm:max-w-[425px] overflow-y-auto max-h-[90vh] no-scrollbar">
+            <DialogContent className="sm:max-w-106.25 overflow-y-auto max-h-[90vh] no-scrollbar">
               <form onSubmit={onCollectionSubmit}>
                 <DialogHeader>
                   <DialogTitle>{editingCollection ? "Edit Collection" : "Add Collection"}</DialogTitle>

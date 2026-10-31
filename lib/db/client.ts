@@ -36,10 +36,12 @@ const globalWithMongo = global as typeof globalThis & {
  */
 export function isClientClosed(client?: MongoClient | null): boolean {
   if (!client) return true
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  if ((client as any).s?.hasBeenClosed) return true
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const state = (client as any).topology?.s?.state
+  const clientInternal = client as unknown as {
+    s?: { hasBeenClosed?: boolean }
+    topology?: { s?: { state?: string } }
+  }
+  if (clientInternal.s?.hasBeenClosed) return true
+  const state = clientInternal.topology?.s?.state
   if (state === "closed" || state === "destroying") return true
   return false
 }

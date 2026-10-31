@@ -22,7 +22,7 @@ export class JobRegistry {
   async runAll(): Promise<Record<string, { durationMs: number; itemsProcessed: number; success: boolean }>> {
     // Sort jobs by priority ascending
     const sorted = [...this.jobs].sort((a, b) => a.priority - b.priority);
-    const results: Record<string, any> = {};
+    const results: Record<string, { durationMs: number; itemsProcessed: number; success: boolean }> = {};
 
     const db = await getDb();
     const metricsCol = db.collection('job_metrics');
@@ -36,9 +36,9 @@ export class JobRegistry {
       try {
         const res = await job.run();
         itemsProcessed = res.itemsProcessed;
-      } catch (err: any) {
+      } catch (err: unknown) {
         success = false;
-        error = err.message || String(err);
+        error = err instanceof Error ? err.message : String(err);
       }
 
       const finish = new Date();

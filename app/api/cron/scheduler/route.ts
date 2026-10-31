@@ -57,7 +57,7 @@ class RetryFailedSchedulesJob implements Job {
           }
         );
         retriedCount++;
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error(`[Scheduler Daily Fallback] Failed to reschedule reminder ${r._id}:`, err);
       }
     }
@@ -74,7 +74,7 @@ class RetryFailedSchedulesJob implements Job {
         console.log(`[Scheduler Daily Fallback] Retrying sync for watchlist item ${w._id}`);
         await WatchlistService.syncItem(w);
         retriedCount++;
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error(`[Scheduler Daily Fallback] Failed to sync failed watchlist item ${w._id}:`, err);
       }
     }
@@ -102,8 +102,9 @@ export async function GET(req: NextRequest) {
 
     const results = await registry.runAll();
     return NextResponse.json({ success: true, results });
-  } catch (error: any) {
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Internal Server Error";
+    return NextResponse.json({ success: false, error: errorMessage }, { status: 500 });
   }
 }
 

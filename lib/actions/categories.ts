@@ -2,7 +2,7 @@
 
 import { revalidatePath, updateTag } from "next/cache";
 import clientPromise from "../mongodb";
-import { ObjectId } from "mongodb";
+import { ObjectId, Filter, Document } from "mongodb";
 import { getSessionUser, getErrorMessage } from "../auth-utils";
 import { getDb } from "../db";
 import { getCategories } from "@/lib/queries/categories";
@@ -93,7 +93,7 @@ export async function updateCategoryAction(idOrSlug: string, data: Record<string
       updateData.slug = updateData.slug.toLowerCase().trim();
     }
 
-    const query: any = { userId: user.id };
+    const query: Filter<Document> = { userId: user.id };
     if (ObjectId.isValid(idOrSlug)) {
       query._id = new ObjectId(idOrSlug);
     } else {
@@ -105,7 +105,7 @@ export async function updateCategoryAction(idOrSlug: string, data: Record<string
       const existing = await db.collection("categories").findOne({
         userId: user.id,
         slug: updateData.slug,
-        _id: { $ne: query._id || null }
+        _id: { $ne: query._id as ObjectId }
       });
       if (existing) {
         return { success: false, error: "A category with this slug already exists." };
@@ -235,9 +235,10 @@ export async function getCategoriesAction() {
     ]);
 
     const countMap = new Map<string, number>();
-    counts.forEach((c: any) => {
-      const idStr = c._id?.toString() || "";
-      countMap.set(idStr, c.count);
+    counts.forEach((c) => {
+      const count = typeof c.count === "number" ? c.count : 0;
+      const idStr = c._id ? String(c._id) : "";
+      countMap.set(idStr, count);
     });
 
     const categoriesWithCounts = categories.map(cat => {

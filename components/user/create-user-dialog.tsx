@@ -59,7 +59,7 @@ export function CreateUserDialog({ open, onOpenChange, onSuccess }: CreateUserDi
       await toast.promise(promise, {
         loading: "Creating user...",
         success: "User created successfully",
-        error: (err: any) => err?.message || "Failed to create user",
+        error: (err: unknown) => (err as { message?: string })?.message || "Failed to create user",
       })
     } finally {
       setIsLoading(false)

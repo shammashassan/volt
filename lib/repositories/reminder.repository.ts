@@ -1,6 +1,6 @@
 import { getDb } from '@/lib/db';
 import { Reminder } from '@/types/reminder';
-import { ObjectId } from 'mongodb';
+import { ObjectId, OptionalUnlessRequiredId } from 'mongodb';
 import { UserId } from '@/types/shared';
 
 export class ReminderRepository {
@@ -36,7 +36,7 @@ export class ReminderRepository {
       createdAt: new Date(),
       updatedAt: new Date()
     };
-    const res = await col.insertOne(doc as any);
+    const res = await col.insertOne(doc as OptionalUnlessRequiredId<Reminder>);
     return { ...doc, _id: res.insertedId };
   }
 

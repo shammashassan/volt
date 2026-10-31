@@ -252,7 +252,7 @@ export function NotificationsContent({
     toast.promise(promise, {
       loading: "Completing reminder...",
       success: "Reminder marked as complete",
-      error: (err: any) => err?.message || "Failed to complete reminder",
+      error: (err: unknown) => (err as { message?: string })?.message || "Failed to complete reminder",
     });
   };
 

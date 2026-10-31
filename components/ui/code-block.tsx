@@ -3,7 +3,7 @@
 import * as React from "react"
 import { Check, Copy } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import { highlightCode } from "@/lib/highlighter"
 
 // Context for compound composition

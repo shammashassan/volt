@@ -54,8 +54,9 @@ export class ReminderService {
         scheduledFor: triggerAt.toISOString(),
         scheduledAt: new Date().toISOString()
       };
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(`[Scheduler] Failed to schedule QStash message for reminder ${reminderId}:`, err);
+      const errorMessage = err instanceof Error ? err.message : String(err);
       
       // Update DB to 'failed' state so it can be picked up by fallback mechanisms
       await this.repo.update(reminderId, reminder.userId, {
@@ -63,7 +64,7 @@ export class ReminderService {
           provider: 'qstash',
           status: 'failed',
           scheduledFor: triggerAt.toISOString(),
-          error: err.message || String(err)
+          error: errorMessage
         }
       });
 
@@ -71,10 +72,10 @@ export class ReminderService {
         provider: 'qstash',
         status: 'failed',
         scheduledFor: triggerAt.toISOString(),
-        error: err.message || String(err)
+        error: errorMessage
       };
 
-      throw new Error(`Failed to schedule reminder notification: ${err.message || err}`);
+      throw new Error(`Failed to schedule reminder notification: ${errorMessage}`);
     }
 
     await this.searchIndexRepo.upsert({

@@ -4,7 +4,7 @@ import * as React from "react"
 import { Check, PlusCircle } from "lucide-react"
 import { Column } from "@tanstack/react-table"
 
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -47,38 +47,38 @@ export function DataTableFacetedFilter<TData, TValue>({
         <PlusCircle className="mr-2 h-4 w-4" />
         {title}
         {selectedValues?.size > 0 && (
-            <>
-              <Separator orientation="vertical" className="mx-2 h-4" />
-              <Badge
-                variant="secondary"
-                className="lg:hidden"
-              >
-                {selectedValues.size}
-              </Badge>
-              <div className="hidden space-x-1 lg:flex">
-                {selectedValues.size > 2 ? (
-                  <Badge
-                    variant="secondary"
-                    
-                  >
-                    {selectedValues.size} selected
-                  </Badge>
-                ) : (
-                  options
-                    .filter((option) => selectedValues.has(option.value))
-                    .map((option) => (
-                      <Badge
-                        variant="secondary"
-                        key={option.value}
-                        
-                      >
-                        {option.label}
-                      </Badge>
-                    ))
-                )}
-              </div>
-            </>
-          )}
+          <>
+            <Separator orientation="vertical" className="mx-2 h-4" />
+            <Badge
+              variant="secondary"
+              className="lg:hidden"
+            >
+              {selectedValues.size}
+            </Badge>
+            <div className="hidden space-x-1 lg:flex">
+              {selectedValues.size > 2 ? (
+                <Badge
+                  variant="secondary"
+
+                >
+                  {selectedValues.size} selected
+                </Badge>
+              ) : (
+                options
+                  .filter((option) => selectedValues.has(option.value))
+                  .map((option) => (
+                    <Badge
+                      variant="secondary"
+                      key={option.value}
+
+                    >
+                      {option.label}
+                    </Badge>
+                  ))
+              )}
+            </div>
+          </>
+        )}
       </PopoverTrigger>
       <PopoverContent className="w-[200px]" align="start">
         <Command>

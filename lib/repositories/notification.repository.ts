@@ -1,6 +1,6 @@
 import { getDb } from '@/lib/db';
 import { Notification } from '@/types/notification';
-import { ObjectId } from 'mongodb';
+import { ObjectId, OptionalUnlessRequiredId } from 'mongodb';
 import { UserId } from '@/types/shared';
 
 export class NotificationRepository {
@@ -26,7 +26,7 @@ export class NotificationRepository {
       createdAt: new Date(),
       updatedAt: new Date()
     };
-    const res = await col.insertOne(doc as any);
+    const res = await col.insertOne(doc as OptionalUnlessRequiredId<Notification>);
     return { ...doc, _id: res.insertedId };
   }
 

@@ -93,7 +93,7 @@ export const columns = (
       const category = row.original.categoryId
       if (!category) return null
       return (
-        <Badge variant={getCategoryVariant(category) as any}>
+        <Badge variant="secondary">
           <span className="capitalize">{category}</span>
         </Badge>
       )

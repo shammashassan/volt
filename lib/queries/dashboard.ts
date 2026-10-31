@@ -22,6 +22,10 @@ export const getStats = cache(async (userId: string) => {
     notes,
     projects,
     people,
+    resourcesCount: resources,
+    collectionsCount: categories,
+    notesCount: notes,
+    peopleCount: people,
     totalResources: resources,
     totalCategories: categories,
     latestResourceName: latestResource[0]?.title || latestResource[0]?.name || "None"

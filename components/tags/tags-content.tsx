@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Tag, FileText, Link as LinkIcon, User, Layers, X, Filter, ArrowUp, ArrowDown, Flame, CaseSensitive, Calendar } from "lucide-react"
 import { Empty, EmptyHeader, EmptyTitle, EmptyDescription, EmptyMedia } from "@/components/ui/empty"
 import { Badge } from "@/components/ui/badge"
+import { PersonAvatar } from "@/components/people/person-avatar"
 import { ResourceCard } from "@/components/resources/resource-card"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useRouter } from "next/navigation"
@@ -33,13 +34,6 @@ interface TagsContentProps {
   people: Person[]
 }
 
-const TYPE_CONFIG: Record<PersonType, { label: string; variant: "secondary" | "outline" | "destructive" | "default" }> = {
-  developer: { label: "Developer", variant: "default" },
-  designer: { label: "Designer", variant: "secondary" },
-  founder: { label: "Founder", variant: "secondary" },
-  creator: { label: "Creator", variant: "outline" },
-  company: { label: "Company", variant: "outline" }
-}
 
 export function TagsContent({ resources, notes, people }: TagsContentProps) {
   const [selectedTags, setSelectedTags] = useState<string[]>([])
@@ -456,34 +450,33 @@ export function TagsContent({ resources, notes, people }: TagsContentProps) {
                       </EmptyHeader>
                     </Empty>
                   ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
+                    <div className="flex flex-wrap items-start gap-6 p-6">
                       {filteredEntities.people.map((person) => {
-                        const typeConfig = TYPE_CONFIG[person.type] || { label: "Developer", variant: "default" as const }
                         const id = person._id?.toString() || person.id || ""
+
                         return (
-                          <Card
+                          <div
                             key={id}
-                            
-                            onClick={() => router.push(`/people/${id}`)}
+                            className="group flex flex-col items-center w-28 pt-2 pb-2 gap-2"
                           >
-                            <CardHeader>
-                              <div className="flex items-start justify-between gap-3">
-                                <CardTitle>
-                                  <span className="line-clamp-1">{person.name}</span>
-                                </CardTitle>
-                                <Badge variant={typeConfig.variant} className="select-none">
-                                  <span className="text-[8px] uppercase tracking-wider">{typeConfig.label}</span>
-                                </Badge>
-                              </div>
-                            </CardHeader>
-                            <CardContent>
-                              {person.notes && (
-                                <p className="text-xs text-muted-foreground/80 line-clamp-2 leading-relaxed">
-                                  {person.notes}
-                                </p>
-                              )}
-                            </CardContent>
-                          </Card>
+                            <button
+                              type="button"
+                              onClick={() => router.push(`/people/${id}`)}
+                              className="cursor-pointer transition-transform hover:scale-105 active:scale-95"
+                            >
+                              <PersonAvatar person={person} size="xl" />
+                              <span className="sr-only">{person.name}</span>
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => router.push(`/people/${id}`)}
+                              className="text-xs font-medium text-center text-foreground hover:text-primary transition-colors truncate w-full cursor-pointer"
+                              title={person.name}
+                            >
+                              {person.name}
+                            </button>
+                          </div>
                         )
                       })}
                     </div>

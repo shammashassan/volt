@@ -26,6 +26,16 @@ export interface WatchlistItem {
   };
   createdAt: Date;
   updatedAt: Date;
+  sync?: {
+    releasedNotified?: boolean;
+    ottReleasedNotified?: boolean;
+    lastNotifiedEpisode?: number;
+    version?: number;
+    lastChecked?: Date;
+    provider?: string;
+    providerId?: string;
+    failedAttempts?: number;
+  };
   scheduler?: {
     theatrical?: ScheduleMetadata;
     ott?: ScheduleMetadata;

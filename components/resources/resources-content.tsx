@@ -3,7 +3,7 @@
 import * as React from "react"
 import { useState, useMemo, useEffect, useRef, useCallback } from "react"
 import { ResourceCard } from "@/components/resources/resource-card"
-import { ResourceForm } from "@/components/resources/resource-form"
+import { ResourceForm, type ResourceFormData } from "@/components/resources/resource-form"
 import { motion, AnimatePresence } from "motion/react"
 
 // DnD Kit imports
@@ -444,7 +444,7 @@ export function ResourcesContent({
   }
 
   // Save changes (Update or Create)
-  const handleSave = async (data: any) => {
+  const handleSave = async (data: ResourceFormData) => {
     const resId = selectedResource?._id?.toString() || selectedResource?.id
     if (!isCreating && !resId) {
       toast.add({
@@ -479,7 +479,7 @@ export function ResourcesContent({
         {
           loading: isCreating ? "Creating resource..." : "Updating resource...",
           success: isCreating ? "Resource created successfully" : "Resource updated successfully",
-          error: (err: any) => (err instanceof Error ? err.message : String(err)) || (isCreating ? "Failed to create resource" : "Failed to update resource"),
+          error: (err: unknown) => (err instanceof Error ? err.message : String(err)) || (isCreating ? "Failed to create resource" : "Failed to update resource"),
         }
       )
     } catch {
@@ -517,7 +517,7 @@ export function ResourcesContent({
         {
           loading: "Deleting resource...",
           success: "Resource deleted successfully",
-          error: (err: any) => (err instanceof Error ? err.message : String(err)) || "Failed to delete resource",
+          error: (err: unknown) => (err instanceof Error ? err.message : String(err)) || "Failed to delete resource",
         }
       )
     } catch {
@@ -575,7 +575,7 @@ export function ResourcesContent({
         {
           loading: "Updating order...",
           success: "Resource order updated",
-          error: (err: any) => {
+          error: (err: unknown) => {
             router.refresh()
             return (err instanceof Error ? err.message : String(err)) || "Failed to update resource order"
           },
@@ -711,10 +711,12 @@ export function ResourcesContent({
       <Dialog
         open={isDialogOpen}
         onOpenChange={(open, eventDetails) => {
-          if (!open && eventDetails?.reason === "outside-press") {
-            const target = (eventDetails.event as any)?.target as HTMLElement | undefined
+          const details = eventDetails as { reason?: string; event?: Event; cancel?: () => void } | undefined
+          if (!open && details?.reason === "outside-press") {
+            const event = details?.event
+            const target = event?.target instanceof HTMLElement ? event.target : undefined
             if (target?.closest && target.closest('[data-slot^="combobox-"]')) {
-              eventDetails.cancel?.()
+              details?.cancel?.()
               return
             }
           }

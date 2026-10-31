@@ -28,17 +28,17 @@ export class TmdbProvider implements WatchlistProvider {
     const details: WatchlistProviderDetails = {
       posterUrl: data.poster_path ? `https://image.tmdb.org/t/p/w342${data.poster_path}` : undefined,
       runtime: data.runtime || (data.episode_run_time ? data.episode_run_time[0] : undefined),
-      genres: data.genres ? data.genres.map((g: any) => g.name) : [],
+      genres: data.genres ? (data.genres as Array<{ name: string }>).map((g) => g.name) : [],
       status: data.status
     };
 
     if (mediaType === 'movie') {
       details.releaseDate = data.release_date;
       // Fetch digital release dates if possible
-      const releaseResults = data.release_dates?.results || [];
-      const usReleases = releaseResults.find((r: any) => r.iso_3166_1 === 'US')?.release_dates || [];
-      const digital = usReleases.find((d: any) => d.type === 4); // Type 4 = Digital release
-      if (digital) {
+      const releaseResults = (data.release_dates?.results || []) as Array<{ iso_3166_1?: string; release_dates?: Array<{ type?: number; release_date?: string }> }>;
+      const usReleases = releaseResults.find((r) => r.iso_3166_1 === 'US')?.release_dates || [];
+      const digital = usReleases.find((d) => d.type === 4); // Type 4 = Digital release
+      if (digital?.release_date) {
         details.ottReleaseDate = digital.release_date.split('T')[0];
       }
     } else {

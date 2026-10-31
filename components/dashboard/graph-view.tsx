@@ -45,7 +45,7 @@ import {
   PopoverTitle,
   PopoverDescription
 } from "@/components/ui/popover"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import { GraphData, GraphNode } from "@/lib/actions/graph"
 
 interface NodeVisualState {
@@ -435,7 +435,7 @@ export function GraphView({ data }: { data: GraphData }) {
       const state = stateRef.current
       const zoomFactor = 1.08
       const direction = e.deltaY < 0 ? 1 : -1
-      const newScale = direction > 0 
+      const newScale = direction > 0
         ? Math.min(3, state.transform.scale * zoomFactor)
         : Math.max(0.2, state.transform.scale / zoomFactor)
 
@@ -481,7 +481,7 @@ export function GraphView({ data }: { data: GraphData }) {
 
     window.addEventListener("resize", handleResize)
     document.addEventListener("fullscreenchange", handleFullscreenChange)
-    
+
     // Initial call to configure size on mount
     handleResize()
 
@@ -731,7 +731,7 @@ export function GraphView({ data }: { data: GraphData }) {
           // Render with opacity 0.55 (idle) or 1.0 (active)
           ctx.globalAlpha = visual.opacity * (isActiveNode ? 1.0 : 0.55)
           ctx.fillStyle = isDark ? "#ffffff" : "#09090b"
-          
+
           const isActiveLabel = isActiveNode
           const fontSize = isActiveLabel ? 11.5 : 11
           ctx.font = `normal ${fontSize}px Inter, sans-serif`
@@ -752,12 +752,12 @@ export function GraphView({ data }: { data: GraphData }) {
         const rect = canvas.getBoundingClientRect()
         const screenX = state.hoveredNode.x * state.transform.scale + state.transform.x
         const screenY = state.hoveredNode.y * state.transform.scale + state.transform.y
-        
+
         // Convert to absolute viewport-relative coordinates
         const clientX = rect.left + screenX
         const R_screen = state.hoveredNode.radius * (state.hoveredNode.visual?.scale || 1.0) * state.transform.scale
         const clientY = rect.top + screenY - R_screen - 8
-        
+
         tooltip.style.left = `${clientX}px`
         tooltip.style.top = `${clientY}px`
         tooltip.style.display = "flex"
@@ -903,7 +903,7 @@ export function GraphView({ data }: { data: GraphData }) {
       state.dragStartPos = { x: touch.clientX, y: touch.clientY }
       state.hasDragged = false
       setSelectedNode(nodeUnderTouch)
-      
+
       // Open hovercard immediately on touch start / grab
       state.hoveredNode = nodeUnderTouch
       setHoveredNode(nodeUnderTouch)
@@ -1012,7 +1012,7 @@ export function GraphView({ data }: { data: GraphData }) {
 
   return (
     <div className="flex flex-1 flex-col h-[calc(100vh-var(--header-height)-10rem)] min-h-[500px] md:min-h-[600px] overflow-hidden gap-4 p-4 lg:p-6">
-      
+
       {/* 1. Horizontal Filter Bar */}
       <div className="shrink-0 w-full max-w-7xl mx-auto z-10">
         <div className="p-3 border border-border/40 bg-card/30 backdrop-blur-xs rounded-2xl flex flex-col gap-3 md:flex-row md:items-center">
@@ -1030,7 +1030,7 @@ export function GraphView({ data }: { data: GraphData }) {
               />
             </InputGroup>
           </div>
-          
+
           {/* Toggle Group Filters */}
           <div className="flex items-center gap-2 self-end md:self-auto flex-wrap">
             <span className="text-[11px] text-muted-foreground font-medium uppercase tracking-wider hidden sm:inline">
@@ -1068,7 +1068,7 @@ export function GraphView({ data }: { data: GraphData }) {
                         render={
                           <ToggleGroupItem
                             value={type}
-                            
+
                           />
                         }
                       >
@@ -1082,11 +1082,11 @@ export function GraphView({ data }: { data: GraphData }) {
                 })}
               </ToggleGroup>
             </TooltipProvider>
-            
+
             <Button
               variant="ghost"
               size="xs"
-              
+
               onClick={() => {
                 stateRef.current.alpha = 0.4 // Reheat simulation
                 const allOn = Object.values(filters).some((v) => !v)
@@ -1109,7 +1109,7 @@ export function GraphView({ data }: { data: GraphData }) {
                   <Button
                     variant="outline"
                     size="xs"
-                    
+
                   />
                 }
               >
@@ -1121,7 +1121,7 @@ export function GraphView({ data }: { data: GraphData }) {
                   <PopoverTitle>Canvas Settings</PopoverTitle>
                   <PopoverDescription>Adjust display modes</PopoverDescription>
                 </PopoverHeader>
-                
+
                 <div className="flex flex-col gap-1 mt-1">
                   <Button
                     variant="ghost"

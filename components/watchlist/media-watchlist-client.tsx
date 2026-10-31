@@ -205,7 +205,7 @@ export function MediaWatchlistClient({ initialItems }: MediaWatchlistClientProps
     toast.promise(promise, {
       loading: `Adding "${result.title}" to watchlist...`,
       success: (msg: string) => msg,
-      error: (err: any) => err?.message || "Failed to add item.",
+      error: (err: unknown) => (err as { message?: string })?.message || "Failed to add item.",
     });
   };
 
@@ -228,7 +228,7 @@ export function MediaWatchlistClient({ initialItems }: MediaWatchlistClientProps
     toast.promise(promise, {
       loading: "Updating status...",
       success: "Updated status",
-      error: (err: any) => err?.message || "Failed to update status.",
+      error: (err: unknown) => (err as { message?: string })?.message || "Failed to update status.",
     });
   };
 
@@ -250,7 +250,7 @@ export function MediaWatchlistClient({ initialItems }: MediaWatchlistClientProps
     toast.promise(promise, {
       loading: "Updating rating...",
       success: rating ? `Rated ${rating}/10` : "Cleared rating",
-      error: (err: any) => err?.message || "Failed to update rating.",
+      error: (err: unknown) => (err as { message?: string })?.message || "Failed to update rating.",
     });
   };
 
@@ -271,7 +271,7 @@ export function MediaWatchlistClient({ initialItems }: MediaWatchlistClientProps
     toast.promise(promise, {
       loading: "Deleting item...",
       success: `Deleted "${targetItem?.metadata?.title || "item"}"`,
-      error: (err: any) => err?.message || "Failed to delete item.",
+      error: (err: unknown) => (err as { message?: string })?.message || "Failed to delete item.",
     });
   };
 

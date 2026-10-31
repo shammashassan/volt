@@ -5,6 +5,31 @@ import { AnilistProvider } from '@/lib/providers/anilist.provider';
 import { NotificationService } from '@/lib/services/notification.service';
 import { ObjectId } from 'mongodb';
 import { SchedulerService } from '@/lib/scheduler/scheduler.service';
+import type { ScheduleMetadata } from '@/lib/scheduler/types';
+
+export type SyncItemInput = Omit<Partial<WatchlistItem>, '_id'> & {
+  _id?: string | ObjectId
+  userId?: string
+  externalId?: string
+  source?: string
+  type?: string
+  status?: string
+  metadata?: WatchlistItem["metadata"]
+  sync?: {
+    releasedNotified?: boolean
+    ottReleasedNotified?: boolean
+    lastNotifiedEpisode?: number
+    version?: number
+    [key: string]: unknown
+  }
+  scheduler?: {
+    theatrical?: ScheduleMetadata
+    ott?: ScheduleMetadata
+    episode?: ScheduleMetadata
+    [key: string]: ScheduleMetadata | undefined
+  }
+  [key: string]: unknown
+}
 
 export class WatchlistService {
   private static providers = {
@@ -12,11 +37,11 @@ export class WatchlistService {
     anilist: new AnilistProvider()
   };
 
-  public static async syncItem(item: any, now: Date = new Date()): Promise<void> {
+  public static async syncItem(item: SyncItemInput, now: Date = new Date()): Promise<void> {
     const db = await getDb();
     const col = db.collection('watchlist');
     const provider = this.providers[item.source as 'tmdb' | 'anilist'];
-    if (!provider) return;
+    if (!provider || !item.externalId || !item.type || !item.userId) return;
 
     const details = await provider.sync(item.externalId, item.type);
     
@@ -63,7 +88,16 @@ export class WatchlistService {
       }
     }
     
-    const updates: any = {
+    const updates: Record<string, unknown> & {
+      metadata: Record<string, unknown>
+      sync: {
+        releasedNotified?: boolean
+        ottReleasedNotified?: boolean
+        lastNotifiedEpisode?: number
+        [key: string]: unknown
+      }
+      scheduler: Record<string, unknown>
+    } = {
       metadata: {
         ...item.metadata,
         posterUrl: details.posterUrl || item.metadata?.posterUrl,
@@ -155,7 +189,7 @@ export class WatchlistService {
             console.log(`[Scheduler] Scheduling watchlist ${jobType} trigger for item ${item._id} at ${scheduledDate.toISOString()}`);
             const messageId = await SchedulerService.schedule(
               '/api/scheduler/watchlist',
-              { id: item._id.toString(), type: jobType },
+              { id: item._id?.toString() ?? "", type: jobType },
               scheduledDate
             );
 
@@ -166,13 +200,14 @@ export class WatchlistService {
               scheduledFor: targetIso,
               scheduledAt: now.toISOString()
             };
-          } catch (err: any) {
+          } catch (err: unknown) {
             console.error(`[Scheduler] Failed to schedule QStash message for ${jobType} on watchlist item ${item._id}:`, err);
+            const errorMessage = err instanceof Error ? err.message : String(err);
             updates.scheduler[jobType] = {
               provider: 'qstash',
               status: 'failed',
               scheduledFor: targetIso,
-              error: err.message || String(err)
+              error: errorMessage
             };
           }
         }
@@ -195,14 +230,19 @@ export class WatchlistService {
       const theatricalDateObj = details.releaseDate ? new Date(details.releaseDate) : undefined;
       const ottDateObj = details.ottReleaseDate ? new Date(details.ottReleaseDate) : undefined;
 
-      await handleScheduleJob('theatrical', theatricalDateObj, item.status === 'planned', updates.sync.releasedNotified);
-      await handleScheduleJob('ott', ottDateObj, item.status === 'planned', updates.sync.ottReleasedNotified);
+      await handleScheduleJob('theatrical', theatricalDateObj, item.status === 'planned', Boolean(updates.sync.releasedNotified));
+      await handleScheduleJob('ott', ottDateObj, item.status === 'planned', Boolean(updates.sync.ottReleasedNotified));
     } else if (isEpisodic) {
       const episodeDateObj = details.nextEpisodeDate ? new Date(details.nextEpisodeDate) : undefined;
       await handleScheduleJob('episode', episodeDateObj, item.status === 'watching', false);
     }
 
-    await col.updateOne({ _id: item._id }, { $set: updates });
+    const query = item._id
+      ? (typeof item._id === 'string' && ObjectId.isValid(item._id)
+          ? { _id: new ObjectId(item._id) }
+          : { _id: item._id })
+      : { id: item.id };
+    await col.updateOne(query as Parameters<typeof col.updateOne>[0], { $set: updates });
   }
 
   public static async syncItemById(id: string | ObjectId): Promise<boolean> {

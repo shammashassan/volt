@@ -46,9 +46,10 @@ export const getCategoriesWithCounts = cache(async (userId: string) => {
   ]);
 
   const countMap = new Map<string, number>();
-  counts.forEach((c: any) => {
-    const idStr = c._id?.toString() || "";
-    countMap.set(idStr, c.count);
+  counts.forEach((c) => {
+    const count = typeof c.count === "number" ? c.count : 0;
+    const idStr = c._id ? String(c._id) : "";
+    countMap.set(idStr, count);
   });
 
   return categories.map(cat => {

@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { FileQuestion, Home } from "lucide-react"
 import { buttonVariants } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 
 export const metadata = {
   title: "404 - Page Not Found",

@@ -30,15 +30,30 @@ import {
 import { Sparkles, Check, Star, Loader2, Folder, User, ExternalLink, Trash2 } from "lucide-react"
 import { toast } from "@/components/ui/toast"
 import { RESOURCE_TYPES } from "@/components/resources/resource-types"
-import { ResourceType } from "@/types"
+import { ResourceType, Resource, Category, Project, Person } from "@/types"
+
+export interface ResourceFormData extends Partial<Resource> {
+  title: string
+  url: string
+  tags: string[]
+  type: ResourceType
+  favorite: boolean
+  projectIds: string[]
+  personIds: string[]
+  name?: string
+  link?: string
+  category?: string
+  featured?: boolean
+  [key: string]: unknown
+}
 
 interface ResourceFormProps {
-  initialData?: any
-  onSubmit: (data: any) => Promise<void>
+  initialData?: (Partial<Resource> & { name?: string; link?: string; category?: string; featured?: boolean }) | null
+  onSubmit: (data: ResourceFormData) => Promise<void>
   isLoading: boolean
-  categories: any[]
-  projects?: any[]
-  people?: any[]
+  categories: Category[]
+  projects?: Project[]
+  people?: Person[]
   onCancel?: () => void
   onDelete?: () => void
   isDeleting?: boolean
@@ -183,7 +198,7 @@ export function ResourceForm({
         <div className="grid grid-cols-2 gap-4">
           <Field>
             <FieldLabel htmlFor="category">Category</FieldLabel>
-            <Select value={categoryId} onValueChange={setCategoryId}>
+            <Select value={categoryId} onValueChange={(val) => setCategoryId(val ?? "none")}>
               <SelectTrigger id="category" >
                 <SelectValue placeholder="Select" />
               </SelectTrigger>

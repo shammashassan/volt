@@ -4,10 +4,20 @@ import * as React from "react"
 import { useState, useMemo } from "react"
 import { Person, PersonType } from "@/types"
 import { Button } from "@/components/ui/button"
-import { User, Plus, Edit3, Trash2, ExternalLink } from "lucide-react"
-import { Separator } from "@/components/ui/separator"
+import {
+  User,
+  Users,
+  Plus,
+  Search,
+  X,
+  SlidersHorizontal,
+  ArrowUpDown,
+  Sparkles,
+  MoreHorizontal,
+  Pencil,
+  Trash2,
+} from "lucide-react"
 import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card"
 import {
   Dialog,
   DialogContent,
@@ -25,7 +35,30 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Field, FieldGroup, FieldLabel } from "@/components/ui/field"
+import { Field, FieldGroup, FieldLabel, FieldDescription } from "@/components/ui/field"
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupButton,
+} from "@/components/ui/input-group"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import {
+  Empty,
+  EmptyHeader,
+  EmptyTitle,
+  EmptyDescription,
+  EmptyMedia,
+  EmptyContent,
+} from "@/components/ui/empty"
 import { addPersonAction, deletePersonAction, updatePersonAction } from "@/lib/actions"
 import { toast } from "@/components/ui/toast"
 import { useRouter } from "next/navigation"
@@ -40,22 +73,20 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
+import { PersonAvatar } from "./person-avatar"
 
 interface PeopleContentProps {
   initialPeople: Person[]
 }
 
-const TYPE_CONFIG: Record<PersonType, { label: string; variant: "secondary" | "outline" | "destructive" | "default" }> = {
-  developer: { label: "Developer", variant: "default" },
-  designer: { label: "Designer", variant: "secondary" },
-  founder: { label: "Founder", variant: "secondary" },
-  creator: { label: "Creator", variant: "outline" },
-  company: { label: "Company", variant: "outline" }
-}
+type RoleFilter = "all" | PersonType
+type SortOption = "name-asc" | "name-desc" | "date-newest" | "date-oldest"
 
 export function PeopleContent({ initialPeople }: PeopleContentProps) {
   const [people, setPeople] = useState<Person[]>(initialPeople)
   const [searchQuery, setSearchQuery] = useState("")
+  const [roleFilter, setRoleFilter] = useState<RoleFilter>("all")
+  const [sortOption, setSortOption] = useState<SortOption>("name-asc")
 
   // Dialog state
   const [isOpen, setIsOpen] = useState(false)
@@ -71,6 +102,12 @@ export function PeopleContent({ initialPeople }: PeopleContentProps) {
   const [formNotes, setFormNotes] = useState("")
   const [formTags, setFormTags] = useState("")
 
+  const router = useRouter()
+
+  React.useEffect(() => {
+    setPeople(initialPeople)
+  }, [initialPeople])
+
   React.useEffect(() => {
     if (newPersonParam) {
       setEditingPerson(null)
@@ -83,13 +120,6 @@ export function PeopleContent({ initialPeople }: PeopleContentProps) {
     }
   }, [newPersonParam])
 
-
-  const router = useRouter()
-
-  React.useEffect(() => {
-    setPeople(initialPeople)
-  }, [initialPeople])
-
   const handleOpenCreate = () => {
     setEditingPerson(null)
     setFormName("")
@@ -100,9 +130,11 @@ export function PeopleContent({ initialPeople }: PeopleContentProps) {
     setIsOpen(true)
   }
 
-  const handleOpenEdit = (person: Person, e: React.MouseEvent) => {
-    e.stopPropagation()
-    e.preventDefault()
+  const handleOpenEdit = (person: Person, e?: React.MouseEvent) => {
+    if (e) {
+      e.stopPropagation()
+      e.preventDefault()
+    }
     setEditingPerson(person)
     setFormName(person.name)
     setFormType(person.type)
@@ -112,9 +144,11 @@ export function PeopleContent({ initialPeople }: PeopleContentProps) {
     setIsOpen(true)
   }
 
-  const handleOpenDelete = (id: string, e: React.MouseEvent) => {
-    e.stopPropagation()
-    e.preventDefault()
+  const handleOpenDelete = (id: string, e?: React.MouseEvent) => {
+    if (e) {
+      e.stopPropagation()
+      e.preventDefault()
+    }
     setPersonToDelete(id)
   }
 
@@ -136,7 +170,9 @@ export function PeopleContent({ initialPeople }: PeopleContentProps) {
         {
           loading: "Deleting person...",
           success: "Person deleted successfully",
-          error: (err: any) => (err instanceof Error ? err.message : String(err)) || "Failed to delete person",
+          error: (err: unknown) =>
+            (err instanceof Error ? err.message : String(err)) ||
+            "Failed to delete person",
         }
       )
     } catch {
@@ -169,14 +205,16 @@ export function PeopleContent({ initialPeople }: PeopleContentProps) {
       .filter((t) => t !== "")
 
     const data = {
-      name: formName,
+      name: formName.trim(),
       type: formType,
       links: linksArray,
-      notes: formNotes,
+      notes: formNotes.trim(),
       tags: tagsArray,
     }
     const isEditing = Boolean(editingPerson)
-    const id = editingPerson ? (editingPerson._id?.toString() || editingPerson.id || "") : ""
+    const id = editingPerson
+      ? editingPerson._id?.toString() || editingPerson.id || ""
+      : ""
 
     try {
       await toast.promise(
@@ -201,8 +239,12 @@ export function PeopleContent({ initialPeople }: PeopleContentProps) {
         })(),
         {
           loading: isEditing ? "Updating person..." : "Creating person...",
-          success: isEditing ? "Person updated successfully" : "Person created successfully",
-          error: (err: any) => (err instanceof Error ? err.message : String(err)) || (isEditing ? "Failed to update person" : "Failed to create person"),
+          success: isEditing
+            ? "Person updated successfully"
+            : "Person created successfully",
+          error: (err: unknown) =>
+            (err instanceof Error ? err.message : String(err)) ||
+            (isEditing ? "Failed to update person" : "Failed to create person"),
         }
       )
     } catch {
@@ -212,16 +254,66 @@ export function PeopleContent({ initialPeople }: PeopleContentProps) {
     }
   }
 
+  // Count distribution across types
+  const roleCounts = useMemo(() => {
+    const counts = {
+      all: people.length,
+      developer: 0,
+      designer: 0,
+      founder: 0,
+      creator: 0,
+      company: 0,
+    }
+    people.forEach((p) => {
+      if (counts[p.type] !== undefined) {
+        counts[p.type]++
+      }
+    })
+    return counts
+  }, [people])
+
+  // Filter and sort people
   const filteredPeople = useMemo(() => {
-    if (!searchQuery.trim()) return people
-    const q = searchQuery.toLowerCase()
-    return people.filter(
-      (p) =>
+    const q = searchQuery.toLowerCase().trim()
+
+    const filtered = people.filter((p) => {
+      const matchesSearch =
+        !q ||
         p.name.toLowerCase().includes(q) ||
         p.type.toLowerCase().includes(q) ||
+        (p.notes && p.notes.toLowerCase().includes(q)) ||
         (p.tags || []).some((t) => t.toLowerCase().includes(q))
-    )
-  }, [people, searchQuery])
+
+      const matchesRole = roleFilter === "all" || p.type === roleFilter
+
+      return matchesSearch && matchesRole
+    })
+
+    return [...filtered].sort((a, b) => {
+      if (sortOption === "name-asc") {
+        return a.name.localeCompare(b.name)
+      }
+      if (sortOption === "name-desc") {
+        return b.name.localeCompare(a.name)
+      }
+      if (sortOption === "date-newest") {
+        const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0
+        const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0
+        return timeB - timeA
+      }
+      if (sortOption === "date-oldest") {
+        const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0
+        const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0
+        return timeA - timeB
+      }
+      return 0
+    })
+  }, [people, searchQuery, roleFilter, sortOption])
+
+  const clearFilters = () => {
+    setSearchQuery("")
+    setRoleFilter("all")
+  }
 
   return (
     <div className="flex flex-1 flex-col gap-6 pb-12">
@@ -230,8 +322,8 @@ export function PeopleContent({ initialPeople }: PeopleContentProps) {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between max-w-7xl">
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                <User className="size-6" />
+              <div className="flex size-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                <Users className="size-6" />
               </div>
               <div className="flex items-center gap-2">
                 <h1 className="text-3xl font-black tracking-tight md:text-4xl bg-clip-text text-transparent bg-linear-to-r from-foreground to-foreground/60">
@@ -242,135 +334,296 @@ export function PeopleContent({ initialPeople }: PeopleContentProps) {
                 </Badge>
               </div>
             </div>
-            <p className="text-lg text-muted-foreground/80 max-w-2xl font-medium">
-              Track creators, developers, designers, or organizations to reference and connect them with saved assets.
+            <p className="text-base text-muted-foreground max-w-2xl font-medium">
+              Manage mentors, creators, developers, and organizations connected to your workspace.
             </p>
           </div>
           <Button onClick={handleOpenCreate}>
-            <Plus />
-            Track Person
+            <Plus data-icon="inline-start" />
+            <span>Track Person</span>
           </Button>
         </div>
       </section>
 
-      {/* Main Content section */}
+      {/* Controls & Filter Toolbar */}
       <section className="px-4 lg:px-6">
-        <div className="max-w-7xl flex flex-col gap-6">
-          {/* Search Bar */}
-          <div className="max-w-md w-full">
-            <Input
-              placeholder="Search by name, type, or tags..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="h-9"
-            />
+        <div className="flex flex-col gap-4 max-w-7xl">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            {/* Search Input with InputGroup */}
+            <InputGroup className="w-full sm:max-w-md">
+              <InputGroupAddon align="inline-start">
+                <Search />
+              </InputGroupAddon>
+              <InputGroupInput
+                placeholder="Search by name, role, tags, bio..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              {searchQuery && (
+                <InputGroupAddon align="inline-end">
+                  <InputGroupButton
+                    size="icon-xs"
+                    onClick={() => setSearchQuery("")}
+                  >
+                    <X />
+                    <span className="sr-only">Clear search</span>
+                  </InputGroupButton>
+                </InputGroupAddon>
+              )}
+            </InputGroup>
+
+            {/* Sort Controls */}
+            <div className="flex items-center gap-2 self-end sm:self-auto">
+              <DropdownMenu>
+                <DropdownMenuTrigger
+                  render={
+                    <Button variant="outline" size="sm">
+                      <ArrowUpDown data-icon="inline-start" />
+                      <span className="hidden md:inline">Sort:</span>
+                      <span className="capitalize">
+                        {sortOption === "name-asc"
+                          ? "A to Z"
+                          : sortOption === "name-desc"
+                            ? "Z to A"
+                            : sortOption === "date-newest"
+                              ? "Newest"
+                              : "Oldest"}
+                      </span>
+                    </Button>
+                  }
+                />
+                <DropdownMenuContent align="end" className="w-40">
+                  <DropdownMenuGroup>
+                    <DropdownMenuItem onClick={() => setSortOption("name-asc")}>
+                      <span>Name (A to Z)</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setSortOption("name-desc")}>
+                      <span>Name (Z to A)</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setSortOption("date-newest")}>
+                      <span>Date (Newest)</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setSortOption("date-oldest")}>
+                      <span>Date (Oldest)</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
 
-          {/* People Grid */}
+          {/* Role Filter Tabs using components/ui/tabs.tsx */}
+          {/* Mobile Select dropdown */}
+          <div className="sm:hidden w-full">
+            <Select
+              value={roleFilter}
+              onValueChange={(val) => setRoleFilter(val as RoleFilter)}
+            >
+              <SelectTrigger className="w-full h-10">
+                <SelectValue placeholder="Filter Role" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All ({roleCounts.all})</SelectItem>
+                <SelectItem value="developer">
+                  Developers ({roleCounts.developer})
+                </SelectItem>
+                <SelectItem value="designer">
+                  Designers ({roleCounts.designer})
+                </SelectItem>
+                <SelectItem value="founder">
+                  Founders ({roleCounts.founder})
+                </SelectItem>
+                <SelectItem value="creator">
+                  Creators ({roleCounts.creator})
+                </SelectItem>
+                <SelectItem value="company">
+                  Companies ({roleCounts.company})
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Desktop tabs using Tabs from components/ui/tabs.tsx */}
+          <Tabs
+            value={roleFilter}
+            onValueChange={(val) => setRoleFilter(val as RoleFilter)}
+            className="hidden sm:block w-full"
+          >
+            <div className="overflow-x-auto pb-1 no-scrollbar">
+              <TabsList className="inline-flex">
+                <TabsTrigger value="all">
+                  All <span className="ml-1 opacity-60 font-medium">({roleCounts.all})</span>
+                </TabsTrigger>
+                <TabsTrigger value="developer">
+                  Developers <span className="ml-1 opacity-60 font-medium">({roleCounts.developer})</span>
+                </TabsTrigger>
+                <TabsTrigger value="designer">
+                  Designers <span className="ml-1 opacity-60 font-medium">({roleCounts.designer})</span>
+                </TabsTrigger>
+                <TabsTrigger value="founder">
+                  Founders <span className="ml-1 opacity-60 font-medium">({roleCounts.founder})</span>
+                </TabsTrigger>
+                <TabsTrigger value="creator">
+                  Creators <span className="ml-1 opacity-60 font-medium">({roleCounts.creator})</span>
+                </TabsTrigger>
+                <TabsTrigger value="company">
+                  Companies <span className="ml-1 opacity-60 font-medium">({roleCounts.company})</span>
+                </TabsTrigger>
+              </TabsList>
+            </div>
+          </Tabs>
+        </div>
+      </section>
+
+      {/* Main Content section: Single view of only the avatar with text/label (no background card or card outline) */}
+      <section className="px-4 lg:px-6">
+        <div className="max-w-7xl flex flex-col gap-6">
           {filteredPeople.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 text-center border border-dashed border-border/60 rounded-2xl bg-card/10 backdrop-blur-xs gap-3">
-              <User className="size-10 text-muted-foreground/40" />
-              <h3 className="font-bold text-lg lowercase italic">no people tracked</h3>
-              <p className="text-xs text-muted-foreground/80 max-w-xs leading-relaxed">
-                Start tracking influential minds, team members, or agencies to associate them with saved links and notes.
-              </p>
-              <Button onClick={handleOpenCreate} variant="outline" size="sm" className="mt-2">
-                Track First Person
-              </Button>
-            </div>
+            <Empty>
+              <EmptyHeader>
+                <EmptyMedia variant="icon">
+                  <User />
+                </EmptyMedia>
+                <EmptyTitle>
+                  {people.length === 0
+                    ? "No people tracked yet"
+                    : "No profiles match your filters"}
+                </EmptyTitle>
+                <EmptyDescription>
+                  {people.length === 0
+                    ? "Start tracking influential minds, colleagues, or teams to associate them with saved links and notes."
+                    : "Try adjusting your search query or role filter to find who you are looking for."}
+                </EmptyDescription>
+              </EmptyHeader>
+              <EmptyContent>
+                <div className="flex items-center justify-center gap-2">
+                  {people.length > 0 && (
+                    <Button variant="outline" size="sm" onClick={clearFilters}>
+                      <SlidersHorizontal data-icon="inline-start" />
+                      <span>Reset Filters</span>
+                    </Button>
+                  )}
+                  <Button size="sm" onClick={handleOpenCreate}>
+                    <Plus data-icon="inline-start" />
+                    <span>Track First Person</span>
+                  </Button>
+                </div>
+              </EmptyContent>
+            </Empty>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredPeople.map((person) => {
-                const typeConfig = TYPE_CONFIG[person.type] || { label: "Developer", variant: "primary" as const }
-                const id = person._id?.toString() || person.id || ""
-                return (
-                  <Card
-                    key={id}
-                    size="sm" className="group flex flex-col justify-between"
-                    onClick={() => router.push(`/people/${id}`)}
-                  >
-                    <CardHeader>
-                      <div className="flex items-start justify-between gap-3">
-                        <CardTitle className="flex-1">
-                          {person.name}
-                        </CardTitle>
-                        <Badge variant={typeConfig.variant}>
-                          {typeConfig.label}
-                        </Badge>
+            /* Single view: Only Avatar with label/text (no background card, no outline) + Edit/Delete actions */
+            <div className="flex flex-wrap items-start gap-8">
+                {filteredPeople.map((person) => {
+                  const id = person._id?.toString() || person.id || ""
+
+                  return (
+                    <div
+                      key={id}
+                      className="group relative flex flex-col items-center w-32 pt-2 pb-2 gap-2"
+                    >
+                      {/* Edit & Delete Action Menu on hover/focus - top right corner, no avatar overlap */}
+                      <div className="absolute top-0 right-1 z-10 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger
+                            render={
+                              <Button
+                                variant="secondary"
+                                size="icon-xs"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <MoreHorizontal />
+                                <span className="sr-only">Actions for {person.name}</span>
+                              </Button>
+                            }
+                          />
+                          <DropdownMenuContent align="end" className="w-40">
+                            <DropdownMenuGroup>
+                              <DropdownMenuItem onClick={() => router.push(`/people/${id}`)}>
+                                <User />
+                                <span>View Profile</span>
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={(e) => handleOpenEdit(person, e)}>
+                                <Pencil />
+                                <span>Edit Profile</span>
+                              </DropdownMenuItem>
+                            </DropdownMenuGroup>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuGroup>
+                              <DropdownMenuItem
+                                variant="destructive"
+                                onClick={(e) => handleOpenDelete(id, e)}
+                              >
+                                <Trash2 />
+                                <span>Delete Profile</span>
+                              </DropdownMenuItem>
+                            </DropdownMenuGroup>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
-                      {person.notes && (
-                        <CardDescription className="mt-1.5">
-                          {person.notes}
-                        </CardDescription>
-                      )}
-                    </CardHeader>
-                    <CardContent>
-                      {/* Tags */}
-                      {person.tags && person.tags.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mb-2">
-                          {person.tags.slice(0, 3).map((tag) => (
-                            <Badge key={tag} variant="secondary">
-                              {tag}
-                            </Badge>
-                          ))}
-                        </div>
-                      )}
-                      {/* Clickable Links */}
-                      {person.links && person.links.length > 0 && (
-                        <div className="flex flex-wrap gap-2 mt-3">
-                          {person.links.slice(0, 2).map((link, idx) => (
-                            <a
-                              key={idx}
-                              href={link}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              onClick={(e) => e.stopPropagation()}
-                              className="inline-flex items-center text-[10px] font-bold text-primary hover:underline gap-1 max-w-[150px] truncate"
-                            >
-                              <ExternalLink className="size-3 shrink-0" />
-                              {new URL(link).hostname}
-                            </a>
-                          ))}
-                        </div>
-                      )}
-                    </CardContent>
-                    <CardFooter className="flex justify-between items-center">
-                      <span className="text-muted-foreground/60">
-                        Added {new Date(person.createdAt).toLocaleDateString()}
-                      </span>
-                      <div className="flex items-center gap-1.5">
-                        <Button variant="ghost" size="icon-sm"
-                          onClick={(e) => handleOpenEdit(person, e)}
-                          title="Edit Profile"
-                        >
-                          <Edit3 className="size-3.5" />
-                        </Button>
-                        <Button variant="ghost" size="icon-sm"
-                          onClick={(e) => handleOpenDelete(id, e)}
-                          title="Delete Profile"
-                        >
-                          <Trash2 className="size-3.5" />
-                        </Button>
-                      </div>
-                    </CardFooter>
-                  </Card>
-                )
-              })}
-            </div>
+
+                      {/* Avatar */}
+                      <button
+                        type="button"
+                        onClick={() => router.push(`/people/${id}`)}
+                        className="cursor-pointer transition-transform hover:scale-105 active:scale-95"
+                      >
+                        <PersonAvatar person={person} size="xl" />
+                        <span className="sr-only">{person.name}</span>
+                      </button>
+
+                      {/* Name / label text without background card or outline */}
+                      <button
+                        type="button"
+                        onClick={() => router.push(`/people/${id}`)}
+                        className="text-xs font-medium text-center text-foreground hover:text-primary transition-colors truncate w-full cursor-pointer"
+                        title={person.name}
+                      >
+                        {person.name}
+                      </button>
+                    </div>
+                  )
+                })}
+              </div>
           )}
 
-          <Dialog open={isOpen} onOpenChange={(open) => {
-            setIsOpen(open)
-            if (!open && newPersonParam) void setNewPersonParam(null)
-          }}>
-            <DialogContent className="sm:max-w-[425px] overflow-y-auto max-h-[90vh] no-scrollbar">
-              <form onSubmit={handleSave}>
+          {/* Create & Edit Modal with Live Avatar Preview */}
+          <Dialog
+            open={isOpen}
+            onOpenChange={(open) => {
+              setIsOpen(open)
+              if (!open && newPersonParam) void setNewPersonParam(null)
+            }}
+          >
+            <DialogContent className="sm:max-w-[480px] overflow-y-auto max-h-[90vh] no-scrollbar">
+              <form onSubmit={handleSave} className="flex flex-col gap-4">
                 <DialogHeader>
-                  <DialogTitle>{editingPerson ? "Edit Profile" : "Track Person"}</DialogTitle>
+                  <DialogTitle>
+                    {editingPerson ? "Edit Profile" : "Track Person"}
+                  </DialogTitle>
                   <DialogDescription>
-                    {editingPerson ? "Modify details of this tracked profile." : "Start tracking a person or agency to reference them inside your repository."}
+                    {editingPerson
+                      ? "Modify details of this tracked profile."
+                      : "Start tracking a person or company to connect them with saved links and notes."}
                   </DialogDescription>
                 </DialogHeader>
+
+                {/* Live Avatar Preview with Increased Size and Icon Subcomponent */}
+                <div className="flex items-center gap-3.5 rounded-xl border border-border/60 bg-muted/30 p-3">
+                  <PersonAvatar
+                    person={{ name: formName || "Full Name", type: formType }}
+                    size="xl"
+                  />
+                  <div className="flex flex-col min-w-0">
+                    <span className="text-sm font-semibold truncate">
+                      {formName || "Full Name"}
+                    </span>
+                    <span className="text-xs text-muted-foreground flex items-center gap-1 capitalize">
+                      <Sparkles className="size-3 text-primary shrink-0" />
+                      <span>{formType}</span>
+                    </span>
+                  </div>
+                </div>
+
                 <FieldGroup>
                   <Field>
                     <FieldLabel htmlFor="name">Full Name</FieldLabel>
@@ -378,13 +631,20 @@ export function PeopleContent({ initialPeople }: PeopleContentProps) {
                       id="name"
                       value={formName}
                       onChange={(e) => setFormName(e.target.value)}
-                      placeholder="E.g. Lee Robinson"
+                      placeholder="e.g. Lee Robinson"
                       disabled={isLoading}
                     />
                   </Field>
+
                   <Field>
                     <FieldLabel htmlFor="type">Profile Type</FieldLabel>
-                    <Select value={formType} onValueChange={(val) => setFormType(val as PersonType)} disabled={isLoading}>
+                    <Select
+                      value={formType}
+                      onValueChange={(val) => {
+                        if (val) setFormType(val as PersonType)
+                      }}
+                      disabled={isLoading}
+                    >
                       <SelectTrigger id="type">
                         <SelectValue placeholder="Select Type" />
                       </SelectTrigger>
@@ -397,48 +657,64 @@ export function PeopleContent({ initialPeople }: PeopleContentProps) {
                       </SelectContent>
                     </Select>
                   </Field>
+
                   <Field>
-                    <FieldLabel htmlFor="links">
-                      Profile Links <span className="text-[10px] text-muted-foreground lowercase">(comma separated URLs)</span>
-                    </FieldLabel>
+                    <FieldLabel htmlFor="links">Profile Links</FieldLabel>
                     <Input
                       id="links"
                       value={formLinks}
                       onChange={(e) => setFormLinks(e.target.value)}
-                      placeholder="https://github.com/..., https://twitter.com/..."
+                      placeholder="https://github.com/..., https://x.com/..."
                       disabled={isLoading}
                     />
+                    <FieldDescription>
+                      Comma separated URLs (e.g. GitHub, X, personal portfolio).
+                    </FieldDescription>
                   </Field>
+
                   <Field>
-                    <FieldLabel htmlFor="tags">
-                      Profile Tags <span className="text-[10px] text-muted-foreground lowercase">(comma separated)</span>
-                    </FieldLabel>
+                    <FieldLabel htmlFor="tags">Tags</FieldLabel>
                     <Input
                       id="tags"
                       value={formTags}
                       onChange={(e) => setFormTags(e.target.value)}
-                      placeholder="nextjs, react, vercel, photography"
+                      placeholder="nextjs, react, ui, performance"
                       disabled={isLoading}
                     />
+                    <FieldDescription>
+                      Comma separated keywords for taxonomy.
+                    </FieldDescription>
                   </Field>
+
                   <Field>
                     <FieldLabel htmlFor="notes">Bio / Notes</FieldLabel>
                     <Textarea
                       id="notes"
                       value={formNotes}
                       onChange={(e) => setFormNotes(e.target.value)}
-                      placeholder="E.g. Lead DevRel at Vercel. Writes about React server components."
+                      placeholder="e.g. VP of Product at Vercel. Writes about developer experience."
                       className="min-h-[80px]"
                       disabled={isLoading}
                     />
                   </Field>
                 </FieldGroup>
+
                 <DialogFooter>
-                  <Button type="button" variant="outline" size="sm" onClick={() => setIsOpen(false)} disabled={isLoading}>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsOpen(false)}
+                    disabled={isLoading}
+                  >
                     Cancel
                   </Button>
                   <Button type="submit" size="sm" disabled={isLoading}>
-                    {isLoading ? "Saving..." : editingPerson ? "Save Changes" : "Track Person"}
+                    {isLoading
+                      ? "Saving..."
+                      : editingPerson
+                        ? "Save Changes"
+                        : "Track Person"}
                   </Button>
                 </DialogFooter>
               </form>
@@ -446,23 +722,28 @@ export function PeopleContent({ initialPeople }: PeopleContentProps) {
           </Dialog>
 
           {/* Delete Confirmation Alert */}
-          <AlertDialog open={!!personToDelete} onOpenChange={(open) => !open && setPersonToDelete(null)}>
+          <AlertDialog
+            open={!!personToDelete}
+            onOpenChange={(open) => !open && setPersonToDelete(null)}
+          >
             <AlertDialogContent>
               <AlertDialogHeader>
                 <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  This action cannot be undone. This will permanently delete the tracked person profile. Linked resources and notes will not be deleted, but they will be disconnected from this person.
+                  This action cannot be undone. This will permanently delete the tracked person profile. Linked resources and notes will remain intact.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel disabled={isLoading}>Cancel</AlertDialogCancel>
-                <AlertDialogAction variant="destructive"
+                <AlertDialogCancel disabled={isLoading}>
+                  Cancel
+                </AlertDialogCancel>
+                <AlertDialogAction
+                  variant="destructive"
                   onClick={(e) => {
                     e.preventDefault()
-                    confirmDelete()
+                    void confirmDelete()
                   }}
                   disabled={isLoading}
-                  
                 >
                   {isLoading ? "Deleting..." : "Delete"}
                 </AlertDialogAction>

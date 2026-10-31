@@ -6,7 +6,7 @@ import Image from "next/image"
 import { Card, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { ExternalLinkIcon, PencilIcon, Trash2Icon, Globe } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import { trackResourceViewAction, useResourceAction } from "@/lib/actions"
 import { getResourceTypeInfo } from "./resource-types"
 
@@ -430,7 +430,7 @@ const ResourceCardComponent = function ResourceCardComponent<
   if (onClick) {
     return (
       <div
-        ref={containerRef as any}
+        ref={(node) => { containerRef.current = node }}
         onClick={(e) => {
           handleTrack()
           onClick(e)
@@ -444,7 +444,7 @@ const ResourceCardComponent = function ResourceCardComponent<
 
   if (disableRedirect) {
     return (
-      <div ref={containerRef as any} className="block group focus-visible:outline-hidden">
+      <div ref={(node) => { containerRef.current = node }} className="block group focus-visible:outline-hidden">
         {content}
       </div>
     )
@@ -452,7 +452,7 @@ const ResourceCardComponent = function ResourceCardComponent<
 
   return (
     <a
-      ref={containerRef as any}
+      ref={(node) => { containerRef.current = node }}
       {...externalProps}
       onClick={handleTrack}
       className="block group focus-visible:outline-hidden"

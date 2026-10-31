@@ -184,7 +184,7 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
     toast.promise(promise, {
       loading: "Adding reminder...",
       success: "Reminder added",
-      error: (err: any) => err?.message || "Failed to add reminder",
+      error: (err: unknown) => (err as { message?: string })?.message || "Failed to add reminder",
     });
   };
 
@@ -207,7 +207,7 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
     toast.promise(promise, {
       loading: "Updating reminder...",
       success: completedStatus ? "Reminder completed" : "Reminder pending",
-      error: (err: any) => err?.message || "Failed to update status",
+      error: (err: unknown) => (err as { message?: string })?.message || "Failed to update status",
     });
   };
 
@@ -229,7 +229,7 @@ export function RemindersContent({ initialReminders, notes, projects }: Reminder
     toast.promise(promise, {
       loading: "Deleting reminder...",
       success: "Reminder deleted",
-      error: (err: any) => err?.message || "Failed to delete reminder",
+      error: (err: unknown) => (err as { message?: string })?.message || "Failed to delete reminder",
     });
   };
 

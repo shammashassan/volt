@@ -71,7 +71,7 @@ export function UserManagement({ initialUsers }: { initialUsers: UserData[] }) {
       toast.promise(promise, {
         loading: "Updating role...",
         success: `Role updated to ${role}`,
-        error: (err: any) => err?.message || "Failed to set role",
+        error: (err: unknown) => (err as { message?: string })?.message || "Failed to set role",
       });
     });
   }
@@ -92,7 +92,7 @@ export function UserManagement({ initialUsers }: { initialUsers: UserData[] }) {
       toast.promise(promise, {
         loading: isBanned ? "Unbanning user..." : "Banning user...",
         success: isBanned ? "User unbanned" : "User banned",
-        error: (err: any) => err?.message || "Failed to update ban status",
+        error: (err: unknown) => (err as { message?: string })?.message || "Failed to update ban status",
       });
     });
   }
@@ -118,7 +118,7 @@ export function UserManagement({ initialUsers }: { initialUsers: UserData[] }) {
       toast.promise(promise, {
         loading: "Deleting user...",
         success: "User deleted successfully",
-        error: (err: any) => err?.message || "Failed to delete user",
+        error: (err: unknown) => (err as { message?: string })?.message || "Failed to delete user",
       });
     });
   }

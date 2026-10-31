@@ -87,7 +87,7 @@ export function QuickSaveCard() {
                 {
                     loading: "Saving to Workspace...",
                     success: "Saved to Workspace!",
-                    error: (err: any) => (err instanceof Error ? err.message : String(err)) || "Failed to save resource",
+                    error: (err: unknown) => (err instanceof Error ? err.message : String(err)) || "Failed to save resource",
                 }
             )
         } catch {

@@ -2,7 +2,7 @@
 
 import { revalidatePath, updateTag } from "next/cache";
 import clientPromise from "../mongodb";
-import { ObjectId } from "mongodb";
+import { ObjectId, Filter, Document } from "mongodb";
 import { getSessionUser, getErrorMessage } from "../auth-utils";
 
 export async function addCollectionAction(
@@ -88,7 +88,7 @@ export async function updateCollectionAction(idOrSlug: string, data: Record<stri
       updateData.slug = updateData.slug.toLowerCase().trim();
     }
 
-    const query: any = { userId: user.id };
+    const query: Filter<Document> = { userId: user.id };
     if (ObjectId.isValid(idOrSlug)) {
       query._id = new ObjectId(idOrSlug);
     } else {
@@ -100,7 +100,7 @@ export async function updateCollectionAction(idOrSlug: string, data: Record<stri
       const existing = await db.collection("collections").findOne({
         userId: user.id,
         slug: updateData.slug,
-        _id: { $ne: query._id || null }
+        _id: { $ne: query._id as ObjectId }
       });
       if (existing) {
         return { success: false, error: "A collection with this slug already exists." };

@@ -1,4 +1,4 @@
-export type EventCallback = (payload: any) => void | Promise<void>;
+export type EventCallback = (payload: unknown) => void | Promise<void>;
 
 export class EventBus {
   private static instance: EventBus;
@@ -20,7 +20,7 @@ export class EventBus {
     this.listeners.get(eventType)!.push(callback);
   }
 
-  public publish(eventType: string, payload: any): void {
+  public publish(eventType: string, payload: unknown): void {
     const handlers = this.listeners.get(eventType) || [];
     for (const handler of handlers) {
       try {

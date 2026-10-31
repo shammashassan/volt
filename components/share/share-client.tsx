@@ -197,7 +197,7 @@ export function ShareClient({
             data.isDuplicate
               ? "This URL is already in your library!"
               : "Link saved to Inbox!",
-          error: (err: any) => err?.message || "Failed to auto-save the link.",
+          error: (err: unknown) => (err as { message?: string })?.message || "Failed to auto-save the link.",
         });
       } catch (err: unknown) {
         setStatus("error");
@@ -287,7 +287,7 @@ export function ShareClient({
       await toast.promise(updateOp, {
         loading: "Updating resource...",
         success: "Resource categorized successfully!",
-        error: (err: any) => err?.message || "Failed to update resource.",
+        error: (err: unknown) => (err as { message?: string })?.message || "Failed to update resource.",
       });
     } catch {
       // toast.promise displays error

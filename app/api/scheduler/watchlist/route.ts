@@ -33,12 +33,13 @@ async function handleRequest(req: Request) {
     }
 
     return NextResponse.json({ success: true });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("[Scheduler] Exception in watchlist webhook handler:", err);
     
     // Return 500 on transient database/server errors to allow QStash retrying
+    const errorMessage = err instanceof Error ? err.message : "Internal Server Error";
     return NextResponse.json(
-      { success: false, error: err.message || "Internal Server Error" },
+      { success: false, error: errorMessage },
       { status: 500 }
     );
   }

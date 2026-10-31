@@ -1,6 +1,6 @@
 "use client"
 
-import { cn } from "@/lib/utils"
+import { cn } from "cn"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import {
@@ -115,7 +115,7 @@ export function LoginForm({
                       placeholder="John Doe"
                       autoComplete="name"
                       required
-                     
+
                     />
                   </Field>
                 )}
@@ -129,7 +129,7 @@ export function LoginForm({
                     autoComplete="email"
                     spellCheck={false}
                     required
-                   
+
                   />
                 </Field>
                 <Field>
@@ -143,7 +143,7 @@ export function LoginForm({
                       type={showPassword ? "text" : "password"}
                       autoComplete={isSignUp ? "new-password" : "current-password"}
                       required
-                     
+
                     />
                     <Button
                       type="button"

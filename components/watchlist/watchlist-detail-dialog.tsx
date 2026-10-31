@@ -14,7 +14,7 @@ import { Slider } from "@/components/ui/slider";
 import { Separator } from "@/components/ui/separator";
 import { Film, Calendar, Tv, Clock, Star, Tag } from "lucide-react";
 import { WATCHLIST_STATUS_LABELS, WATCHLIST_TYPE_LABELS } from "@/lib/constants/watchlist";
-import { cn } from "@/lib/utils";
+import { cn } from "cn";
 
 interface WatchlistDetailDialogProps {
   item: WatchlistItem;

@@ -392,7 +392,7 @@ export function NotesContent({
           {
             loading: "Updating checklist...",
             success: "Checklist updated",
-            error: (err: any) => (err instanceof Error ? err.message : String(err)) || "Failed to update checkbox state",
+            error: (err: unknown) => (err instanceof Error ? err.message : String(err)) || "Failed to update checkbox state",
           }
         )
       } catch {
@@ -535,7 +535,7 @@ export function NotesContent({
         {
           loading: isCreating ? "Creating note..." : "Saving note...",
           success: isCreating ? "Note created" : "Note saved",
-          error: (err: any) => (err instanceof Error ? err.message : String(err)) || (isCreating ? "Failed to create note" : "Failed to update note"),
+          error: (err: unknown) => (err instanceof Error ? err.message : String(err)) || (isCreating ? "Failed to create note" : "Failed to update note"),
         }
       )
     } catch {
@@ -599,7 +599,7 @@ export function NotesContent({
         {
           loading: "Deleting note...",
           success: "Note deleted",
-          error: (err: any) => (err instanceof Error ? err.message : String(err)) || "Failed to delete note",
+          error: (err: unknown) => (err instanceof Error ? err.message : String(err)) || "Failed to delete note",
         }
       )
     } catch {
@@ -949,7 +949,7 @@ export function NotesContent({
                                       {
                                         loading: "Updating pin...",
                                         success: note.pinned ? "Unpinned" : "Pinned",
-                                        error: (err: any) => (err instanceof Error ? err.message : String(err)) || "Failed to update pin",
+                                        error: (err: unknown) => (err instanceof Error ? err.message : String(err)) || "Failed to update pin",
                                       }
                                     )
                                   } catch {
@@ -1460,7 +1460,7 @@ export function NotesContent({
                           {
                             loading: "Updating pin...",
                             success: selectedNote?.pinned ? "Unpinned" : "Pinned",
-                            error: (err: any) => (err instanceof Error ? err.message : String(err)) || "Failed to update pin",
+                            error: (err: unknown) => (err instanceof Error ? err.message : String(err)) || "Failed to update pin",
                           }
                         )
                       } catch {

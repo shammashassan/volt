@@ -160,8 +160,8 @@ export function SettingsContent() {
 
   if (!session) return null
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const user = session.user as any
+
+  const user = session.user as typeof session.user & { twoFactorEnabled?: boolean }
   const is2FAEnabled = Boolean(user?.twoFactorEnabled)
   const isProfileDirty = profileData.name !== initialProfileData.name || profileData.email !== initialProfileData.email
   const isPasswordValid =

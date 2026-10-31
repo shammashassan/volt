@@ -56,7 +56,7 @@ export class CalendarService {
 
     // Add watchlist releases
     for (const w of watchlist) {
-      const relDateStr = (w.metadata as any)?.releaseDate;
+      const relDateStr = w.metadata?.releaseDate;
       if (!relDateStr) continue;
 
       const relDate = new Date(relDateStr);
