@@ -35,11 +35,21 @@ export async function proxy(request: NextRequest) {
         session = null;
     }
 
-    const isPublicPath =
+    // Public marketing and informational routes
+    const isPublicMarketingPath =
         pathname === "/" ||
+        pathname === "/privacy" ||
+        pathname === "/terms";
+
+    // Authentication-specific routes
+    const isAuthPath =
         pathname === "/sign-in" ||
         pathname === "/sign-up" ||
-        pathname === "/login";
+        pathname === "/login" ||
+        pathname === "/forgot-password" ||
+        pathname === "/reset-password" ||
+        pathname === "/verify-email" ||
+        pathname === "/2fa";
 
     if (!session) {
         // Fallback check: if the cookie cache is empty/expired, check if the session cookie itself exists
@@ -51,7 +61,7 @@ export async function proxy(request: NextRequest) {
             return NextResponse.next();
         }
 
-        if (isPublicPath) {
+        if (isPublicMarketingPath || isAuthPath) {
             return NextResponse.next();
         }
         return NextResponse.redirect(new URL("/sign-in", request.url));
@@ -59,19 +69,15 @@ export async function proxy(request: NextRequest) {
 
     // Session exists, handle redirects
     const user = session.user as { role?: string };
-    const role = user.role;
+    const role = user?.role;
 
     // Authenticated user visiting auth pages should be routed directly to dashboard
-    if (
-        pathname === "/login" ||
-        pathname === "/sign-in" ||
-        pathname === "/sign-up"
-    ) {
-        return NextResponse.redirect(new URL("/explore", request.url));
+    if (isAuthPath) {
+        return NextResponse.redirect(new URL("/dashboard", request.url));
     }
 
     if (pathname.startsWith("/users") && role !== "admin") {
-        return NextResponse.redirect(new URL("/explore", request.url));
+        return NextResponse.redirect(new URL("/dashboard", request.url));
     }
 
     return NextResponse.next();

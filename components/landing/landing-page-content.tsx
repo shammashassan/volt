@@ -2,6 +2,7 @@
 
 import React, { useRef, useState, useEffect } from 'react'
 import { Preloader } from '@/components/landing/preloader'
+import { authClient } from '@/lib/auth-client'
 import { HeroHeader } from '@/components/layout/header'
 import { HeroSection } from '@/components/landing/hero-section'
 import { FeatureGrid } from '@/components/landing/feature-grid'
@@ -27,6 +28,7 @@ import { LogoMark } from '@/components/brand/logo-mark'
 gsap.registerPlugin(useGSAP, ScrollTrigger)
 
 export function LandingPageContent() {
+  const { data: session } = authClient.useSession()
   const pageRef = useRef<HTMLDivElement>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [startReveal, setStartReveal] = useState(false)
@@ -220,10 +222,10 @@ export function LandingPageContent() {
                 </p>
                 <div className="cta-reveal-item opacity-0">
                   <Link
-                    href="/dashboard"
+                    href={session ? "/dashboard" : "/sign-up"}
                     className="inline-flex h-16 items-center justify-center rounded-full bg-primary px-12 text-lg font-bold text-primary-foreground shadow-xl shadow-primary/20 transition-[transform,shadow,background-color] hover:scale-105 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
                   >
-                    Access Workspace
+                    {session ? "Open Your Workspace" : "Get Started with Volt"}
                   </Link>
                 </div>
               </div>

@@ -3,6 +3,7 @@
 import React, { useRef } from 'react'
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
+import { authClient } from '@/lib/auth-client'
 import { gsap } from 'gsap'
 import { useGSAP } from '@gsap/react'
 
@@ -22,6 +23,7 @@ const GitHubIcon = ({ className }: { className?: string }) => (
 )
 
 export function HeroSection({ startReveal = false }: { startReveal?: boolean }) {
+  const { data: session } = authClient.useSession()
   const containerRef = useRef<HTMLDivElement>(null)
 
   // Mouse spotlight coordinates tracking
@@ -197,13 +199,23 @@ export function HeroSection({ startReveal = false }: { startReveal?: boolean }) 
           </div>
 
           <div className="mt-4 flex flex-wrap items-center justify-center gap-4">
-            <Link
-              href="/dashboard"
-              className="group hero-btn opacity-0 inline-flex h-14 items-center justify-center gap-2 rounded-full border border-transparent bg-primary px-10 text-base font-semibold text-primary-foreground shadow-lg shadow-primary/20 transition-[transform,shadow,background-color] hover:scale-105 active:scale-95"
-            >
-              Open Workspace
-              <ArrowRight className="size-5 transition-transform duration-200 group-hover:translate-x-1" />
-            </Link>
+            {session ? (
+              <Link
+                href="/dashboard"
+                className="group hero-btn opacity-0 inline-flex h-14 items-center justify-center gap-2 rounded-full border border-transparent bg-primary px-10 text-base font-semibold text-primary-foreground shadow-lg shadow-primary/20 transition-[transform,shadow,background-color] hover:scale-105 active:scale-95"
+              >
+                Open Workspace
+                <ArrowRight className="size-5 transition-transform duration-200 group-hover:translate-x-1" />
+              </Link>
+            ) : (
+              <Link
+                href="/sign-up"
+                className="group hero-btn opacity-0 inline-flex h-14 items-center justify-center gap-2 rounded-full border border-transparent bg-primary px-10 text-base font-semibold text-primary-foreground shadow-lg shadow-primary/20 transition-[transform,shadow,background-color] hover:scale-105 active:scale-95"
+              >
+                Get Started Free
+                <ArrowRight className="size-5 transition-transform duration-200 group-hover:translate-x-1" />
+              </Link>
+            )}
             <Link
               href="https://github.com/shammashassan/volt"
               target="_blank"

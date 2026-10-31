@@ -4,12 +4,14 @@ import { Logo } from '../brand/logo'
 import { Menu, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ModeToggle } from './mode-toggle'
+import { authClient } from '@/lib/auth-client'
 import { gsap } from 'gsap'
 import { useGSAP } from '@gsap/react'
 
 gsap.registerPlugin(useGSAP)
 
 export const HeroHeader = ({ startReveal = false }: { startReveal?: boolean }) => {
+    const { data: session } = authClient.useSession()
     const menuItems = [
         { name: 'Features', href: '#features' },
         { name: 'Workflow', href: '#workflow' },
@@ -106,6 +108,7 @@ export const HeroHeader = ({ startReveal = false }: { startReveal?: boolean }) =
                                         <li key={index}>
                                             <Link
                                                 href={item.href}
+                                                onClick={() => setMenuState(false)}
                                                 className="text-muted-foreground hover:text-accent-foreground font-medium block duration-150">
                                                 <span>{item.name}</span>
                                             </Link>
@@ -116,12 +119,32 @@ export const HeroHeader = ({ startReveal = false }: { startReveal?: boolean }) =
                             <div className="hidden lg:block">
                                 <ModeToggle />
                             </div>
-                            <Link
-                                href="/dashboard"
-                                className="inline-flex h-9 w-full lg:w-auto items-center justify-center rounded-full bg-primary px-4 text-xs font-semibold text-primary-foreground shadow-sm transition-transform hover:scale-105 mt-6 lg:mt-0"
-                            >
-                                Open Workspace
-                            </Link>
+                            {session ? (
+                                <Link
+                                    href="/dashboard"
+                                    onClick={() => setMenuState(false)}
+                                    className="inline-flex h-9 w-full lg:w-auto items-center justify-center rounded-full bg-primary px-4 text-xs font-semibold text-primary-foreground shadow-sm transition-transform hover:scale-105 mt-6 lg:mt-0"
+                                >
+                                    Open Workspace
+                                </Link>
+                            ) : (
+                                <div className="flex w-full flex-col gap-2 mt-6 lg:mt-0 lg:w-auto lg:flex-row lg:items-center lg:gap-3">
+                                    <Link
+                                        href="/sign-in"
+                                        onClick={() => setMenuState(false)}
+                                        className="inline-flex h-9 w-full lg:w-auto items-center justify-center rounded-full border border-border bg-background px-4 text-xs font-medium text-foreground transition-colors hover:bg-muted lg:border-transparent lg:bg-transparent lg:hover:bg-transparent lg:text-muted-foreground lg:hover:text-foreground"
+                                    >
+                                        Sign In
+                                    </Link>
+                                    <Link
+                                        href="/sign-up"
+                                        onClick={() => setMenuState(false)}
+                                        className="inline-flex h-9 w-full lg:w-auto items-center justify-center rounded-full bg-primary px-4 text-xs font-semibold text-primary-foreground shadow-sm transition-transform hover:scale-105"
+                                    >
+                                        Get Started
+                                    </Link>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
