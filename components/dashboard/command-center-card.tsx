@@ -35,45 +35,47 @@ export function CommandCenterCard() {
           </button>
 
           {/* Quick actions */}
-          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5 min-w-0">
-            <span className="sticky left-0 z-10 mr-1 shrink-0 bg-card pr-2 font-mono text-[10px] lowercase tracking-wider text-muted-foreground/60">
+          <div className="flex items-center gap-3 min-w-0">
+            <span className="shrink-0 font-mono text-[10px] lowercase tracking-wider text-muted-foreground/60">
               quick actions
             </span>
-            <Button
-              variant="outline"
-              size="sm"
-              render={<Link href="/resources?new=true" />}
-              nativeButton={false}
-            >
-              <Plus data-icon="inline-start" />
-              Add resource
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              render={<Link href="/categories?new=category" />}
-              nativeButton={false}
-            >
-              <FolderPlus data-icon="inline-start" />
-              New category
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => { window.location.hash = "#favorites" }}
-            >
-              <Star data-icon="inline-start" />
-              Favorites
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              render={<Link href="/categories" />}
-              nativeButton={false}
-            >
-              <LayoutGrid data-icon="inline-start" />
-              Categories
-            </Button>
+            <div className="flex flex-1 items-center gap-2 overflow-x-auto no-scrollbar scroll-fade-x py-0.5">
+              <Button
+                variant="outline"
+                size="sm"
+                render={<Link href="/resources?new=true" />}
+                nativeButton={false}
+              >
+                <Plus data-icon="inline-start" />
+                Add resource
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                render={<Link href="/categories?new=category" />}
+                nativeButton={false}
+              >
+                <FolderPlus data-icon="inline-start" />
+                New category
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => { window.location.hash = "#favorites" }}
+              >
+                <Star data-icon="inline-start" />
+                Favorites
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                render={<Link href="/categories" />}
+                nativeButton={false}
+              >
+                <LayoutGrid data-icon="inline-start" />
+                Categories
+              </Button>
+            </div>
           </div>
         </div>
       </CardContent>

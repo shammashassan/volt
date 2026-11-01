@@ -24,19 +24,43 @@ export default function WatchlistLoading() {
         </div>
       </section>
 
-      {/* Filter Toolbar */}
+      {/* Controls Section: Status Tabs & Filter Toolbar */}
       <section className="px-4 lg:px-6">
-        <div className="p-4 border border-border/40 bg-card/30 backdrop-blur-sm rounded-2xl flex flex-col gap-4 lg:flex-row lg:items-center max-w-7xl">
-          {/* Search Input Placeholder */}
-          <Skeleton className="h-10 flex-1 w-full" />
-          {/* Filter buttons/selectors */}
-          <div className="flex flex-wrap gap-3 items-center w-full lg:w-auto">
-            {/* Status Select */}
-            <Skeleton className="h-10 w-[140px]" />
-            {/* Type Select */}
-            <Skeleton className="h-10 w-[140px]" />
-            {/* Rated Toggle */}
-            <Skeleton className="h-10 w-20" />
+        <div className="flex flex-col gap-4 max-w-7xl">
+          {/* Mobile Status Dropdown Skeleton (< md) */}
+          <div className="md:hidden w-full">
+            <Skeleton className="h-9 w-full" />
+          </div>
+
+          {/* Desktop/Tablet Status Tabs Skeleton (>= md) */}
+          <div className="hidden md:block w-full overflow-x-auto no-scrollbar">
+            <div className="inline-flex h-9 items-center gap-1 rounded-lg bg-muted p-1">
+              {/* Active */}
+              <Skeleton className="h-7 w-20" />
+              {/* Watching */}
+              <Skeleton className="h-7 w-24" />
+              {/* Planned */}
+              <Skeleton className="h-7 w-24" />
+              {/* Completed */}
+              <Skeleton className="h-7 w-28" />
+              {/* Dropped */}
+              <Skeleton className="h-7 w-24" />
+              {/* All */}
+              <Skeleton className="h-7 w-16" />
+            </div>
+          </div>
+
+          {/* Search & Sub-filters Toolbar */}
+          <div className="p-3 sm:p-4 border border-border/40 bg-card/30 backdrop-blur-sm rounded-2xl flex flex-col gap-3 sm:flex-row sm:items-center">
+            {/* Search Input Placeholder */}
+            <Skeleton className="h-9 flex-1 w-full" />
+            {/* Filter buttons/selectors */}
+            <div className="flex flex-wrap gap-2.5 items-center w-full sm:w-auto">
+              {/* Type Select */}
+              <Skeleton className="h-9 w-32" />
+              {/* Rated Toggle */}
+              <Skeleton className="h-9 w-20" />
+            </div>
           </div>
         </div>
       </section>

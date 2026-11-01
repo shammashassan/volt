@@ -86,7 +86,7 @@ export function ResourceForm({
   )
   const [projectIds, setProjectIds] = useState<string[]>(initialData?.projectIds || [])
   const [personIds, setPersonIds] = useState<string[]>(initialData?.personIds || [])
-  const [order, setOrder] = useState<number>(initialData?.order ?? 0)
+  const [order, setOrder] = useState<number | string>(initialData?.order ?? 0)
 
   const projectsAnchor = useComboboxAnchor()
   const peopleAnchor = useComboboxAnchor()
@@ -140,7 +140,7 @@ export function ResourceForm({
       favorite,
       projectIds,
       personIds,
-      order,
+      order: typeof order === "number" ? order : (parseInt(order, 10) || 0),
       // old format compatibility
       name,
       link,
@@ -412,7 +412,15 @@ export function ResourceForm({
             id="order"
             type="number"
             value={order}
-            onChange={(e) => setOrder(parseInt(e.target.value) || 0)}
+            onChange={(e) => {
+              const val = e.target.value
+              if (val === "") {
+                setOrder("")
+              } else {
+                const parsed = parseInt(val, 10)
+                setOrder(isNaN(parsed) ? "" : parsed)
+              }
+            }}
             placeholder="0"
             
           />

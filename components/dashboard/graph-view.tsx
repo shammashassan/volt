@@ -17,7 +17,8 @@ import {
   HelpCircle,
   Maximize,
   Minimize,
-  SlidersHorizontal
+  SlidersHorizontal,
+  CheckCheck
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
@@ -38,13 +39,14 @@ import {
   TooltipTrigger
 } from "@/components/ui/tooltip"
 import {
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-  PopoverHeader,
-  PopoverTitle,
-  PopoverDescription
-} from "@/components/ui/popover"
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator
+} from "@/components/ui/dropdown-menu"
 import { cn } from "cn"
 import { GraphData, GraphNode } from "@/lib/actions/graph"
 
@@ -164,6 +166,34 @@ export function GraphView({ data }: { data: GraphData }) {
   const [mounted, setMounted] = useState(false)
   const [isTouchDevice, setIsTouchDevice] = useState(false)
   const [isFullscreen, setIsFullscreen] = useState(false)
+
+  const handleResetSimulation = () => {
+    const state = stateRef.current
+    state.nodes.forEach((n, i) => {
+      const angle = i * 0.5
+      const distance = 40 + i * 15
+      n.x = state.width / 2 + Math.cos(angle) * distance
+      n.y = state.height / 2 + Math.sin(angle) * distance
+      n.vx = 0
+      n.vy = 0
+    })
+    state.alpha = 1.0
+    centerGraph()
+  }
+
+  const handleToggleAll = () => {
+    stateRef.current.alpha = 0.4
+    const allOn = Object.values(filters).some((v) => !v)
+    setFilters({
+      category: allOn,
+      project: allOn,
+      person: allOn,
+      note: allOn,
+      resource: allOn,
+    })
+  }
+
+  const isAllFiltersOn = Object.values(filters).every(Boolean)
 
   const toggleFullscreen = () => {
     const container = containerRef.current
@@ -1031,151 +1061,117 @@ export function GraphView({ data }: { data: GraphData }) {
             </InputGroup>
           </div>
 
-          {/* Toggle Group Filters */}
-          <div className="flex items-center gap-2 self-end md:self-auto flex-wrap">
-            <span className="text-[11px] text-muted-foreground font-medium uppercase tracking-wider hidden sm:inline">
-              Filters:
-            </span>
-            <TooltipProvider delay={150}>
-              <ToggleGroup
-                multiple={true}
-                value={Object.keys(filters).filter((k) => filters[k])}
-                onValueChange={(values) => {
-                  stateRef.current.alpha = 0.4 // Reheat simulation
-                  const nextFilters = {
-                    category: values.includes("category"),
-                    project: values.includes("project"),
-                    person: values.includes("person"),
-                    note: values.includes("note"),
-                    resource: values.includes("resource"),
-                  }
-                  setFilters(nextFilters)
-                }}
-                variant="outline"
-                size="sm"
+          {/* Controls Bar (Row 2 on mobile: Filters on left, Options dropdown on right) */}
+          <div className="flex items-center justify-between w-full md:w-auto md:justify-end gap-2">
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <span className="text-[11px] text-muted-foreground font-medium uppercase tracking-wider hidden sm:inline">
+                Filters:
+              </span>
+              <TooltipProvider delay={150}>
+                <ToggleGroup
+                  multiple={true}
+                  value={Object.keys(filters).filter((k) => filters[k])}
+                  onValueChange={(values) => {
+                    stateRef.current.alpha = 0.4
+                    const nextFilters = {
+                      category: values.includes("category"),
+                      project: values.includes("project"),
+                      person: values.includes("person"),
+                      note: values.includes("note"),
+                      resource: values.includes("resource"),
+                    }
+                    setFilters(nextFilters)
+                  }}
+                  variant="outline"
+                  size="sm"
+                >
+                  {Object.keys(filters).map((type) => {
+                    const Icon = TYPE_ICONS[type as keyof typeof TYPE_ICONS] || FileText
+                    const theme = (mounted && isDark) ? GRAPH_THEME.dark : GRAPH_THEME.light
+                    const typeConfig = theme.nodeTypes[type as keyof typeof theme.nodeTypes] || theme.nodeTypes.note
+                    const color = typeConfig.color
+                    const activeCount = data.nodes.filter((n) => n.type === type).length
+
+                    return (
+                      <Tooltip key={type}>
+                        <TooltipTrigger
+                          render={
+                            <ToggleGroupItem
+                              value={type}
+                            />
+                          }
+                        >
+                          <Icon className="size-3.5" style={{ color: color }} />
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom">
+                          {typeConfig.label} ({activeCount} nodes)
+                        </TooltipContent>
+                      </Tooltip>
+                    )
+                  })}
+                </ToggleGroup>
+              </TooltipProvider>
+
+              {/* Toggle All visible on sm+ screens */}
+              <Button
+                variant="ghost"
+                size="xs"
+                className="hidden sm:inline-flex"
+                onClick={handleToggleAll}
               >
-                {Object.keys(filters).map((type) => {
-                  const Icon = TYPE_ICONS[type as keyof typeof TYPE_ICONS] || FileText
-                  const theme = (mounted && isDark) ? GRAPH_THEME.dark : GRAPH_THEME.light
-                  const typeConfig = theme.nodeTypes[type as keyof typeof theme.nodeTypes] || theme.nodeTypes.note
-                  const color = typeConfig.color
-                  const isSelected = filters[type]
-                  const activeCount = data.nodes.filter((n) => n.type === type).length
+                Toggle All
+              </Button>
+            </div>
 
-                  return (
-                    <Tooltip key={type}>
-                      <TooltipTrigger
-                        render={
-                          <ToggleGroupItem
-                            value={type}
-
-                          />
-                        }
-                      >
-                        <Icon className="size-3.5" style={{ color: color }} />
-                      </TooltipTrigger>
-                      <TooltipContent side="bottom">
-                        {typeConfig.label} ({activeCount} nodes)
-                      </TooltipContent>
-                    </Tooltip>
-                  )
-                })}
-              </ToggleGroup>
-            </TooltipProvider>
-
-            <Button
-              variant="ghost"
-              size="xs"
-
-              onClick={() => {
-                stateRef.current.alpha = 0.4 // Reheat simulation
-                const allOn = Object.values(filters).some((v) => !v)
-                setFilters({
-                  category: allOn,
-                  project: allOn,
-                  person: allOn,
-                  note: allOn,
-                  resource: allOn,
-                })
-              }}
-            >
-              Toggle All
-            </Button>
-
-            {/* View Settings Popover */}
-            <Popover>
-              <PopoverTrigger
+            {/* View Settings Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger
                 render={
                   <Button
                     variant="outline"
                     size="xs"
-
                   />
                 }
               >
                 <SlidersHorizontal className="size-3.5" />
                 <span className="hidden sm:inline">Options</span>
-              </PopoverTrigger>
-              <PopoverContent align="end" className="w-56 z-50">
-                <PopoverHeader>
-                  <PopoverTitle>Canvas Settings</PopoverTitle>
-                  <PopoverDescription>Adjust display modes</PopoverDescription>
-                </PopoverHeader>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-52 z-50">
+                <DropdownMenuGroup className="sm:hidden">
+                  <DropdownMenuLabel>Filters</DropdownMenuLabel>
+                  <DropdownMenuItem onClick={handleToggleAll}>
+                    <CheckCheck className="size-3.5" />
+                    <span>{isAllFiltersOn ? "Deselect All Filters" : "Select All Filters"}</span>
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
+                <DropdownMenuSeparator className="sm:hidden" />
 
-                <div className="flex flex-col gap-1 mt-1">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="justify-start"
-                    onClick={toggleFullscreen}
-                  >
+                <DropdownMenuGroup>
+                  <DropdownMenuLabel>Canvas Settings</DropdownMenuLabel>
+                  <DropdownMenuItem onClick={toggleFullscreen}>
                     {isFullscreen ? (
                       <>
-                        <Minimize className="size-3.5 text-muted-foreground" />
+                        <Minimize className="size-3.5" />
                         <span>Exit Fullscreen</span>
                       </>
                     ) : (
                       <>
-                        <Maximize className="size-3.5 text-muted-foreground" />
+                        <Maximize className="size-3.5" />
                         <span>Enter Fullscreen</span>
                       </>
                     )}
-                  </Button>
-
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="justify-start"
-                    onClick={centerGraph}
-                  >
-                    <Maximize2 className="size-3.5 text-muted-foreground" />
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={centerGraph}>
+                    <Maximize2 className="size-3.5" />
                     <span>Recenter View</span>
-                  </Button>
-
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="justify-start"
-                    onClick={() => {
-                      const state = stateRef.current
-                      state.nodes.forEach((n, i) => {
-                        const angle = i * 0.5
-                        const distance = 40 + i * 15
-                        n.x = state.width / 2 + Math.cos(angle) * distance
-                        n.y = state.height / 2 + Math.sin(angle) * distance
-                        n.vx = 0
-                        n.vy = 0
-                      })
-                      state.alpha = 1.0 // Reheat
-                      centerGraph()
-                    }}
-                  >
-                    <RefreshCw className="size-3.5 text-muted-foreground" />
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleResetSimulation}>
+                    <RefreshCw className="size-3.5" />
                     <span>Reset Simulation</span>
-                  </Button>
-                </div>
-              </PopoverContent>
-            </Popover>
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </div>

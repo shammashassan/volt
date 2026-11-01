@@ -1,5 +1,4 @@
 import { Skeleton } from "@/components/ui/skeleton"
-import { Network } from "lucide-react"
 
 export default function GraphLoading() {
   return (
@@ -9,9 +8,7 @@ export default function GraphLoading() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between max-w-7xl">
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-4">
-              <div className="flex size-12 items-center justify-center rounded-xl bg-primary/10 text-primary shrink-0">
-                <Network className="size-6 animate-pulse" />
-              </div>
+              <Skeleton className="size-12 shrink-0" />
               <div className="flex items-center gap-2">
                 <Skeleton className="h-9 w-52 md:h-10" />
               </div>

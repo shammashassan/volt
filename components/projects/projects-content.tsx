@@ -295,7 +295,8 @@ export function ProjectsContent({ initialProjects }: ProjectsContentProps) {
                 return (
                   <Card
                     key={id}
-                    size="sm" className="group flex flex-col justify-between"
+                    size="sm"
+                    className="group flex flex-col justify-between cursor-pointer"
                     onClick={() => router.push(`/projects/${id}`)}
                   >
                     <CardHeader>
@@ -309,7 +310,7 @@ export function ProjectsContent({ initialProjects }: ProjectsContentProps) {
                       </div>
                       {project.description && (
                         <CardDescription className="mt-1.5">
-                          {project.description}
+                          <p className="line-clamp-3">{project.description}</p>
                         </CardDescription>
                       )}
                       {project.url && (
@@ -325,24 +326,26 @@ export function ProjectsContent({ initialProjects }: ProjectsContentProps) {
                         </a>
                       )}
                     </CardHeader>
-                    <CardFooter className="flex justify-between items-center">
+                    <CardFooter className="flex justify-between items-center cursor-default" onClick={(e) => e.stopPropagation()}>
                       <span className="text-muted-foreground/60">
                         Added {new Date(project.createdAt).toLocaleDateString()}
                       </span>
                       <div className="flex items-center gap-1.5">
                         <Button variant="ghost" size="icon-sm"
                           onClick={(e) => handleOpenEdit(project, e)}
+                          className="cursor-pointer"
                           title="Edit Project"
                         >
                           <Edit3 className="size-3.5" />
                         </Button>
                         <Button variant="ghost" size="icon-sm"
                           onClick={(e) => handleOpenDelete(id, e)}
+                          className="cursor-pointer"
                           title="Delete Project"
                         >
                           <Trash2 className="size-3.5" />
                         </Button>
-                        <ArrowRight className="size-4 text-muted-foreground/40 group-hover:text-primary transition-colors ml-1" />
+                        <ArrowRight className="size-4 text-muted-foreground/40 group-hover:text-primary transition-colors ml-1 cursor-pointer" onClick={() => router.push(`/projects/${id}`)} />
                       </div>
                     </CardFooter>
                   </Card>
